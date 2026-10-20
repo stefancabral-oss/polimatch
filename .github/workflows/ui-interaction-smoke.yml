@@ -76,6 +76,11 @@ jobs:
           POLIMATCH_E2E_GOOGLE: '1'
         run: node app/e2e/interaction-smoke.mjs
 
+      - name: Validate ordered two-card selection and recovery
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+        run: node app/e2e/ordered-choices.mjs
+
       - name: Validate deterministic daily session
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}

@@ -1,3 +1,4 @@
+import { orderedChoiceComparisons, ORDERED_PAIR_POINTS, ORDERED_CHOICE_RULESET } from "../../shared/ordered-choice.js";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import pg from "pg";
 import { isRoundZebra } from "../../shared/player-feedback.js";
@@ -320,7 +321,7 @@ export function rankingEventFromSnapshots(beforeRanking, afterRanking, winnerId,
   return "confirm";
 }
 
-export function roundFeedbackFromSnapshots(beforeRanking, afterRanking, candidateIds, winnerId, rankingEvent, { zebra = false } = {}) {
+export function roundFeedbackFromSnapshots(beforeRanking, afterRanking, candidateIds, winnerId, rankingEvent, { zebra = false, selectionIds = null } = {}) {
   const before = new Map(beforeRanking.map((candidate) => [candidate.id, candidate]));
   const after = new Map(afterRanking.map((candidate) => [candidate.id, candidate]));
   const outcomes = candidateIds.map((id) => {
@@ -332,7 +333,8 @@ export function roundFeedbackFromSnapshots(beforeRanking, afterRanking, candidat
     const tierChange = tier.level > previousTier.level ? "up" : tier.level < previousTier.level ? "down" : null;
     return {
       id,
-      result: id === winnerId ? "winner" : "loser",
+      result: (selectionIds || [winnerId]).includes(id) ? "winner" : "loser",
+      ...(selectionIds ? { selectionOrder: selectionIds.includes(id) ? selectionIds.indexOf(id) + 1 : null } : {}),
       delta: current.elo - previous.elo,
       elo: current.elo,
       previousRank: Number.isInteger(previous.rank) ? previous.rank : null,
@@ -378,13 +380,14 @@ export function feedbackChannelsFromSnapshots({
   winnerId,
   personalZebra = false,
   globalZebra = false,
+  selectionIds = null,
 }) {
   const rankingEvent = rankingEventFromSnapshots(personalBefore, personalAfter, winnerId, { zebra: personalZebra });
-  const personalFeedback = roundFeedbackFromSnapshots(personalBefore, personalAfter, candidateIds, winnerId, rankingEvent, { zebra: personalZebra });
+  const personalFeedback = roundFeedbackFromSnapshots(personalBefore, personalAfter, candidateIds, winnerId, rankingEvent, { zebra: personalZebra, selectionIds });
   const globalRankingEvent = rankingEventFromSnapshots(globalBefore, globalAfter, winnerId, { zebra: globalZebra });
-  const globalFeedback = roundFeedbackFromSnapshots(globalBefore, globalAfter, candidateIds, winnerId, globalRankingEvent, { zebra: globalZebra });
-  const winnerDelta = Number(personalFeedback.outcomes.find(({ result }) => result === "winner")?.delta) || 0;
-  const globalWinnerDelta = Number(globalFeedback.outcomes.find(({ result }) => result === "winner")?.delta) || 0;
+  const globalFeedback = roundFeedbackFromSnapshots(globalBefore, globalAfter, candidateIds, winnerId, globalRankingEvent, { zebra: globalZebra, selectionIds });
+  const winnerDelta = Number(personalFeedback.outcomes.find(({ id }) => id === winnerId)?.delta) || 0;
+  const globalWinnerDelta = Number(globalFeedback.outcomes.find(({ id }) => id === winnerId)?.delta) || 0;
   return {
     rankingEvent,
     personalFeedback,
@@ -415,7 +418,8 @@ export function persistedRoundChannels(row) {
   // Ele pode ser reapresentado como público, mas nunca renomeado como pessoal.
   const effectiveGlobalFeedback = globalFeedback
     || (feedbackScope === FEEDBACK_SCOPE_LEGACY_GLOBAL ? feedback : null);
-  const globalWinnerDelta = effectiveGlobalFeedback?.outcomes.find(({ result }) => result === "winner")?.delta;
+  const globalWinnerDelta = (effectiveGlobalFeedback?.outcomes.find(({ id }) => id === row.winner_id)
+    || effectiveGlobalFeedback?.outcomes.find(({ result }) => result === "winner"))?.delta;
   const globalEvent = globalEventFromFeedback({
     rankingEvent: row.global_ranking_event
       || (feedbackScope === FEEDBACK_SCOPE_LEGACY_GLOBAL ? row.ranking_event : null)
@@ -434,7 +438,7 @@ export function persistedRoundChannels(row) {
   };
 }
 
-async function createCleanSchema(client, candidateRegistry) {
+async function createCleanSchema(client, candidateRegistry, maintenanceNow) {
   await client.query(`
     CREATE TABLE IF NOT EXISTS schema_migrations (
       id text PRIMARY KEY,
@@ -583,6 +587,17 @@ async function createCleanSchema(client, candidateRegistry) {
       global_feedback jsonb,
       created_at timestamptz NOT NULL DEFAULT now(),
       CHECK (cardinality(candidate_ids) IN (2, 4))
+    );
+
+    ALTER TABLE choice_rounds ADD COLUMN IF NOT EXISTS selection_ids text[];
+    ALTER TABLE choice_rounds DROP CONSTRAINT IF EXISTS choice_rounds_selection_check;
+    ALTER TABLE choice_rounds ADD CONSTRAINT choice_rounds_selection_check CHECK (
+      selection_ids IS NULL OR (
+        cardinality(candidate_ids)=4 AND cardinality(selection_ids)=2
+        AND selection_ids[1] IS NOT NULL AND selection_ids[2] IS NOT NULL
+        AND selection_ids[1] <> selection_ids[2]
+        AND selection_ids <@ candidate_ids AND selection_ids[1]=winner_id
+      )
     );
 
     ALTER TABLE choice_rounds
@@ -922,7 +937,8 @@ async function createCleanSchema(client, candidateRegistry) {
   if (!applied.rowCount) {
     await client.query("INSERT INTO schema_migrations (id) VALUES ($1)", [RESET_MIGRATION_ID]);
   }
-  await client.query("DELETE FROM abuse_quota_counters WHERE window_start < now() - interval '8 days'");
+  // Retention must use the same clock as vote admission and editorial windows.
+  await client.query("DELETE FROM abuse_quota_counters WHERE window_start < $1::timestamptz - interval '8 days'", [maintenanceNow.toISOString()]);
   return { resetApplied: !applied.rowCount, migrationId: RESET_MIGRATION_ID };
 }
 
@@ -1508,10 +1524,10 @@ async function ensureDailyPlayerSession(client, materialized, playerId) {
 async function selectDailyPlayerSession(client, materialized, playerId) {
   const { edition, rounds } = materialized;
   const answersResult = await client.query(
-    `SELECT slot, answer_id, winner_id, answered_at
-     FROM daily_answers
-     WHERE edition_id = $1 AND player_id = $2
-     ORDER BY slot`,
+    `SELECT a.slot, a.answer_id, a.winner_id, a.answered_at, r.selection_ids
+     FROM daily_answers a JOIN choice_rounds r ON r.round_id=a.answer_id
+     WHERE a.edition_id = $1 AND a.player_id = $2
+     ORDER BY a.slot`,
     [edition.id, playerId],
   );
   const predictionsResult = await client.query(
@@ -1529,6 +1545,7 @@ async function selectDailyPlayerSession(client, materialized, playerId) {
     slot: Number(row.slot),
     answerId: row.answer_id,
     winnerId: row.winner_id,
+    ...(row.selection_ids ? { selectionIds: row.selection_ids } : {}),
     answeredAt: new Date(row.answered_at).toISOString(),
   }));
   const completed = completionResult.rowCount === 1;
@@ -1592,6 +1609,7 @@ async function selectDailyPlayerSession(client, materialized, playerId) {
 async function applyFourCardRound(client, {
   topic,
   winnerId,
+  selectionIds,
   roundCandidates,
   roundId,
   player,
@@ -1604,12 +1622,19 @@ async function applyFourCardRound(client, {
   feedbackCatalog = publicCatalog,
   lockRound = true,
 }) {
+  const ordered = selectionIds !== undefined;
+  let comparisonPairs;
+  try {
+    comparisonPairs = ordered ? orderedChoiceComparisons(roundCandidates, selectionIds, winnerId)
+      : roundCandidates.filter(id => id !== winnerId).map(loserId => ({ winnerId, loserId }));
+  } catch (error) { throw contractError(error.message, 400, "ORDERED_CHOICE_INVALID"); }
+  const selectionFields = ordered ? { selectionIds: [...selectionIds], scoringRuleset: ORDERED_CHOICE_RULESET } : {};
   const sortedCandidates = [...roundCandidates].sort();
   const persistedCandidates = persistedRoundCandidates(roundCandidates, choiceMode);
   const loserIds = roundCandidates.filter((candidateId) => candidateId !== winnerId);
   if (lockRound) await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [roundId]);
   const previous = await client.query(
-    `SELECT topic_id, winner_id, candidate_ids, player_id, winner_delta, zebra,
+    `SELECT topic_id, winner_id, selection_ids, candidate_ids, player_id, winner_delta, zebra,
             ranking_event, feedback, feedback_scope, global_ranking_event, global_feedback,
             choice_mode, daily_edition_id, daily_slot
      FROM choice_rounds WHERE round_id = $1`,
@@ -1621,7 +1646,8 @@ async function applyFourCardRound(client, {
     const sameContext = row.choice_mode === choiceMode
       && (row.daily_edition_id || null) === dailyEditionId
       && (row.daily_slot === null ? null : Number(row.daily_slot)) === dailySlot;
-    if (row.topic_id !== topic || row.winner_id !== winnerId || !sameCandidates
+    if (JSON.stringify(row.selection_ids || null) !== JSON.stringify(ordered ? selectionIds : null)
+      || row.topic_id !== topic || row.winner_id !== winnerId || !sameCandidates
       || (row.player_id || null) !== player.id || !sameContext) {
       throw contractError("roundId já utilizado com outra escolha", 409, "ROUND_REPLAY_DIVERGENT");
     }
@@ -1636,7 +1662,8 @@ async function applyFourCardRound(client, {
       winnerDelta: Number(row.winner_delta),
       zebra: Boolean(row.zebra),
       ...channels,
-      comparisons: loserIds.length,
+      ...selectionFields,
+      comparisons: comparisonPairs.length,
     };
     return { payload: { ...global, round, vote: round, player: personal }, created: false };
   }
@@ -1653,16 +1680,14 @@ async function applyFourCardRound(client, {
 
   let zebra = isRoundZebra(globalRatings.get(winnerId), loserIds.map(id => globalRatings.get(id)));
   const comparisons = [];
-  const winnerRatingBeforeRound = globalRatings.get(winnerId);
-  for (const loserId of loserIds) {
-    const winnerRating = winnerRatingBeforeRound;
-    const loserRating = globalRatings.get(loserId);
-    const deltas = ratingDeltas(winnerRating, loserRating);
+  for (const pair of comparisonPairs) {
+    const winnerRating = globalRatings.get(pair.winnerId);
+    const loserRating = globalRatings.get(pair.loserId);
+    const deltas = ordered ? { winnerDelta: ORDERED_PAIR_POINTS, loserDelta: -ORDERED_PAIR_POINTS } : ratingDeltas(winnerRating, loserRating);
     const pairZebra = isZebra(winnerRating, loserRating);
-    // Pair flags remain audit data; the round event uses the strongest opponent.
-    comparisons.push({ loserId, winnerRating, loserRating, ...deltas, zebra: pairZebra });
-    await client.query("UPDATE ranking_stats SET rating = rating + $3, wins = wins + 1, zebras = zebras + $4 WHERE topic_id = $1 AND candidate_id = $2", [topic, winnerId, deltas.winnerDelta, pairZebra ? 1 : 0]);
-    await client.query("UPDATE ranking_stats SET rating = rating + $3, losses = losses + 1 WHERE topic_id = $1 AND candidate_id = $2", [topic, loserId, deltas.loserDelta]);
+    comparisons.push({ ...pair, winnerRating, loserRating, ...deltas, zebra: pairZebra });
+    await client.query("UPDATE ranking_stats SET rating = rating + $3, wins = wins + 1, zebras = zebras + $4 WHERE topic_id = $1 AND candidate_id = $2", [topic, pair.winnerId, deltas.winnerDelta, pairZebra ? 1 : 0]);
+    await client.query("UPDATE ranking_stats SET rating = rating + $3, losses = losses + 1 WHERE topic_id = $1 AND candidate_id = $2", [topic, pair.loserId, deltas.loserDelta]);
   }
   await client.query("UPDATE ranking_pools SET duels = duels + 1 WHERE topic_id = $1", [topic]);
 
@@ -1677,20 +1702,17 @@ async function applyFourCardRound(client, {
   const personalRatings = new Map(personalRows.rows.map((row) => [row.candidate_id, Number(row.rating)]));
   if (roundCandidates.some((candidateId) => !Number.isFinite(personalRatings.get(candidateId)))) throw new Error("ranking pessoal não inicializado");
   let personalZebra = isRoundZebra(personalRatings.get(winnerId), loserIds.map(id => personalRatings.get(id)));
-  const personalWinnerRatingBeforeRound = personalRatings.get(winnerId);
-  for (const loserId of loserIds) {
-    const personalWinnerRating = personalWinnerRatingBeforeRound;
-    const personalLoserRating = personalRatings.get(loserId);
-    const personalDelta = ratingDeltas(personalWinnerRating, personalLoserRating);
-    // Personal upset is also evaluated against the entire table.
-    await client.query("UPDATE player_stats SET rating = rating + $4, wins = wins + 1 WHERE player_id = $1 AND topic_id = $2 AND candidate_id = $3", [player.id, topic, winnerId, personalDelta.winnerDelta]);
-    await client.query("UPDATE player_stats SET rating = rating + $4, losses = losses + 1 WHERE player_id = $1 AND topic_id = $2 AND candidate_id = $3", [player.id, topic, loserId, personalDelta.loserDelta]);
+  for (const pair of comparisonPairs) {
+    const personalDelta = ordered ? { winnerDelta: ORDERED_PAIR_POINTS, loserDelta: -ORDERED_PAIR_POINTS }
+      : ratingDeltas(personalRatings.get(pair.winnerId), personalRatings.get(pair.loserId));
+    await client.query("UPDATE player_stats SET rating = rating + $4, wins = wins + 1 WHERE player_id = $1 AND topic_id = $2 AND candidate_id = $3", [player.id, topic, pair.winnerId, personalDelta.winnerDelta]);
+    await client.query("UPDATE player_stats SET rating = rating + $4, losses = losses + 1 WHERE player_id = $1 AND topic_id = $2 AND candidate_id = $3", [player.id, topic, pair.loserId, personalDelta.loserDelta]);
   }
   await client.query("UPDATE player_pools SET version = version + 1, duels = duels + 1 WHERE player_id = $1 AND topic_id = $2", [player.id, topic]);
   await client.query("UPDATE anonymous_players SET last_seen_at = now() WHERE id = $1", [player.id]);
 
   const globalAfterFeedback = await selectRanking(client, topic, { catalog: feedbackCatalog });
-  const pendingComparisons = loserIds.map((loserId) => ({ winnerId, loserId }));
+  const pendingComparisons = comparisonPairs;
   const personalAfterFeedback = await selectRanking(client, topic, {
     playerId: player.id,
     pendingComparisons,
@@ -1705,6 +1727,7 @@ async function applyFourCardRound(client, {
     winnerId,
     personalZebra,
     globalZebra: zebra,
+    selectionIds: ordered ? selectionIds : null,
   });
   const {
     rankingEvent,
@@ -1716,10 +1739,10 @@ async function applyFourCardRound(client, {
   } = channels;
   await client.query(
     `INSERT INTO choice_rounds (
-       round_id, player_id, topic_id, winner_id, candidate_ids, winner_delta, zebra,
+       round_id, player_id, topic_id, winner_id, candidate_ids, winner_delta, zebra, selection_ids,
        ranking_event, feedback, feedback_scope, global_ranking_event, global_feedback,
        choice_mode, daily_edition_id, daily_slot
-     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12::jsonb, $13, $14, $15)`,
+     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $16, $8, $9::jsonb, $10, $11, $12::jsonb, $13, $14, $15)`,
     [
       roundId,
       player.id,
@@ -1736,13 +1759,14 @@ async function applyFourCardRound(client, {
       choiceMode,
       dailyEditionId,
       dailySlot,
+      ordered ? selectionIds : null,
     ],
   );
   for (const comparison of comparisons) {
     await client.query(
       `INSERT INTO votes (vote_id, round_id, player_id, topic_id, winner_id, loser_id, winner_rating_before, loser_rating_before, winner_delta, loser_delta, zebra)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-      [randomUUID(), roundId, player.id, topic, winnerId, comparison.loserId, comparison.winnerRating, comparison.loserRating, comparison.winnerDelta, comparison.loserDelta, comparison.zebra],
+      [randomUUID(), roundId, player.id, topic, comparison.winnerId, comparison.loserId, comparison.winnerRating, comparison.loserRating, comparison.winnerDelta, comparison.loserDelta, comparison.zebra],
     );
   }
   const global = feedbackCatalog === publicCatalog
@@ -1763,7 +1787,8 @@ async function applyFourCardRound(client, {
     personalFeedback: feedback,
     feedbackScope: FEEDBACK_SCOPE_PERSONAL,
     globalEvent,
-    comparisons: loserIds.length,
+    ...selectionFields,
+    comparisons: comparisonPairs.length,
   };
   return { payload: { ...global, round, vote: round, player: personal }, created: true };
 }
@@ -1790,7 +1815,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
       const client = await pool.connect();
       try {
         await client.query("BEGIN");
-        const migration = await createCleanSchema(client, candidateRegistry);
+        const migration = await createCleanSchema(client, candidateRegistry, clockInstant(clock));
         await installGameSchema(client);
         await client.query("COMMIT");
         return migration;
@@ -1963,6 +1988,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
       editionId,
       slot: requestedSlot,
       winnerId,
+      selectionIds,
       answerId: requestedAnswerId,
       recoveryKey,
       playerVersion,
@@ -2014,6 +2040,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
           const result = await applyFourCardRound(client, {
             topic,
             winnerId,
+            selectionIds,
             roundCandidates: replayRound.candidateIds,
             roundId: answerId,
             player,
@@ -2112,6 +2139,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
         const result = await applyFourCardRound(client, {
           topic,
           winnerId,
+          selectionIds,
           roundCandidates: authoritativeRound.candidateIds,
           roundId: answerId,
           player,
@@ -2684,7 +2712,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
       }
     },
 
-    async roundVote({ topicId, winnerId, candidateIds, roundId: requestedRoundId, recoveryKey, playerVersion, now }) {
+    async roundVote({ topicId, winnerId, selectionIds, candidateIds, roundId: requestedRoundId, recoveryKey, playerVersion, now }) {
       const validated = validateRoundVote(topicId, winnerId, candidateIds, candidateRegistry);
       const topic = validated.topic;
       const roundCandidates = validated.candidateIds;
@@ -2700,6 +2728,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
         const result = await applyFourCardRound(client, {
           topic,
           winnerId,
+          selectionIds,
           roundCandidates,
           roundId,
           player,

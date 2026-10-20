@@ -1,3 +1,4 @@
+import { selectOrderedCard } from "./ordered-selection.js";
 import "./styles.css";
 import { gameRequest, loadGameCapabilities } from "./api.js";
 import { sessionMirror } from "../../shared/session-mirror.js";
@@ -95,6 +96,7 @@ const state = {
   identityEpoch: 0,
   roundOutcome: null,
   selectedId: "",
+  selectionIds: [],
   showCoach: false,
   busy: false,
   ready: false,
@@ -177,6 +179,7 @@ function installDailySession(session, { createAnswerId = true } = {}) {
   const previousPendingKey = state.dailySession?.pendingPrediction
     ? `${state.dailySession.edition.id}:${state.dailySession.pendingPrediction.slot}`
     : "";
+  state.selectionIds = [];
   state.dailySession = validateDailySession(session);
   state.dailyCandidates = state.dailySession.catalog;
   state.dailyLoading = false;
@@ -300,6 +303,8 @@ function headerMarkup() {
 }
 
 function candidateSlotModel(candidate, { actionMode = "vote" } = {}) {
+  const ordered = actionMode === "vote" && state.round.length === 4 && state.gameFeatures.orderedChoices === true;
+  const selectionOrder = ordered ? state.selectionIds.indexOf(candidate.id) + 1 : 0;
   const prediction = actionMode === "prediction";
   const outcome = prediction ? null : state.roundOutcome?.outcomes.find(({ id }) => id === candidate.id);
   const delta = Number(outcome?.delta);
@@ -311,7 +316,8 @@ function candidateSlotModel(candidate, { actionMode = "vote" } = {}) {
     actionMode,
     accessibleName: prediction
       ? `${candidate.name}, carta básica. ${PREDICTION_REVEAL_COPY.cardAria}`
-      : `Escolher ${candidate.name}`,
+      : ordered ? selectionOrder ? `${candidate.name}, ${selectionOrder}ª escolha. Toque para desmarcar.` : `Escolher ${candidate.name} em ${state.selectionIds.length + 1}º lugar` : `Escolher ${candidate.name}`,
+    selected: ordered ? selectionOrder > 0 : undefined,
     profileAccessibleName: `Conhecer ${candidate.name}`,
     initials: initials(candidate.name),
     photo: candidateCardArt(candidate),
@@ -325,14 +331,14 @@ function candidateSlotModel(candidate, { actionMode = "vote" } = {}) {
     locked,
     busy: prediction ? state.predictionBusy : state.busy,
     classes: [
-      state.selectedId === candidate.id ? "is-selected" : "",
+      (selectionOrder || state.selectedId === candidate.id) ? "is-selected" : "",
       outcome ? `is-round-${outcome.winner ? "winner" : "loser"}` : "",
     ].filter(Boolean),
     outcome: outcome ? {
       tone: outcome.tone,
-      value: outcome.winner ? "Escolhida" : "Não escolhida",
-      message: outcome.winner ? "Confirmada" : "Sem descarte",
-    } : null,
+      value: ordered && outcome.selectionOrder ? `${outcome.selectionOrder}ª escolha` : outcome.winner ? "Escolhida" : "Não escolhida",
+      message: ordered ? `${delta > 0 ? "+" : ""}${delta} pontos` : outcome.winner ? "Confirmada" : "",
+    } : selectionOrder ? { tone: "gain", value: `${selectionOrder}ª escolha`, message: "Toque em outra carta" } : null,
   };
 }
 
@@ -420,7 +426,7 @@ function topicsContent() {
       <div><p class="eyebrow">Como funciona</p><h2 id="home-how-title">Rápido de jogar. Fácil de entender.</h2></div>
       <ol>
         <li><span>01</span><strong>Jogue as mesmas dez</strong><small>O baralho do dia é igual para todos.</small></li>
-        <li><span>02</span><strong>Escolha sua preferida</strong><small>Um toque confirma a sua decisão.</small></li>
+        <li><span>02</span><strong data-home-selection-title>Escolha sua preferida</strong><small data-home-selection-description>Um toque confirma a sua decisão.</small></li>
         <li><span>03</span><strong>Feche 10/10</strong><small>Receba o comprovante das suas dez preferências.</small></li>
       </ol>
     </section>
@@ -438,7 +444,8 @@ function dailyClosingScreen() {
   const byId = new Map(state.dailyCandidates.map((candidate) => [candidate.id, candidate]));
   const choices = session.answers.map((answer) => {
     const candidate = byId.get(answer.winnerId);
-    return `<li><span>${String(answer.slot).padStart(2, "0")}</span><strong>${escapeHtml(candidate?.displayName || shortName(candidate?.name || answer.winnerId))}</strong></li>`;
+    const second = answer.selectionIds?.[1] && byId.get(answer.selectionIds[1]);
+    return `<li><span>${String(answer.slot).padStart(2, "0")}</span><strong>${second ? "1ª " : ""}${escapeHtml(candidate?.displayName || shortName(candidate?.name || answer.winnerId))}${second ? ` · 2ª ${escapeHtml(second.displayName || shortName(second.name))}` : ""}</strong></li>`;
   }).join("");
   const predictionReveal = aggregateAvailable("prediction-reveal");
   const cutCopy = predictionReveal
@@ -451,7 +458,7 @@ function dailyClosingScreen() {
       count: session.predictionProgress.predicted,
       noun: session.predictionProgress.predicted === 1 ? PREDICTION_REVEAL_COPY.predictionNounOne : PREDICTION_REVEAL_COPY.predictionNounMany,
     })
-    : "Suas dez preferências ficaram registradas.";
+    : session.answers.some(answer => answer.selectionIds) ? "Suas dez rodadas ficaram registradas." : "Suas dez preferências ficaram registradas.";
   return `<section class="daily-close-screen">
     <section class="daily-close-hero">
       <p class="eyebrow">Rodada do dia · 10/10</p>
@@ -464,7 +471,7 @@ function dailyClosingScreen() {
     ${mirrorMarkup}
     ${state.gameFeatures.mirror && aggregateAvailable("mirror-comparison") ? mirrorComparisonContent() : ""}
     <section class="daily-receipt" aria-labelledby="daily-receipt-title">
-      <div><p class="eyebrow">Seu comprovante</p><h2 id="daily-receipt-title">As dez escolhidas</h2></div>
+      <div><p class="eyebrow">Seu comprovante</p><h2 id="daily-receipt-title">${session.answers.some(answer => answer.selectionIds) ? "Suas escolhas por rodada" : "As dez escolhidas"}</h2></div>
       <ol>${choices}</ol>
     </section>
     <div class="daily-close-actions">
@@ -818,6 +825,8 @@ function renderTopics() {
     : dailyComplete ? "Ver fechamento de hoje" : dailyAnswered ? `Continuar · ${dailyAnswered}/${dailyTotal}` : "Jogar rodada do dia";
   refs.panels.topics.querySelector("[data-home-start-label]").textContent = dailyAction;
   refs.panels.topics.querySelector("#start-election-secondary span").textContent = dailyAction;
+  refs.panels.topics.querySelector("[data-home-selection-title]").textContent = state.gameFeatures.orderedChoices ? "Escolha duas, em ordem" : "Escolha sua preferida";
+  refs.panels.topics.querySelector("[data-home-selection-description]").textContent = state.gameFeatures.orderedChoices ? "A primeira vale mais. O segundo toque confirma a rodada." : "Um toque confirma a sua decisão.";
   refs.panels.topics.querySelector("[data-daily-progress]").textContent = `${dailyAnswered}/${dailyTotal}`;
   const publicRanking = aggregateAvailable("global-ranking");
   const prediction = aggregateAvailable("prediction-reveal");
@@ -863,13 +872,14 @@ function renderDuel() {
   const predictionPresentation = prediction ? dailyPredictionExtras() : null;
   refs.duelArena.classList.toggle("arena-pair", pair);
   refs.duelEyebrow.textContent = predictionPresentation?.eyebrow || (pair ? state.gameMode === "warmup" ? "Duelo rápido" : "Desempate do seu Top 5" : daily ? "Rodada do dia" : "Modo livre");
-  refs.duelHeading.textContent = predictionPresentation?.heading || "Quem você prefere?";
+  const ordered = !prediction && !pair && state.gameFeatures.orderedChoices === true;
+  refs.duelHeading.textContent = predictionPresentation?.heading || (ordered ? "Escolha duas cartas" : "Quem você prefere?");
   refs.progress.textContent = predictionPresentation?.progress || (daily
     ? `${state.dailySession.progress.answered + 1}/${state.dailySession.progress.total}`
     : pair ? `${state.gameMode === "tiebreak" ? "Até " : ""}${state.pairRemaining} confrontos para concluir` : `${state.personalDuels} ${state.personalDuels === 1 ? "escolha" : "escolhas"}`);
   refs.instruction.textContent = predictionPresentation?.instruction
     || state.result
-    || "Escolha uma pessoa ou use Conhecer perfil antes de decidir.";
+    || (ordered ? state.selectionIds.length ? "1/2 · Agora escolha a segunda. Toque na primeira para desmarcar." : "0/2 · Escolha a primeira, depois a segunda. A primeira vale mais pontos." : "Escolha uma pessoa ou use Conhecer perfil antes de decidir.");
   refs.instruction.classList.toggle("is-result", !prediction && Boolean(state.result));
   refs.instruction.classList.toggle("is-error", predictionPresentation?.error || state.resultTone === "erro");
   refs.instruction.hidden = !prediction && Boolean(state.personalFeedbackMessage);
@@ -978,7 +988,7 @@ function renderCoach() {
   const finalInstruction = state.gameMode === "daily"
     ? "Esta combinação é fixa e igual para todos: não há troca no modo diário."
     : "Se nenhuma fizer sentido, troque as quatro.";
-  refs.coachDescription.textContent = `Cada carta tem dois controles: escolha uma pessoa quando decidir ou abra Conhecer perfil antes de votar. ${finalInstruction}`;
+  refs.coachDescription.textContent = state.gameFeatures.orderedChoices ? "Escolha duas cartas em ordem. A primeira recebe +24 pontos e a segunda +8. As duas restantes perdem 16 pontos cada. Toque novamente na primeira para desmarcar antes de escolher a segunda." : `Cada carta tem dois controles: escolha uma pessoa quando decidir ou abra Conhecer perfil antes de votar. ${finalInstruction}`;
   if (refs.coachDialog.open) return;
   queueMicrotask(() => {
     if (!state.showCoach || refs.coachDialog.open) return;
@@ -1035,6 +1045,7 @@ function showProfile(id, trigger = document.activeElement) {
 
 function chooseNextRound() {
   if (state.gameMode !== "free") throw new Error("rodada diária só avança pela resposta autoritativa do servidor");
+  state.selectionIds = [];
   state.previousRound = state.round.map(({ id }) => id);
   const next = nextBalancedGroup(state.candidates, state.matchQueue, state.previousRound);
   state.round = next.group;
@@ -1097,12 +1108,28 @@ async function enterDuel(mode = state.gameMode) {
 
 async function vote(winnerId, { retry = false } = {}) {
   if (state.busy || (state.pendingWinnerId && !retry)) return;
+  const ordered = state.round.length === 4 && state.gameFeatures.orderedChoices === true;
+  if (ordered && !retry) {
+    const selection = selectOrderedCard(state.selectionIds, winnerId, state.round.map(({ id }) => id));
+    state.selectionIds = selection.selectionIds;
+    state.result = "";
+    if (!selection.complete) {
+      render();
+      announceStatus(state.selectionIds.length ? "Primeira escolha marcada. Escolha a segunda ou toque novamente para desmarcar." : "Seleção desmarcada. Escolha duas cartas.");
+      return;
+    }
+  }
+  if (ordered) {
+    if (state.selectionIds.length !== 2) return;
+    winnerId = state.selectionIds[0];
+  }
   const winner = state.round.find(({ id }) => id === winnerId);
   if (!winner || ![2, 4].includes(state.round.length)) return;
   const attempt = {
     gameMode: state.gameMode,
     roundId: state.roundId,
     winnerId: winner.id,
+    ...(ordered ? { selectionIds: [...state.selectionIds] } : {}),
     candidateIds: state.round.map(({ id }) => id),
     ...(state.gameMode === "daily" ? {
       editionId: state.dailySession.edition.id,
@@ -1136,6 +1163,7 @@ async function vote(winnerId, { retry = false } = {}) {
       ? await submitDailyVote(attempt.roundId, attempt.editionId, attempt.slot, attempt.winnerId, "eleicoes-2026", {
         recoveryKey: attemptIdentity.recoveryKey,
         version: attemptPlayerVersion,
+        selectionIds: attempt.selectionIds,
         predictionEnabled: aggregateAvailable("prediction-reveal"),
       })
       : ["warmup", "tiebreak"].includes(attempt.gameMode)
@@ -1143,6 +1171,7 @@ async function vote(winnerId, { retry = false } = {}) {
       : await submitRoundVote(attempt.roundId, attempt.winnerId, attempt.candidateIds, "eleicoes-2026", {
         recoveryKey: attemptIdentity.recoveryKey,
         version: attemptPlayerVersion,
+        selectionIds: attempt.selectionIds,
       });
     if (!isCurrentVoteIdentity(state, attemptIdentity)) return;
     const dailyMode = attempt.gameMode === "daily";
@@ -1186,6 +1215,7 @@ async function vote(winnerId, { retry = false } = {}) {
     state.roundOutcome = channels.personal;
     state.personalFeedbackMessage = response.vote?.feedbackScope === "legacy-global"
       ? channels.personal.message
+      : ordered ? `${winner.displayName || winner.name}: +24 · ${state.round.find(person => person.id === attempt.selectionIds[1])?.displayName || state.round.find(person => person.id === attempt.selectionIds[1])?.name}: +8 · Outras duas: −16 cada.`
       : choiceMessage(winner.displayName || winner.name, confirmed.personalDuels, { zebra: response.vote?.personalFeedback?.zebra });
     state.globalFeedbackMessage = "";
     state.result = "";
@@ -1234,7 +1264,7 @@ async function vote(winnerId, { retry = false } = {}) {
         render();
       }, 1800);
     };
-    if (state.gameFeatures.discard) {
+    if (!ordered && state.gameFeatures.discard) {
       state.pendingDiscard = { roundId: attempt.roundId, candidates: state.round.filter(person => person.id !== winnerId) };
       advanceAfterDiscard = advance; renderDiscard();
     } else roundAdvanceTimer = setTimeout(advance, 1050);
@@ -2083,6 +2113,7 @@ async function enterPairMode(mode) {
   if (!state.gameFeatures.pairs || state.busy) return;
   const identity = { epoch: state.identityEpoch, recoveryKey: state.recoveryKey };
   const loadEpoch = ++state.dailyLoadEpoch;
+  state.selectionIds = [];
   state.screen = "duel"; state.gameMode = mode; state.pairLoading = true;
   state.pairError = ""; state.showCoach = false; state.round = []; render();
   try {

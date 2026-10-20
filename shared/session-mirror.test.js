@@ -59,3 +59,11 @@ test("35 ordinary rounds distribute feedback across seven comprehensible message
   assert.ok([...counts.values()].every(count => count === 5));
   assert.ok([...counts.keys()].every(text => !/Elo|patente/.test(text)));
 });
+
+test('ordered sessions include both selected people in the descriptive mirror', () => {
+  const catalog=['a','b','c','d'].map(id=>({id,party:id==='a'?'PT':'PL',primaryArea:'Política institucional',mirrorGroup:'politica',taxonomyProvenance:{party:{status:'extracted'},primaryArea:{status:'extracted'}},publication:{content:{status:'approved'}}}));
+  const mirror=sessionMirror({status:'completed',edition:{id:'ordered'},progress:{total:1},catalog,answers:[{winnerId:'a',selectionIds:['a','b']}]});
+  assert.equal(mirror.total,2);
+  assert.deepEqual(mirror.axes[1].values,[{value:'PL',count:1},{value:'PT',count:1}]);
+  assert.match(mirror.axes[1].text,/2 de 2 escolhas/);
+});

@@ -162,6 +162,7 @@ export function submitRoundVote(roundId, winnerId, candidateIds, topicId = "elei
       candidateIds,
       topicId,
       playerVersion: player.version,
+      ...(player.selectionIds ? { selectionIds: player.selectionIds } : {}),
     }),
   });
 }
@@ -180,6 +181,7 @@ export function submitDailyVote(answerId, editionId, slot, winnerId, topicId = "
       winnerId,
       topicId,
       playerVersion: player.version,
+      ...(player.selectionIds ? { selectionIds: player.selectionIds } : {}),
       ...(player.predictionEnabled === true ? { predictionContractVersion: 1 } : {}),
     }),
   });

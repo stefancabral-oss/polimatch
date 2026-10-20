@@ -50,6 +50,7 @@ export function patchCandidateSlot(slot, model) {
     button.setAttribute("aria-disabled", "true");
     button.removeAttribute("aria-busy");
     button.removeAttribute("aria-label");
+    button.removeAttribute("aria-pressed");
     profileButton.setAttribute("aria-disabled", "true");
     profileButton.removeAttribute("aria-label");
     profileButton.hidden = true;
@@ -63,6 +64,8 @@ export function patchCandidateSlot(slot, model) {
   if (model.actionMode === "prediction") button.dataset.predict = model.id;
   else if (model.actionMode === "vote") button.dataset.vote = model.id;
   button.setAttribute("aria-label", model.accessibleName);
+  if (model.selected === undefined) button.removeAttribute("aria-pressed");
+  else button.setAttribute("aria-pressed", String(model.selected));
   button.setAttribute("aria-disabled", String(Boolean(model.locked ?? model.busy)));
   setBooleanAttribute(button, "aria-busy", model.busy);
   profileButton.hidden = !model.profileEnabled;

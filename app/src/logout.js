@@ -50,6 +50,7 @@ export function resetPendingVoteForIdentityChange(state, createRoundId = () => c
   state.retryAt = 0;
   state.sessionRecoveryMode = "";
   state.selectedId = "";
+  state.selectionIds = [];
   state.roundOutcome = null;
   state.busy = false;
   state.result = "";
