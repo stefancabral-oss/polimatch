@@ -1,0 +1,38 @@
+{
+  "issue": 246,
+  "baseCommit": "5ddf9c6e34524376ac9b2e93210107f1b9dd02c0",
+  "frontendTests": {
+    "passed": 208,
+    "failed": 0
+  },
+  "build": {
+    "passed": true
+  },
+  "browser": {
+    "engine": "chromium",
+    "widths": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "questionsPerGame": 20,
+    "legacyResume": true,
+    "proposalWithoutQuotes": true,
+    "shareEdition": true,
+    "keyboard": true,
+    "reload": true,
+    "blockedStorage": true,
+    "apiRequests": 0,
+    "errors": 0
+  },
+  "curation": {
+    "literalStatements": 12,
+    "proposalSummaries": 8,
+    "speakers": 4,
+    "receipt": "references/curation-receipt.json"
+  },
+  "remoteCI": "pending PR; see final PR receipt",
+  "deployment": "pending; see final PR receipt",
+  "humanReview": "pending"
+}

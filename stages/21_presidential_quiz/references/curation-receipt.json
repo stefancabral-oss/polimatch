@@ -1,0 +1,240 @@
+{
+  "checkedAt": "2026-10-20",
+  "scope": "Curadoria editorial pedida pelo usuário; não é amostra neutra ou exaustiva.",
+  "method": "Leitura das fontes recuperadas, transcrições e plano TSE; resumos não apresentados como fala literal.",
+  "planDocument": "https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/proposta-pl",
+  "excludedUnconfirmedDetails": [
+    "Prazo de 24 horas para abrir empresas: não confirmado no documento consultado.",
+    "500 mil novas vagas carcerárias: substituído pelos cinco presídios expressos no plano.",
+    "Manutenção do Bolsa Família por dois anos: não usada sem confirmação no trecho primário consultado."
+  ],
+  "photos": [
+    {
+      "personId": 1,
+      "path": "/portraits/001.jpg"
+    },
+    {
+      "personId": 2,
+      "path": "/portraits/002.jpg"
+    },
+    {
+      "personId": 39,
+      "path": "/portraits/039.jpg"
+    },
+    {
+      "personId": 47,
+      "path": "/portraits/047.jpg"
+    }
+  ],
+  "questions": [
+    {
+      "id": "p01",
+      "author": "lula",
+      "kind": "quote",
+      "date": "2016-09-15",
+      "page": null,
+      "sourceUrl": "https://www.aosfatos.org/noticias/video-2016-editado-lula-disse-que-so-bolsonaro-ganha-dele/",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p02",
+      "author": "flavio",
+      "kind": "proposal",
+      "date": "2026",
+      "page": 13,
+      "sourceUrl": "https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/proposta-pl#page=13",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p03",
+      "author": "janja",
+      "kind": "quote",
+      "date": "2024-11-16",
+      "page": null,
+      "sourceUrl": "https://noticias.r7.com/brasilia/em-evento-paralelo-ao-g20-janja-xinga-elon-musk-16112024/",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p04",
+      "author": "lula",
+      "kind": "quote",
+      "date": "2023-06-29",
+      "page": null,
+      "sourceUrl": "https://www.cnnbrasil.com.br/politica/conceito-de-democracia-e-relativo-para-voce-e-para-mim-diz-lula-ao-responder-sobre-eleicoes-na-venezuela/",
+      "relatedSource": {
+        "url": "https://agenciagov.ebc.com.br/noticias/202502/presidente-defende-regulacao-do-ambiente-digital-201cquanto-maior-a-liberdade-de-expressao-maior-a-responsabilidade201d",
+        "label": "Compare: defesa da democracia em 06/02/2025"
+      },
+      "checked": true
+    },
+    {
+      "id": "p05",
+      "author": "flavio",
+      "kind": "proposal",
+      "date": "2026",
+      "page": 14,
+      "sourceUrl": "https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/proposta-pl#page=14",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p06",
+      "author": "nikolas",
+      "kind": "quote",
+      "date": "2023-03-08",
+      "page": null,
+      "sourceUrl": "https://www.camara.leg.br/internet/SitaqWeb/TextoHTML.asp?Data=08/03/2023&dtHoraQuarto=14:44&dtHorarioQuarto=14:44&etapa=5&nuDiscurso=1&nuInsercao=1&nuOrador=1&nuQuarto=2827616&nuSessao=17.2023&sgFaseSessao=BC&txApelido=Nikolas+Ferreira&txEtapa=&txFaseSessao=Breves+Comunica%C3%A7%C3%B5es&txTipoSessao=Ordin%C3%A1ria+-+CD",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p07",
+      "author": "flavio",
+      "kind": "proposal",
+      "date": "2026",
+      "page": 26,
+      "sourceUrl": "https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/proposta-pl#page=26",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p08",
+      "author": "lula",
+      "kind": "quote",
+      "date": "2020-05-19",
+      "page": null,
+      "sourceUrl": "https://noticias.uol.com.br/politica/ultimas-noticias/2020/05/20/lula-entrevista-coronavirus-ainda-bem.htm",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p09",
+      "author": "flavio",
+      "kind": "proposal",
+      "date": "2026",
+      "page": 13,
+      "sourceUrl": "https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/proposta-pl#page=13",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p10",
+      "author": "lula",
+      "kind": "quote",
+      "date": "2016-01-20",
+      "page": null,
+      "sourceUrl": "https://epoca.globo.com/tempo/filtro/noticia/2016/01/nao-existe-viva-alma-mais-honesta-do-que-eu-diz-lula.html",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p11",
+      "author": "janja",
+      "kind": "quote",
+      "date": "2026-09-09",
+      "page": null,
+      "sourceUrl": "https://noticias.uol.com.br/eleicoes/2026/09/09/esse-e-o-verdadeiro-ungido-de-deus-diz-janja-sobre-lula-em-teresina.ghtm",
+      "relatedSource": {
+        "url": "https://www.aosfatos.org/noticias/janja-deus-eleicao-lula/",
+        "label": "Checagem: frase falsa que circulou sobre esse comício"
+      },
+      "checked": true
+    },
+    {
+      "id": "p12",
+      "author": "flavio",
+      "kind": "proposal",
+      "date": "2026",
+      "page": 36,
+      "sourceUrl": "https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/proposta-pl#page=36",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p13",
+      "author": "lula",
+      "kind": "quote",
+      "date": "2023-04-28",
+      "page": null,
+      "sourceUrl": "https://noticias.uol.com.br/ultimas-noticias/agencia-estado/2023/04/28/lula-se-tem-uma-profissao-honesta-e-a-do-politico.htm",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p14",
+      "author": "flavio",
+      "kind": "proposal",
+      "date": "2026",
+      "page": 27,
+      "sourceUrl": "https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/proposta-pl#page=27",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p15",
+      "author": "lula",
+      "kind": "quote",
+      "date": "2000",
+      "page": null,
+      "sourceUrl": "https://www1.folha.uol.com.br/folha/brasil/ult96u9767.shtml",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p16",
+      "author": "nikolas",
+      "kind": "quote",
+      "date": "2023-03-08",
+      "page": null,
+      "sourceUrl": "https://www.camara.leg.br/internet/SitaqWeb/TextoHTML.asp?Data=08/03/2023&dtHoraQuarto=14:44&dtHorarioQuarto=14:44&etapa=5&nuDiscurso=1&nuInsercao=1&nuOrador=1&nuQuarto=2827616&nuSessao=17.2023&sgFaseSessao=BC&txApelido=Nikolas+Ferreira&txEtapa=&txFaseSessao=Breves+Comunica%C3%A7%C3%B5es&txTipoSessao=Ordin%C3%A1ria+-+CD",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p17",
+      "author": "flavio",
+      "kind": "proposal",
+      "date": "2026",
+      "page": 43,
+      "sourceUrl": "https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/proposta-pl#page=43",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p18",
+      "author": "lula",
+      "kind": "quote",
+      "date": "2003-11-07",
+      "page": null,
+      "sourceUrl": "https://www.tribunapr.com.br/noticias/brasil/lula-namibia-e-tao-limpa-que-nem-parece-a-africa/",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p19",
+      "author": "flavio",
+      "kind": "proposal",
+      "date": "2026",
+      "page": 47,
+      "sourceUrl": "https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/proposta-pl#page=47",
+      "relatedSource": null,
+      "checked": true
+    },
+    {
+      "id": "p20",
+      "author": "lula",
+      "kind": "quote",
+      "date": "2016-03-15",
+      "page": null,
+      "sourceUrl": "https://www.metropoles.com/brasil/politica-brasil/lula-ofende-feministas-do-pt-em-novo-audio-divulgado-pela-pf",
+      "relatedSource": null,
+      "checked": true
+    }
+  ],
+  "editorialCorrections": [
+    "Comparação com Jesus em 15/09/2016 refere-se à notoriedade, não à honestidade; corrigido após confrontar o recorte com o contexto completo da checagem."
+  ]
+}

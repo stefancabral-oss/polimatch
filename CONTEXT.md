@@ -104,3 +104,6 @@ A decisão posterior de Stefan substitui a escolha única no núcleo de quatro c
 
 ## Quem disse isso? — issue #244
 Novo modo de conhecimento aprovado por Stefan, independente do ranking político. Estágio stages/20_quote_quiz/CONTEXT.md. Layout: duas cartas clicáveis, nome uma vez, frase real e revelação com fonte.
+
+## Edição presidencial — issue #246
+Stefan aprovou o resultado do estágio 20 e definiu novo recorte editorial, com vozes misturadas e propostas oficiais. Estágio ativo: stages/21_presidential_quiz/CONTEXT.md. Preservar autoria real e distinguir resumo de plano de citação literal.
