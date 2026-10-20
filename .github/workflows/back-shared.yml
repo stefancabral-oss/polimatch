@@ -98,6 +98,8 @@ jobs:
         run: npm ci --prefix back
       - name: Test PostgreSQL integration
         run: npm run test:integration --prefix back
+      - name: Verify ordered two-card choices and receipts
+        run: node back/scripts/ordered-choices-smoke.mjs
       - name: Prove vote abuse is blocked
         run: npm run test:abuse --prefix back
       - name: Verify issued pairs, optional discard and earned inventory

@@ -208,3 +208,26 @@ test("a newly created response can never omit personal outcomes", () => {
   };
   assert.throws(() => confirmedVoteData(created, candidates, attempt), /rodada divergente/);
 });
+
+test('ordered confirmation requires the exact pair, order and symmetric bottom penalties', () => {
+  const orderedAttempt = {...attempt, selectionIds:['a','b']};
+  const payload = response();
+  for (const key of ['round','vote']) Object.assign(payload[key], {selectionIds:['a','b'],scoringRuleset:'ordered-two-v1',comparisons:5});
+  for (const row of payload.vote.personalFeedback.outcomes) {
+    row.result = ['a','b'].includes(row.id) ? 'winner' : 'loser';
+    row.selectionOrder = row.id === 'a' ? 1 : row.id === 'b' ? 2 : null;
+    row.delta = {a:24,b:8,c:-16,d:-16}[row.id];
+  }
+  assert.doesNotThrow(() => confirmedVoteData(payload,candidates,orderedAttempt));
+  for (const mutate of [
+    p => p.vote.selectionIds.reverse(),
+    p => p.round.selectionIds.splice(1,1,'c'),
+    p => p.vote.personalFeedback.outcomes[1].delta = -8,
+    p => p.vote.personalFeedback.outcomes[3].delta = -17,
+    p => p.vote.comparisons = 3,
+  ]) {
+    const invalid=structuredClone(payload); mutate(invalid);
+    assert.throws(() => confirmedVoteData(invalid,candidates,orderedAttempt));
+  }
+  assert.throws(() => confirmedVoteData(payload,candidates,attempt));
+});

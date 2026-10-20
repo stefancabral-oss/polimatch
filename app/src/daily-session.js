@@ -1,3 +1,4 @@
+import { orderedChoiceComparisons } from "../../shared/ordered-choice.js";
 import { confirmedVoteData } from "./vote-response.js";
 import { DAILY_DISTRIBUTION_COPY, formatAggregateCopy } from "./aggregate-copy.js";
 
@@ -73,6 +74,9 @@ export function validateDailySession(payload) {
       || answerIds.has(answer.answerId)
       || !payload.rounds[index].candidateIds.includes(answer.winnerId)
       || !Number.isFinite(Date.parse(answer.answeredAt))) fail("answers");
+    if (answer.selectionIds !== undefined) {
+      try { orderedChoiceComparisons(payload.rounds[index].candidateIds, answer.selectionIds, answer.winnerId); } catch { fail("answers.selectionIds"); }
+    }
     answerIds.add(answer.answerId);
   }
 
@@ -162,13 +166,15 @@ export function confirmedDailyVoteData(response, candidates, attempt, current = 
     return currentAnswer?.slot === answer.slot
       && currentAnswer.answerId === answer.answerId
       && currentAnswer.winnerId === answer.winnerId
+      && JSON.stringify(currentAnswer.selectionIds || null) === JSON.stringify(answer.selectionIds || null)
       && currentAnswer.answeredAt === answer.answeredAt;
   });
   if (!previous || dailySession.edition.id !== previous.edition.id
     || attempt.slot !== previous.progress.answered + 1
     || dailySession.progress.answered < previous.progress.answered + 1
     || !previousAnswersRemain
-    || !acceptedAnswer || acceptedAnswer.slot !== attempt.slot || acceptedAnswer.winnerId !== attempt.winnerId) {
+    || !acceptedAnswer || acceptedAnswer.slot !== attempt.slot || acceptedAnswer.winnerId !== attempt.winnerId
+    || JSON.stringify(acceptedAnswer.selectionIds || null) !== JSON.stringify(attempt.selectionIds || null)) {
     fail("vote.progress");
   }
   return { ...confirmed, dailySession };

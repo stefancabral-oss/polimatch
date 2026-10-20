@@ -1,0 +1,9 @@
+{
+  "issue": 239,
+  "stage": "19_ordered_two_choices",
+  "scoringRuleset": "ordered-two-v1",
+  "points": [24, 8, -16, -16],
+  "local": {"shared": {"passed": 90, "failed": 0}, "backend": {"passed": 229, "failed": 0}, "frontend": {"passed": 201, "failed": 0}, "build": "passed", "chromiumDaily": ["390x844", "1440x900"]},
+  "pending": ["PostgreSQL integration in CI", "WebKit in CI", "final expanded browser run", "merge", "production verification"],
+  "humanVisualReview": "not claimed"
+}

@@ -1,3 +1,4 @@
+import { orderedChoiceComparisons, ORDERED_CHOICE_RULESET } from "../../shared/ordered-choice.js";
 import { rankingForCatalog, roundFeedbackChannels } from "./domain.js";
 
 export const LEGACY_REPLAY_MESSAGE = "Escolha já confirmada. O detalhamento pessoal desta rodada anterior não está disponível.";
@@ -51,7 +52,12 @@ function isNeutralLegacyPersonalFeedback(feedback) {
     && feedback.outcomes.length === 0;
 }
 
-function requireMatchingRound(response, { roundId, winnerId, candidateIds }) {
+function requireMatchingRound(response, { roundId, winnerId, candidateIds, selectionIds }) {
+  const ordered = selectionIds !== undefined;
+  if (ordered) orderedChoiceComparisons(candidateIds, selectionIds, winnerId);
+  const sameSelection = !ordered
+    ? !Object.hasOwn(response.round || {}, "selectionIds") && !Object.hasOwn(response.vote || {}, "selectionIds")
+    : [response.round, response.vote].every(round => sameOrderedIds(round?.selectionIds, selectionIds) && round.scoringRuleset === ORDERED_CHOICE_RULESET);
   const expectedCandidates = new Set(candidateIds);
   const outcomes = response.vote?.personalFeedback?.outcomes;
   const outcomeIds = Array.isArray(outcomes) ? outcomes.map(({ id }) => id) : [];
@@ -76,16 +82,19 @@ function requireMatchingRound(response, { roundId, winnerId, candidateIds }) {
   const personalFeedbackIsComplete = response.vote?.feedbackScope === "personal"
     && outcomeIds.length === candidateIds.length && uniqueOutcomeIds.size === candidateIds.length
     && outcomeIds.every((id) => expectedCandidates.has(id))
-    && winners.length === 1 && winners[0]?.id === winnerId && losers.length === candidateIds.length - 1
+    && (ordered ? winners.length === 2 && winners.every(row => selectionIds.includes(row.id))
+      && outcomes.every(row => row.selectionOrder === (selectionIds.includes(row.id) ? selectionIds.indexOf(row.id) + 1 : null)
+        && row.delta === (row.id === selectionIds[0] ? 24 : row.id === selectionIds[1] ? 8 : -16))
+      : winners.length === 1 && winners[0]?.id === winnerId) && losers.length === candidateIds.length - (ordered ? 2 : 1)
     && completeOutcomes && typeof response.vote.personalFeedback?.zebra === "boolean"
     && Boolean(String(response.vote.personalFeedback?.primaryEvent || "").trim());
-  if (!roundId || ![2, 4].includes(candidateIds.length) || new Set(candidateIds).size !== candidateIds.length || !expectedCandidates.has(winnerId)
+  if (!sameSelection || !roundId || ![2, 4].includes(candidateIds.length) || new Set(candidateIds).size !== candidateIds.length || !expectedCandidates.has(winnerId)
     || response.round?.id !== roundId || response.vote?.id !== roundId
     || response.round?.status !== status || !["created", "alreadyProcessed"].includes(status)
     || response.round?.winnerId !== winnerId || response.vote?.winnerId !== winnerId
     || !sameOrderedIds(response.round?.candidateIds, candidateIds)
     || !sameOrderedIds(response.vote?.candidateIds, candidateIds)
-    || response.vote?.comparisons !== candidateIds.length - 1
+    || response.vote?.comparisons !== (ordered ? 5 : candidateIds.length - 1)
     || (!legacyReplay && !personalFeedbackIsComplete)) {
     throw new TypeError("resposta de voto inválida: rodada divergente");
   }

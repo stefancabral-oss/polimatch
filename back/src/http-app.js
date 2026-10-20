@@ -197,7 +197,7 @@ export function createHttpApp({
     }
   });
 
-  app.get("/api/game-capabilities", (_req, res) => noStore(res).json({ version: 1, pairs: true, discard: true, mirror: true, collection: env.COLLECTION_ENABLED !== "false" }));
+  app.get("/api/game-capabilities", (_req, res) => noStore(res).json({ version: 1, orderedChoices: true, pairs: true, discard: false, mirror: true, collection: env.COLLECTION_ENABLED !== "false" }));
   app.post("/api/pair-round", async (req, res) => {
     try { noStore(res).json(await store.pairRound(requiredRecoveryKey(req), String(req.body?.topicId || "eleicoes-2026"), req.body?.mode)); }
     catch (error) { sendError(req, res, error); }
@@ -339,10 +339,11 @@ export function createHttpApp({
   });
 
   app.post("/api/round-vote", async (req, res) => {
-    const { roundId, winnerId, candidateIds, topicId, playerVersion } = req.body || {};
+    const { roundId, winnerId, selectionIds, candidateIds, topicId, playerVersion } = req.body || {};
     try {
       const payload = await store.roundVote({
         roundId,
+        ...(selectionIds !== undefined ? { selectionIds } : {}),
         winnerId: String(winnerId || ""),
         candidateIds,
         topicId: String(topicId || "eleicoes-2026"),
@@ -364,6 +365,7 @@ export function createHttpApp({
       editionId,
       slot,
       winnerId,
+      selectionIds,
       topicId,
       playerVersion,
       predictionContractVersion,
@@ -371,6 +373,7 @@ export function createHttpApp({
     try {
       const payload = await store.dailyVote({
         answerId,
+        ...(selectionIds !== undefined ? { selectionIds } : {}),
         editionId: String(editionId || ""),
         slot,
         winnerId: String(winnerId || ""),

@@ -286,7 +286,7 @@ function projectFeedback(feedback) {
   return {
     ...selectFields(feedback, ["rankingEvent", "primaryEvent", "zebra"]),
     outcomes: feedback.outcomes.map((outcome) => {
-      const projected = selectFields(outcome, ["id", "result", "delta", "elo", "previousRank", "rank", "preferenceScore", "rankBasis", "tierChange"]);
+      const projected = selectFields(outcome, ["id", "result", "selectionOrder", "delta", "elo", "previousRank", "rank", "preferenceScore", "rankBasis", "tierChange"]);
       if (Object.hasOwn(outcome || {}, "previousTier")) projected.previousTier = projectTier(outcome.previousTier);
       if (Object.hasOwn(outcome || {}, "tier")) projected.tier = projectTier(outcome.tier);
       return projected;
@@ -345,7 +345,7 @@ function projectDailySession(session) {
   if (session.progress && typeof session.progress === "object") result.progress = selectFields(session.progress, ["answered", "total"]);
   if (Array.isArray(session.answers)) {
     result.answers = session.answers
-      ? session.answers.map((answer) => selectFields(answer, ["slot", "answerId", "winnerId", "answeredAt"]))
+      ? session.answers.map((answer) => selectFields(answer, ["slot", "answerId", "winnerId", "selectionIds", "answeredAt"]))
       : [];
   }
   if (Array.isArray(session.predictions)) {
@@ -405,6 +405,8 @@ function personalRound(round) {
     "rankingEvent",
     "feedbackScope",
     "comparisons",
+    "selectionIds",
+    "scoringRuleset",
   ];
   const result = Object.fromEntries(allowed.filter((key) => Object.hasOwn(round, key)).map((key) => [key, round[key]]));
   if (round.feedbackScope === "legacy-global") {
