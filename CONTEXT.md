@@ -101,3 +101,6 @@ O programa só é considerado concluído quando:
 
 ## Duas escolhas ordenadas — issue #239
 A decisão posterior de Stefan substitui a escolha única no núcleo de quatro cartas: primeira preferência recebe mais pontos que segunda; as duas restantes recebem a mesma penalização. O estágio ativo é stages/19_ordered_two_choices/CONTEXT.md. Histórico e modos binários permanecem compatíveis.
+
+## Quem disse isso? — issue #244
+Novo modo de conhecimento aprovado por Stefan, independente do ranking político. Estágio stages/20_quote_quiz/CONTEXT.md. Layout: duas cartas clicáveis, nome uma vez, frase real e revelação com fonte.
