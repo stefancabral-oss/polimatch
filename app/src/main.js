@@ -414,8 +414,8 @@ function topicsContent() {
     </section>
 
     <section class="home-topic" aria-labelledby="quote-quiz-title">
-      <div class="home-topic-heading"><div><p class="eyebrow">Novo jogo · Lula ou Flávio?</p><h2 id="quote-quiz-title">Quem disse isso?</h2></div></div>
-      <p>Dez frases reais. Você reconhece quem falou? Descubra a fonte e o contexto depois de cada resposta. Seu placar de conhecimento é separado das preferências.</p>
+      <div class="home-topic-heading"><div><p class="eyebrow">Novo jogo · Corrida presidencial</p><h2 id="quote-quiz-title">Quem disse isso?</h2></div></div>
+      <p>Gafes históricas, falas da campanha e propostas oficiais. Lula, Flávio, Janja ou Nikolas: você reconhece as vozes? Veja a fonte e o contexto depois de responder.</p>
       <a class="home-topic-cta" href="./quem-disse-isso.html"><span>Reconhecer as frases</span><b aria-hidden="true">→</b></a>
     </section>
     <section class="home-topic" aria-labelledby="home-topic-title">
