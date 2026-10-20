@@ -49,6 +49,7 @@ try {
   let session=await store.dailySession(other.recoveryKey,request.topicId);
   let version=0;
   for (let slot=1;slot<=10;slot++) {
+    await audit.query("DELETE FROM abuse_quota_counters WHERE scope='player-round-minute'");
     const selectionIds=session.round.candidateIds.slice(0,2);
     const dailyRequest={topicId:request.topicId,editionId:session.edition.id,slot,answerId:randomUUID(),winnerId:selectionIds[0],selectionIds,recoveryKey:other.recoveryKey,playerVersion:version};
     const result=await store.dailyVote(dailyRequest);

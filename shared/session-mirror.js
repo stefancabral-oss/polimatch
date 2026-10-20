@@ -5,7 +5,7 @@ export function sessionMirror(session) {
   if (session?.status !== "completed" || !Array.isArray(session.answers)
       || session.answers.length !== session.progress?.total) return null;
   const byId = new Map(session.catalog.map(person => [person.id, person]));
-  const chosen = session.answers.map(answer => byId.get(answer.winnerId));
+  const chosen = session.answers.flatMap(answer => (answer.selectionIds || [answer.winnerId]).map(id => byId.get(id)));
   if (chosen.some(person => !person)) throw new TypeError("Espelho: escolha fora do catálogo");
   const total = chosen.length;
   const axis = (id, label, field, vocabulary) => {
@@ -15,7 +15,7 @@ export function sessionMirror(session) {
     const values = [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR"))
       .map(([value, count]) => ({ value, count }));
     return { id, label, known: known.length, unknown: total - known.length, values,
-      text: known.length ? `Suas escolhas incluem ${values.length} ${label.toLowerCase()} em ${known.length} de ${total} rodadas com informação confirmada.`
+      text: known.length ? `Suas escolhas incluem ${values.length} ${label.toLowerCase()} em ${known.length} de ${total} escolhas com informação confirmada.`
         : `Ainda não há informação confirmada suficiente para comparar ${label.toLowerCase()} nas suas escolhas.` };
   };
   const groups = chosen.filter(person => person.publication?.content?.status === "approved" && ["politica", "influencia_debate"].includes(person.mirrorGroup));

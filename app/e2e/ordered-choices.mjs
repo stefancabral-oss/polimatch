@@ -71,6 +71,8 @@ try {
   }
   await page.waitForFunction(()=>document.body.textContent.includes('10/10'));
   assert.equal(answers.length,10); assert.equal(version,10); assert.equal(requests.length,11);
+  await page.getByRole("heading",{name:"Suas escolhas por rodada"}).waitFor();
+  assert.match(await page.locator(".daily-receipt").innerText(),/1ª.*2ª/s);
   await page.reload();
   await page.locator('.bottom-nav [data-screen="duel"]').click();
   await page.waitForFunction(()=>document.body.textContent.includes('10/10'));

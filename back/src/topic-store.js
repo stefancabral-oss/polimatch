@@ -437,7 +437,7 @@ export function persistedRoundChannels(row) {
   };
 }
 
-async function createCleanSchema(client, candidateRegistry) {
+async function createCleanSchema(client, candidateRegistry, maintenanceNow) {
   await client.query(`
     CREATE TABLE IF NOT EXISTS schema_migrations (
       id text PRIMARY KEY,
@@ -936,7 +936,8 @@ async function createCleanSchema(client, candidateRegistry) {
   if (!applied.rowCount) {
     await client.query("INSERT INTO schema_migrations (id) VALUES ($1)", [RESET_MIGRATION_ID]);
   }
-  await client.query("DELETE FROM abuse_quota_counters WHERE window_start < now() - interval '8 days'");
+  // Retention must use the same clock as vote admission and editorial windows.
+  await client.query("DELETE FROM abuse_quota_counters WHERE window_start < $1::timestamptz - interval '8 days'", [maintenanceNow.toISOString()]);
   return { resetApplied: !applied.rowCount, migrationId: RESET_MIGRATION_ID };
 }
 
@@ -1813,7 +1814,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
       const client = await pool.connect();
       try {
         await client.query("BEGIN");
-        const migration = await createCleanSchema(client, candidateRegistry);
+        const migration = await createCleanSchema(client, candidateRegistry, clockInstant(clock));
         await installGameSchema(client);
         await client.query("COMMIT");
         return migration;

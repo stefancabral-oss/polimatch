@@ -426,7 +426,7 @@ function topicsContent() {
       <div><p class="eyebrow">Como funciona</p><h2 id="home-how-title">Rápido de jogar. Fácil de entender.</h2></div>
       <ol>
         <li><span>01</span><strong>Jogue as mesmas dez</strong><small>O baralho do dia é igual para todos.</small></li>
-        <li><span>02</span><strong>Escolha sua preferida</strong><small>Um toque confirma a sua decisão.</small></li>
+        <li><span>02</span><strong data-home-selection-title>Escolha sua preferida</strong><small data-home-selection-description>Um toque confirma a sua decisão.</small></li>
         <li><span>03</span><strong>Feche 10/10</strong><small>Receba o comprovante das suas dez preferências.</small></li>
       </ol>
     </section>
@@ -444,7 +444,8 @@ function dailyClosingScreen() {
   const byId = new Map(state.dailyCandidates.map((candidate) => [candidate.id, candidate]));
   const choices = session.answers.map((answer) => {
     const candidate = byId.get(answer.winnerId);
-    return `<li><span>${String(answer.slot).padStart(2, "0")}</span><strong>${escapeHtml(candidate?.displayName || shortName(candidate?.name || answer.winnerId))}</strong></li>`;
+    const second = answer.selectionIds?.[1] && byId.get(answer.selectionIds[1]);
+    return `<li><span>${String(answer.slot).padStart(2, "0")}</span><strong>${second ? "1ª " : ""}${escapeHtml(candidate?.displayName || shortName(candidate?.name || answer.winnerId))}${second ? ` · 2ª ${escapeHtml(second.displayName || shortName(second.name))}` : ""}</strong></li>`;
   }).join("");
   const predictionReveal = aggregateAvailable("prediction-reveal");
   const cutCopy = predictionReveal
@@ -457,7 +458,7 @@ function dailyClosingScreen() {
       count: session.predictionProgress.predicted,
       noun: session.predictionProgress.predicted === 1 ? PREDICTION_REVEAL_COPY.predictionNounOne : PREDICTION_REVEAL_COPY.predictionNounMany,
     })
-    : "Suas dez preferências ficaram registradas.";
+    : "Suas dez rodadas ficaram registradas.";
   return `<section class="daily-close-screen">
     <section class="daily-close-hero">
       <p class="eyebrow">Rodada do dia · 10/10</p>
@@ -470,7 +471,7 @@ function dailyClosingScreen() {
     ${mirrorMarkup}
     ${state.gameFeatures.mirror && aggregateAvailable("mirror-comparison") ? mirrorComparisonContent() : ""}
     <section class="daily-receipt" aria-labelledby="daily-receipt-title">
-      <div><p class="eyebrow">Seu comprovante</p><h2 id="daily-receipt-title">As dez escolhidas</h2></div>
+      <div><p class="eyebrow">Seu comprovante</p><h2 id="daily-receipt-title">${session.answers.some(answer => answer.selectionIds) ? "Suas escolhas por rodada" : "As dez escolhidas"}</h2></div>
       <ol>${choices}</ol>
     </section>
     <div class="daily-close-actions">
@@ -824,6 +825,8 @@ function renderTopics() {
     : dailyComplete ? "Ver fechamento de hoje" : dailyAnswered ? `Continuar · ${dailyAnswered}/${dailyTotal}` : "Jogar rodada do dia";
   refs.panels.topics.querySelector("[data-home-start-label]").textContent = dailyAction;
   refs.panels.topics.querySelector("#start-election-secondary span").textContent = dailyAction;
+  refs.panels.topics.querySelector("[data-home-selection-title]").textContent = state.gameFeatures.orderedChoices ? "Escolha duas, em ordem" : "Escolha sua preferida";
+  refs.panels.topics.querySelector("[data-home-selection-description]").textContent = state.gameFeatures.orderedChoices ? "A primeira vale mais. O segundo toque confirma a rodada." : "Um toque confirma a sua decisão.";
   refs.panels.topics.querySelector("[data-daily-progress]").textContent = `${dailyAnswered}/${dailyTotal}`;
   const publicRanking = aggregateAvailable("global-ranking");
   const prediction = aggregateAvailable("prediction-reveal");
