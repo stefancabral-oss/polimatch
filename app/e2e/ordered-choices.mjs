@@ -81,7 +81,7 @@ try {
   await cards.nth(0).click(); assert.equal(requests.length,beforeFree);
   // Skipping an unconfirmed table clears its draft.
   await page.locator('#skip-round').click();
-  assert.equal(await page.locator('[aria-pressed="true"]').count(),0);
+  assert.equal(await page.locator('[data-vote][aria-pressed="true"]').count(),0);
   await cards.nth(0).click(); await cards.nth(1).click();
   await page.waitForFunction(()=>document.querySelector('[data-feedback-channels]')?.hidden===false);
   assert.equal(requests.length,beforeFree+1);
