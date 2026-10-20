@@ -145,3 +145,8 @@ jobs:
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
         run: node app/e2e/civic-navigation.mjs
+
+      - name: Validate sourced quote quiz and independent score
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+        run: node app/e2e/quote-quiz.mjs

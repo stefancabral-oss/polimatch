@@ -413,6 +413,11 @@ function topicsContent() {
       </div>
     </section>
 
+    <section class="home-topic" aria-labelledby="quote-quiz-title">
+      <div class="home-topic-heading"><div><p class="eyebrow">Novo jogo · Lula ou Flávio?</p><h2 id="quote-quiz-title">Quem disse isso?</h2></div></div>
+      <p>Dez frases reais. Você reconhece quem falou? Descubra a fonte e o contexto depois de cada resposta. Seu placar de conhecimento é separado das preferências.</p>
+      <a class="home-topic-cta" href="./quem-disse-isso.html"><span>Reconhecer as frases</span><b aria-hidden="true">→</b></a>
+    </section>
     <section class="home-topic" aria-labelledby="home-topic-title">
       <div class="home-topic-heading">
         <div><p class="eyebrow">Edição disponível</p><h2 id="home-topic-title">${PUBLIC_RANKING_COPY.topicEyebrow}</h2></div>

@@ -1,0 +1,84 @@
+{
+  "checkedAt": "2026-10-20",
+  "method": "Leitura integral nas fontes públicas e comparação literal; recortes não resumem programas atuais. Datas da fala conforme registro oficial.",
+  "photos": {
+    "source": "shared/photo-recovery-manifest.json",
+    "paths": [
+      "/portraits/001.jpg",
+      "/portraits/002.jpg"
+    ],
+    "authorization": "Restauração #202; nenhuma imagem gerada usada como fotografia."
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "sourceUrl": "https://www12.senado.leg.br/noticias/materias/2025/02/19/flavio-bolsonaro-e-eleito-presidente-da-csp",
+      "sourceLabel": "Agência Senado",
+      "speechDate": "2025-02-19",
+      "literalTextVerified": true
+    },
+    {
+      "id": "q02",
+      "sourceUrl": "https://www2.camara.leg.br/a-camara/presidencia/galeria-presidentes/henrique-eduardo-alves-2013-2014/noticias/confira-a-integra-do-discurso-do-ex-presidente-lula-na-sessao-em-sua-homenagem-nesta-terca-feira-29",
+      "sourceLabel": "Câmara dos Deputados",
+      "speechDate": "2013-10-29",
+      "literalTextVerified": true
+    },
+    {
+      "id": "q03",
+      "sourceUrl": "https://agenciagov.ebc.com.br/noticias/202502/presidente-defende-regulacao-do-ambiente-digital-201cquanto-maior-a-liberdade-de-expressao-maior-a-responsabilidade201d",
+      "sourceLabel": "Agência Gov / Planalto",
+      "speechDate": "2025-02-06",
+      "literalTextVerified": true
+    },
+    {
+      "id": "q04",
+      "sourceUrl": "https://www25.senado.leg.br/web/atividade/pronunciamentos/-/p/pronunciamento/518071",
+      "sourceLabel": "Senado Federal · discurso integral",
+      "speechDate": "2025-11-05",
+      "literalTextVerified": true
+    },
+    {
+      "id": "q05",
+      "sourceUrl": "https://www12.senado.leg.br/radio/1/noticia/2019/02/13/reforma-da-previdencia-e-seguranca-publica-sao-prioridades-do-senador-flavio-bolsonaro",
+      "sourceLabel": "Rádio Senado · áudio e transcrição",
+      "speechDate": "2019-02-13",
+      "literalTextVerified": true
+    },
+    {
+      "id": "q06",
+      "sourceUrl": "https://www.camara.leg.br/noticias/932450-leia-o-discurso-do-presidente-lula-",
+      "sourceLabel": "Câmara dos Deputados · discurso de posse",
+      "speechDate": "2023-01-01",
+      "literalTextVerified": true
+    },
+    {
+      "id": "q07",
+      "sourceUrl": "https://www25.senado.leg.br/web/atividade/pronunciamentos/-/p/pronunciamento/512527",
+      "sourceLabel": "Senado Federal · discurso integral",
+      "speechDate": "2025-03-19",
+      "literalTextVerified": true
+    },
+    {
+      "id": "q08",
+      "sourceUrl": "https://www2.camara.leg.br/a-camara/presidencia/galeria-presidentes/henrique-eduardo-alves-2013-2014/noticias/confira-a-integra-do-discurso-do-ex-presidente-lula-na-sessao-em-sua-homenagem-nesta-terca-feira-29",
+      "sourceLabel": "Câmara dos Deputados",
+      "speechDate": "2013-10-29",
+      "literalTextVerified": true
+    },
+    {
+      "id": "q09",
+      "sourceUrl": "https://agenciagov.ebc.com.br/noticias/202502/presidente-defende-regulacao-do-ambiente-digital-201cquanto-maior-a-liberdade-de-expressao-maior-a-responsabilidade201d",
+      "sourceLabel": "Agência Gov / Planalto",
+      "speechDate": "2025-02-06",
+      "literalTextVerified": true
+    },
+    {
+      "id": "q10",
+      "sourceUrl": "https://www12.senado.leg.br/noticias/materias/2025/02/19/flavio-bolsonaro-e-eleito-presidente-da-csp",
+      "sourceLabel": "Agência Senado",
+      "speechDate": "2025-02-19",
+      "literalTextVerified": true
+    }
+  ]
+}

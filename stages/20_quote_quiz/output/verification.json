@@ -1,0 +1,12 @@
+{
+  "issue": 244,
+  "stage": 20,
+  "baseCommit": "de670844f59b527a3892713f771c392e637ba4bc",
+  "unit": {"command": "npm test --prefix app", "passed": 206, "failed": 0},
+  "build": {"command": "npm run build --prefix app", "passed": true, "distFilesVerified": 162},
+  "browser": {"engine": "chromium", "viewports": [320,390,768,1440], "allTenQuestions": true, "keyboard": true, "resume": true, "shareFallback": true, "blockedStorage": true, "replay": true, "apiRequests": 0, "pageErrors": 0},
+  "diffCheck": true,
+  "remoteCI": "pending PR",
+  "deployment": "pending independent verification",
+  "humanImplementationReview": "pending"
+}
