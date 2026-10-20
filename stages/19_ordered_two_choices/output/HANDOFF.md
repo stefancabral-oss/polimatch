@@ -14,3 +14,10 @@ A integração antiga falhava em daily_quota_used porque a limpeza inicial usava
 
 ## Entrega e publicação
 PR #241: https://github.com/stefancabral-oss/polimatch/pull/241. Código e build prontos; integração condicionada aos checks dessa PR. Confirmar os dois serviços publicados. Não declarar deploy sem observar assets e capacidade novos no site.
+
+## Publicação e ajuste de conferência — #242
+Em 20/10/2026 UTC, os serviços API e PWA no Dokploy concluíram deploy de a2a859ed987f1ea64688e6197806b9ff4c152973. A API pública passou a anunciar orderedChoices=true e discard=false; o site passou a servir index-BPtVlyMw.js. Uma rodada real de teste avançou de 1/10 para 2/10 após dois toques; o primeiro toque e a desmarcação não avançaram a rodada.
+
+A inspeção encontrou título legado no tutorial e mensagem do aquecimento persistindo na entrada das dez escolhas. O ajuste #242 torna o título dependente da capacidade e limpa a mensagem ao sair dos modos binários. O smoke ordered-choices agora passa pelo aquecimento e valida o tutorial e a instrução 0/2 antes da seleção. Frontend 201/201, build e Chromium 390x844 e 1440x900 passaram localmente. Verificar os checks da PR e republicar a PWA antes de considerar o texto corrigido em produção. A API não muda neste ajuste.
+
+O build da API também reportou alerta npm em proxy-addr 2.0.7 (GHSA-jqcg-44mw-7w3h), anterior à feature. O app configura confiança por quantidade de saltos inteira, não pela lista de sub-redes descrita no aviso. A atualização dessa dependência fica separada do ajuste visual.
