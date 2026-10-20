@@ -458,7 +458,7 @@ function dailyClosingScreen() {
       count: session.predictionProgress.predicted,
       noun: session.predictionProgress.predicted === 1 ? PREDICTION_REVEAL_COPY.predictionNounOne : PREDICTION_REVEAL_COPY.predictionNounMany,
     })
-    : "Suas dez rodadas ficaram registradas.";
+    : session.answers.some(answer => answer.selectionIds) ? "Suas dez rodadas ficaram registradas." : "Suas dez preferências ficaram registradas.";
   return `<section class="daily-close-screen">
     <section class="daily-close-hero">
       <p class="eyebrow">Rodada do dia · 10/10</p>
