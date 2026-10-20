@@ -776,6 +776,7 @@ function captureRefs() {
     modal: app.querySelector("#modal"),
     coachDialog: app.querySelector("#coach-dialog"),
     coachStart: app.querySelector("#dismiss-coach"),
+    coachTitle: app.querySelector("#coach-title"),
     coachDescription: app.querySelector("[data-coach-description]"),
     overlays: app.querySelector("[data-overlay-root]"),
     liveRegion: app.querySelector(".app-live-region"),
@@ -988,6 +989,7 @@ function renderCoach() {
   const finalInstruction = state.gameMode === "daily"
     ? "Esta combinação é fixa e igual para todos: não há troca no modo diário."
     : "Se nenhuma fizer sentido, troque as quatro.";
+  refs.coachTitle.textContent = state.gameFeatures.orderedChoices ? "Escolha duas, em ordem." : "Escolha uma entre quatro.";
   refs.coachDescription.textContent = state.gameFeatures.orderedChoices ? "Escolha duas cartas em ordem. A primeira recebe +24 pontos e a segunda +8. As duas restantes perdem 16 pontos cada. Toque novamente na primeira para desmarcar antes de escolher a segunda." : `Cada carta tem dois controles: escolha uma pessoa quando decidir ou abra Conhecer perfil antes de votar. ${finalInstruction}`;
   if (refs.coachDialog.open) return;
   queueMicrotask(() => {
@@ -1089,6 +1091,10 @@ async function enterDuel(mode = state.gameMode) {
   if (["warmup", "tiebreak"].includes(mode)) return enterPairMode(mode);
   sound.play("enter");
   const previousMode = state.gameMode;
+  if (["warmup", "tiebreak"].includes(previousMode)) {
+    state.result = "";
+    state.resultTone = "";
+  }
   state.dailyLoadEpoch = Number(state.dailyLoadEpoch || 0) + 1;
   state.gameMode = mode;
   state.screen = "duel";

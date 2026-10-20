@@ -15,12 +15,12 @@ try {
    const count=answers.length;
    return {...seed,status:count===10?'completed':'active',progress:{answered:count,total:10},answers:[...answers],predictions:answers.map((a,i)=>({slot:a.slot,predictionId:`650e8400-e29b-41d4-a716-${String(i+1).padStart(12,'0')}`,candidateId:null,skipped:true,respondedAt:a.answeredAt})),predictionProgress:{responded:count,predicted:0,skipped:count,total:count},pendingPrediction:null,round:count===10?null:seed.rounds[count],completion:count===10?seed.completion:null};
   }
-  await page.addInitScript(()=>localStorage.setItem('polimatch:v4:round-coach','seen'));
   await page.route('**/api/**',async route=>{
    const path=new URL(route.request().url()).pathname;
    const send=(json,status=200)=>route.fulfill({status,json});
    if(path==='/api/capabilities') return send(capabilityFixture([]));
-   if(path==='/api/game-capabilities') return send({version:1,orderedChoices:true,pairs:false,discard:false,mirror:false,collection:false});
+   if(path==='/api/game-capabilities') return send({version:1,orderedChoices:true,pairs:true,discard:false,mirror:false,collection:false});
+   if(path==='/api/pair-round') return send({mode:'warmup',status:'active',remaining:3,round:{id:'warmup-1',candidateIds:catalog.slice(0,2).map(p=>p.id)}});
    if(path==='/api/candidates') return send({candidates:catalog});
    if(path==='/api/player') return send({recoveryKey:'pm2_'+'a'.repeat(43)},201);
    if(path==='/api/player/state') return send({version,duels:version,ranking:ranking()});
@@ -42,6 +42,11 @@ try {
   });
   await page.goto(process.env.POLIMATCH_E2E_URL||'http://127.0.0.1:4173/');
   await page.locator('.bottom-nav [data-screen="duel"]').click();
+  await page.locator('#leave-pair:visible').click();
+  await page.getByRole('heading',{name:'Escolha duas, em ordem.',exact:true}).waitFor();
+  await page.locator('#dismiss-coach').click();
+  assert.match(await page.locator('.round-instruction:visible').innerText(),/0\/2/);
+  assert.doesNotMatch(await page.locator('.round-instruction:visible').innerText(),/Duas cartas\. A escolha conta/);
   const cards=page.locator('[data-vote]:visible');
   await cards.first().waitFor();
   assert.equal(await cards.count(),4);
