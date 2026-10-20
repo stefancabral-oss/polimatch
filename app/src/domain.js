@@ -130,7 +130,7 @@ export function roundOutcome(feedback, candidates = [], winnerId = "") {
         : winner ? "Levou a rodada" : "Levou a pior",
     };
   }) : [];
-  const winner = outcomes.find((outcome) => outcome.winner);
+  const winner = outcomes.find((outcome) => outcome.id === winnerId) || outcomes.find((outcome) => outcome.winner);
   const dropped = outcomes.find((outcome) => outcome.tierChange === "down");
   const primaryEvent = feedback ? feedback.primaryEvent || feedback.rankingEvent || "confirm" : null;
   let message = winner ? `${winner.name} levou +${winner.delta} Elo. Os outros três sentiram.` : "Escolha confirmada.";
@@ -148,7 +148,7 @@ export function roundOutcome(feedback, candidates = [], winnerId = "") {
 
 function publicRoundOutcome(feedback, candidates = [], winnerId = "") {
   const result = roundOutcome(feedback, candidates, winnerId);
-  const winner = result.outcomes.find((outcome) => outcome.winner);
+  const winner = result.outcomes.find((outcome) => outcome.id === winnerId) || result.outcomes.find((outcome) => outcome.winner);
   const dropped = result.outcomes.find((outcome) => outcome.tierChange === "down");
   const copy = PUBLIC_RANKING_COPY.feedback;
   let message = winner

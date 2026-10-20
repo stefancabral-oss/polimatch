@@ -386,8 +386,8 @@ export function feedbackChannelsFromSnapshots({
   const personalFeedback = roundFeedbackFromSnapshots(personalBefore, personalAfter, candidateIds, winnerId, rankingEvent, { zebra: personalZebra, selectionIds });
   const globalRankingEvent = rankingEventFromSnapshots(globalBefore, globalAfter, winnerId, { zebra: globalZebra });
   const globalFeedback = roundFeedbackFromSnapshots(globalBefore, globalAfter, candidateIds, winnerId, globalRankingEvent, { zebra: globalZebra, selectionIds });
-  const winnerDelta = Number(personalFeedback.outcomes.find(({ result }) => result === "winner")?.delta) || 0;
-  const globalWinnerDelta = Number(globalFeedback.outcomes.find(({ result }) => result === "winner")?.delta) || 0;
+  const winnerDelta = Number(personalFeedback.outcomes.find(({ id }) => id === winnerId)?.delta) || 0;
+  const globalWinnerDelta = Number(globalFeedback.outcomes.find(({ id }) => id === winnerId)?.delta) || 0;
   return {
     rankingEvent,
     personalFeedback,
@@ -418,7 +418,8 @@ export function persistedRoundChannels(row) {
   // Ele pode ser reapresentado como público, mas nunca renomeado como pessoal.
   const effectiveGlobalFeedback = globalFeedback
     || (feedbackScope === FEEDBACK_SCOPE_LEGACY_GLOBAL ? feedback : null);
-  const globalWinnerDelta = effectiveGlobalFeedback?.outcomes.find(({ result }) => result === "winner")?.delta;
+  const globalWinnerDelta = (effectiveGlobalFeedback?.outcomes.find(({ id }) => id === row.winner_id)
+    || effectiveGlobalFeedback?.outcomes.find(({ result }) => result === "winner"))?.delta;
   const globalEvent = globalEventFromFeedback({
     rankingEvent: row.global_ranking_event
       || (feedbackScope === FEEDBACK_SCOPE_LEGACY_GLOBAL ? row.ranking_event : null)

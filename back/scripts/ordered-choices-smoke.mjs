@@ -15,12 +15,12 @@ await store.init();
 const player=await store.createPlayer({networkHash:'1'.repeat(64)});
 const other=await store.createPlayer({networkHash:'2'.repeat(64)});
 const ids=['lula','jair-bolsonaro','anitta','neymar-jr'];
-const request={topicId:'eleicoes-2026',winnerId:ids[0],selectionIds:ids.slice(0,2),candidateIds:ids,roundId:randomUUID(),recoveryKey:player.recoveryKey,playerVersion:0};
+const request={topicId:'eleicoes-2026',winnerId:ids[0],selectionIds:ids.slice(0,2),candidateIds:[ids[1],ids[0],ids[2],ids[3]],roundId:randomUUID(),recoveryKey:player.recoveryKey,playerVersion:0};
 try {
   const before=await store.playerRanking(player.recoveryKey,request.topicId);
   const [created,replay]=await Promise.all([store.roundVote(request),store.roundVote(request)]);
   assert.equal(created.round.status,'created'); assert.equal(replay.round.status,'alreadyProcessed');
-  assert.equal(created.round.comparisons,5); assert.equal(created.player.duels,1);
+  assert.equal(created.round.comparisons,5); assert.equal(created.round.winnerDelta,24); assert.equal(created.player.duels,1);
   assert.deepEqual(created.round.personalFeedback,replay.round.personalFeedback);
   assert.deepEqual(created.round.selectionIds,ids.slice(0,2));
   const expected=[24,8,-16,-16];

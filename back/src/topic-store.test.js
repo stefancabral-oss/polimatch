@@ -688,3 +688,13 @@ test("a persisted personal round restores personal and public channels independe
   assert.equal(channels.rankingEvent, "leader");
   assert.deepEqual(channels.globalEvent.feedback, globalFeedback);
 });
+
+test('ordered feedback uses the first preference even when its table position follows the second', () => {
+  const before=['b','a','c','d'].map(id=>({id,elo:1000,rank:1}));
+  const after=before.map(p=>({...p,elo:p.elo+{a:24,b:8,c:-16,d:-16}[p.id]}));
+  const result=feedbackChannelsFromSnapshots({personalBefore:before,personalAfter:after,globalBefore:before,globalAfter:after,candidateIds:before.map(p=>p.id),winnerId:'a',selectionIds:['a','b']});
+  assert.equal(result.winnerDelta,24);
+  const replay=persistedRoundChannels({winner_id:'a',selection_ids:['a','b'],feedback_scope:'personal',feedback:result.personalFeedback,global_feedback:result.globalFeedback});
+  assert.equal(replay.personalFeedback.outcomes.find(p=>p.id==='b').selectionOrder,2);
+  if(replay.globalEvent) assert.equal(replay.globalEvent.winnerDelta,24);
+});
