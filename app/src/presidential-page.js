@@ -18,7 +18,7 @@ import { createSoundController } from "./sound.js";
 import { installChromaMotion } from "./chroma-motion.js";
 import {
   tcgCardMarkup,
-  portraitStyle,
+  portraitMarkup,
   escapeCardText as e,
 } from "./tcg-card.js";
 import {
@@ -425,7 +425,7 @@ function renderRoster(query = "") {
     filtered
       .map(
         (p) =>
-          `<button type="button" class="roster-person" data-profile="${p.id}"><span class="portrait-thumb"><img src=".${e(p.photo.path)}" style="${portraitStyle(p.photo)}" alt="" loading="lazy"></span><span><strong>${e(p.name)}</strong><small>${e(supportLabel(p, rosterAll ? null : category.id))}</small></span><b aria-hidden="true">↗</b></button>`,
+          `<button type="button" class="roster-person" data-profile="${p.id}"><span class="portrait-thumb">${portraitMarkup(p.photo, { loading: "lazy" })}</span><span><strong>${e(p.name)}</strong><small>${e(supportLabel(p, rosterAll ? null : category.id))}</small></span><b aria-hidden="true">↗</b></button>`,
       )
       .join("") || "<p>Nenhuma pessoa encontrada.</p>";
 }
@@ -443,7 +443,7 @@ function renderRanking() {
     played
       .map(
         (p) =>
-          `<li><span>${p.rank ?? "—"}</span><span class="portrait-thumb"><img src=".${e(byId.get(p.id)?.photo.path || "")}" style="${portraitStyle(byId.get(p.id)?.photo)}" alt=""></span><strong>${e(byId.get(p.id)?.name || p.name)}</strong><span>${p.elo} <small>pontos</small></span></li>`,
+          `<li><span>${p.rank ?? "—"}</span><span class="portrait-thumb">${portraitMarkup(byId.get(p.id)?.photo)}</span><strong>${e(byId.get(p.id)?.name || p.name)}</strong><span>${p.elo} <small>pontos</small></span></li>`,
       )
       .join("") ||
     "<li>Você ainda não confirmou escolhas nesta categoria.</li>";

@@ -15,7 +15,7 @@
       "failed": 0
     },
     "frontend": {
-      "passed": 211,
+      "passed": 212,
       "failed": 0
     },
     "build": "passed",
@@ -32,22 +32,29 @@
       "Chromium responsive layout: 3 screens / 16 viewports",
       "Ordered daily choices: ten rounds, recovery and reload at 390/1440",
       "Quiz: 20 questions, four viewports, sharing, replay, legacy and unavailable storage"
-    ]
+    ],
+    "framing": "Dedicated clipped viewports preserve aspect ratio; per-photo framing keeps faces inside the portrait area without changing source files."
   },
   "screenshots": {
     "screenshots/chromium-390-inicio.png": {
-      "sha256": "31d8c3d3f70eb3e6608df8d8778528cdff2ded4180dcc367a0530be50c3f200c"
+      "sha256": "3dab65d53be122e56d0776be2da9fc951dde52968f8ea27ad8cfce1c4e23e277"
     },
     "screenshots/chromium-1440-confirmada.png": {
-      "sha256": "aa6d2adeeb4c1d20e269672dfaeeb759e3107129d4e7bf0b9c04d14cf7ad1530"
+      "sha256": "177ebf1832655f69c472d6e6a9eddd76e1ab75184dfaeccd94a62f5eb8b6b739"
     },
     "screenshots/chromium-390-confirmada.png": {
-      "sha256": "ef5a3c93f1db9ec448a946e49634f1a83ce2ce36e4e1fb9a4674f4b05693e0a7"
+      "sha256": "055ea9a51e2bb48fd7149107d5bf8ab886b95c5977de9da4388412fece8d4687"
     },
     "screenshots/chromium-1440-inicio.png": {
-      "sha256": "3e507ed8f859c906d5f457f8a6f35c011a9453ada21d0bc64c031feb30adfe5a"
+      "sha256": "c664d5f58b4ad0229a35c3379b1c3a84a093fb23fecca1e0bd6d039f2fbfed6c"
     }
   },
   "pullRequest": "https://github.com/stefancabral-oss/polimatch/pull/250",
-  "codeCommit": "2dbdcd631877a127811f4d8accd5bbce5ba2947b"
+  "sourceFingerprints": {
+    "app/src/tcg-card.js": "86ebf1ecc502cedcc347baff1fbb1f22790a3c3f65ec7673cb8434c34548b46e",
+    "app/src/tcg-card.css": "65e5c09d924c40b22f141bbca8c9b9c3e794565f36c19169643a5575e0e9b558",
+    "app/src/presidential-page.js": "570cab626626cad3da06a7a503779fc1cf3fc1923e7a413ec654b96b3955030f",
+    "shared/presidential-roster.json": "cbd9adb9664c97db77702b7b506fedcf07477c7819366461874d4ed9fed1a999",
+    "shared/presidential-curation.js": "c04b050021c5fdf5379c93a1f94946718ca2ef2a31db38510f44babf9f244296"
+  }
 }

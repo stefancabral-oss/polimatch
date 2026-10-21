@@ -12,7 +12,7 @@ export function escapeCardText(value = "") {
 export function portraitStyle(photo = {}) {
   const position = /^(?:center|\d{1,3}% \d{1,3}%)$/.test(photo.position || "")
     ? photo.position
-    : "center 20%";
+    : "center top";
   if (
     photo.crop &&
     [photo.crop.x, photo.crop.y, photo.crop.width].every(Number.isFinite) &&
@@ -27,7 +27,24 @@ export function portraitStyle(photo = {}) {
   const rotation = [-90, 90, 180].includes(photo.rotation)
     ? `transform:rotate(${photo.rotation}deg);`
     : "";
-  return `object-position:${position};${rotation}`;
+  return `object-position:${position};object-fit:${photo.fit === "contain" ? "contain" : "cover"};${rotation}`;
+}
+
+let cropSequence = 0;
+export function portraitMarkup(photo, { alt = "", loading = "eager" } = {}) {
+  const e = escapeCardText;
+  const crop = photo?.crop;
+  if (crop?.height && photo.width && photo.height) {
+    const viewBox = [
+      crop.x * photo.width,
+      crop.y * photo.height,
+      crop.width * photo.width,
+      crop.height * photo.height,
+    ].join(" ");
+    const clip = `portrait-clip-${++cropSequence}`;
+    return `<svg class="portrait-viewport" viewBox="${viewBox}" preserveAspectRatio="xMidYMid meet" ${alt ? `role="img" aria-label="${e(alt)}"` : 'aria-hidden="true"'}><defs><clipPath id="${clip}"><rect x="${crop.x * photo.width}" y="${crop.y * photo.height}" width="${crop.width * photo.width}" height="${crop.height * photo.height}"/></clipPath></defs><image clip-path="url(#${clip})" href="${e(photo.path)}" width="${photo.width}" height="${photo.height}"/></svg>`;
+  }
+  return `<img src="${e(photo?.path || photo || "")}" style="${portraitStyle(photo)}" alt="${e(alt)}" loading="${loading}" decoding="async">`;
 }
 
 export function tcgCardMarkup(
@@ -35,10 +52,9 @@ export function tcgCardMarkup(
   { decorative = false, category = "Corrida presidencial", index = 0 } = {},
 ) {
   const e = escapeCardText;
-  const image = person.photo?.path || person.photo || "";
   const serial = String(person.personId || index + 1).padStart(3, "0");
   const content = `<span class="tcg-edge" aria-hidden="true"></span>
-    <span class="tcg-art"><img src="${e(image)}" style="${portraitStyle(person.photo)}" alt="${decorative ? "" : `Retrato de ${e(person.name)}`}" ${decorative ? 'loading="eager"' : 'decoding="async"'}></span>
+    <span class="tcg-art">${portraitMarkup(person.photo, { alt: decorative ? "" : `Retrato de ${person.name}` })}</span>
     <span class="tcg-foil" aria-hidden="true"></span><span class="tcg-etching" aria-hidden="true"></span>
     <span class="tcg-top" aria-hidden="true"><img src="./brand/symbol-monochrome.svg" alt=""><span>POLIMATCH</span><b>✦</b></span>
     <span class="tcg-choice" aria-hidden="true" hidden></span>

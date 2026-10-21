@@ -71,6 +71,19 @@ export function validatePresidentialRoster(
           person.photo.crop.x + person.photo.crop.width > 1)
       )
         throw new TypeError(`Recorte inválido: ${person.id}`);
+      if (
+        person.photo.crop?.height !== undefined &&
+        (!Number.isFinite(person.photo.crop.height) ||
+          person.photo.crop.height <= 0 ||
+          person.photo.crop.y + person.photo.crop.height > 1 ||
+          !Number.isSafeInteger(person.photo.width) ||
+          !Number.isSafeInteger(person.photo.height) ||
+          person.photo.width <= 0 ||
+          person.photo.height <= 0)
+      )
+        throw new TypeError(`Janela de retrato inválida: ${person.id}`);
+      if (person.photo.fit && !["cover", "contain"].includes(person.photo.fit))
+        throw new TypeError(`Ajuste de retrato inválido: ${person.id}`);
     } else if (requirePhotos)
       throw new TypeError(`Retrato ausente: ${person.id}`);
     for (const membership of person.memberships) {

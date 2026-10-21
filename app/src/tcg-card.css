@@ -56,7 +56,7 @@
 .tcg-art {
   position: absolute;
   z-index: 2;
-  inset: 9px 9px 12%;
+  inset: 9px 9px 100px;
   overflow: hidden;
   border-radius: 10px 10px 0 0;
   background: #0a3f33;
@@ -290,7 +290,7 @@
     border-radius: 12px;
   }
   .tcg-art {
-    inset: 7px 7px 13%;
+    inset: 7px 7px 81px;
     border-radius: 8px 8px 0 0;
   }
   .tcg-top {
@@ -350,4 +350,22 @@
     transform: none !important;
     transition: none;
   }
+}
+
+.tcg-card [hidden] {
+  display: none !important;
+}
+.portrait-viewport {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.tcg-art::after {
+  background: linear-gradient(
+    180deg,
+    #001c1933,
+    transparent 25% 75%,
+    #002a2244 95%,
+    #001c19 100%
+  );
 }

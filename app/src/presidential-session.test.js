@@ -80,3 +80,23 @@ test("TCG card keeps one visible name, escapes markup, differentiates decorative
   assert.ok(!decorative.includes("<button"));
   assert.match(decorative, /aria-hidden="true"/);
 });
+
+test("portrait viewports preserve aspect ratio and use unique clipping boundaries", async () => {
+  const { portraitMarkup } = await import("./tcg-card.js");
+  const photo = {
+    path: "/portraits/presidential/source.png",
+    width: 800,
+    height: 700,
+    crop: { x: 0.3, y: 0.2, width: 0.2, height: 0.5 },
+  };
+  const markup = portraitMarkup(photo);
+  assert.match(markup, /viewBox="240 140 160 350"/);
+  assert.match(markup, /preserveAspectRatio="xMidYMid meet"/);
+  assert.match(markup, /<clipPath/);
+  assert.match(markup, /href="\/portraits\/presidential\/source.png"/);
+  assert.notEqual(
+    markup,
+    portraitMarkup(photo),
+    "clip IDs must be unique across a card, roster and profile",
+  );
+});

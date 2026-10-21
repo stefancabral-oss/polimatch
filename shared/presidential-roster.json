@@ -655,7 +655,8 @@
         "source": "Acervo PoliMatch · carlos-bolsonaro",
         "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
         "credit": "Créditos do acervo PoliMatch",
-        "kind": "existing"
+        "kind": "existing",
+        "fit": "contain"
       }
     },
     {
@@ -759,7 +760,8 @@
         "source": "Acervo PoliMatch · guilherme-boulos",
         "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
         "credit": "Créditos do acervo PoliMatch",
-        "kind": "existing"
+        "kind": "existing",
+        "fit": "contain"
       }
     },
     {
@@ -819,7 +821,8 @@
         "source": "Acervo PoliMatch · geraldo-alckmin",
         "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
         "credit": "Créditos do acervo PoliMatch",
-        "kind": "existing"
+        "kind": "existing",
+        "fit": "contain"
       }
     },
     {
@@ -839,7 +842,8 @@
         "source": "Acervo PoliMatch · simone-tebet",
         "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
         "credit": "Créditos do acervo PoliMatch",
-        "kind": "existing"
+        "kind": "existing",
+        "fit": "contain"
       }
     },
     {
@@ -1220,7 +1224,16 @@
         "source": "https://images.metroimg.com/2024/04/05214528/Captura-de-tela-2024-04-05-214606_resized_compressed.jpg",
         "sourceUrl": "https://www.metropoles.com/colunas/fabia-oliveira/apos-largar-o-futebol-pedro-ortega-investe-em-apostas-esportivas",
         "credit": "Retrato de Pedro Ortega. Reprodução, publicado pelo Metrópoles.",
-        "kind": "curated"
+        "kind": "curated",
+        "position": "50% 0%",
+        "crop": {
+          "x": 0.3,
+          "y": 0,
+          "width": 0.35,
+          "height": 0.63
+        },
+        "width": 1200,
+        "height": 800
       }
     },
     {
@@ -1264,10 +1277,13 @@
         "credit": "Reprodução do perfil público @zig_na_voz, publicada pelo Intercept Brasil.",
         "kind": "curated",
         "crop": {
-          "x": 0.28,
-          "y": 0.21,
-          "width": 0.23
-        }
+          "x": 0.32,
+          "y": 0.23,
+          "width": 0.19,
+          "height": 0.45
+        },
+        "width": 821,
+        "height": 737
       }
     },
     {
@@ -1312,7 +1328,8 @@
         "credit": "Imagem publicada por elcomercio.pe. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 1200,
-        "height": 800
+        "height": 800,
+        "fit": "contain"
       }
     },
     {
@@ -1356,7 +1373,14 @@
         "credit": "Imagem publicada por www.purepeople.com.br. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 666,
-        "height": 666
+        "height": 666,
+        "position": "30% 0%",
+        "crop": {
+          "x": 0.12,
+          "y": 0,
+          "width": 0.45,
+          "height": 0.53
+        }
       }
     },
     {
@@ -1486,7 +1510,8 @@
         "credit": "Imagem publicada por www.brasil247.com. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 1170,
-        "height": 540
+        "height": 540,
+        "fit": "contain"
       }
     },
     {
@@ -1508,7 +1533,12 @@
         "credit": "Imagem publicada por pulitzercenter.org. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 1600,
-        "height": 1066
+        "height": 1066,
+        "crop": {
+          "x": 0.55,
+          "y": 0,
+          "width": 0.45
+        }
       }
     },
     {
@@ -1554,7 +1584,8 @@
         "width": 600,
         "height": 600,
         "position": "center",
-        "rotation": -90
+        "rotation": -90,
+        "fit": "contain"
       }
     },
     {
@@ -1706,7 +1737,12 @@
         "kind": "curated",
         "width": 1200,
         "height": 1204,
-        "position": "8% 20%"
+        "position": "8% 20%",
+        "crop": {
+          "x": 0,
+          "y": 0,
+          "width": 0.48
+        }
       }
     },
     {
@@ -1878,7 +1914,8 @@
         "credit": "Imagem publicada por www.terra.com.br. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 1200,
-        "height": 900
+        "height": 900,
+        "fit": "contain"
       }
     },
     {
@@ -1966,7 +2003,8 @@
         "credit": "Imagem publicada por www.correio24horas.com.br. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 1400,
-        "height": 762
+        "height": 762,
+        "fit": "contain"
       }
     },
     {
@@ -1988,7 +2026,8 @@
         "credit": "Imagem publicada por www.newyorker.com. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 1705,
-        "height": 1705
+        "height": 1705,
+        "fit": "contain"
       }
     },
     {
@@ -2054,7 +2093,8 @@
         "credit": "Imagem publicada por oc-media.org. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 960,
-        "height": 640
+        "height": 640,
+        "fit": "contain"
       }
     },
     {
@@ -2164,7 +2204,8 @@
         "credit": "Imagem publicada por en.wikipedia.org. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 1200,
-        "height": 900
+        "height": 900,
+        "position": "90% 0%"
       }
     },
     {
@@ -2208,7 +2249,8 @@
         "credit": "Imagem publicada por www.imdb.com. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 1000,
-        "height": 1403
+        "height": 1403,
+        "position": "90% 0%"
       }
     },
     {
@@ -2230,7 +2272,8 @@
         "credit": "Imagem publicada por commons.wikimedia.org. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 800,
-        "height": 500
+        "height": 500,
+        "position": "90% 0%"
       }
     },
     {
@@ -2297,7 +2340,8 @@
         "kind": "curated",
         "width": 1960,
         "height": 1470,
-        "position": "center"
+        "position": "center",
+        "fit": "contain"
       }
     },
     {
@@ -2341,7 +2385,8 @@
         "credit": "Imagem publicada por www.musicradar.com. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 1125,
-        "height": 1125
+        "height": 1125,
+        "fit": "contain"
       }
     },
     {
@@ -2551,7 +2596,8 @@
         "source": "Acervo PoliMatch · janja",
         "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
         "credit": "Créditos do acervo PoliMatch",
-        "kind": "existing"
+        "kind": "existing",
+        "fit": "contain"
       }
     },
     {
@@ -2573,7 +2619,8 @@
         "credit": "Imagem publicada por ultimosegundo.ig.com.br. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 1200,
-        "height": 800
+        "height": 800,
+        "fit": "contain"
       }
     },
     {
@@ -2595,7 +2642,8 @@
         "credit": "Imagem publicada por www.brasildefato.com.br. A autoria e a licença constam na fonte quando disponíveis.",
         "kind": "curated",
         "width": 560,
-        "height": 560
+        "height": 560,
+        "fit": "contain"
       }
     },
     {
