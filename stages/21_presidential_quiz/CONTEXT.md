@@ -15,3 +15,6 @@ Unidade: autoria/opções/fontes e restaurar por edição. Navegador Chromium/We
 
 ## Gate
 Direção editorial, mistura de vozes e implementação/publicação autorizadas na conversa. Etapa 20 validada pelo usuário; issue pode registrar esse gate. Não substituir revisão humana do resultado novo por CI. Não fechar #246 como aprovado sem retorno do usuário.
+
+## Correção visual de 21/10/2026
+Stefan identificou que o indicador Concluído parecia um botão sem ação. Remover a moldura e o preenchimento do progresso, identificar a conclusão com um check e semântica de status. Preservar as ações Compartilhar, Jogar novamente, fontes e troca de edição. Regressão de navegador verifica status sem borda e sem foco de botão nas quatro larguras. Esta correção não aprova automaticamente o gate visual humano.

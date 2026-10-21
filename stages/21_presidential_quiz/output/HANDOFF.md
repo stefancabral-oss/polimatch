@@ -15,3 +15,8 @@ Edição anterior permanece em ?edicao=1, com a chave de progresso antiga. A pre
 Seleção não é neutra nem exaustiva da carreira. Frases com conteúdo pejorativo são registros contextualizados e não humor dirigido a grupos protegidos. Propostas são intenções sujeitas à implementação, não garantias ou realizações. Sem sync entre dispositivos. Fontes externas podem mudar.
 
 Base 5ddf9c6; branch feat/246-presidential-quiz. Usuário aprovou a etapa 20 e a nova direção editorial. Revisão humana da nova implementação ainda pendente; manter #246 aberta para esse retorno.
+
+## Correção do falso botão Concluído — 21/10/2026
+A imagem enviada por Stefan mostrou a ambiguidade do indicador de conclusão. Era um span sem evento de clique, mas a borda arredondada imitava um botão. Progresso agora é texto sem moldura; conclusão recebe check e role=status com nome Jogo concluído. Ações reais preservadas. Teste de regressão falhou antes da correção (status acessível ausente) e exige ausência de borda, fundo, raio e foco na conclusão. Resultado e controles reais serão conferidos após deploy. Gate humano permanece pendente.
+
+Validação local da correção: 208 testes, build e diff --check aprovados. Quiz completo e status sem aparência de botão em 320/390/768/1440 px, com screenshot do resultado; reinício, fallback de compartilhamento e edição anterior preservados. CI remoto e publicação serão registrados na PR.
