@@ -34,5 +34,32 @@
   },
   "remoteCI": "pending PR; see final PR receipt",
   "deployment": "pending; see final PR receipt",
-  "humanReview": "pending"
+  "humanReview": "pending",
+  "completionStatusFix": {
+    "date": "2026-10-21",
+    "userEvidence": "image(20261021-102426).png: Concluído interpreted as a button",
+    "rootCause": "noninteractive span styled as a rounded outlined control",
+    "change": "plain status text, check mark and accessible status name; no border, background or focus target",
+    "regressionBefore": "failed: status element absent",
+    "regressionAfter": {
+      "passed": true,
+      "engine": "chromium",
+      "widths": [
+        320,
+        390,
+        768,
+        1440
+      ],
+      "fullQuiz": true,
+      "replay": true,
+      "sharingFallback": true,
+      "legacyResume": true,
+      "unitTests": 208,
+      "build": true,
+      "diffCheck": true
+    },
+    "remoteCI": "pending; see PR receipt",
+    "production": "pending; see PR receipt",
+    "humanVisualReview": "pending"
+  }
 }

@@ -33,6 +33,12 @@ try {
   }
   assert.match(await page.locator('#result-title').innerText(),/20.*de 20/s);
   assert.match(await page.locator('.score-strip').innerText(),/3750/);
+  const completed=page.getByRole('status',{name:'Jogo concluído',exact:true});
+  assert.equal(await completed.count(),1);
+  const statusStyle=await completed.evaluate(node=>{const style=getComputedStyle(node);return {tag:node.tagName,border:style.borderTopWidth,radius:style.borderRadius,background:style.backgroundColor,tabIndex:node.tabIndex};});
+  assert.deepEqual(statusStyle,{tag:'SPAN',border:'0px',radius:'0px',background:'rgba(0, 0, 0, 0)',tabIndex:-1});
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  if(process.env.POLIMATCH_QUIZ_SCREENSHOTS) await page.screenshot({path:`${process.env.POLIMATCH_QUIZ_SCREENSHOTS}/${width}-result.png`,fullPage:true});
   await page.reload(); await page.locator('#share').waitFor();
   await page.evaluate(()=>{Object.defineProperty(navigator,'share',{configurable:true,value:undefined});Object.defineProperty(navigator,'clipboard',{configurable:true,value:undefined});});
   await page.locator('#share').click();

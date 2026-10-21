@@ -62,7 +62,7 @@ function render(focus='') {
   root.innerHTML=`<div class="quiz-shell"><header class="quiz-header">
     <a class="brand" href="./" aria-label="PoliMatch — início"><img src="./icon.svg" alt="" width="32" height="32">PoliMatch</a><a class="back" href="./">← Início</a></header>
     <main id="content"><div class="quiz-title"><div><p class="eyebrow">${edition.id===EDITION?'Vozes da corrida presidencial':'Lula ou Flávio?'}</p>
-    <h1 tabindex="-1">Quem disse isso?</h1></div><span class="progress">${complete?'Concluído':`${state.index+1} de ${questions.length}`}</span></div>
+    <h1 tabindex="-1">Quem disse isso?</h1></div><span class="progress" role="status" aria-label="${complete?'Jogo concluído':'Progresso do jogo'}">${complete?'✓ Concluído':`${state.index+1} de ${questions.length}`}</span></div>
     <p class="intro">${complete?'Confira seu resultado e desafie alguém a reconhecer essas vozes.':proposal(question)?'De quem é a proposta? Toque no autor do plano.':'Parece óbvio? Toque em quem você acha que disse.'}</p>
     ${complete?result(score):`<section class="question ${proposal(question)?'proposal':''}" aria-label="${proposal(question)?'Proposta da rodada':'Frase da rodada'}">
       ${proposal(question)?'<span class="question-kind">Proposta resumida · sem citação literal</span>':'<span class="quote-mark" aria-hidden="true">“</span>'}
