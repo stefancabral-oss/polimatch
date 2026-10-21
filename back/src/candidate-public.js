@@ -264,7 +264,7 @@ function publicationPayload(candidate) {
       version: ownStringOr(cardArt, "version", "", "publication.cardArt.version"),
     },
     documentaryPhoto: {
-      status: status(documentaryPhoto.status, ["missing", "approved", "rejected", "restored"], "missing", "publication.documentaryPhoto.status"),
+      status: status(documentaryPhoto.status, ["missing", "approved", "rejected", "restored", "curated"], "missing", "publication.documentaryPhoto.status"),
       image: ownStringOr(documentaryPhoto, "image", "", "publication.documentaryPhoto.image"),
       source: ownStringOr(documentaryPhoto, "source", "", "publication.documentaryPhoto.source"),
       license: ownStringOr(documentaryPhoto, "license", "", "publication.documentaryPhoto.license"),

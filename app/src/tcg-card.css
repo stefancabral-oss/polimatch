@@ -1,0 +1,353 @@
+.tcg-card {
+  --holo-x: 50%;
+  --holo-y: 50%;
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  position: relative;
+  isolation: isolate;
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #ffe3a0;
+  border-radius: 20px;
+  background: linear-gradient(
+    125deg,
+    #ffe5a1,
+    #916320 17%,
+    #fff4c7 35%,
+    #b58a37 60%,
+    #fff5c8 77%,
+    #70501f
+  );
+  color: #fffcf4;
+  text-align: left;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transform: perspective(950px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  box-shadow:
+    0 2px 0 #5d451e,
+    0 4px 0 #231d0e,
+    0 18px 34px #0008,
+    0 0 0 1px #0c1d16,
+    inset 0 0 0 2px #ffffd633;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.tcg-card > span {
+  pointer-events: none;
+}
+.tcg-edge {
+  position: absolute;
+  z-index: 1;
+  inset: 4px;
+  border: 1px solid #f3d68c;
+  border-radius: 16px;
+  background: linear-gradient(130deg, #145b45, #011b17 45%, #205342);
+  box-shadow:
+    inset 0 0 0 2px #002b22,
+    inset 0 0 0 3px #e7c56e77;
+}
+.tcg-art {
+  position: absolute;
+  z-index: 2;
+  inset: 9px 9px 12%;
+  overflow: hidden;
+  border-radius: 10px 10px 0 0;
+  background: #0a3f33;
+}
+.tcg-art img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center 20%;
+  filter: saturate(0.9) contrast(1.04);
+}
+.tcg-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      #001c1955,
+      transparent 25% 43%,
+      #002a22aa 70%,
+      #001c19 100%
+    ),
+    radial-gradient(ellipse at 50% 35%, transparent 35%, #002b2460 100%);
+}
+.tcg-foil {
+  position: absolute;
+  z-index: 3;
+  inset: 8px;
+  border-radius: 12px;
+  mix-blend-mode: screen;
+  opacity: 0.38;
+  background:
+    radial-gradient(
+      circle at var(--holo-x) var(--holo-y),
+      #fff9ca55,
+      transparent 36%
+    ),
+    linear-gradient(
+      116deg,
+      transparent 10%,
+      #f4d49022 22%,
+      #6de1cd33 30%,
+      #c8b5ff44 36%,
+      #ffe9a655 40%,
+      transparent 47% 65%,
+      #51c5ae33 75%,
+      transparent 85%
+    );
+  background-size:
+    100% 100%,
+    220% 220%;
+  background-position:
+    center,
+    var(--holo-x) var(--holo-y);
+}
+.tcg-etching {
+  position: absolute;
+  z-index: 4;
+  inset: 7px;
+  border: 1px solid #fff3bc77;
+  border-radius: 13px;
+  background:
+    repeating-linear-gradient(130deg, transparent 0 23px, #e4cd8b08 24px 25px),
+    repeating-radial-gradient(
+      ellipse at 0% 100%,
+      transparent 0 24px,
+      #f3d7881c 25px 26px,
+      transparent 27px 30px
+    );
+  -webkit-mask-image:
+    linear-gradient(90deg, #000, transparent 18% 82%, #000),
+    linear-gradient(0deg, #000, transparent 22% 87%, #000);
+  mask-image:
+    linear-gradient(90deg, #000, transparent 18% 82%, #000),
+    linear-gradient(0deg, #000, transparent 22% 87%, #000);
+}
+.tcg-top {
+  position: absolute;
+  z-index: 5;
+  top: 17px;
+  left: 17px;
+  right: 17px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-shadow: 0 1px 4px #00130f;
+}
+.tcg-top > img {
+  width: 18px;
+  height: 18px;
+}
+.tcg-top > b {
+  margin-left: auto;
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ead7a5;
+  border-radius: 50%;
+  color: #ffe4a0;
+  background: #052e27cc;
+  box-shadow:
+    inset 0 0 0 3px #c1ac7944,
+    0 1px 8px #0007;
+  font-size: 15px;
+}
+.tcg-caption {
+  position: absolute;
+  z-index: 6;
+  left: 14px;
+  right: 14px;
+  bottom: 24px;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  min-height: 72px;
+  padding: 13px 12px 12px;
+  border-top: 1px solid #ffe7aa;
+  border-bottom: 1px solid #705624;
+  background: linear-gradient(120deg, #fffdf5, #f5eddb 65%, #dcd2b9);
+  color: #082f29;
+  clip-path: polygon(0 0, 94% 0, 100% 17%, 100% 100%, 6% 100%, 0 83%);
+}
+.tcg-category {
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #716036;
+}
+.tcg-name {
+  display: block;
+  min-width: 0;
+  font-size: clamp(14px, 1.35vw, 22px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.tcg-footer {
+  position: absolute;
+  z-index: 7;
+  bottom: 10px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  color: #e4d4a6;
+  font-size: 6px;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  white-space: nowrap;
+}
+.tcg-spark {
+  position: absolute;
+  z-index: 7;
+  bottom: 90px;
+  right: 15px;
+  color: #fff2bd;
+  font-size: 29px;
+  filter: drop-shadow(0 0 6px #f6d98b);
+}
+.tcg-choice {
+  position: absolute;
+  z-index: 8;
+  top: 50px;
+  right: 16px;
+  width: 38px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid #fff2c1;
+  border-radius: 50%;
+  color: #062c23;
+  background: linear-gradient(145deg, #fff5c5, #cfaa4b);
+  font-size: 19px;
+  font-weight: 950;
+  box-shadow:
+    0 0 0 4px #023b31cc,
+    0 0 25px #e8ce7e88;
+}
+.tcg-outcome {
+  font-size: 11px;
+  font-weight: 850;
+  color: #186447;
+}
+.tcg-card[aria-pressed="true"] {
+  border-color: #fff4be;
+  box-shadow:
+    0 3px 0 #b58d3a,
+    0 18px 35px #0009,
+    0 0 0 2px #fce2a1,
+    0 0 35px #e9ce7d55;
+  transform: translateY(-5px);
+}
+.tcg-card.is-muted {
+  filter: saturate(0.5) brightness(0.72);
+}
+.tcg-card.is-muted .tcg-outcome {
+  color: #7b4640;
+}
+.tcg-card:hover {
+  box-shadow:
+    0 3px 0 #8c6c2e,
+    0 24px 40px #0009,
+    0 0 23px #d5bd6d33;
+}
+.tcg-card:focus-visible {
+  outline: 3px solid #a7ffdf;
+  outline-offset: 5px;
+}
+.tcg-card--decorative {
+  cursor: default;
+}
+.tcg-card[aria-disabled="true"] {
+  cursor: default;
+}
+@media (max-width: 600px) {
+  .tcg-card {
+    border-radius: 15px;
+  }
+  .tcg-edge {
+    inset: 3px;
+    border-radius: 12px;
+  }
+  .tcg-art {
+    inset: 7px 7px 13%;
+    border-radius: 8px 8px 0 0;
+  }
+  .tcg-top {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    font-size: 5px;
+    gap: 3px;
+  }
+  .tcg-top > img {
+    width: 14px;
+    height: 14px;
+  }
+  .tcg-top > b {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+  }
+  .tcg-caption {
+    left: 10px;
+    right: 10px;
+    bottom: 19px;
+    padding: 9px 8px;
+    min-height: 57px;
+    gap: 3px;
+  }
+  .tcg-name {
+    font-size: clamp(12px, 3.6vw, 18px);
+  }
+  .tcg-category {
+    font-size: 5px;
+    letter-spacing: 0.08em;
+  }
+  .tcg-footer {
+    bottom: 8px;
+    left: 13px;
+    right: 13px;
+    font-size: 4px;
+  }
+  .tcg-choice {
+    top: 39px;
+    right: 12px;
+    width: 29px;
+    font-size: 15px;
+  }
+  .tcg-spark {
+    bottom: 70px;
+    right: 10px;
+    font-size: 21px;
+  }
+  .tcg-outcome {
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tcg-card {
+    transform: none !important;
+    transition: none;
+  }
+}

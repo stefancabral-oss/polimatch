@@ -651,3 +651,9 @@ button:focus-visible { outline: 3px solid #2a8d70; outline-offset: 3px; }
 .finish-safira, .finish-quartzo { background: linear-gradient(130deg, #586aab, #d4e5ef, #586aab); }
 .finish-onix { background: linear-gradient(130deg, #576766, #c2cfcc, #576766); }
 .finish-aurora, .finish-cristal { background: linear-gradient(130deg, #a3d3c8, #e5c4da, #bedae2); }
+
+/* Curadoria presidencial: a mesma carta Chroma na capa e na mesa. */
+.home-race-deck{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-content:center;position:relative;max-width:440px;width:100%;margin:auto;padding:10px 15px 32px}
+.home-race-preview{position:relative;min-width:0;z-index:1}.home-race-preview:nth-of-type(odd){transform:rotate(-5deg)}.home-race-preview:nth-of-type(even){transform:rotate(5deg) translateY(10px)}
+.home-race-preview .tcg-card{aspect-ratio:5/7}.home-race-preview .tcg-name{font-size:16px}.home-race-preview .tcg-caption{min-height:60px;padding:10px}.home-race-deck>p{position:absolute;bottom:0;left:0;right:0;margin:0;text-align:center;font-size:9px;color:#dbc38a}
+@media(max-width:600px){.home-race-deck{max-width:310px;gap:11px;padding:8px 10px 30px}.home-race-preview .tcg-name{font-size:12px}.home-race-preview .tcg-caption{min-height:46px;padding:7px}.home-race-preview .tcg-top{font-size:4px}.home-race-preview .tcg-category{font-size:4px}.home-race-preview .tcg-footer{font-size:3px}.home-race-preview .tcg-spark{bottom:57px}}

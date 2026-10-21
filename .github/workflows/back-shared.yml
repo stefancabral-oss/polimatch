@@ -100,6 +100,8 @@ jobs:
         run: npm run test:integration --prefix back
       - name: Verify ordered two-card choices and receipts
         run: node back/scripts/ordered-choices-smoke.mjs
+      - name: Verify presidential pools, existing players and isolated Chroma duels
+        run: node back/scripts/presidential-duels-smoke.mjs
       - name: Prove vote abuse is blocked
         run: npm run test:abuse --prefix back
       - name: Verify issued pairs, optional discard and earned inventory

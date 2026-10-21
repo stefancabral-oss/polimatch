@@ -150,3 +150,8 @@ jobs:
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
         run: node app/e2e/quote-quiz.mjs
+
+      - name: Validate presidential Chroma duels and interrupted confirmations
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+        run: node app/e2e/presidential-duels.mjs

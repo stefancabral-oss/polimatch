@@ -1,0 +1,46 @@
+{
+  "stage": 22,
+  "issue": 249,
+  "baseCommit": "dac70018ac1c37c2e1abf004a8bb4d622ed31e7e",
+  "date": "2026-10-21",
+  "humanGate": "pending",
+  "productionChanged": false,
+  "checks": {
+    "shared": {
+      "passed": 93,
+      "failed": 0
+    },
+    "backend": {
+      "passed": 232,
+      "failed": 0
+    },
+    "frontend": {
+      "passed": 211,
+      "failed": 0
+    },
+    "build": "passed",
+    "portraitIntegrity": "104 assets with SHA-256 and source",
+    "chromiumPresidential": "passed at 390x844 and 1440x1000",
+    "responsiveWidths": [
+      320,
+      375,
+      768,
+      1440
+    ],
+    "postgresAndWebkit": "CI required; local runtime downloads unavailable"
+  },
+  "screenshots": {
+    "screenshots/chromium-390-inicio.png": {
+      "sha256": "31d8c3d3f70eb3e6608df8d8778528cdff2ded4180dcc367a0530be50c3f200c"
+    },
+    "screenshots/chromium-1440-confirmada.png": {
+      "sha256": "aa6d2adeeb4c1d20e269672dfaeeb759e3107129d4e7bf0b9c04d14cf7ad1530"
+    },
+    "screenshots/chromium-390-confirmada.png": {
+      "sha256": "ef5a3c93f1db9ec448a946e49634f1a83ce2ce36e4e1fb9a4674f4b05693e0a7"
+    },
+    "screenshots/chromium-1440-inicio.png": {
+      "sha256": "3e507ed8f859c906d5f457f8a6f35c011a9453ada21d0bc64c031feb30adfe5a"
+    }
+  }
+}

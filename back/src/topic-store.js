@@ -917,6 +917,12 @@ async function createCleanSchema(client, candidateRegistry, maintenanceNow) {
     if (!topic.active) continue;
     const playableCandidates = candidateRegistry.candidatesForTopic(topic.id);
     await client.query("INSERT INTO ranking_pools (topic_id) VALUES ($1) ON CONFLICT DO NOTHING", [topic.id]);
+    // Novas curadorias também precisam existir para jogadores criados antes do
+    // deploy. Nunca altera versões, placares ou votos de pools já existentes.
+    await client.query(
+      "INSERT INTO player_pools (player_id, topic_id) SELECT id, $1 FROM anonymous_players ON CONFLICT DO NOTHING",
+      [topic.id],
+    );
     for (const candidate of playableCandidates) {
       await client.query(
         "INSERT INTO ranking_stats (topic_id, candidate_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
