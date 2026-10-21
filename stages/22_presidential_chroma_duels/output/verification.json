@@ -27,7 +27,12 @@
       768,
       1440
     ],
-    "postgresAndWebkit": "CI required; local runtime downloads unavailable"
+    "postgresAndWebkit": "CI required; local runtime downloads unavailable",
+    "legacyRegression": [
+      "Chromium responsive layout: 3 screens / 16 viewports",
+      "Ordered daily choices: ten rounds, recovery and reload at 390/1440",
+      "Quiz: 20 questions, four viewports, sharing, replay, legacy and unavailable storage"
+    ]
   },
   "screenshots": {
     "screenshots/chromium-390-inicio.png": {
@@ -42,5 +47,7 @@
     "screenshots/chromium-1440-inicio.png": {
       "sha256": "3e507ed8f859c906d5f457f8a6f35c011a9453ada21d0bc64c031feb30adfe5a"
     }
-  }
+  },
+  "pullRequest": "https://github.com/stefancabral-oss/polimatch/pull/250",
+  "codeCommit": "2dbdcd631877a127811f4d8accd5bbce5ba2947b"
 }

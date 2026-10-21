@@ -1,10 +1,13 @@
 # ICM 22 — Duelos da corrida presidencial
 
 Issue: https://github.com/stefancabral-oss/polimatch/issues/249
+PR: https://github.com/stefancabral-oss/polimatch/pull/250
+Código validado: https://github.com/stefancabral-oss/polimatch/commit/2dbdcd631877a127811f4d8accd5bbce5ba2947b
 Branch: `feat/presidential-chroma-duels`
 Base: `dac70018ac1c37c2e1abf004a8bb4d622ed31e7e`
 
 ## Entrega
+- Categorias abrem diretamente a arena; a filtragem do elenco permanece na tela de consulta.
 - Nova entrada na home e página `duelos-da-corrida.html`, com identidade própria PoliMatch/Chroma Malaquita: borda facetada, dupla gravação, verniz holográfico reativo, placa de porcelana, número da carta e marcações 1ª/2ª escolha.
 - 104 identidades únicas, 107 vínculos em seis categorias: 20 políticos, 11 empresários, 20 influenciadores, 20 artistas/cantores, 15 internacionais e 20 lideranças sem mandato. Soma por categoria contém repetições autorizadas; o baralho de uma categoria nunca duplica uma identidade.
 - Mantidas as lacunas das listas anteriores: não inventa oito empresários nem cinco internacionais de apoio a Lula. Erasmo integra os dois apoios como uma única carta. Pablo tem uma identidade em três categorias.
