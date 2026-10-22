@@ -1,0 +1,2806 @@
+{
+  "schemaVersion": 1,
+  "curationDate": "2026-10-21",
+  "authorizationIssue": 249,
+  "excludedIds": [
+    "michelle-bolsonaro",
+    "jair-bolsonaro",
+    "eduardo-bolsonaro",
+    "romeu-zema"
+  ],
+  "categories": [
+    {
+      "id": "politicos",
+      "topicId": "corrida-politicos",
+      "name": "Políticos",
+      "description": "Apoiadores com atuação na política institucional.",
+      "members": [
+        {
+          "id": "nikolas-ferreira",
+          "support": "flavio"
+        },
+        {
+          "id": "gustavo-gayer",
+          "support": "flavio"
+        },
+        {
+          "id": "jeffrey-chiquini",
+          "support": "flavio"
+        },
+        {
+          "id": "bruno-zambelli",
+          "support": "flavio"
+        },
+        {
+          "id": "deltan-dallagnol",
+          "support": "flavio"
+        },
+        {
+          "id": "lucas-pavanato",
+          "support": "flavio"
+        },
+        {
+          "id": "cabo-gilberto-silva",
+          "support": "flavio"
+        },
+        {
+          "id": "carlos-bolsonaro",
+          "support": "flavio"
+        },
+        {
+          "id": "guilherme-derrite",
+          "support": "flavio"
+        },
+        {
+          "id": "sergio-moro",
+          "support": "flavio"
+        },
+        {
+          "id": "andre-janones",
+          "support": "lula"
+        },
+        {
+          "id": "erika-hilton",
+          "support": "lula"
+        },
+        {
+          "id": "guilherme-boulos",
+          "support": "lula"
+        },
+        {
+          "id": "fernando-haddad",
+          "support": "lula"
+        },
+        {
+          "id": "marina-silva",
+          "support": "lula"
+        },
+        {
+          "id": "geraldo-alckmin",
+          "support": "lula"
+        },
+        {
+          "id": "simone-tebet",
+          "support": "lula"
+        },
+        {
+          "id": "samia-bonfim",
+          "support": "lula"
+        },
+        {
+          "id": "lindbergh-farias",
+          "support": "lula"
+        },
+        {
+          "id": "joao-campos",
+          "support": "lula"
+        }
+      ]
+    },
+    {
+      "id": "empresarios",
+      "topicId": "corrida-empresarios",
+      "name": "Empresários",
+      "description": "Apoios e contribuições públicas documentadas. Apoio não significa exclusividade.",
+      "members": [
+        {
+          "id": "luciano-hang",
+          "support": "flavio"
+        },
+        {
+          "id": "pablo-marcal",
+          "support": "flavio"
+        },
+        {
+          "id": "tallis-gomes",
+          "support": "flavio"
+        },
+        {
+          "id": "marcos-freitas",
+          "support": "flavio"
+        },
+        {
+          "id": "fernando-oliveira-lima",
+          "support": "flavio"
+        },
+        {
+          "id": "renata-barreto",
+          "support": "flavio"
+        },
+        {
+          "id": "alexandre-grendene",
+          "support": "flavio"
+        },
+        {
+          "id": "eloi-vitorio-marchett",
+          "support": "flavio"
+        },
+        {
+          "id": "nelson-jose-vigolo",
+          "support": "flavio"
+        },
+        {
+          "id": "erasmo-carlos-battistella",
+          "support": "flavio"
+        },
+        {
+          "id": "erasmo-carlos-battistella",
+          "support": "lula"
+        },
+        {
+          "id": "jalles-fontoura",
+          "support": "lula"
+        }
+      ]
+    },
+    {
+      "id": "influenciadores",
+      "topicId": "corrida-influenciadores",
+      "name": "Influenciadores",
+      "description": "Criadores de conteúdo que se posicionaram publicamente.",
+      "members": [
+        {
+          "id": "pablo-marcal",
+          "support": "flavio"
+        },
+        {
+          "id": "monica-salgado",
+          "support": "flavio"
+        },
+        {
+          "id": "yuri22",
+          "support": "flavio"
+        },
+        {
+          "id": "pedro-ortega",
+          "support": "flavio"
+        },
+        {
+          "id": "preto-de-direita",
+          "support": "flavio"
+        },
+        {
+          "id": "zig-na-voz",
+          "support": "flavio"
+        },
+        {
+          "id": "favelado-de-direita",
+          "support": "flavio"
+        },
+        {
+          "id": "kelle-cristina",
+          "support": "flavio"
+        },
+        {
+          "id": "firmino-cortada",
+          "support": "flavio"
+        },
+        {
+          "id": "maumau-zk",
+          "support": "flavio"
+        },
+        {
+          "id": "felipe-neto",
+          "support": "lula"
+        },
+        {
+          "id": "alvaro-influenciador",
+          "support": "lula"
+        },
+        {
+          "id": "alane-dias",
+          "support": "lula"
+        },
+        {
+          "id": "rita-von-hunty",
+          "support": "lula"
+        },
+        {
+          "id": "nath-financas",
+          "support": "lula"
+        },
+        {
+          "id": "laura-sabino",
+          "support": "lula"
+        },
+        {
+          "id": "sabrina-fernandes",
+          "support": "lula"
+        },
+        {
+          "id": "camila-fremder",
+          "support": "lula"
+        },
+        {
+          "id": "lauany-schultz",
+          "support": "lula"
+        },
+        {
+          "id": "orlando-calheiros",
+          "support": "lula"
+        }
+      ]
+    },
+    {
+      "id": "artistas",
+      "topicId": "corrida-artistas",
+      "name": "Artistas e cantores",
+      "description": "Música, cinema e televisão na conversa eleitoral.",
+      "members": [
+        {
+          "id": "gusttavo-lima",
+          "support": "flavio"
+        },
+        {
+          "id": "zeze-di-camargo",
+          "support": "flavio"
+        },
+        {
+          "id": "murilo-huff",
+          "support": "flavio"
+        },
+        {
+          "id": "felipe-araujo",
+          "support": "flavio"
+        },
+        {
+          "id": "rodolffo",
+          "support": "flavio"
+        },
+        {
+          "id": "hugo-sertanejo",
+          "support": "flavio"
+        },
+        {
+          "id": "marrone",
+          "support": "flavio"
+        },
+        {
+          "id": "jorge-sertanejo",
+          "support": "flavio"
+        },
+        {
+          "id": "gian-sertanejo",
+          "support": "flavio"
+        },
+        {
+          "id": "joao-neto-sertanejo",
+          "support": "flavio"
+        },
+        {
+          "id": "anitta",
+          "support": "lula"
+        },
+        {
+          "id": "ludmilla",
+          "support": "lula"
+        },
+        {
+          "id": "bruna-marquezine",
+          "support": "lula"
+        },
+        {
+          "id": "paolla-oliveira",
+          "support": "lula"
+        },
+        {
+          "id": "luisa-sonza",
+          "support": "lula"
+        },
+        {
+          "id": "maisa",
+          "support": "lula"
+        },
+        {
+          "id": "xama",
+          "support": "lula"
+        },
+        {
+          "id": "sophie-charlotte",
+          "support": "lula"
+        },
+        {
+          "id": "caetano-veloso",
+          "support": "lula"
+        },
+        {
+          "id": "gilberto-gil",
+          "support": "lula"
+        }
+      ]
+    },
+    {
+      "id": "internacionais",
+      "topicId": "corrida-internacionais",
+      "name": "Internacionais",
+      "description": "Manifestações públicas de apoio vindas de fora do Brasil.",
+      "members": [
+        {
+          "id": "javier-milei",
+          "support": "flavio"
+        },
+        {
+          "id": "benjamin-netanyahu",
+          "support": "flavio"
+        },
+        {
+          "id": "maria-corina-machado",
+          "support": "flavio"
+        },
+        {
+          "id": "abelardo-de-la-espriella",
+          "support": "flavio"
+        },
+        {
+          "id": "mauricio-macri",
+          "support": "flavio"
+        },
+        {
+          "id": "ivan-duque",
+          "support": "flavio"
+        },
+        {
+          "id": "mariano-rajoy",
+          "support": "flavio"
+        },
+        {
+          "id": "guillermo-lasso",
+          "support": "flavio"
+        },
+        {
+          "id": "vicente-fox",
+          "support": "flavio"
+        },
+        {
+          "id": "juan-guaido",
+          "support": "flavio"
+        },
+        {
+          "id": "roger-waters",
+          "support": "lula"
+        },
+        {
+          "id": "tom-morello",
+          "support": "lula"
+        },
+        {
+          "id": "the-strokes",
+          "support": "lula"
+        },
+        {
+          "id": "pedro-sanchez",
+          "support": "lula"
+        },
+        {
+          "id": "finneas-oconnell",
+          "support": "lula"
+        }
+      ]
+    },
+    {
+      "id": "liderancas",
+      "topicId": "corrida-liderancas",
+      "name": "Sem mandato",
+      "description": "Lideranças políticas, sociais e religiosas sem mandato eletivo em exercício.",
+      "members": [
+        {
+          "id": "pablo-marcal",
+          "support": "flavio"
+        },
+        {
+          "id": "silas-malafaia",
+          "support": "flavio"
+        },
+        {
+          "id": "valdemar-costa-neto",
+          "support": "flavio"
+        },
+        {
+          "id": "augusto-cury",
+          "support": "flavio"
+        },
+        {
+          "id": "ronaldo-caiado",
+          "support": "flavio"
+        },
+        {
+          "id": "daniella-marques",
+          "support": "flavio"
+        },
+        {
+          "id": "adolfo-sachsida",
+          "support": "flavio"
+        },
+        {
+          "id": "marcos-troyjo",
+          "support": "flavio"
+        },
+        {
+          "id": "eduardo-cury",
+          "support": "flavio"
+        },
+        {
+          "id": "solange-vieira",
+          "support": "flavio"
+        },
+        {
+          "id": "janja",
+          "support": "lula"
+        },
+        {
+          "id": "edinho-silva",
+          "support": "lula"
+        },
+        {
+          "id": "jose-dirceu",
+          "support": "lula"
+        },
+        {
+          "id": "manuela-davila",
+          "support": "lula"
+        },
+        {
+          "id": "joao-pedro-stedile",
+          "support": "lula"
+        },
+        {
+          "id": "aloizio-mercadante",
+          "support": "lula"
+        },
+        {
+          "id": "gilberto-carvalho",
+          "support": "lula"
+        },
+        {
+          "id": "paulo-okamotto",
+          "support": "lula"
+        },
+        {
+          "id": "monica-valente",
+          "support": "lula"
+        },
+        {
+          "id": "paula-coradi",
+          "support": "lula"
+        }
+      ]
+    }
+  ],
+  "people": [
+    {
+      "id": "nikolas-ferreira",
+      "name": "Nikolas Ferreira",
+      "personId": 39,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "flavio",
+          "sourceUrl": "https://flaviometro.com/#eleitos"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/039.jpg",
+        "sha256": "0d45045f720e5aecccd8cfb890db14eb4b3e4e96b4eb6e81a3d415791b030499",
+        "source": "Acervo PoliMatch · nikolas-ferreira",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "gustavo-gayer",
+      "name": "Gustavo Gayer",
+      "personId": 126,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "flavio",
+          "sourceUrl": "https://flaviometro.com/#eleitos"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/gustavo-gayer.webp",
+        "sha256": "66ac8f45145300398c9eff3db06dac60baeb3788444e33fc3152eae3c8ac2d9a",
+        "source": "https://cdn.jornalopcao.com.br/assets/2025/09/19220906/7a785955-3cc8-4148-85ad-f876b29c7dad.webp",
+        "sourceUrl": "https://www.jornalopcao.com.br/ultimas-noticias/canal-de-gustavo-gayer-alcanca-6o-lugar-entre-canais-de-noticias-e-politica-no-brasil-747329/",
+        "credit": "Imagem publicada por www.jornalopcao.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1425,
+        "height": 974,
+        "position": "50% 15%"
+      }
+    },
+    {
+      "id": "jeffrey-chiquini",
+      "name": "Jeffrey Chiquini",
+      "personId": 127,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "flavio",
+          "sourceUrl": "https://flaviometro.com/#eleitos"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/jeffrey-chiquini.jpg",
+        "sha256": "3cf1523d69bc3fa26f748d23de73f95c7b9ffbdfd393dfcef202d75d557f9341",
+        "source": "https://p2.trrsf.com/image/fget/cf/1200/1200/middle/images.terra.com/2025/07/14/412391673-kg2eljg6lvfpnoqew3mxagwepu.jpg",
+        "sourceUrl": "https://x.com/JeffreyChiquini",
+        "credit": "Imagem publicada por x.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 1200
+      }
+    },
+    {
+      "id": "bruno-zambelli",
+      "name": "Bruno Zambelli",
+      "personId": 128,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "flavio",
+          "sourceUrl": "https://flaviometro.com/#eleitos"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/bruno-zambelli.jpg",
+        "sha256": "36d5ac1d883abaf87a84ab00d968e31bfddb7839301bb73bc8afaca5ec559ca8",
+        "source": "https://static.wixstatic.com/media/8307fe_b42f7fb525794f45bdcef88bb3c1c82c~mv2.jpg/v1/fill/w_858%2Ch_1000%2Cal_c%2Cq_85%2Cusm_0.66_1.00_0.01/8307fe_b42f7fb525794f45bdcef88bb3c1c82c~mv2.jpg",
+        "sourceUrl": "https://www.elosocialsp.org/post/bruno-zambelli-salgado-deputado-estadual-sp-foi-indicado-e-aprovado-podendo-ser-aclamado-e-dipl",
+        "credit": "Imagem publicada por www.elosocialsp.org. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 858,
+        "height": 1000
+      }
+    },
+    {
+      "id": "deltan-dallagnol",
+      "name": "Deltan Dallagnol",
+      "personId": 95,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "flavio",
+          "sourceUrl": "https://flaviometro.com/#eleitos"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/095.jpg",
+        "sha256": "c1d0763faf72bc735bf302d9aa49e982ad09a7adee15d8f02ebdcd5d6107ca07",
+        "source": "Acervo PoliMatch · deltan-dallagnol",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "lucas-pavanato",
+      "name": "Lucas Pavanato",
+      "personId": 129,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "flavio",
+          "sourceUrl": "https://flaviometro.com/#eleitos"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/lucas-pavanato.jpg",
+        "sha256": "7f397f3cb014ed0a5eff90a63d1a10a0b7d9e9cc185295415dbe38686c2d51f9",
+        "source": "https://www.rbsdirect.com.br/filestore/5/8/4/5/4/0/5_afb6afd66de655f/5045485_a20e83ecde58746.jpg?w=700",
+        "sourceUrl": "https://www.bnews.com.br/noticias/politica/bolsonaristas-se-queixam-do-pl-por-espaco-dado-vereador-ex-mbl.html",
+        "credit": "Imagem publicada por www.bnews.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 700,
+        "height": 466
+      }
+    },
+    {
+      "id": "cabo-gilberto-silva",
+      "name": "Cabo Gilberto Silva",
+      "personId": 130,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "flavio",
+          "sourceUrl": "https://flaviometro.com/#eleitos"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/cabo-gilberto-silva.jpg",
+        "sha256": "1e05674bde43441494e4ab27c87e363c8020ceaa8aed3d466b595f83c6734398",
+        "source": "https://www.camara.leg.br/midias/image/2023/08/img20230803134055166-768x473.jpg",
+        "sourceUrl": "https://www.polemicaparaiba.com.br/politica/psol-inclui-nome-de-cabo-gilberto-em-pedido-de-prisao-por-apoio-a-ato-golpista-em-brasilia-e-fala-em-impedir-posse-de-criminosos-eleitos/",
+        "credit": "Imagem publicada por www.polemicaparaiba.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 768,
+        "height": 473
+      }
+    },
+    {
+      "id": "carlos-bolsonaro",
+      "name": "Carlos Bolsonaro",
+      "personId": 65,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "flavio",
+          "sourceUrl": "https://flaviometro.com/#eleitos"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/065.jpg",
+        "sha256": "acfca8611e91b0718312ca818ad59311303851544b12f094b77e86f8382d725d",
+        "source": "Acervo PoliMatch · carlos-bolsonaro",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing",
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "guilherme-derrite",
+      "name": "Guilherme Derrite",
+      "personId": 131,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "flavio",
+          "sourceUrl": "https://flaviometro.com/#eleitos"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/guilherme-derrite.jpg",
+        "sha256": "13a0ee54b5421db46a89e94621ca61b695157cf205367f8f9658b4525f402be5",
+        "source": "https://conteudo.imguol.com.br/c/noticias/5c/2026/09/21/21set2026---guilherme-derrite-pp-no-debate-uolfolha-1790008794383_v2_900x506.jpg",
+        "sourceUrl": "https://noticias.uol.com.br/eleicoes/2026/10/03/numero-de-derrite-para-o-senado-por-sp-e-dos-demais-candidatos-veja-lista.ghtm",
+        "credit": "Imagem publicada por noticias.uol.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 900,
+        "height": 506
+      }
+    },
+    {
+      "id": "sergio-moro",
+      "name": "Sergio Moro",
+      "personId": 86,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "flavio",
+          "sourceUrl": "https://flaviometro.com/#eleitos"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/086.jpg",
+        "sha256": "f492e5fc9f4f5fcc5aae6e338fb05ce4b0064270d50b641e3c8c182e1fc43cb8",
+        "source": "Acervo PoliMatch · sergio-moro",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "andre-janones",
+      "name": "André Janones",
+      "personId": 80,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "lula",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/10/novo-ato-pro-lula-em-sp-tem-jovens-eleitos-haddad-tebet-e-marina-apos-derrotas-no-1o-turno.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/080.jpg",
+        "sha256": "28b576c9ea3cc2812b14b01f284fd71cd201ffd30f23c386b5d98ddaeddfca49",
+        "source": "Acervo PoliMatch · andre-janones",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "erika-hilton",
+      "name": "Erika Hilton",
+      "personId": 132,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "lula",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/10/novo-ato-pro-lula-em-sp-tem-jovens-eleitos-haddad-tebet-e-marina-apos-derrotas-no-1o-turno.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/erika-hilton.jpg",
+        "sha256": "961920a3dca7528e14a621d61595f3f2eb8dfc11d4ed632cf106d817d7cd66e1",
+        "source": "https://p2.trrsf.com/image/fget/cf/1548/0/images.terra.com/2026/09/30/189954144-capa-bons-fluidos-2026-09-30t083056508.jpg",
+        "sourceUrl": "https://hubpolitico.com.br/perfil/erikahilton/eleicoes/2026",
+        "credit": "Imagem publicada por hubpolitico.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1548,
+        "height": 871
+      }
+    },
+    {
+      "id": "guilherme-boulos",
+      "name": "Guilherme Boulos",
+      "personId": 48,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "lula",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/10/novo-ato-pro-lula-em-sp-tem-jovens-eleitos-haddad-tebet-e-marina-apos-derrotas-no-1o-turno.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/048.jpg",
+        "sha256": "64e42b5c5405d64e346f2943b3acb212a6f7b5bda66826e8a43a130fea59631d",
+        "source": "Acervo PoliMatch · guilherme-boulos",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing",
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "fernando-haddad",
+      "name": "Fernando Haddad",
+      "personId": 12,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "lula",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/10/novo-ato-pro-lula-em-sp-tem-jovens-eleitos-haddad-tebet-e-marina-apos-derrotas-no-1o-turno.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/012.jpg",
+        "sha256": "ee6788b8146ed5e5cfdabe850239ce3a2b081fbaf13757d5cd8e17402c12df23",
+        "source": "Acervo PoliMatch · fernando-haddad",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "marina-silva",
+      "name": "Marina Silva",
+      "personId": 33,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "lula",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/10/novo-ato-pro-lula-em-sp-tem-jovens-eleitos-haddad-tebet-e-marina-apos-derrotas-no-1o-turno.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/033.jpg",
+        "sha256": "7c22b5ecbb8fe8a7f9a95b7922699db6f066abf9e0b79df14df7458f4efa20c7",
+        "source": "Acervo PoliMatch · marina-silva",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "geraldo-alckmin",
+      "name": "Geraldo Alckmin",
+      "personId": 8,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "lula",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/10/novo-ato-pro-lula-em-sp-tem-jovens-eleitos-haddad-tebet-e-marina-apos-derrotas-no-1o-turno.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/008.jpg",
+        "sha256": "bb1a69cb6402210a98d8d00346921a4034703a35c1495c4c3fff072514ac46b3",
+        "source": "Acervo PoliMatch · geraldo-alckmin",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing",
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "simone-tebet",
+      "name": "Simone Tebet",
+      "personId": 34,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "lula",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/10/novo-ato-pro-lula-em-sp-tem-jovens-eleitos-haddad-tebet-e-marina-apos-derrotas-no-1o-turno.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/034.jpg",
+        "sha256": "7d69c694abb9be7ab985f06a4e10c7735c02bfdeeefc29153e108a25b574ea3b",
+        "source": "Acervo PoliMatch · simone-tebet",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing",
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "samia-bonfim",
+      "name": "Sâmia Bomfim",
+      "personId": 133,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "lula",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/10/novo-ato-pro-lula-em-sp-tem-jovens-eleitos-haddad-tebet-e-marina-apos-derrotas-no-1o-turno.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/samia-bonfim.jpg",
+        "sha256": "ddb2be71bf2f7f20fe121e9a214b66eaf28f2f5afeedc982f3a08a956d47d9f5",
+        "source": "https://samiabomfim.com.br/static/97e66f99adbe3139f36e56832f570a3e/7d509/bg-podcast.jpg",
+        "sourceUrl": "https://samiabomfim.com.br/",
+        "credit": "Imagem publicada por samiabomfim.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 720,
+        "height": 720
+      }
+    },
+    {
+      "id": "lindbergh-farias",
+      "name": "Lindbergh Farias",
+      "personId": 46,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "lula",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/10/novo-ato-pro-lula-em-sp-tem-jovens-eleitos-haddad-tebet-e-marina-apos-derrotas-no-1o-turno.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/046.jpg",
+        "sha256": "faa89896fd2665e8872a19d028e980761839a7c34c8a9cbb066ab1c2beea8e31",
+        "source": "Acervo PoliMatch · lindbergh-farias",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "joao-campos",
+      "name": "João Campos",
+      "personId": 17,
+      "memberships": [
+        {
+          "category": "politicos",
+          "support": "lula",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/10/novo-ato-pro-lula-em-sp-tem-jovens-eleitos-haddad-tebet-e-marina-apos-derrotas-no-1o-turno.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/017.jpg",
+        "sha256": "dcba3108226083df56089ca8f912007cac1a1e3a560cc4a0cbef11ec20f386e6",
+        "source": "Acervo PoliMatch · joao-campos",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "luciano-hang",
+      "name": "Luciano Hang",
+      "personId": 134,
+      "memberships": [
+        {
+          "category": "empresarios",
+          "support": "flavio",
+          "sourceUrl": "https://omunicipio.com.br/politica/luciano-hang-declara-apoio-a-flavio-bolsonaro-no-segundo-turno-das-eleicoes/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/luciano-hang.jpg",
+        "sha256": "2c6a658648a1995b647b23ee43204d15f06292be34b74962ee03e1ff4c11a0e4",
+        "source": "https://portal.sacre.com.br/_next/image?q=75&url=https%3A%2F%2Fd2hme8z1miz6cd.cloudfront.net%2Fmedia%2Fexame%2F5721968.jpg&w=3840",
+        "sourceUrl": "https://portal.sacre.com.br/noticias/o-fim-da-taxa-das-blusinhas-e-a-destruicao-do-varejo-nacional-diz-fundador-da-havan-6a03c8ebbb8efd22d706e3bb",
+        "credit": "Imagem publicada por portal.sacre.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1024,
+        "height": 683
+      }
+    },
+    {
+      "id": "pablo-marcal",
+      "name": "Pablo Marçal",
+      "personId": 7,
+      "memberships": [
+        {
+          "category": "empresarios",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        },
+        {
+          "category": "influenciadores",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        },
+        {
+          "category": "liderancas",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/007.jpg",
+        "sha256": "a6d3a34e225d8cfe18b08bd4c7723e87820cd8f1e97520026b1be84176528b55",
+        "source": "Acervo PoliMatch · pablo-marcal",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "tallis-gomes",
+      "name": "Tallis Gomes",
+      "personId": 135,
+      "memberships": [
+        {
+          "category": "empresarios",
+          "support": "flavio",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/10/empresarios-ligados-ao-grupo-rockbridge-ajudaram-flavio-bolsonaro-com-relatorios-e-consultoria-dizem-aliados.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/tallis-gomes.jpg",
+        "sha256": "e2fe04cfd8eeb636e9490540329ce23210726e1b3467ab4abc69ed919d82503b",
+        "source": "https://conteudo.imguol.com.br/c/entretenimento/1f/2024/01/10/o-empresario-tallis-gomes-adotou-o-5-am-club-1704898643144_v2_1x1.jpg",
+        "sourceUrl": "https://economia.uol.com.br/noticias/redacao/2024/09/19/tallis-gomes.htm",
+        "credit": "Imagem publicada por economia.uol.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 844,
+        "height": 843
+      }
+    },
+    {
+      "id": "marcos-freitas",
+      "name": "Marcos Freitas",
+      "personId": 136,
+      "memberships": [
+        {
+          "category": "empresarios",
+          "support": "flavio",
+          "sourceUrl": "https://quemapoiaquem.com.br/p/marcos-freitas"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/marcos-freitas.png",
+        "sha256": "54c80494c0fff76af6c945435c6e618493d5d3e65c10ae5548262fc69f3abf89",
+        "source": "https://empreendedor.com.br/wp-content/uploads/2024/02/Marcos-Freitas-palestrante-escritor-best-seller-e-fundador-do-Grupo-Seja-AP-768x768.png",
+        "sourceUrl": "https://gente.ig.com.br/colunas/fabiano-moraes/2024-07-02/marcos-freitas-empresario-renomado-que-se-destacou-nacionalmente.html",
+        "credit": "Imagem publicada por gente.ig.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 768,
+        "height": 768
+      }
+    },
+    {
+      "id": "fernando-oliveira-lima",
+      "name": "Fernando Oliveira Lima",
+      "personId": 137,
+      "memberships": [
+        {
+          "category": "empresarios",
+          "support": "flavio",
+          "sourceUrl": "https://www1.folha.uol.com.br/colunas/painel/2026/10/dono-de-bet-publica-foto-de-helicoptero-adesivado-em-apoio-a-flavio-bolsonaro-partiu-bloquinho.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/fernando-oliveira-lima.jpg",
+        "sha256": "683b96c763789413147cb2fc7298410b2908173533d7f06c21710faf78cbf3ec",
+        "source": "https://media.gazetadopovo.com.br/2025/05/29173408/Fernandin-OIG-720x720.jpg",
+        "sourceUrl": "https://www.gazetadopovo.com.br/ideias/cpi-das-bets-dono-jatinho-levou-senador-ciro-nogueira-monaco/",
+        "credit": "Imagem publicada por www.gazetadopovo.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 720,
+        "height": 720
+      }
+    },
+    {
+      "id": "renata-barreto",
+      "name": "Renata Barreto",
+      "personId": 138,
+      "memberships": [
+        {
+          "category": "empresarios",
+          "support": "flavio",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/p/renata-barreto"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/renata-barreto.jpg",
+        "sha256": "0df66d3d2587047394fad37c62ab008ff130752a0814839b738596d7a3dcd352",
+        "source": "https://i1.feedspot.com/original/7337324.jpg?t=1771224106",
+        "sourceUrl": "https://influencers.feedspot.com/brazil_finance_instagram_influencers/",
+        "credit": "Imagem publicada por influencers.feedspot.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 750,
+        "height": 750
+      }
+    },
+    {
+      "id": "alexandre-grendene",
+      "name": "Alexandre Grendene",
+      "personId": 139,
+      "memberships": [
+        {
+          "category": "empresarios",
+          "support": "flavio",
+          "sourceUrl": "https://noticias.uol.com.br/eleicoes/2026/10/20/eleicao-presidencial-doacoes-2-turno.ghtm"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/alexandre-grendene.jpg",
+        "sha256": "215954a24bb897b64ebf1d6ebc77e0fdbbd2a839dfc935eb3408c1c732f36bbb",
+        "source": "https://s2.glbimg.com/zcsSSY4rcM2e-RUOxUpswYEVSFI%3D/1200x/smart/filters%3Acover%28%29%3Astrip_icc%28%29/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2022/B/Q/LOljyxQ8azWgXtMWFRtQ/21534357.jpg",
+        "sourceUrl": "https://www.subrayado.com.uy/quien-es-alexandre-grendene-el-multimillonario-empresario-que-presta-su-avion-lacalle-pou-n714657",
+        "credit": "Imagem publicada por www.subrayado.com.uy. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 802
+      }
+    },
+    {
+      "id": "eloi-vitorio-marchett",
+      "name": "Elói Vitório Marchett",
+      "personId": 140,
+      "memberships": [
+        {
+          "category": "empresarios",
+          "support": "flavio",
+          "sourceUrl": "https://noticias.uol.com.br/eleicoes/2026/10/20/eleicao-presidencial-doacoes-2-turno.ghtm"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/eloi-vitorio-marchett.jpg",
+        "sha256": "e11e7b2dcc4988715e88681f39c85e31937c59ba8140b2d596fa106e59b182e7",
+        "source": "https://www.jota.info/_next/image?q=75&url=https%3A%2F%2Fimages.jota.info%2Fwp-content%2Fuploads%2F2023%2F09%2Fwhatsapp-image-2023-09-05-at-20-56-28-e1693959248857.jpeg&w=640",
+        "sourceUrl": "https://www.jota.info/autor/vitor-marchetti",
+        "credit": "Imagem publicada por www.jota.info. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 640,
+        "height": 531
+      }
+    },
+    {
+      "id": "nelson-jose-vigolo",
+      "name": "Nelson José Vigolo",
+      "personId": 141,
+      "memberships": [
+        {
+          "category": "empresarios",
+          "support": "flavio",
+          "sourceUrl": "https://noticias.uol.com.br/eleicoes/2026/10/20/eleicao-presidencial-doacoes-2-turno.ghtm"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/nelson-jose-vigolo.jpg",
+        "sha256": "80f96bf63fa8722180414ed4422cc6c398c525d4081af96fd546b359f14a69df",
+        "source": "https://s2-valor.glbimg.com/oGoZ6zBU-f9UxVxo8tj3JP0rYuo%3D/1000x0/smart/filters%3Astrip_icc%28%29/i.s3.glbimg.com/v1/AUTH_63b422c2caee4269b8b34177e8876b93/internal_photos/bs/2019/4/N/9tV73vQJKoFpefA9r6rg/foto10agr-101-jesus-b14.jpg",
+        "sourceUrl": "https://valor.globo.com/agronegocios/noticia/2014/12/10/grupo-bom-jesus-faz-captacoes-e-expande-atividades-agricolas.ghtml",
+        "credit": "Imagem publicada por valor.globo.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1000,
+        "height": 1114
+      }
+    },
+    {
+      "id": "erasmo-carlos-battistella",
+      "name": "Erasmo Carlos Battistella",
+      "personId": 142,
+      "memberships": [
+        {
+          "category": "empresarios",
+          "support": "flavio",
+          "sourceUrl": "https://jornalggn.com.br/eleicoes/2026/os-principais-doadores-das-campanhas-de-lula-e-flavio/"
+        },
+        {
+          "category": "empresarios",
+          "support": "lula",
+          "sourceUrl": "https://jornalggn.com.br/eleicoes/2026/os-principais-doadores-das-campanhas-de-lula-e-flavio/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/erasmo-carlos-battistella.jpg",
+        "sha256": "224024e0bf8097b7771dfc1256b0e22743009d37d0438461dcb6d5b38d437af0",
+        "source": "https://www.brasilagro.com.br/uploads/conteudo/conteudo/2021/05/lvxe1/erasmo-battistella-divulgacao-aprobio-YUQnzY_400x400.jpg",
+        "sourceUrl": "https://www.brasilagro.com.br/conteudo/erasmo-carlos-battistella-o-plano-do-rei-do-biodiesel.html",
+        "credit": "Imagem publicada por www.brasilagro.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 400,
+        "height": 400
+      }
+    },
+    {
+      "id": "jalles-fontoura",
+      "name": "Jalles Fontoura",
+      "personId": 143,
+      "memberships": [
+        {
+          "category": "empresarios",
+          "support": "lula",
+          "sourceUrl": "https://folhadenoticiasgo.com.br/jose-eliton-e-nomes-ligados-ao-psdb-em-goias-declaram-apoio-a-lula-no-2o-turno/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/jalles-fontoura.jpg",
+        "sha256": "50c571ee3bcaf32b933da7065e8b8fdffe48708ecd088172fa5c89416676516c",
+        "source": "https://cdn.jornalopcao.com.br/assets/2025/06/IMG_8628-620x413.jpg",
+        "sourceUrl": "https://www.jornalopcao.com.br/bastidores/jalles-fontoura-aceita-ser-vice-de-marconi-mas-o-nome-preferido-do-tucano-e-otavinho-lage-831703/",
+        "credit": "Imagem publicada por www.jornalopcao.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 620,
+        "height": 413
+      }
+    },
+    {
+      "id": "monica-salgado",
+      "name": "Mônica Salgado",
+      "personId": 144,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/monica-salgado.jpg",
+        "sha256": "7599db727d0ff384384d49c0172dbc022b50a0566c8f88aa1095c9e2f73ed45d",
+        "source": "https://s2-oglobo.glbimg.com/YrsvxfY309d469jA86rV_79sl1Q%3D/906x0/smart/filters%3Astrip_icc%28%29/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2024/B/C/aE7FdjRXyMkG9LaAdbmg/whatsapp-image-2024-08-23-at-16.22.03.jpeg",
+        "sourceUrl": "https://www.revistalofficiel.com.br/pop-culture/monica-salgado-entrevista-sobre-sobre-carreira-e-relacionamentos",
+        "credit": "Imagem publicada por www.revistalofficiel.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 906,
+        "height": 906
+      }
+    },
+    {
+      "id": "yuri22",
+      "name": "Yuri22",
+      "personId": 145,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "flavio",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/p/yuri22"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/yuri22.jpg",
+        "sha256": "f13f23d2cb567f4c96a3a4a91fc40446fa2b59415a8af7391fde9bcbf2817705",
+        "source": "https://cdn.jornaldebrasilia.com.br/wp-content/uploads/2025/06/13154652/WhatsApp-Image-2025-06-13-at-15.12.36-558x620.jpeg",
+        "sourceUrl": "https://jornaldebrasilia.com.br/entretenimento/katia-flavia/yuri22-e-anunciado-como-novo-embaixador-da-betboom-no-brasil/",
+        "credit": "Imagem publicada por jornaldebrasilia.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 558,
+        "height": 620
+      }
+    },
+    {
+      "id": "pedro-ortega",
+      "name": "Pedro Ortega",
+      "personId": 146,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "flavio",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/p/pedro-ortega"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/pedro-ortega.jpg",
+        "sha256": "d3ae33d646a807942ce1c36e69f0cf28548708e5e83a4aab30ea9ec01d321a90",
+        "source": "https://images.metroimg.com/2024/04/05214528/Captura-de-tela-2024-04-05-214606_resized_compressed.jpg",
+        "sourceUrl": "https://www.metropoles.com/colunas/fabia-oliveira/apos-largar-o-futebol-pedro-ortega-investe-em-apostas-esportivas",
+        "credit": "Retrato de Pedro Ortega. Reprodução, publicado pelo Metrópoles.",
+        "kind": "curated",
+        "position": "50% 0%",
+        "crop": {
+          "x": 0.3,
+          "y": 0,
+          "width": 0.35,
+          "height": 0.63
+        },
+        "width": 1200,
+        "height": 800
+      }
+    },
+    {
+      "id": "preto-de-direita",
+      "name": "Preto de Direita",
+      "personId": 147,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/preto-de-direita.jpg",
+        "sha256": "6735775087ee14c2cc3ba6b02bb9a7672f7174001eb5a71db5dd4e7c4e3ab572",
+        "source": "https://imagenes.elpais.com/resizer/v2/BSCFZF4B7AO3IFBUVNBTFRDNU4.jpg?auth=729276a9f4bfd384460b093786cde5eb3de613b9edb389a052247b149d543b90&height=1470&smart=true&width=1960",
+        "sourceUrl": "https://brasil.elpais.com/brasil/2019/06/27/politica/1561649621_458153.html",
+        "credit": "Imagem publicada por brasil.elpais.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1960,
+        "height": 1470
+      }
+    },
+    {
+      "id": "zig-na-voz",
+      "name": "Zig na Voz",
+      "personId": 148,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/zig-na-voz.png",
+        "sha256": "16c7a58c72febaf52c527ec056576aaef31025a5a97b3b739b7c3323deabd23b",
+        "source": "https://uploads.intercept.com.br/2026/08/2-zig-na-voz.png",
+        "sourceUrl": "https://www.intercept.com.br/2026/08/27/flavio-bolsonaro-influenciadores-lucrarem-ataques-lula/",
+        "credit": "Reprodução do perfil público @zig_na_voz, publicada pelo Intercept Brasil.",
+        "kind": "curated",
+        "crop": {
+          "x": 0.32,
+          "y": 0.23,
+          "width": 0.19,
+          "height": 0.45
+        },
+        "width": 821,
+        "height": 737
+      }
+    },
+    {
+      "id": "favelado-de-direita",
+      "name": "Favelado de Direita",
+      "personId": 149,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/favelado-de-direita.jpg",
+        "sha256": "4c589122645db438bc9e1051ba57c55730b9c4ea84d4405c13ff3507200578b2",
+        "source": "https://f.i.uol.com.br/fotografia/2018/10/01/15384397955bb2ba7354019_1538439795_3x2_rt.jpg",
+        "sourceUrl": "https://www.theguardian.com/world/2019/jun/18/brazil-rightwing-hip-hop-rap-bolsonaro",
+        "credit": "Imagem publicada por www.theguardian.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 2400,
+        "height": 1600,
+        "position": "40% 15%"
+      }
+    },
+    {
+      "id": "kelle-cristina",
+      "name": "Kelle Cristina",
+      "personId": 150,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/kelle-cristina.jpg",
+        "sha256": "7f35ba886fcaf633a40570c44b0afd9665d3b079b4d44cf770b371a04c7315f1",
+        "source": "https://elcomercio.pe/resizer/v2/GSK7TW2JGBCU3PJEZYCJJKBFLI.jpg?auth=7b9cc2ff604617330b32ae1b166109dfb1229473234087fc379764f7105f050f&quality=90&smart=true&width=1200",
+        "sourceUrl": "https://elcomercio.pe/mag/fama/quien-es-kelly-cristina-nascimento-la-hija-de-pele-biografia-y-fotos-celebs-de-brasil-nnda-nnlt-noticia/",
+        "credit": "Imagem publicada por elcomercio.pe. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 800,
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "firmino-cortada",
+      "name": "Firmino Cortada",
+      "personId": 151,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/firmino-cortada.png",
+        "source": "https://firminocortada.com.br/wp-content/uploads/2025/12/Foto-Firmino.png",
+        "sourceUrl": "https://firminocortada.com.br/",
+        "sha256": "431b11a1ecbb503fa871ee8867b173c6d8f27348e90e58840faeecf76a2d02a9",
+        "kind": "curated",
+        "credit": "Retrato publicado no site oficial de Firmino Cortada.",
+        "width": 601,
+        "height": 671
+      }
+    },
+    {
+      "id": "maumau-zk",
+      "name": "Maumau ZK",
+      "personId": 152,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "flavio",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/p/maumau-zk"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/maumau-zk.png",
+        "sha256": "8b85584d43336c61e00c361209558d6246d4ec728330c041c76362c600a6782e",
+        "source": "https://conteudo.imguol.com.br/c/noticias/e8/2025/08/07/influenciador-maumau-foi-preso-em-flagrante-apos-uma-arma-ser-encontrada-em-sua-casa-1754581682622_v2_1x1.png",
+        "sourceUrl": "https://www.purepeople.com.br/noticia/quem-e-maumau-influenciador-preso-por-posse-de-arma-em-operacao-contra-jogo-do-tigrinho-bia-miranda-tambem-e-investigada_a410206/1",
+        "credit": "Imagem publicada por www.purepeople.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 666,
+        "height": 666,
+        "position": "30% 0%",
+        "crop": {
+          "x": 0.12,
+          "y": 0,
+          "width": 0.45,
+          "height": 0.53
+        }
+      }
+    },
+    {
+      "id": "felipe-neto",
+      "name": "Felipe Neto",
+      "personId": 81,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "lula",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/p/felipe-neto"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/081.jpg",
+        "sha256": "8235e9a1836386e36256a3c60ded4a5bd78f7119dbaaae7f1a61201b704d14dc",
+        "source": "Acervo PoliMatch · felipe-neto",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "alvaro-influenciador",
+      "name": "Álvaro",
+      "personId": 153,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "lula",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/p/alvaro"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/alvaro-influenciador.jpg",
+        "sha256": "de5d268be6ac96653f4f8014a61a360dad8b44c3c0ba2d707710f01f8e9aa851",
+        "source": "https://assets.portalleodias.com/2024/04/lXXY3wxg-Alvaro-Xaro.jpg",
+        "sourceUrl": "https://portalleodias.com/carnaval/alvaro-relembra-perrengue-em-sua-estreia-na-sapucai-quase-ninguem-me-viu",
+        "credit": "Imagem publicada por portalleodias.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 900
+      }
+    },
+    {
+      "id": "alane-dias",
+      "name": "Alane Dias",
+      "personId": 154,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "lula",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/p/alane-dias"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/alane-dias.jpg",
+        "sha256": "d3ed8625be1727495e065a26d159ca797b7dda41e97fe0902d2ddd31fc124147",
+        "source": "https://s2-gshow.glbimg.com/QfYIphOdhJUUFVkDB61FjO1Pw2I%3D/0x0%3A4000x5334/984x0/smart/filters%3Astrip_icc%28%29/i.s3.glbimg.com/v1/AUTH_e84042ef78cb4708aeebdf1c68c6cbd6/internal_photos/bs/2024/7/0/pft1BCQyem0EfHbugcpw/img-3823-1-.jpg",
+        "sourceUrl": "https://gshow.globo.com/google/amp/cultura-pop/famosos/noticia/alane-dias-do-bbb-24-sonha-viver-antagonista-em-novela-e-explica-ausencia-em-eventos.ghtml",
+        "credit": "Imagem publicada por gshow.globo.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 984,
+        "height": 1312
+      }
+    },
+    {
+      "id": "rita-von-hunty",
+      "name": "Rita Von Hunty",
+      "personId": 155,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "lula",
+          "sourceUrl": "https://www.em.com.br/politica/2026/09/7510696-influenciadores-assinam-carta-de-apoio-a-lula-veja-quem-assinou.html"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/rita-von-hunty.jpg",
+        "sha256": "38a60e505cc5e1ca24d59f1c0b55050396b8cd051c6bfe5bc4217b8e1b503ed6",
+        "source": "https://conteudo.imguol.com.br/c/entretenimento/65/2021/08/30/rita-von-hunty-transforma-o-youtube-em-sala-de-aula-1630361549320_v2_1x1.jpg",
+        "sourceUrl": "https://www.uol.com.br/esporte/colunas/milly-lacombe/2025/09/20/a-despedida-da-drag-queen-que-revolucionou-a-educacao-popular-no-brasil.htm",
+        "credit": "Imagem publicada por www.uol.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 3708,
+        "height": 3710
+      }
+    },
+    {
+      "id": "nath-financas",
+      "name": "Nath Finanças",
+      "personId": 156,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "lula",
+          "sourceUrl": "https://www.em.com.br/politica/2026/09/7510696-influenciadores-assinam-carta-de-apoio-a-lula-veja-quem-assinou.html"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/nath-financas.png",
+        "sha256": "599105dc5e370ad3c8669e8739b963a4a98392b438a775854944a034314bca5c",
+        "source": "https://i0.wp.com/almapreta.com.br/images/2026/03/nath-financas-lanca-serie.webp?fit=1400%2C1050&ssl=1",
+        "sourceUrl": "https://almapreta.com.br/sessao/cotidiano/nath-financas-serie-apostas-luxo-redes/",
+        "credit": "Imagem publicada por almapreta.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1400,
+        "height": 1050
+      }
+    },
+    {
+      "id": "laura-sabino",
+      "name": "Laura Sabino",
+      "personId": 157,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "lula",
+          "sourceUrl": "https://www.em.com.br/politica/2026/09/7510696-influenciadores-assinam-carta-de-apoio-a-lula-veja-quem-assinou.html"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/laura-sabino.jpg",
+        "sha256": "a3f9cb45f9a1162c2beecc4ff1bb333550453e0c4b99847c5739ebabaa326299",
+        "source": "https://conteudo.imguol.com.br/c/tab/48/2022/05/23/laura-sabino-estudante-e-influenciadora-digital-no-campus-da-ufmg-1653312455813_v2_1170x540.jpg",
+        "sourceUrl": "https://www.brasil247.com/brasil/influenciadora-laura-sabino-sobrevive-a-tentativa-de-assassinato-e-sofre-ataques-nas-redes",
+        "credit": "Imagem publicada por www.brasil247.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1170,
+        "height": 540,
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "sabrina-fernandes",
+      "name": "Sabrina Fernandes",
+      "personId": 158,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "lula",
+          "sourceUrl": "https://www.em.com.br/politica/2026/09/7510696-influenciadores-assinam-carta-de-apoio-a-lula-veja-quem-assinou.html"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/sabrina-fernandes.jpg",
+        "sha256": "60476c775974622fdfdcb66afc17ba4f0f972ceba112ff0421016c95a8884e67",
+        "source": "https://substackcdn.com/image/fetch/%24s_%21hc1t%21%2Cf_auto%2Cq_auto%3Agood%2Cfl_progressive%3Asteep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F0fb31546-0f6e-4631-9599-d00d45530d77_1600x1066.jpeg",
+        "sourceUrl": "https://pulitzercenter.org/people/sabrina-fernandes",
+        "credit": "Imagem publicada por pulitzercenter.org. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1600,
+        "height": 1066,
+        "crop": {
+          "x": 0.55,
+          "y": 0,
+          "width": 0.45
+        }
+      }
+    },
+    {
+      "id": "camila-fremder",
+      "name": "Camila Fremder",
+      "personId": 159,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "lula",
+          "sourceUrl": "https://www.em.com.br/politica/2026/09/7510696-influenciadores-assinam-carta-de-apoio-a-lula-veja-quem-assinou.html"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/camila-fremder.jpg",
+        "sha256": "22053fe284d7a557702ded021dcd0f67e1cb2f0ad45f65e8dd3f2545d5b0c6c3",
+        "source": "https://gama-uploads.nyc3.cdn.digitaloceanspaces.com/2024/06/s-flerte-podcast-g.jpg",
+        "sourceUrl": "https://www.revistalofficiel.com.br/cultura/camila-fremder-fala-sobre-livros-podcasts-e-inspiracoes",
+        "credit": "Imagem publicada por www.revistalofficiel.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1400,
+        "height": 1371
+      }
+    },
+    {
+      "id": "lauany-schultz",
+      "name": "Lauany Schultz",
+      "personId": 160,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "lula",
+          "sourceUrl": "https://www.em.com.br/politica/2026/09/7510696-influenciadores-assinam-carta-de-apoio-a-lula-veja-quem-assinou.html"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/lauany-schultz.jpg",
+        "source": "https://ugc.production.linktr.ee/a2922476-03bc-40a1-ae78-bc3af42b6c7f_7C6F0DB1-FBA5-4C73-8D6A-8E98B0E87028.jpeg",
+        "sourceUrl": "https://linktr.ee/lauanyschultz",
+        "sha256": "ca08cc352eb2471d20e2c98ad7be606143d1eeba442d08cfe2f7844058cb0f1a",
+        "kind": "curated",
+        "credit": "Retrato do perfil público de Lauany Schultz no Linktree.",
+        "width": 600,
+        "height": 600,
+        "position": "center",
+        "rotation": -90,
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "orlando-calheiros",
+      "name": "Orlando Calheiros",
+      "personId": 161,
+      "memberships": [
+        {
+          "category": "influenciadores",
+          "support": "lula",
+          "sourceUrl": "https://www.em.com.br/politica/2026/09/7510696-influenciadores-assinam-carta-de-apoio-a-lula-veja-quem-assinou.html"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/orlando-calheiros.jpg",
+        "sha256": "004c6de181c05de0a8040dee8ab3207be8ef99ef69217836a62a5c10dbc950b0",
+        "source": "https://ihu.unisinos.br/images/ihu/2018/11/23_11_orlando_fernandes_calheiros_foto_800_joaovitorsantos_3.JPG",
+        "sourceUrl": "https://ihu.unisinos.br/categorias/159-entrevistas/584861-totalitarismo-como-forma-de-existir-um-olhar-aikewara-sobre-o-mundo-branco-entrevista-especial-com-orlando-calheiros",
+        "kind": "curated",
+        "credit": "João Vitor Santos / Instituto Humanitas Unisinos (IHU).",
+        "position": "38% 20%"
+      }
+    },
+    {
+      "id": "gusttavo-lima",
+      "name": "Gusttavo Lima",
+      "personId": 103,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/flavio-grava-com-cantores-sertanejos-aliados-em-goias-saiba-quem/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/103.jpg",
+        "sha256": "4ec35519858fbf7f75e548c63e73844428a537721b040f825a0542af4dc6abf7",
+        "source": "Acervo PoliMatch · gusttavo-lima",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "zeze-di-camargo",
+      "name": "Zezé Di Camargo",
+      "personId": 162,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/flavio-grava-com-cantores-sertanejos-aliados-em-goias-saiba-quem/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/zeze-di-camargo.jpg",
+        "sha256": "5bfd2f156ec9a60ccafc2028c0e1a09c9575cda8a6dfc442caffa1ccc5fd0d14",
+        "source": "https://cdn.jornaldebrasilia.com.br/wp-content/uploads/2025/12/18132645/Zeze-Di-Camargo-18-1536x1024.jpg",
+        "sourceUrl": "https://jornaldebrasilia.com.br/noticias/mundo/eua-amplia-sancoes-para-outros-familiares-de-maduro-e-supostos-socios/",
+        "credit": "Imagem publicada por jornaldebrasilia.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1536,
+        "height": 1024
+      }
+    },
+    {
+      "id": "murilo-huff",
+      "name": "Murilo Huff",
+      "personId": 163,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/flavio-grava-com-cantores-sertanejos-aliados-em-goias-saiba-quem/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/murilo-huff.jpg",
+        "sha256": "1ebbc4aafb884ee63671632f67b0f89e296919953ad591f6248ad26b5009fd83",
+        "source": "https://i.scdn.co/image/7639309671c245e9b4dae344e4a13db94f436897",
+        "sourceUrl": "https://www.diariodolitoral.com.br/santos/sertanejo-murilo-huff-se-apresenta-no-arena-club-em-santos/157432/",
+        "credit": "Imagem publicada por www.diariodolitoral.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 640,
+        "height": 640
+      }
+    },
+    {
+      "id": "felipe-araujo",
+      "name": "Felipe Araújo",
+      "personId": 164,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/flavio-grava-com-cantores-sertanejos-aliados-em-goias-saiba-quem/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/felipe-araujo.jpg",
+        "sha256": "3e7cc6c377901cf709fbfc1108d183353ae9c8e4e291c1d4c1bb470ad60f3b05",
+        "source": "https://i.scdn.co/image/ab6761610000e5eb5dfb20280d9e8c9777c7316f",
+        "sourceUrl": "https://www.musicmetricsvault.com/artists/felipe-araujo/47uyFQHOD02S0lj9ptRpoB",
+        "credit": "Imagem publicada por www.musicmetricsvault.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 640,
+        "height": 640
+      }
+    },
+    {
+      "id": "rodolffo",
+      "name": "Rodolffo",
+      "personId": 165,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/flavio-grava-com-cantores-sertanejos-aliados-em-goias-saiba-quem/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/rodolffo.jpg",
+        "sha256": "72703b49b6a1f31b1d5eab83459b9f615fe8416de1387c6c09b252e59c79ba4b",
+        "source": "https://pbs.twimg.com/profile_images/1468705419421962247/MTQLUj7N_400x400.jpg",
+        "sourceUrl": "https://x.com/iRodolffo",
+        "credit": "Imagem publicada por x.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 400,
+        "height": 400
+      }
+    },
+    {
+      "id": "hugo-sertanejo",
+      "name": "Hugo",
+      "personId": 166,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/flavio-grava-com-cantores-sertanejos-aliados-em-goias-saiba-quem/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/hugo-sertanejo.jpg",
+        "sha256": "5593110adac73e6ea898184c247325d33752726fb6939abbf04d1afe0360f35d",
+        "source": "https://s2.glbimg.com/y7PCfLq3cQmg6h0K99UKMOR4MSw%3D/1200x/smart/filters%3Acover%28%29%3Astrip_icc%28%29/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2022/Z/S/DvYdU6S4CDg4RvE2lGRA/hugo.png",
+        "sourceUrl": "https://oglobo.globo.com/cultura/musica/noticia/2022/11/mal-feito-ao-vivo-de-hugo-and-guilherme-e-a-musica-mais-ouvida-de-2022-no-brasil-veja-retrospectiva.ghtml",
+        "credit": "Imagem publicada por oglobo.globo.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 1204,
+        "position": "8% 20%",
+        "crop": {
+          "x": 0,
+          "y": 0,
+          "width": 0.48
+        }
+      }
+    },
+    {
+      "id": "marrone",
+      "name": "Marrone",
+      "personId": 167,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/flavio-grava-com-cantores-sertanejos-aliados-em-goias-saiba-quem/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/marrone.jpg",
+        "sha256": "bbf2525f7ee0bc9783cce0cb80fc2bb2e11b0fa35ef3bd88a4680c3b818bc6e4",
+        "source": "https://www.estrelando.com.br/uploads/2023/02/03/marrone-nota-1675442019.jpg",
+        "sourceUrl": "https://www.estrelando.com.br/nota/2023/02/03/marrone-dupla-de-bruno-e-internado-para-fazer-cirurgia-plastica-diz-jornal-280478",
+        "credit": "Imagem publicada por www.estrelando.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 675,
+        "height": 645
+      }
+    },
+    {
+      "id": "jorge-sertanejo",
+      "name": "Jorge",
+      "personId": 168,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/flavio-grava-com-cantores-sertanejos-aliados-em-goias-saiba-quem/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/jorge-sertanejo.jpg",
+        "sha256": "7ca661b0cdefc075eb15ee97a730d7541dbf5b121ebab0e93cbbba4328cc3998",
+        "source": "https://mir-s3-cdn-cf.behance.net/project_modules/1400/2a5da3188052959.6595b6fc4845c.jpg",
+        "sourceUrl": "https://www.behance.net/gallery/188052959/Leo-Cantor-Sertanejo",
+        "credit": "Imagem publicada por www.behance.net. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1400,
+        "height": 2100
+      }
+    },
+    {
+      "id": "gian-sertanejo",
+      "name": "Gian",
+      "personId": 169,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/flavio-grava-com-cantores-sertanejos-aliados-em-goias-saiba-quem/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/gian-sertanejo.png",
+        "sha256": "6b3cc8e573d87169a00c647edd0101c3e9ab2c4bfc6af2b460e32678922ad102",
+        "source": "https://p2.trrsf.com/image/fget/cf/1200/900/middle/images.terra.com/2023/04/12/gian-1h85b623ylq2g.png",
+        "sourceUrl": "https://www.terra.com.br/diversao/cantor-gian-dupla-com-giovani-e-acionado-na-justica-por-divida-de-pensao%2Ce3d0a43649cd663d04ec9e5c94fdc5bbvg8y8prx.html",
+        "credit": "Imagem publicada por www.terra.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 900
+      }
+    },
+    {
+      "id": "joao-neto-sertanejo",
+      "name": "João Neto",
+      "personId": 170,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/flavio-grava-com-cantores-sertanejos-aliados-em-goias-saiba-quem/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/joao-neto-sertanejo.jpg",
+        "sha256": "6f6d36fc4e6af2b0e5cfb4130428aef6cbf52c12b0f824f1169ed10322befa0e",
+        "source": "https://s2-gshow.glbimg.com/Eznepg9z-CP9WJCLzPowk0IKjIM%3D/filters%3Aformat%28jpeg%29/https%3A/i.s3.glbimg.com/v1/AUTH_e84042ef78cb4708aeebdf1c68c6cbd6/internal_photos/bs/2023/B/r/FDxflyQAGo3fI4cZ2njw/311013572-1842314182784714-1698580196646958281-n.jpg",
+        "sourceUrl": "https://gshow.globo.com/cultura-pop/famosos/noticia/cantor-joao-neto-revela-o-que-mudou-em-sua-vida-um-ano-apos-cura-de-cancer.ghtml",
+        "credit": "Imagem publicada por gshow.globo.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1080,
+        "height": 1080
+      }
+    },
+    {
+      "id": "anitta",
+      "name": "Anitta",
+      "personId": 101,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "lula",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/explorar"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/101.jpg",
+        "sha256": "8d564bcd12bc96240edcbf02d2794b0471c67255d400c173ad07495f071b0494",
+        "source": "Acervo PoliMatch · anitta",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "ludmilla",
+      "name": "Ludmilla",
+      "personId": 104,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "lula",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/explorar"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/104.jpg",
+        "sha256": "37a1a3e47cacfeaa1e2a808f9bcb5e8a4849e7943d7427255d5216977df1bf3e",
+        "source": "Acervo PoliMatch · ludmilla",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "bruna-marquezine",
+      "name": "Bruna Marquezine",
+      "personId": 171,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "lula",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/explorar"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/bruna-marquezine.jpg",
+        "sha256": "3ccc11a1edf61e7d500294dba22d70da7d905fd54e6c4beccb711db2dda8ce8d",
+        "source": "https://s2-marieclaire.glbimg.com/ay-sZCB7EtquzSZm3w6YaaDKxA4%3D/1200x/smart/filters%3Acover%28%29%3Astrip_icc%28%29/i.s3.glbimg.com/v1/AUTH_51f0194726ca4cae994c33379977582d/internal_photos/bs/2023/9/D/tBxEseRjav6w3Mona9LQ/bruna-marquezine.jpg",
+        "sourceUrl": "https://www.gettyimages.com/",
+        "credit": "Imagem publicada por www.gettyimages.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 675
+      }
+    },
+    {
+      "id": "paolla-oliveira",
+      "name": "Paolla Oliveira",
+      "personId": 172,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "lula",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/explorar"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/paolla-oliveira.jpg",
+        "sha256": "056db3d6bdc3a27950e4aac5cdc34f5d82dbf1626a3c32e3188cfa5e01475393",
+        "source": "https://p2.trrsf.com/image/fget/cf/1200/900/middle/images.terra.com/2024/04/09/976097559-paolla-oliveira.jpg",
+        "sourceUrl": "https://www.terra.com.br/diversao/gente/paolla-oliveira-para-a-web-ao-usar-vestido-branco-decotado-em-hotel-luxuoso-de-londres%2C8febd7cc9dfa1a33d89b070646874ab825fs89c0.html",
+        "credit": "Imagem publicada por www.terra.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 900,
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "luisa-sonza",
+      "name": "Luísa Sonza",
+      "personId": 173,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "lula",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/explorar"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/luisa-sonza.jpg",
+        "sha256": "d85aa1d1f8f7859071b002bf07d69bf5c689180ac663ea077dee47dc13401f17",
+        "source": "https://s2-gshow.glbimg.com/euNHetMj2mAJ4OVnvskM2C0A11c%3D/2000x0/filters%3Aformat%28jpeg%29/https%3A/i.s3.glbimg.com/v1/AUTH_e84042ef78cb4708aeebdf1c68c6cbd6/internal_photos/bs/2022/c/Y/2gLRE3RcKt2r7eqQpbAw/20221203-vancampos-luisa-sonza-51.jpg",
+        "sourceUrl": "https://gshow.globo.com/cultura-pop/famosos/noticia/luisa-sonza-desabafa-sobre-sua-saude-apos-fim-da-turne-doce-22-o-corpo-pifa.ghtml",
+        "credit": "Imagem publicada por gshow.globo.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 2000,
+        "height": 2000
+      }
+    },
+    {
+      "id": "maisa",
+      "name": "Maisa",
+      "personId": 174,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "lula",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/explorar"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/maisa.jpg",
+        "sha256": "bc483041c19bd88b8c7588ad02a1e8b43c608f35c82b6412246165cef299fe1e",
+        "source": "https://midias.correiobraziliense.com.br/_midias/jpg/2025/01/03/whatsapp_image_2024_12_28_at_18_55_01-44155740.jpg",
+        "sourceUrl": "https://www.correiobraziliense.com.br/diversao-e-arte/2025/01/7022290-de-repente-adulta-maisa-comenta-transicao-do-sbt-para-novela-na-globo.html",
+        "credit": "Imagem publicada por www.correiobraziliense.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1957,
+        "height": 1482
+      }
+    },
+    {
+      "id": "xama",
+      "name": "Xamã",
+      "personId": 175,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "lula",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/xama.jpg",
+        "sha256": "d8e424180061a18f8105c4d5d252fc639ce06743cb35e2fff6362a80cc5ee235",
+        "source": "https://s2-oglobo.glbimg.com/uwsJXjHdah3gFBm0obtDQgGAqy4%3D/1200x/smart/filters%3Acover%28%29%3Astrip_icc%28%29/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2023/r/5/Q4Ryr6TXKbBm5qQchliA/xama.png",
+        "sourceUrl": "https://oglobo.globo.com/kogut/series/noticia/2023/05/xama-vai-estrear-como-ator-em-serie-e-contracenara-com-nanda-costa-saiba-tudo.ghtml",
+        "credit": "Imagem publicada por oglobo.globo.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 1079
+      }
+    },
+    {
+      "id": "sophie-charlotte",
+      "name": "Sophie Charlotte",
+      "personId": 176,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "lula",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/sophie-charlotte.jpg",
+        "sha256": "fd2e41cc7cbf6afb3a47421197ea798463b6d812c133d638811b479831f3725b",
+        "source": "https://cloudfront-us-east-1.images.arcpublishing.com/newr7/NVBB364FBNH5FFPTB3UXA4RQNE.jpg",
+        "sourceUrl": "https://www.correio24horas.com.br/entretenimento/sophie-charlotte-confirma-planos-de-gravar-musicas-em-2025-algo-que-me-faz-muito-feliz-1224",
+        "credit": "Imagem publicada por www.correio24horas.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1400,
+        "height": 762,
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "caetano-veloso",
+      "name": "Caetano Veloso",
+      "personId": 177,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "lula",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/caetano-veloso.jpg",
+        "sha256": "d6d35712abbd8384152ff771c30d3487dcc8cd8a58ec4144e96c08e733b05dfa",
+        "source": "https://media.newyorker.com/photos/61fc77d55a4add84c901e07f/1%3A1/w_1705%2Ch_1705%2Cc_limit/220214_r39855.jpg",
+        "sourceUrl": "https://www.newyorker.com/magazine/2022/02/14/how-caetano-veloso-revolutionized-brazils-sound-and-spirit",
+        "credit": "Imagem publicada por www.newyorker.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1705,
+        "height": 1705,
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "gilberto-gil",
+      "name": "Gilberto Gil",
+      "personId": 178,
+      "memberships": [
+        {
+          "category": "artistas",
+          "support": "lula",
+          "sourceUrl": "https://www.gazetadopovo.com.br/eleicoes/2026/saiba-quais-personalidades-declararam-voto-flavio-e-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/gilberto-gil.jpg",
+        "sha256": "9586d3a52b0818426608ce2557c63bb6e5f6a4bbeafe662c5523363167cca2d3",
+        "source": "https://akamai.sscdn.co/letras/500x500/fotos/b/b/1/d/bb1da3208ab269fca83e28f01f02f424.jpg",
+        "sourceUrl": "https://novabrasilfm.com.br/notas-musicais/gilberto-gil",
+        "credit": "Imagem publicada por novabrasilfm.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 500,
+        "height": 500
+      }
+    },
+    {
+      "id": "javier-milei",
+      "name": "Javier Milei",
+      "personId": 179,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/internacional/premie-da-espanha-pedro-sanchez-declara-apoio-a-lula-antes-do-2o-turno/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/javier-milei.png",
+        "sha256": "b59e1a1a8b2ad4994b2e925a0e4d5ed145c6968fc92cf16002c2795cc88369cd",
+        "source": "https://cdn.digitalasset.works/news/photo/202502/26390_33054_514.png",
+        "sourceUrl": "https://www.digitalasset.works/news/articleView.html?idxno=26390",
+        "credit": "Imagem publicada por www.digitalasset.works. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 600,
+        "height": 469
+      }
+    },
+    {
+      "id": "benjamin-netanyahu",
+      "name": "Benjamin Netanyahu",
+      "personId": 180,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/mundo/musk-lideres-mundiais-comentam-primeiro-turno-brasil-veja-repercussao/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/benjamin-netanyahu.jpg",
+        "sha256": "9f3f3e06e10e3e666e32ace659381c1ddc68634796ecc118760b96e50f66b88f",
+        "source": "https://oc-media.org/_next/image/?q=90&url=https%3A%2F%2Fassets.bucket.fourthestate.app%2Foc-media-prod%2Fcontent%2Fimages%2F2025%2F04%2FNetanyahu_official_portrait-1.jpeg&w=3840",
+        "sourceUrl": "https://oc-media.org/netanyahu-set-to-visit-azerbaijan/",
+        "credit": "Imagem publicada por oc-media.org. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 960,
+        "height": 640,
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "maria-corina-machado",
+      "name": "María Corina Machado",
+      "personId": 181,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/mundo/musk-lideres-mundiais-comentam-primeiro-turno-brasil-veja-repercussao/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/maria-corina-machado.jpg",
+        "sha256": "06fc5bc563ad0679485a5d557ae03574d221f9200a5834faf0fd08ef9e04bb36",
+        "source": "https://imagenes.elpais.com/resizer/v2/7E2TCL33ZFDG3LMTQTM3P4D7KM.jpg?auth=32aa040a71217ff69400312300987775da7b24965e70b4ad6ca0270d6d18ed1c&focal=2150%2C1297&height=1103&width=1960",
+        "sourceUrl": "https://www.nobelprize.org/all-nobel-prizes-2025/",
+        "credit": "Imagem publicada por www.nobelprize.org. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1960,
+        "height": 1103
+      }
+    },
+    {
+      "id": "abelardo-de-la-espriella",
+      "name": "Abelardo de la Espriella",
+      "personId": 182,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "flavio",
+          "sourceUrl": "https://www.gazetadopovo.com.br/mundo/musk-lideres-mundiais-comentam-primeiro-turno-brasil-veja-repercussao/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/abelardo-de-la-espriella.jpg",
+        "sha256": "b6b9fd32dc04a392e64b741cd8493a84a864de12375f81cf15570732eab86e89",
+        "source": "https://www.redprensa.com/sites/default/files/cne-mantiene-candidatura-de-de-la-espriella.jpg",
+        "sourceUrl": "https://www.redprensa.com/politica/cne-mantiene-candidatura-de-abelardo-de-la-espriella",
+        "credit": "Imagem publicada por www.redprensa.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1536,
+        "height": 1024
+      }
+    },
+    {
+      "id": "mauricio-macri",
+      "name": "Mauricio Macri",
+      "personId": 183,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "flavio",
+          "sourceUrl": "https://www.infobae.com/america/america-latina/2026/10/14/ex-presidentes-de-america-latina-respaldaron-a-flavio-bolsonaro-de-cara-a-la-segunda-vuelta-en-brasil/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/mauricio-macri.jpg",
+        "sha256": "d9c13340a2b4a605097681b6fea28ca2b4b69c895987ee3855e5a2b147e528f9",
+        "source": "https://www.economiapersonal.com.ar/wp-content/uploads/2015/11/macri-02.jpeg",
+        "sourceUrl": "https://www.economiapersonal.com.ar/mauricio-macri-presidente-de-la-nacion-argentina/",
+        "credit": "Imagem publicada por www.economiapersonal.com.ar. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 400,
+        "height": 400
+      }
+    },
+    {
+      "id": "ivan-duque",
+      "name": "Iván Duque",
+      "personId": 184,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "flavio",
+          "sourceUrl": "https://www.infobae.com/america/america-latina/2026/10/14/ex-presidentes-de-america-latina-respaldaron-a-flavio-bolsonaro-de-cara-a-la-segunda-vuelta-en-brasil/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/ivan-duque.jpg",
+        "sha256": "85999a0b8a0bff9c5f2b94f35f9f1d48dd8ae9069d7c25a96bafc7da17aae576",
+        "source": "https://www.semana.com/resizer/v2/MDCM7WIRMZAQBCIE35BUGU2NFM.jpg?auth=5c2e404f010e884e0476fe380cf170f9340424882ebfec25e8cb1e193422aa76&fitfill=false&quality=75&smart=true&width=1280",
+        "sourceUrl": "https://www.semana.com/nacion/articulo/no-hizo-nada-ivan-duque-responde-a-las-duras-criticas-de-la-oposicion/202215/",
+        "credit": "Imagem publicada por www.semana.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1280,
+        "height": 853
+      }
+    },
+    {
+      "id": "mariano-rajoy",
+      "name": "Mariano Rajoy",
+      "personId": 185,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "flavio",
+          "sourceUrl": "https://www.infobae.com/america/america-latina/2026/10/14/ex-presidentes-de-america-latina-respaldaron-a-flavio-bolsonaro-de-cara-a-la-segunda-vuelta-en-brasil/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/mariano-rajoy.jpg",
+        "sha256": "bceefc4e1ac493d86c2551c24c543b018900c5e732f5c7c5c53cda3c5335739a",
+        "source": "https://www.ecestaticos.com/image/clipping/1200/900/d2499c93b54346e11f519b8b4d5db209/mariano-rajoy-se-jubila-en-un-buen-momento-personal-y-confinado-en-madrid.jpg",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Galicians",
+        "credit": "Imagem publicada por en.wikipedia.org. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 900,
+        "position": "90% 0%"
+      }
+    },
+    {
+      "id": "guillermo-lasso",
+      "name": "Guillermo Lasso",
+      "personId": 186,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "flavio",
+          "sourceUrl": "https://www.infobae.com/america/america-latina/2026/10/14/ex-presidentes-de-america-latina-respaldaron-a-flavio-bolsonaro-de-cara-a-la-segunda-vuelta-en-brasil/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/guillermo-lasso.jpg",
+        "sha256": "4f7c52c08432f72bf9fbe691c2af3217e22ac3a84a7f00a328bf448642d1e9f0",
+        "source": "https://pbs.twimg.com/profile_images/1932942820593020928/-ImYvvu5_400x400.jpg",
+        "sourceUrl": "https://x.com/LassoGuillermo",
+        "credit": "Imagem publicada por x.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 400,
+        "height": 400
+      }
+    },
+    {
+      "id": "vicente-fox",
+      "name": "Vicente Fox",
+      "personId": 187,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "flavio",
+          "sourceUrl": "https://www.infobae.com/america/america-latina/2026/10/14/ex-presidentes-de-america-latina-respaldaron-a-flavio-bolsonaro-de-cara-a-la-segunda-vuelta-en-brasil/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/vicente-fox.jpg",
+        "sha256": "022e7dc721a178ec4d721958cb8bbda14387fe48a4c2d603bde00baa362f9a59",
+        "source": "https://m.media-amazon.com/images/M/MV5BZThhNDgwMTMtZjQ2NC00MTU3LWIyMWQtYTZkNDdmZWFkNzJjXkEyXkFqcGc%40._V1_FMjpg_UX1000_.jpg",
+        "sourceUrl": "https://www.imdb.com/title/tt7188102/",
+        "credit": "Imagem publicada por www.imdb.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1000,
+        "height": 1403,
+        "position": "90% 0%"
+      }
+    },
+    {
+      "id": "juan-guaido",
+      "name": "Juan Guaidó",
+      "personId": 188,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "flavio",
+          "sourceUrl": "https://www.infobae.com/america/america-latina/2026/10/14/ex-presidentes-de-america-latina-respaldaron-a-flavio-bolsonaro-de-cara-a-la-segunda-vuelta-en-brasil/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/juan-guaido.jpg",
+        "sha256": "96e86a0efd725ec5972be5db1f285629cc9674a1ac0818dfcc84e23a9b20c399",
+        "source": "https://w2a-noticierovenevision-net.s3.amazonaws.com/public/media/images/16208804512003-0b84f9.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AJuan_Guaid%C3%B3_2019_portrait-%28cropped%29.jpg",
+        "credit": "Imagem publicada por commons.wikimedia.org. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 800,
+        "height": 500,
+        "position": "90% 0%"
+      }
+    },
+    {
+      "id": "roger-waters",
+      "name": "Roger Waters",
+      "personId": 189,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "lula",
+          "sourceUrl": "https://www.poder360.com.br/poder-eleicoes-2026/roger-waters-chama-flavio-de-babaca-e-declara-apoio-a-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/roger-waters.jpg",
+        "sha256": "80768f0eee267cf90cd37df9fb4b51e2b8a4eb627543db3cea5b9884f6ff59f9",
+        "source": "https://www.thatericalper.com/wp-content/uploads/2016/07/waters_roger.jpg",
+        "sourceUrl": "https://www.thatericalper.com/2016/07/11/bertelsmann-welcomes-pink-floyd-legend-roger-waters-to-bmg/",
+        "credit": "Imagem publicada por www.thatericalper.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 650,
+        "height": 430
+      }
+    },
+    {
+      "id": "tom-morello",
+      "name": "Tom Morello",
+      "personId": 190,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "lula",
+          "sourceUrl": "https://veja.abril.com.br/cultura/com-baterista-brasileiro-banda-the-strokes-anuncia-apoio-a-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/tom-morello.jpg",
+        "sha256": "a9da5c7b3793c4bee872d14201577be2a8f6ba9b83a91caf05f6d1f7e27c72b3",
+        "source": "https://p2.trrsf.com/image/fget/cf/1200/1200/middle/images.terra.com/2024/11/05/502172391-tom-morello-foto-sara-jayegetty-images-para-o-rock-and-roll-hall-of-fame.jpg",
+        "sourceUrl": "https://www.terra.com.br/diversao/tom-morello-explica-killing-in-the-name-para-fas-contra-vacina-e-desabafa-zero-compreensao%2C87720b1cedbe45d410fbe13bff3cca110vq08bu7.html",
+        "credit": "Imagem publicada por www.terra.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 1200
+      }
+    },
+    {
+      "id": "the-strokes",
+      "name": "The Strokes",
+      "personId": 191,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "lula",
+          "sourceUrl": "https://veja.abril.com.br/cultura/com-baterista-brasileiro-banda-the-strokes-anuncia-apoio-a-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/the-strokes.jpg",
+        "sha256": "391972ce8ce914f54f7c7e947b3701575643ff3fe8f74ac4be4a0927c93de36a",
+        "source": "https://imagenes.elpais.com/resizer/v2/XYECUQ2DF3754OGNEA3W4QKWBA.jpg?auth=d510fcc75aa4edec6e4681161baa16d27f063dbc5bab01ffdad4525fd8549512&height=1470&smart=true&width=1960",
+        "sourceUrl": "https://www.theguardian.com/music/musicblog/2016/jun/22/the-strokes-10-of-the-best",
+        "credit": "Imagem publicada por www.theguardian.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1960,
+        "height": 1470,
+        "position": "center",
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "pedro-sanchez",
+      "name": "Pedro Sánchez",
+      "personId": 192,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "lula",
+          "sourceUrl": "https://www.cnnbrasil.com.br/internacional/premie-da-espanha-pedro-sanchez-declara-apoio-a-lula-antes-do-2o-turno/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/pedro-sanchez.jpg",
+        "sha256": "ac91834a1c7ffabd2173f5500343a4495076566d9785027db3c5cd4ae4203015",
+        "source": "https://www.bursa.ro/_img/articole/mare/586185.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File%3APedro_S%C3%A1nchez_P%C3%A9rez-Castej%C3%B3n_2021_%28cropped%29.jpg",
+        "credit": "Imagem publicada por commons.wikimedia.org. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 600,
+        "height": 538
+      }
+    },
+    {
+      "id": "finneas-oconnell",
+      "name": "Finneas O’Connell",
+      "personId": 193,
+      "memberships": [
+        {
+          "category": "internacionais",
+          "support": "lula",
+          "sourceUrl": "https://www.quemapoiaquem.com.br/p/finneas"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/finneas-oconnell.jpg",
+        "sha256": "605183364c276740c43f16fc9b215b017c30db4fb7ec5f5ffd16c76c1cb76e40",
+        "source": "https://cdn.mos.cms.futurecdn.net/v2/t%3A0%2Cl%3A437%2Ccw%3A1125%2Cch%3A1125%2Cq%3A80%2Cw%3A1125/qTf4UHbMMNfLXbDqBGFGPR.jpg",
+        "sourceUrl": "https://www.musicradar.com/artists/singers-songwriters/i-really-think-this-is-the-one-that-i-want-them-to-hear-i-love-this-one-finneas-writes-new-three-second-mnemonic-for-apple-tv",
+        "credit": "Imagem publicada por www.musicradar.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1125,
+        "height": 1125,
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "silas-malafaia",
+      "name": "Silas Malafaia",
+      "personId": 91,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "flavio",
+          "sourceUrl": "https://www.intercept.com.br/2026/10/02/malafaia-cartas-votos-flavio-tarcisio-marco-feliciano/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/091.jpg",
+        "sha256": "47ea5b1ac870bdc17ebf25053e9b4e8e93b1cc29c53d11fc9bbceca423a0b653",
+        "source": "Acervo PoliMatch · silas-malafaia",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "valdemar-costa-neto",
+      "name": "Valdemar Costa Neto",
+      "personId": 66,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "flavio",
+          "sourceUrl": "https://www1.folha.uol.com.br/poder/2026/09/flavio-bolsonaro-reune-apoiadores-na-paulista-para-ato-do-7-de-setembro.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/066.jpg",
+        "sha256": "5b8c45771da332cf0f4c0e412ed413d2888048aea5551d92390478a0918c7dba",
+        "source": "Acervo PoliMatch · valdemar-costa-neto",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "augusto-cury",
+      "name": "Augusto Cury",
+      "personId": 5,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/veja-os-partidos-que-declararam-apoio-a-flavio-bolsonaro-e-a-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/005.jpg",
+        "sha256": "06feb3c392ff950de7b1c41d2f561498fb2094af57e2d23888acd333e9c21951",
+        "source": "Acervo PoliMatch · augusto-cury",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "ronaldo-caiado",
+      "name": "Ronaldo Caiado",
+      "personId": 4,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "flavio",
+          "sourceUrl": "https://www.cnnbrasil.com.br/eleicoes/veja-os-partidos-que-declararam-apoio-a-flavio-bolsonaro-e-a-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/004.jpg",
+        "sha256": "542eebfb4cb590dc9d25d1453d2f60ca2f0dce4100bf92a761d1149a74abc116",
+        "source": "Acervo PoliMatch · ronaldo-caiado",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing"
+      }
+    },
+    {
+      "id": "daniella-marques",
+      "name": "Daniella Marques",
+      "personId": 194,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "flavio",
+          "sourceUrl": "https://www1.folha.uol.com.br/mercado/2026/07/liberais-transitam-por-equipes-de-presidenciaveis-da-direita-e-durigan-e-escalado-para-defender-lula.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/daniella-marques.jpg",
+        "sha256": "f0fcf16921868ec518e72a7fbb89833e8aef676d3798e173eb55652660dbedb9",
+        "source": "https://s2-valor-investe.glbimg.com/-8WYdcTmWKaZAew8mXjBXnpJJoo%3D/1200x/smart/filters%3Acover%28%29%3Astrip_icc%28%29/i.s3.glbimg.com/v1/AUTH_f035dd6fd91c438fa04ab718d608bbaa/internal_photos/bs/2022/W/8/AoLUdgRRejYJZoc0gmgA/52031736815-1a92554ae4-o.jpg",
+        "sourceUrl": "https://valorinveste.globo.com/mercados/brasil-e-politica/noticia/2022/06/29/saiba-quem-e-daniella-marques-escolhida-por-bolsonaro-para-presidir-a-caixa.ghtml",
+        "credit": "Imagem publicada por valorinveste.globo.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 800
+      }
+    },
+    {
+      "id": "adolfo-sachsida",
+      "name": "Adolfo Sachsida",
+      "personId": 195,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "flavio",
+          "sourceUrl": "https://www1.folha.uol.com.br/mercado/2026/07/liberais-transitam-por-equipes-de-presidenciaveis-da-direita-e-durigan-e-escalado-para-defender-lula.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/adolfo-sachsida.jpg",
+        "sha256": "570b15a6463e0331dca4540accc46db1702937389ac43ed7e0737d36f245c99d",
+        "source": "https://static.poder360.com.br/2020/05/adolfo-sachsida-8-jan-2020-sergio-lima.jpg",
+        "sourceUrl": "https://www.4oito.com.br/noticia/secretario-de-politica-economica-do-ministerio-da-economia-vai-palestrar-na-unesc-18487",
+        "credit": "Imagem publicada por www.4oito.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1620,
+        "height": 1080
+      }
+    },
+    {
+      "id": "marcos-troyjo",
+      "name": "Marcos Troyjo",
+      "personId": 196,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "flavio",
+          "sourceUrl": "https://www1.folha.uol.com.br/mercado/2026/07/liberais-transitam-por-equipes-de-presidenciaveis-da-direita-e-durigan-e-escalado-para-defender-lula.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/marcos-troyjo.jpg",
+        "sha256": "442f3590cd48939cd134c82e6acc31f6bb8d6fbc9eba75e441e99ee51973b709",
+        "source": "https://multipalestras.com/wp-content/uploads/2025/06/MT-scaled-e1750345189922.jpeg",
+        "sourceUrl": "https://multipalestras.com/2025/06/19/marcos-troyjo/",
+        "credit": "Imagem publicada por multipalestras.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1978,
+        "height": 1958
+      }
+    },
+    {
+      "id": "eduardo-cury",
+      "name": "Eduardo Cury",
+      "personId": 197,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "flavio",
+          "sourceUrl": "https://www.em.com.br/politica/platobr/2026/07/7462006-apos-um-ano-de-trabalho-programa-de-governo-de-flavio-bolsonaro-chega-a-reta-final.html"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/eduardo-cury.jpg",
+        "sha256": "86c7a1e13c8d1d15dcd7e8d5d4589ab159fad7904f4bbdee9a115a2f72021b90",
+        "source": "https://s2-valor.glbimg.com/jRGcdJNVhxehBuWxCuj9gW7_uLE%3D/1200x/smart/filters%3Acover%28%29%3Astrip_icc%28%29/i.s3.glbimg.com/v1/AUTH_63b422c2caee4269b8b34177e8876b93/internal_photos/bs/2024/8/j/NGGEboQAyYiPEbQbAyow/455694378-1047633156731331-5374245460642524849-n.jpg",
+        "sourceUrl": "https://valor.globo.com/politica/eleicoes-2024/noticia/2024/10/26/qual-e-o-numero-de-eduardo-cury-candidato-a-prefeito-de-sao-jose-dos-campos-sp.ghtml",
+        "credit": "Imagem publicada por valor.globo.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 1200
+      }
+    },
+    {
+      "id": "solange-vieira",
+      "name": "Solange Vieira",
+      "personId": 198,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "flavio",
+          "sourceUrl": "https://www1.folha.uol.com.br/mercado/2026/07/liberais-transitam-por-equipes-de-presidenciaveis-da-direita-e-durigan-e-escalado-para-defender-lula.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/solange-vieira.jpg",
+        "sha256": "b2ff59113f14c036b5e03eef0154acf54f50c2ec217d1010b7389c2854b81d98",
+        "source": "https://static.poder360.com.br/2021/10/SolangeVieira-Susep-FotoEdu-AndradeAscomME-1536x1024.jpeg",
+        "sourceUrl": "https://www.poder360.com.br/economia/solange-vieira-deixa-superintendencia-da-susep-para-conduzir-projeto-do-bndes/",
+        "credit": "Imagem publicada por www.poder360.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1536,
+        "height": 1024
+      }
+    },
+    {
+      "id": "janja",
+      "name": "Janja",
+      "personId": 47,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "lula",
+          "sourceUrl": "https://www.poder360.com.br/poder-eleicoes-2026/janja-participou-ativamente-de-campanha-e-foi-em-maioria-dos-atos/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/047.jpg",
+        "sha256": "cbb0f245987db7f53cee95da3c9da222820183f4dc8eef8e4a4c929e491493eb",
+        "source": "Acervo PoliMatch · janja",
+        "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+        "credit": "Créditos do acervo PoliMatch",
+        "kind": "existing",
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "edinho-silva",
+      "name": "Edinho Silva",
+      "personId": 67,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "lula",
+          "sourceUrl": "https://www.poder360.com.br/poder-eleicoes-2026/campanha-de-lula-ja-mudou-e-estamos-ditando-a-disputa-diz-dirceu/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/edinho-silva.jpg",
+        "sha256": "fc825fbd7dcd68d63e17d1e742d620951bb4e16e546e052a96ac395547488979",
+        "source": "https://s2-oglobo.glbimg.com/SOFXTgL29i0PlSyNPh6afpxN5EY%3D/1200x/smart/filters%3Acover%28%29%3Astrip_icc%28%29/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2024/U/G/yh0xAFSOakEVYluPaCpA/106526778-mariz-pa-brasilia-09-04-2024-edinho-silva-prefeito-araraquara-pt-edinho-silva-atual-pr.jpg",
+        "sourceUrl": "https://ultimosegundo.ig.com.br/politica/2025-07-07/edinho-silva-e-eleito-presidente-nacional-do-pt.html",
+        "credit": "Imagem publicada por ultimosegundo.ig.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1200,
+        "height": 800,
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "jose-dirceu",
+      "name": "José Dirceu",
+      "personId": 199,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "lula",
+          "sourceUrl": "https://www.poder360.com.br/poder-eleicoes-2026/campanha-de-lula-ja-mudou-e-estamos-ditando-a-disputa-diz-dirceu/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/jose-dirceu.jpg",
+        "sha256": "7ae2c037de5f392f2ce99794d0e164220d6d30bc0e7185dc5200a00248e6b17a",
+        "source": "https://s2.glbimg.com/qcO4ob4gWcgPPtpYdR9X1cd5aU8%3D/560x560/e.glbimg.com/og/ed/f/original/2018/04/26/76388068_brazilian-former-chief-of-staff-2003-2005-jose-dirceu-speaks-during-editada.jpg",
+        "sourceUrl": "https://www.brasildefato.com.br/2017/05/02/stf-determina-soltura-de-jose-dirceu/",
+        "credit": "Imagem publicada por www.brasildefato.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 560,
+        "height": 560,
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "manuela-davila",
+      "name": "Manuela d’Ávila",
+      "personId": 200,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "lula",
+          "sourceUrl": "https://www.correiodopovo.com.br/not%C3%ADcias/pol%C3%ADtica/elei%C3%A7%C3%B5es/em-convencao-manuela-davila-celebra-chegada-ao-psol-e-reforca-aliancas-na-corrida-eleitoral-1.1734187"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/manuela-davila.jpg",
+        "sha256": "2deb29b39e46cf49ef008127756aaa3df57c8127ee4c8ee01338825231b34f0a",
+        "source": "https://conteudo.imguol.com.br/c/entretenimento/1f/2019/10/10/manuela-davila-1570734135058_v2_1x1.jpg",
+        "sourceUrl": "https://www.uol.com.br/universa/noticias/redacao/2019/10/11/manuela-davila-unica-pauta-que-tinham-pra-mim-era-de-musa-do-congresso.htm",
+        "credit": "Imagem publicada por www.uol.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 2729,
+        "height": 2729
+      }
+    },
+    {
+      "id": "joao-pedro-stedile",
+      "name": "João Pedro Stédile",
+      "personId": 201,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "lula",
+          "sourceUrl": "https://mst.org.br/2026/09/22/espaco-cultural-elza-soares-recebe-plenaria-que-fecha-a-reta-final-pela-reeleicao-de-lula/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/joao-pedro-stedile.jpg",
+        "sha256": "57bb2a7bf0068bb6898d0a724586272305619d7e6c173d3cfe2fe1aa04fb043d",
+        "source": "https://auniao.pb.gov.br/noticias/caderno_diversidade/stedile-do-mst-estara-presente/JooPedroStdileVALTERCAMPANATO_AGNCIABRASIL.jpg",
+        "sourceUrl": "https://www.brasildefato.com.br/2018/10/28/joao-pedro-stedile-nos-temos-que-retomar-o-trabalho-de-base/",
+        "credit": "Imagem publicada por www.brasildefato.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 4553,
+        "height": 3189
+      }
+    },
+    {
+      "id": "aloizio-mercadante",
+      "name": "Aloizio Mercadante",
+      "personId": 202,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "lula",
+          "sourceUrl": "https://www1.folha.uol.com.br/colunas/painel/2026/09/mercadante-tira-ferias-do-bndes-para-se-dedicar-a-campanha-de-lula.shtml"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/aloizio-mercadante.jpg",
+        "sha256": "1720e17065cf51cd638757d7b9709b017784cb9371b16f39c16763a21958da39",
+        "source": "https://static.poder360.com.br/2022/11/Mercadante-no-CCBB-sede-da-transicao.jpeg",
+        "sourceUrl": "https://globalprogressivemobilisation.org/en/speakers/Mercadante",
+        "credit": "Imagem publicada por globalprogressivemobilisation.org. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1621,
+        "height": 1080
+      }
+    },
+    {
+      "id": "gilberto-carvalho",
+      "name": "Gilberto Carvalho",
+      "personId": 203,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "lula",
+          "sourceUrl": "https://www.poder360.com.br/poder-eleicoes-2026/campanha-de-lula-ja-mudou-e-estamos-ditando-a-disputa-diz-dirceu/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/gilberto-carvalho.jpg",
+        "sha256": "f641dcdd24eb75c0c98801618498434f4e6b52c6ccb5add3a6c841f78f49f791",
+        "source": "https://f.i.uol.com.br/folha/poder/images/15303756.jpeg",
+        "sourceUrl": "https://www1.folha.uol.com.br/poder/2017/01/1851129-ex-ministro-gilberto-carvalho-defende-acordo-do-pt-com-a-base-de-temer.shtml",
+        "credit": "Imagem publicada por www1.folha.uol.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 635,
+        "height": 436
+      }
+    },
+    {
+      "id": "paulo-okamotto",
+      "name": "Paulo Okamotto",
+      "personId": 204,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "lula",
+          "sourceUrl": "https://www.poder360.com.br/poder-eleicoes-2026/campanha-de-lula-ja-mudou-e-estamos-ditando-a-disputa-diz-dirceu/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/paulo-okamotto.jpg",
+        "sha256": "52349fc1a1e25a75590788ed653a048fffb30da7e188efe8460e93bcb44ddf76",
+        "source": "https://inverta.org/jornal/repositorio/imagens-materias/paulo-okamoto-presidente-do-instituto-lula.jpeg/%40%40images/4ccebde4-d4d5-4218-ba68-8274523764a6.jpeg",
+        "sourceUrl": "https://www.gettyimages.com/",
+        "credit": "Imagem publicada por www.gettyimages.com. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 600,
+        "height": 401
+      }
+    },
+    {
+      "id": "monica-valente",
+      "name": "Mônica Valente",
+      "personId": 205,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "lula",
+          "sourceUrl": "https://www.poder360.com.br/poder-eleicoes-2026/campanha-de-lula-ja-mudou-e-estamos-ditando-a-disputa-diz-dirceu/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/monica-valente.jpg",
+        "sha256": "1eb478e6ea1d55a2c735de0d629a28e4340edbd767d369767d13778e54ea9f65",
+        "source": "https://static.cdn.pleno.news/2023/02/monica-valente.jpg",
+        "sourceUrl": "https://crusoe.com.br/diario/cpi-do-mst-recebe-pedido-para-ouvir-presidente-do-foro-de-sao-paulo/",
+        "credit": "Imagem publicada por crusoe.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 1080,
+        "height": 661,
+        "position": "90% 20%"
+      }
+    },
+    {
+      "id": "paula-coradi",
+      "name": "Paula Coradi",
+      "personId": 206,
+      "memberships": [
+        {
+          "category": "liderancas",
+          "support": "lula",
+          "sourceUrl": "https://psol50.org.br/psol-aprova-apoio-a-lula-e-renovacao-da-federacao-com-a-rede/"
+        }
+      ],
+      "photo": {
+        "path": "/portraits/presidential/paula-coradi.jpg",
+        "sha256": "e9d3aea4cc6578de7cbf33526af5eb2b0c3b051e6655cedd662965115e183132",
+        "source": "https://www.opovo.com.br/_midias/jpg/2025/09/27/750x500/1_16959340866515e68675cea_1695934086_3x2_rt-37049234.jpg",
+        "sourceUrl": "https://psol50.org.br/com-67-dos-votos-paula-coradi-e-eleita-a-nova-presidenta-do-psol/",
+        "credit": "Imagem publicada por psol50.org.br. A autoria e a licença constam na fonte quando disponíveis.",
+        "kind": "curated",
+        "width": 750,
+        "height": 500
+      }
+    }
+  ],
+  "visualReviewStatus": "pending"
+}
