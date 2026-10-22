@@ -1,0 +1,122 @@
+[
+  {
+    "id": "nikolas-ferreira",
+    "name": "Nikolas Ferreira",
+    "path": "output/artwork/nikolas-ferreira-v01.png",
+    "sha256": "3445a8a837056c509e7e86d2ed60f15c6848afc51d234bd82661d013106d2f2e",
+    "bytes": 3041224,
+    "width": 1060,
+    "height": 1484,
+    "visualInspection": "reviewed-for-legibility-and-recognizability",
+    "humanReview": "approved-by-user-2026-10-22",
+    "tool": "built-in imagegen"
+  },
+  {
+    "id": "erika-hilton",
+    "name": "Erika Hilton",
+    "path": "output/artwork/erika-hilton-v01.png",
+    "sha256": "150700791561fb69f0e1415c699184048fa2aebb09a3b7c571aeeffbff5c99a6",
+    "bytes": 3013460,
+    "width": 1060,
+    "height": 1484,
+    "visualInspection": "reviewed-for-legibility-and-recognizability",
+    "humanReview": "approved-by-user-2026-10-22",
+    "tool": "built-in imagegen"
+  },
+  {
+    "id": "luciano-hang",
+    "name": "Luciano Hang",
+    "path": "output/artwork/luciano-hang-v01.png",
+    "sha256": "e3c52e71d0e12c5650434cbad3f30bdaf5556a277c8471a246f24730dc461cfd",
+    "bytes": 3134179,
+    "width": 1060,
+    "height": 1484,
+    "visualInspection": "reviewed-for-legibility-and-recognizability",
+    "humanReview": "approved-by-user-2026-10-22",
+    "tool": "built-in imagegen"
+  },
+  {
+    "id": "erasmo-carlos-battistella",
+    "name": "Erasmo Carlos Battistella",
+    "path": "output/artwork/erasmo-carlos-battistella-v01.png",
+    "sha256": "1df56562ba33515f244e40778d1e00124fefd6f277759096c54b1c4f771211de",
+    "bytes": 2828539,
+    "width": 1060,
+    "height": 1484,
+    "visualInspection": "reviewed-for-legibility-and-recognizability",
+    "humanReview": "approved-by-user-2026-10-22",
+    "tool": "built-in imagegen"
+  },
+  {
+    "id": "pablo-marcal",
+    "name": "Pablo Marçal",
+    "path": "output/artwork/pablo-marcal-v01.png",
+    "sha256": "2db012be82baff705626fac28e0aa17ea5bfed676c4975987a32502d3b883735",
+    "bytes": 2837772,
+    "width": 1060,
+    "height": 1484,
+    "visualInspection": "reviewed-for-legibility-and-recognizability",
+    "humanReview": "approved-by-user-2026-10-22",
+    "tool": "built-in imagegen"
+  },
+  {
+    "id": "felipe-neto",
+    "name": "Felipe Neto",
+    "path": "output/artwork/felipe-neto-v01.png",
+    "sha256": "d9620d11e0012ebcdcb58fadcce5f5f8b21221cd3600064ee3e58451bb01e9e5",
+    "bytes": 2916722,
+    "width": 1060,
+    "height": 1484,
+    "visualInspection": "reviewed-for-legibility-and-recognizability",
+    "humanReview": "approved-by-user-2026-10-22",
+    "tool": "built-in imagegen"
+  },
+  {
+    "id": "gusttavo-lima",
+    "name": "Gusttavo Lima",
+    "path": "output/artwork/gusttavo-lima-v01.png",
+    "sha256": "8a1ce3bc78774eab35416437a32ea510fa65abff4a84a1b4164abc218fabc568",
+    "bytes": 2950510,
+    "width": 1060,
+    "height": 1484,
+    "visualInspection": "reviewed-for-legibility-and-recognizability",
+    "humanReview": "approved-by-user-2026-10-22",
+    "tool": "built-in imagegen"
+  },
+  {
+    "id": "anitta",
+    "name": "Anitta",
+    "path": "output/artwork/anitta-v01.png",
+    "sha256": "7be66ff0ba36de7c568d4bad4ff7682a92b1530e2ce6d09d64a9b0cb3bf8f7cc",
+    "bytes": 3023698,
+    "width": 1060,
+    "height": 1484,
+    "visualInspection": "reviewed-for-legibility-and-recognizability",
+    "humanReview": "approved-by-user-2026-10-22",
+    "tool": "built-in imagegen"
+  },
+  {
+    "id": "javier-milei",
+    "name": "Javier Milei",
+    "path": "output/artwork/javier-milei-v01.png",
+    "sha256": "f797f55cbd3ad82bee95fcd740b4642eb3ebecdb74ed3c686f084f9ee473be18",
+    "bytes": 2919314,
+    "width": 1060,
+    "height": 1484,
+    "visualInspection": "reviewed-for-legibility-and-recognizability",
+    "humanReview": "approved-by-user-2026-10-22",
+    "tool": "built-in imagegen"
+  },
+  {
+    "id": "janja",
+    "name": "Janja",
+    "path": "output/artwork/janja-v01.png",
+    "sha256": "2239cfb2f6063558adde8c061233fc1f96afa3de0495c1f1e612e63e442de6d7",
+    "bytes": 3059282,
+    "width": 1060,
+    "height": 1484,
+    "visualInspection": "reviewed-for-legibility-and-recognizability",
+    "humanReview": "approved-by-user-2026-10-22",
+    "tool": "built-in imagegen"
+  }
+]

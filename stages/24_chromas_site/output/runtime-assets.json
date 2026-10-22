@@ -1,0 +1,102 @@
+[
+  {
+    "path": "app/public/chromas/inaugural/nikolas-ferreira-v01-3445a8a8-530.webp",
+    "bytes": 147608,
+    "sha256": "cc5d8fdd7dbe0922c2dc750f1c0521803dd9a733ee22eec5174e6beac13ffca9"
+  },
+  {
+    "path": "app/public/chromas/inaugural/nikolas-ferreira-v01-3445a8a8-1060.webp",
+    "bytes": 484866,
+    "sha256": "f0d7243e06338b7787480c378921ad3744a2075c6b57a94878d9850aed49dc5a"
+  },
+  {
+    "path": "app/public/chromas/inaugural/erika-hilton-v01-15070079-530.webp",
+    "bytes": 145602,
+    "sha256": "0ac136d889d2c98504685e40197291efdb7863d8f3df41f1132f6361e205a8e8"
+  },
+  {
+    "path": "app/public/chromas/inaugural/erika-hilton-v01-15070079-1060.webp",
+    "bytes": 458054,
+    "sha256": "61b946927ebc2a68010b44b65ac6c88c5ca9966a20b3926514d35b4c7caee267"
+  },
+  {
+    "path": "app/public/chromas/inaugural/luciano-hang-v01-e3c52e71-530.webp",
+    "bytes": 155420,
+    "sha256": "717298c3fd9b0ae4d133be9c7ba2d936b107858301cb04a119084a2deb5e7b49"
+  },
+  {
+    "path": "app/public/chromas/inaugural/luciano-hang-v01-e3c52e71-1060.webp",
+    "bytes": 523708,
+    "sha256": "188690ec8bda082c4285e262655fd087eea2c2ab32d6ce95f82b47fabf2a572d"
+  },
+  {
+    "path": "app/public/chromas/inaugural/erasmo-carlos-battistella-v01-1df56562-530.webp",
+    "bytes": 149766,
+    "sha256": "f292ff45aab6ea433cbecc2a83ba054a917f3559da6af54302e9ce94672c019b"
+  },
+  {
+    "path": "app/public/chromas/inaugural/erasmo-carlos-battistella-v01-1df56562-1060.webp",
+    "bytes": 435820,
+    "sha256": "bf93fc6d8f3b113ca6bb48448dc78afea78defd0fb25555669848a774dd68aeb"
+  },
+  {
+    "path": "app/public/chromas/inaugural/pablo-marcal-v01-2db012be-530.webp",
+    "bytes": 147592,
+    "sha256": "0ade9842f9c9b6d63e14182044281aba2c9b532fe4d9943a76cca5e2de1f83bd"
+  },
+  {
+    "path": "app/public/chromas/inaugural/pablo-marcal-v01-2db012be-1060.webp",
+    "bytes": 437530,
+    "sha256": "deb4788ebb5bbf6a1ab1ac771308f5394d8cd05ca215cd974ecc7f75e97d7695"
+  },
+  {
+    "path": "app/public/chromas/inaugural/felipe-neto-v01-d9620d11-530.webp",
+    "bytes": 153242,
+    "sha256": "7c434c9f44b544eedb9b49c4e2ce6eb397540c8883703c5e88476c10badbdfa2"
+  },
+  {
+    "path": "app/public/chromas/inaugural/felipe-neto-v01-d9620d11-1060.webp",
+    "bytes": 454688,
+    "sha256": "14eb907df0693745650674467f77f53006487477a0363a8b1e2a2b332cd58549"
+  },
+  {
+    "path": "app/public/chromas/inaugural/gusttavo-lima-v01-8a1ce3bc-530.webp",
+    "bytes": 154364,
+    "sha256": "19bf9d5c1071866192eb12b49fd757e2b67d378203f5ff7198e68d7e3cba2792"
+  },
+  {
+    "path": "app/public/chromas/inaugural/gusttavo-lima-v01-8a1ce3bc-1060.webp",
+    "bytes": 486796,
+    "sha256": "918e183795cb581c3c97ddbb1819d73b09166a27a5629bd27bc9d3c02782d3bd"
+  },
+  {
+    "path": "app/public/chromas/inaugural/anitta-v01-7be66ff0-530.webp",
+    "bytes": 155294,
+    "sha256": "846535e9265fc8bfe939f06f36fe10de063b83672be0783adf443de0c19c8657"
+  },
+  {
+    "path": "app/public/chromas/inaugural/anitta-v01-7be66ff0-1060.webp",
+    "bytes": 494148,
+    "sha256": "98c2a1b7179fc34ce3f24947a1f05652f34b64a8ab4460a3c6ac52cbdbe9dc9d"
+  },
+  {
+    "path": "app/public/chromas/inaugural/javier-milei-v01-f797f55c-530.webp",
+    "bytes": 142332,
+    "sha256": "01dcc81fc0404a3527a8325845534a0c55a4a32bbaaa866552194b6c5733284a"
+  },
+  {
+    "path": "app/public/chromas/inaugural/javier-milei-v01-f797f55c-1060.webp",
+    "bytes": 463274,
+    "sha256": "a6687043c9c7cca8d83975b8921a2eb0e1bce5348fa7fa1eeef76b4bdda3697c"
+  },
+  {
+    "path": "app/public/chromas/inaugural/janja-v01-2239cfb2-530.webp",
+    "bytes": 147728,
+    "sha256": "18268917da8c65c55dc1927ae528bd059b36503ee3e4ab8beac14f1fb06878a1"
+  },
+  {
+    "path": "app/public/chromas/inaugural/janja-v01-2239cfb2-1060.webp",
+    "bytes": 487488,
+    "sha256": "4e3dbca158ad74b503a1ca98f13f25bea8d5d743c38826d169e14ebd2239b16b"
+  }
+]

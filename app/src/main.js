@@ -1,5 +1,9 @@
 import { selectOrderedCard } from "./ordered-selection.js";
 import "./styles.css";
+import "./tcg-card.css";
+import PRESIDENTIAL_ROSTER from "../../shared/presidential-roster.json";
+import { tcgCardMarkup } from "./tcg-card.js";
+import { installInauguralChromas } from './inaugural-chromas.js';
 import { gameRequest, loadGameCapabilities } from "./api.js";
 import { sessionMirror } from "../../shared/session-mirror.js";
 import { choiceMessage } from "../../shared/player-feedback.js";
@@ -24,6 +28,7 @@ import { compactTaxonomyLabel } from "../../shared/catalog-taxonomy.js";
 import { createCivicShell } from "./civic/shell.js";
 
 const app = document.querySelector("#app");
+installInauguralChromas(app);
 const sound = createSoundController();
 const state = {
   screen: "topics",
@@ -370,14 +375,10 @@ function authOverlay() {
 
 function topicsContent() {
   const availableCandidates = state.candidates;
-  const featuredSlots = [47, 28, 1, 63];
-  const featuredCandidates = featuredSlots.map((personId) => availableCandidates.find((candidate) => Number(candidate.personId) === personId)).filter(Boolean);
+  const featuredIds = ["janja", "nikolas-ferreira", "erika-hilton", "pablo-marcal"];
+  const featuredCandidates = featuredIds.map(id => PRESIDENTIAL_ROSTER.people.find(person => person.id === id));
   const preview = featuredCandidates.map((candidate, index) => {
-    const art = candidateCardArt(candidate);
-    return `<article class="home-preview-card home-preview-card-${index + 1}" aria-hidden="true">
-      ${art ? `<img src="${escapeHtml(art)}" alt="" width="240" height="300">` : ""}
-      <span><strong>${escapeHtml(candidate.displayName || shortName(candidate.name))}</strong><small>${escapeHtml(candidateTaxonomy(candidate))}</small></span>
-    </article>`;
+    return `<article class="home-race-preview home-race-preview-${index + 1}" aria-hidden="true">${tcgCardMarkup(candidate, {decorative:true})}</article>`;
   }).join("");
   const availableCount = availableCandidates.length;
   const dailyAnswered = Number(state.dailySession?.progress?.answered) || 0;
@@ -406,13 +407,18 @@ function topicsContent() {
           <span><strong data-global-duels>${state.globalDuels}</strong> escolhas confirmadas</span>
         </div>
       </div>
-      <div class="home-deck" aria-label="Prévia das cartas básicas">
+      <div class="home-deck home-race-deck" aria-label="Prévia das cartas Chroma da corrida">
         <span class="home-deck-glow" aria-hidden="true"></span>
         ${preview}
-        <p><span aria-hidden="true">◆</span> Cartas básicas · Edição 2026</p>
+        <p><span aria-hidden="true">◆</span> Chroma Malaquita · Corrida presidencial</p>
       </div>
     </section>
 
+    <section class="home-topic" aria-labelledby="presidential-duels-title">
+      <div class="home-topic-heading"><div><p class="eyebrow">Novas cartas · Chroma Malaquita</p><h2 id="presidential-duels-title">Duelos da corrida.</h2></div></div>
+      <p>${PRESIDENTIAL_ROSTER.people.length} pessoas em seis categorias. Políticos, empresários, influenciadores, artistas, internacionais e lideranças. Escolha duas por rodada e forme o seu ranking.</p>
+      <a class="home-topic-cta" href="./duelos-da-corrida.html"><span>Entrar na arena</span><b aria-hidden="true">→</b></a>
+    </section>
     <section class="home-topic" aria-labelledby="quote-quiz-title">
       <div class="home-topic-heading"><div><p class="eyebrow">Novo jogo · Corrida presidencial</p><h2 id="quote-quiz-title">Quem disse isso?</h2></div></div>
       <p>Gafes históricas, falas da campanha e propostas oficiais. Lula, Flávio, Janja ou Nikolas: você reconhece as vozes? Veja a fonte e o contexto depois de responder.</p>

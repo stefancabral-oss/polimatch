@@ -1,0 +1,22 @@
+{
+  "identityCount": 104,
+  "uniqueIds": 104,
+  "plannedSlots": 1248,
+  "generatedFiles": 10,
+  "sourceHashesVerified": 104,
+  "excludedIdsAbsent": true,
+  "allVersionsTwelve": true,
+  "pngDecodePassed": true,
+  "aspectRatioTarget": "5:7 ±0.002",
+  "mastersUnmodified": true,
+  "humanReview": "approved-by-user-2026-10-22",
+  "runtimeChanged": false,
+  "published": false,
+  "ci": "not-run: art-only assets and documentation; no application changes",
+  "notes": [
+    "Erika Hilton and Luciano Hang have small typography/border variations; standardize in integration after visual review.",
+    "AI edits may introduce facial/detail drift; human likeness review remains required.",
+    "Master PNGs not optimized for runtime and not added to frontend bundle."
+  ],
+  "approvalMessage": "Show. Implementa no site"
+}

@@ -14,6 +14,8 @@ import { createCandidateRegistry } from "./editorial-gate.js";
 import { loadRepositoryFile, statRepositoryFile } from "./repository-files.js";
 import PHOTO_RECOVERY from "../../shared/photo-recovery-manifest.json" with { type: "json" };
 import { withPhotoRecovery } from "./photo-recovery.js";
+import PRESIDENTIAL_ROSTER from "../../shared/presidential-roster.json" with { type: "json" };
+import { withPresidentialRoster } from "./presidential-roster.js";
 
 export const TOPICS = Object.freeze([
   {
@@ -50,8 +52,10 @@ export const EDITORIAL_CANDIDATE_REGISTRY = createCandidateRegistry({
   statRepositoryFile,
   verifyApprovalAuthority: approvalAuthorityFromEnvironment(process.env),
 });
-export const PRODUCTION_CANDIDATE_REGISTRY = withPhotoRecovery(EDITORIAL_CANDIDATE_REGISTRY, PHOTO_RECOVERY, loadRepositoryFile);
-export const CANDIDATES = PRODUCTION_CANDIDATE_REGISTRY.candidates;
+export const RECOVERED_CANDIDATE_REGISTRY = withPhotoRecovery(EDITORIAL_CANDIDATE_REGISTRY, PHOTO_RECOVERY, loadRepositoryFile);
+export const PRODUCTION_CANDIDATE_REGISTRY = withPresidentialRoster(RECOVERED_CANDIDATE_REGISTRY, PRESIDENTIAL_ROSTER, loadRepositoryFile);
+// O catálogo histórico de 125 continua disponível para consumidores legados.
+export const CANDIDATES = RECOVERED_CANDIDATE_REGISTRY.candidates;
 export const CANDIDATES_BY_ID = PRODUCTION_CANDIDATE_REGISTRY.candidatesById;
 export const TOPICS_BY_ID = PRODUCTION_CANDIDATE_REGISTRY.topicsById;
 

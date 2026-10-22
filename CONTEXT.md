@@ -107,3 +107,10 @@ Novo modo de conhecimento aprovado por Stefan, independente do ranking político
 
 ## Edição presidencial — issue #246
 Stefan aprovou o resultado do estágio 20 e definiu novo recorte editorial, com vozes misturadas e propostas oficiais. Estágio ativo: stages/21_presidential_quiz/CONTEXT.md. Preservar autoria real e distinguir resumo de plano de citação literal.
+
+## Duelos da corrida e Chroma — issue #249
+Em 21/10/2026 Stefan solicitou duelos com todas as categorias de apoiadores
+consolidadas na conversa e uma nova camada visual de cartas TCG. Estágio ativo:
+`stages/22_presidential_chroma_duels/CONTEXT.md`. Esta curadoria tem temas próprios,
+não substitui snapshots históricos e exclui Michelle, Jair, Eduardo Bolsonaro e
+Romeu Zema. As regras de duas escolhas e confirmação online permanecem vigentes.
