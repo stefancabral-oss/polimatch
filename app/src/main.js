@@ -3,6 +3,7 @@ import "./styles.css";
 import "./tcg-card.css";
 import PRESIDENTIAL_ROSTER from "../../shared/presidential-roster.json";
 import { tcgCardMarkup } from "./tcg-card.js";
+import { installInauguralChromas } from './inaugural-chromas.js';
 import { gameRequest, loadGameCapabilities } from "./api.js";
 import { sessionMirror } from "../../shared/session-mirror.js";
 import { choiceMessage } from "../../shared/player-feedback.js";
@@ -27,6 +28,7 @@ import { compactTaxonomyLabel } from "../../shared/catalog-taxonomy.js";
 import { createCivicShell } from "./civic/shell.js";
 
 const app = document.querySelector("#app");
+installInauguralChromas(app);
 const sound = createSoundController();
 const state = {
   screen: "topics",
@@ -373,7 +375,7 @@ function authOverlay() {
 
 function topicsContent() {
   const availableCandidates = state.candidates;
-  const featuredIds = ["janja", "nikolas-ferreira", "erika-hilton", "sergio-moro"];
+  const featuredIds = ["janja", "nikolas-ferreira", "erika-hilton", "pablo-marcal"];
   const featuredCandidates = featuredIds.map(id => PRESIDENTIAL_ROSTER.people.find(person => person.id === id));
   const preview = featuredCandidates.map((candidate, index) => {
     return `<article class="home-race-preview home-race-preview-${index + 1}" aria-hidden="true">${tcgCardMarkup(candidate, {decorative:true})}</article>`;

@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-22",
+  "approvedArtworkCount": 10,
+  "runtimeDerivativeCount": 20,
+  "masterPngBytes": 29724700,
+  "runtimeBytes": 6225320,
+  "unitTests": {
+    "shared": 93,
+    "backend": 232,
+    "frontend": 214,
+    "failures": 0
+  },
+  "editorialAttestations": "passed; no extra editorial approvals",
+  "build": "passed; old #176 pilot excluded; masters outside runtime",
+  "chromium": {
+    "viewports": [
+      390,
+      1440
+    ],
+    "responsiveWidths": [
+      320,
+      375,
+      768,
+      1440
+    ],
+    "completeRoundsPerViewport": 10,
+    "allSixCategories": true,
+    "all104Profiles": true,
+    "imageArtProfiles": 10,
+    "imageFailureFallback": true,
+    "orderedSelection": true,
+    "replayAfterLostResponse": true,
+    "reload": true,
+    "offlineBlock": true,
+    "restart": true,
+    "shareNativeClipboardAndManual": true,
+    "ranking": true,
+    "sourceLinks": true,
+    "sound": true,
+    "consoleErrors": 0
+  },
+  "webkit": "pending remote CI; local host missing system dependencies",
+  "remoteCI": "pending PR",
+  "production": "pending; API currently returns zero candidates for corrida-politicos",
+  "humanArtworkApproval": {
+    "actor": "Stefan",
+    "message": "Show. Implementa no site",
+    "scope": "ten inaugural artworks"
+  }
+}

@@ -1,5 +1,6 @@
 import "./presidential.css";
 import "./tcg-card.css";
+import { installInauguralChromas } from './inaugural-chromas.js';
 import ROSTER from "../../shared/presidential-roster.json";
 import {
   categoryPeople,
@@ -31,6 +32,7 @@ import {
 
 validatePresidentialRoster(ROSTER);
 const root = document.querySelector("#presidential-app");
+installInauguralChromas(root);
 const sound = createSoundController();
 const byId = new Map(ROSTER.people.map((p) => [p.id, p]));
 const identityKey = "polimatch:v3:recovery-key";
@@ -72,7 +74,7 @@ function writeStorage() {
 const initialPreview = [
   "nikolas-ferreira",
   "janja",
-  "sergio-moro",
+  "pablo-marcal",
   "erika-hilton",
 ].map((id) => byId.get(id));
 root.innerHTML = `<div class="presidential-shell">
@@ -94,7 +96,7 @@ root.innerHTML = `<div class="presidential-shell">
   <section id="race-ranking" class="race-ranking" hidden aria-labelledby="ranking-title"><div class="section-top"><div><p class="race-eyebrow">SÓ AS SUAS ESCOLHAS</p><h1 id="ranking-title">Seu ranking.</h1></div><button class="race-text-button" id="ranking-back" type="button">‹ Voltar</button></div><p id="ranking-note"></p><ol id="ranking-list"></ol></section>
   <p id="connection-notice" class="race-notice" role="status" hidden>Você está sem conexão. Reconecte para confirmar suas escolhas.</p><p id="storage-notice" class="race-notice" hidden>Este navegador não permite salvar a partida aqui. As escolhas confirmadas continuam no servidor; mantenha esta aba aberta para continuar.</p><p id="race-error" class="race-notice" role="alert" hidden></p>
  </main>
- <footer class="race-footer"><span>PoliMatch · Corrida presidencial</span><span>Jogo pessoal. Não é pesquisa eleitoral.</span><a href="./quem-disse-isso.html">Quem disse isso? ↗</a></footer>
+ <footer class="race-footer"><span>PoliMatch · Corrida presidencial</span><span>Jogo pessoal. Não é pesquisa eleitoral.<br>Algumas cartas usam retratos artísticos com IA.</span><a href="./quem-disse-isso.html">Quem disse isso? ↗</a></footer>
  <nav class="race-nav" aria-label="Navegação dos duelos"><a href="./">⌂<span>Início</span></a><button type="button" id="nav-play" aria-current="page">◇<span>Duelos</span></button><button type="button" id="nav-roster">▦<span>Elenco</span></button><button type="button" id="nav-ranking">▥<span>Meu ranking</span></button></nav>
  <dialog id="race-profile" class="race-profile"><button type="button" id="profile-close" class="race-icon" aria-label="Fechar perfil">×</button><div id="profile-content"></div></dialog>
 </div>`;
@@ -168,7 +170,7 @@ function patchTable() {
     button.setAttribute("aria-pressed", String(order > 0));
     button.setAttribute(
       "aria-label",
-      `${byId.get(button.dataset.card).name}${session.confirmed ? (order ? `, ${order}ª escolha confirmada` : ", não escolhida") : order ? ", primeira escolha. Toque para desmarcar" : `, escolher em ${session.selectionIds.length ? "segundo" : "primeiro"} lugar`}`,
+      `${byId.get(button.dataset.card).name}${session.confirmed ? (order ? `, ${order}ª escolha confirmada` : ", não escolhida") : order ? ", primeira escolha. Toque para desmarcar" : `, escolher em ${session.selectionIds.length ? "segundo" : "primeiro"} lugar`}${button.classList.contains('tcg-card--inaugural') ? ', retrato artístico com IA' : ''}`,
     );
     button.classList.toggle("is-muted", session.confirmed && !order);
     const badge = button.querySelector(".tcg-choice");

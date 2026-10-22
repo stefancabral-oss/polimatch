@@ -155,3 +155,8 @@ jobs:
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
         run: node app/e2e/presidential-duels.mjs
+
+      - name: Validate approved complete Chromas and image-error fallback
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+        run: node app/e2e/inaugural-chromas.mjs

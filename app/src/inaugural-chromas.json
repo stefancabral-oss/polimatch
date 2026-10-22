@@ -1,0 +1,102 @@
+[
+  {
+    "id": "nikolas-ferreira",
+    "name": "Nikolas Ferreira",
+    "src": "/chromas/inaugural/nikolas-ferreira-v01-3445a8a8-530.webp",
+    "srcset": "/chromas/inaugural/nikolas-ferreira-v01-3445a8a8-530.webp 530w, /chromas/inaugural/nikolas-ferreira-v01-3445a8a8-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "3445a8a837056c509e7e86d2ed60f15c6848afc51d234bd82661d013106d2f2e"
+  },
+  {
+    "id": "erika-hilton",
+    "name": "Erika Hilton",
+    "src": "/chromas/inaugural/erika-hilton-v01-15070079-530.webp",
+    "srcset": "/chromas/inaugural/erika-hilton-v01-15070079-530.webp 530w, /chromas/inaugural/erika-hilton-v01-15070079-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "150700791561fb69f0e1415c699184048fa2aebb09a3b7c571aeeffbff5c99a6"
+  },
+  {
+    "id": "luciano-hang",
+    "name": "Luciano Hang",
+    "src": "/chromas/inaugural/luciano-hang-v01-e3c52e71-530.webp",
+    "srcset": "/chromas/inaugural/luciano-hang-v01-e3c52e71-530.webp 530w, /chromas/inaugural/luciano-hang-v01-e3c52e71-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "e3c52e71d0e12c5650434cbad3f30bdaf5556a277c8471a246f24730dc461cfd"
+  },
+  {
+    "id": "erasmo-carlos-battistella",
+    "name": "Erasmo Carlos Battistella",
+    "src": "/chromas/inaugural/erasmo-carlos-battistella-v01-1df56562-530.webp",
+    "srcset": "/chromas/inaugural/erasmo-carlos-battistella-v01-1df56562-530.webp 530w, /chromas/inaugural/erasmo-carlos-battistella-v01-1df56562-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "1df56562ba33515f244e40778d1e00124fefd6f277759096c54b1c4f771211de"
+  },
+  {
+    "id": "pablo-marcal",
+    "name": "Pablo Marçal",
+    "src": "/chromas/inaugural/pablo-marcal-v01-2db012be-530.webp",
+    "srcset": "/chromas/inaugural/pablo-marcal-v01-2db012be-530.webp 530w, /chromas/inaugural/pablo-marcal-v01-2db012be-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "2db012be82baff705626fac28e0aa17ea5bfed676c4975987a32502d3b883735"
+  },
+  {
+    "id": "felipe-neto",
+    "name": "Felipe Neto",
+    "src": "/chromas/inaugural/felipe-neto-v01-d9620d11-530.webp",
+    "srcset": "/chromas/inaugural/felipe-neto-v01-d9620d11-530.webp 530w, /chromas/inaugural/felipe-neto-v01-d9620d11-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "d9620d11e0012ebcdcb58fadcce5f5f8b21221cd3600064ee3e58451bb01e9e5"
+  },
+  {
+    "id": "gusttavo-lima",
+    "name": "Gusttavo Lima",
+    "src": "/chromas/inaugural/gusttavo-lima-v01-8a1ce3bc-530.webp",
+    "srcset": "/chromas/inaugural/gusttavo-lima-v01-8a1ce3bc-530.webp 530w, /chromas/inaugural/gusttavo-lima-v01-8a1ce3bc-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "8a1ce3bc78774eab35416437a32ea510fa65abff4a84a1b4164abc218fabc568"
+  },
+  {
+    "id": "anitta",
+    "name": "Anitta",
+    "src": "/chromas/inaugural/anitta-v01-7be66ff0-530.webp",
+    "srcset": "/chromas/inaugural/anitta-v01-7be66ff0-530.webp 530w, /chromas/inaugural/anitta-v01-7be66ff0-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "7be66ff0ba36de7c568d4bad4ff7682a92b1530e2ce6d09d64a9b0cb3bf8f7cc"
+  },
+  {
+    "id": "javier-milei",
+    "name": "Javier Milei",
+    "src": "/chromas/inaugural/javier-milei-v01-f797f55c-530.webp",
+    "srcset": "/chromas/inaugural/javier-milei-v01-f797f55c-530.webp 530w, /chromas/inaugural/javier-milei-v01-f797f55c-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "f797f55cbd3ad82bee95fcd740b4642eb3ebecdb74ed3c686f084f9ee473be18"
+  },
+  {
+    "id": "janja",
+    "name": "Janja",
+    "src": "/chromas/inaugural/janja-v01-2239cfb2-530.webp",
+    "srcset": "/chromas/inaugural/janja-v01-2239cfb2-530.webp 530w, /chromas/inaugural/janja-v01-2239cfb2-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "2239cfb2f6063558adde8c061233fc1f96afa3de0495c1f1e612e63e442de6d7"
+  }
+]

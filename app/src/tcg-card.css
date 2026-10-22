@@ -369,3 +369,56 @@
     #001c19 100%
   );
 }
+
+/* Approved complete cards already contain their own frame, brand and name.
+   Keep the base photograph underneath as a network-error/loading fallback. */
+.tcg-complete-art {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+}
+.tcg-card.is-chroma-ready {
+  border-color: transparent;
+  background: #083a2d;
+}
+.is-chroma-ready > .tcg-complete-art { opacity: 1; }
+.is-chroma-ready > .tcg-edge,
+.is-chroma-ready > .tcg-art,
+.is-chroma-ready > .tcg-etching,
+.is-chroma-ready > .tcg-top,
+.is-chroma-ready > .tcg-footer,
+.is-chroma-ready > .tcg-spark { visibility: hidden; }
+.is-chroma-ready > .tcg-foil {
+  inset: 0;
+  opacity: .2;
+  -webkit-mask-image: linear-gradient(90deg,#000,transparent 8% 92%,#000);
+  mask-image: linear-gradient(90deg,#000,transparent 8% 92%,#000);
+}
+.tcg-card.is-chroma-ready > .tcg-caption {
+  left: 6%;
+  right: 6%;
+  bottom: 23%;
+  padding: 0;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  clip-path: none;
+}
+.is-chroma-ready .tcg-category,
+.is-chroma-ready .tcg-name { display: none; }
+.is-chroma-ready .tcg-outcome {
+  padding: 6px 4px;
+  border: 1px solid #e6d08b;
+  border-radius: 5px;
+  background: #fffaf0f2;
+  text-align: center;
+  font-size: clamp(9px, 1vw, 12px);
+  box-shadow: 0 2px 9px #001c1766;
+}
+.is-chroma-ready .tcg-choice { top: 13%; right: 7%; }
