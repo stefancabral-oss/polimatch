@@ -63,10 +63,15 @@ try {
   await page.waitForFunction(()=>document.querySelector('[data-feedback-channels]')?.hidden===false);
   assert.deepEqual(requests[1],retryBody);
   assert.equal(await page.locator('[data-discard-panel]:visible').count(),0);
-  assert.match(await page.locator('[data-feedback-channels]').innerText(),/\+24/);
-  assert.match(await page.locator('[data-feedback-channels]').innerText(),/\+8/);
-  await page.waitForTimeout(250);
-  assert.equal(await page.locator('.card-outcome.loss:visible').count(),2);
+  // Sample the temporary confirmation in one browser turn rather than waiting
+  // a fixed 250ms plus several protocol round trips inside its 1050ms lifetime.
+  await page.waitForFunction(()=>document.querySelectorAll('.card-outcome.loss').length===2);
+  const confirmation=await page.evaluate(()=>({
+   text:document.querySelector('[data-feedback-channels]').innerText,
+   losses:[...document.querySelectorAll('.card-outcome.loss')].filter(n=>n.getClientRects().length>0).length,
+  }));
+  assert.match(confirmation.text,/\+24/); assert.match(confirmation.text,/\+8/);
+  assert.equal(confirmation.losses,2);
   if(process.env.POLIMATCH_ORDERED_SCREENSHOTS) await page.screenshot({path:`${process.env.POLIMATCH_ORDERED_SCREENSHOTS}/${viewport.width}-confirmed.png`,fullPage:true});
   for(let slot=2;slot<=10;slot++) {
    await page.waitForFunction(()=>document.querySelector('[data-game-mode="daily"]')?.getAttribute('aria-busy')==='false' && document.querySelectorAll('[data-vote][aria-disabled="false"]').length===4);

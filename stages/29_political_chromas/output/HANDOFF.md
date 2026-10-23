@@ -19,3 +19,8 @@ quarenta WebPs conferida. A gravação é atômica, com readback integral.
 Matriz Chromium/WebKit, merge/deploy e QA público serão registrados na PR ligada
 à issue #263 antes da comunicação de publicação. Gate visual final com Stefan;
 esta revisão técnica não substitui aprovação humana de produto.
+
+CI WebKit revelou duas condições de tempo em testes existentes da home/quiz:
+feedback de 1050ms amostrado com espera fixa e Enter enviado pelo foco global.
+Amostragem de feedback agora é atômica e por estado, e Enter usa a própria
+carta como alvo. Mesmas asserções funcionais, sem alterar runtime do produto.
