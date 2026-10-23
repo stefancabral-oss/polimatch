@@ -1,0 +1,54 @@
+[
+  {
+    "id": "flavio-bolsonaro",
+    "name": "Flávio Bolsonaro",
+    "photo": {
+      "path": "/chromas/approved/002_flavio-bolsonaro.jpg"
+    },
+    "src": "/chromas/cover/flavio-bolsonaro-special-635f252a-530.webp",
+    "srcset": "/chromas/cover/flavio-bolsonaro-special-635f252a-530.webp 530w, /chromas/cover/flavio-bolsonaro-special-635f252a-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "635f252aabb5400e3b2aa8a53198840a3738b6b921ba809fd3283043b7d14e18",
+    "masterUrl": "https://github.com/stefancabral-oss/polimatch/blob/e29e8266f091ed1c13a292cc0d43edaf4d887ea7/stages/26_special_chromas/output/artwork/flavio-bolsonaro-22-special-v01.png",
+    "variants": [
+      {
+        "src": "/chromas/cover/flavio-bolsonaro-special-635f252a-530.webp",
+        "width": 530,
+        "sha256": "afdfe1ce9f0e9f58c749c5a2e0bc92f2d97ca90002d7a07b04e081099c3c48fd"
+      },
+      {
+        "src": "/chromas/cover/flavio-bolsonaro-special-635f252a-1060.webp",
+        "width": 1060,
+        "sha256": "e780fb620ce315d81e3addaa38d741a0b006835282d1eb63acca951de8e099d3"
+      }
+    ]
+  },
+  {
+    "id": "lula",
+    "name": "Lula",
+    "photo": {
+      "path": "/chromas/approved/001_luiz-inacio-lula-da-silva.jpg"
+    },
+    "src": "/chromas/cover/lula-special-607a1b23-530.webp",
+    "srcset": "/chromas/cover/lula-special-607a1b23-530.webp 530w, /chromas/cover/lula-special-607a1b23-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "masterSha256": "607a1b23c17fd05cfbf778d15b244cf746238af7167239ef2518c5284bc9a9a8",
+    "masterUrl": "https://github.com/stefancabral-oss/polimatch/blob/e29e8266f091ed1c13a292cc0d43edaf4d887ea7/stages/26_special_chromas/output/artwork/lula-13-special-v01.png",
+    "variants": [
+      {
+        "src": "/chromas/cover/lula-special-607a1b23-530.webp",
+        "width": 530,
+        "sha256": "78c1ff3604c0719ff4b1b24d9b9004e4d586f12aab4fca136ba8064bc4f8b412"
+      },
+      {
+        "src": "/chromas/cover/lula-special-607a1b23-1060.webp",
+        "width": 1060,
+        "sha256": "df813424e58099bb2e326397bb0c3e7982c4f00de036aa86cef098c22cf54a27"
+      }
+    ]
+  }
+]

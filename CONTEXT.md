@@ -125,3 +125,8 @@ do estágio 26, apresentadas para avaliação e ainda fora do runtime.
 Em 23/10/2026 Stefan mostrou que a página principal ainda conserva outro menu
 flutuante. Estágio 27 aplica a mesma faixa separada também ao shell de Início,
 Duelo, Coleção e Ranking, preservando navegação cívica e controles existentes.
+
+## Capa presidencial — issue #261
+Em 23/10/2026 Stefan pediu Flávio, Lula, Nikolas e Janja na capa principal.
+Estágio 28 usa as artes especiais existentes Flávio azul/22 e Lula vermelha/13
+somente na capa, preservando jogos, inventário e as Malaquitas de Nikolas/Janja.

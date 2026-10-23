@@ -51,11 +51,10 @@ export function portraitMarkup(photo, { alt = "", loading = "eager" } = {}) {
 
 export function tcgCardMarkup(
   person,
-  { decorative = false, category = "Corrida presidencial", index = 0 } = {},
+  { decorative = false, category = "Corrida presidencial", index = 0, chroma = inauguralChroma(person.id) } = {},
 ) {
   const e = escapeCardText;
   const serial = String(person.personId || index + 1).padStart(3, "0");
-  const chroma = inauguralChroma(person.id);
   const content = `${chroma ? `<img class="tcg-complete-art" data-chroma-art src="${e(chroma.src)}" srcset="${e(chroma.srcset)}" sizes="(max-width: 640px) 45vw, 300px" width="1060" height="1484" alt="" decoding="async">` : ''}<span class="tcg-edge" aria-hidden="true"></span>
     <span class="tcg-art">${portraitMarkup(person.photo, { alt: decorative ? "" : `Retrato de ${person.name}` })}</span>
     <span class="tcg-foil" aria-hidden="true"></span><span class="tcg-etching" aria-hidden="true"></span>

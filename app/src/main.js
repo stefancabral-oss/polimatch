@@ -3,6 +3,7 @@ import "./styles.css";
 import "./tcg-card.css";
 import PRESIDENTIAL_ROSTER from "../../shared/presidential-roster.json";
 import { tcgCardMarkup } from "./tcg-card.js";
+import { HOME_COVER_PEOPLE, homeCoverChroma } from './home-cover.js';
 import { installInauguralChromas } from './inaugural-chromas.js';
 import { gameRequest, loadGameCapabilities } from "./api.js";
 import { sessionMirror } from "../../shared/session-mirror.js";
@@ -375,10 +376,8 @@ function authOverlay() {
 
 function topicsContent() {
   const availableCandidates = state.candidates;
-  const featuredIds = ["janja", "nikolas-ferreira", "erika-hilton", "pablo-marcal"];
-  const featuredCandidates = featuredIds.map(id => PRESIDENTIAL_ROSTER.people.find(person => person.id === id));
-  const preview = featuredCandidates.map((candidate, index) => {
-    return `<article class="home-race-preview home-race-preview-${index + 1}" aria-hidden="true">${tcgCardMarkup(candidate, {decorative:true})}</article>`;
+  const preview = HOME_COVER_PEOPLE.map((candidate, index) => {
+    return `<article class="home-race-preview home-race-preview-${index + 1}" aria-hidden="true">${tcgCardMarkup(candidate, {decorative:true, chroma:homeCoverChroma(candidate.id)})}</article>`;
   }).join("");
   const availableCount = availableCandidates.length;
   const dailyAnswered = Number(state.dailySession?.progress?.answered) || 0;
@@ -410,7 +409,7 @@ function topicsContent() {
       <div class="home-deck home-race-deck" aria-label="Prévia das cartas Chroma da corrida">
         <span class="home-deck-glow" aria-hidden="true"></span>
         ${preview}
-        <p><span aria-hidden="true">◆</span> Chroma Malaquita · Corrida presidencial</p>
+        <p><span aria-hidden="true">◆</span> Chromas · Corrida presidencial</p>
       </div>
     </section>
 
