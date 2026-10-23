@@ -160,3 +160,8 @@ jobs:
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
         run: node app/e2e/inaugural-chromas.mjs
+
+      - name: Validate non-overlapping presidential navigation and dynamic viewport
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+        run: node app/e2e/presidential-navigation.mjs

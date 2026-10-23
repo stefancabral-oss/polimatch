@@ -78,6 +78,7 @@ const initialPreview = [
   "erika-hilton",
 ].map((id) => byId.get(id));
 root.innerHTML = `<div class="presidential-shell">
+ <div class="race-scroll-area">
  <header class="race-header"><a class="race-brand" href="./"><img src="./brand/symbol-flat.svg" alt=""><span>PoliMatch</span></a><span class="race-edition">Edição · 2026</span><button class="race-icon" id="race-sound" aria-label="Ativar som" type="button">♪</button></header>
  <main>
   <section id="race-lobby" class="race-lobby">
@@ -97,6 +98,7 @@ root.innerHTML = `<div class="presidential-shell">
   <p id="connection-notice" class="race-notice" role="status" hidden>Você está sem conexão. Reconecte para confirmar suas escolhas.</p><p id="storage-notice" class="race-notice" hidden>Este navegador não permite salvar a partida aqui. As escolhas confirmadas continuam no servidor; mantenha esta aba aberta para continuar.</p><p id="race-error" class="race-notice" role="alert" hidden></p>
  </main>
  <footer class="race-footer"><span>PoliMatch · Corrida presidencial</span><span>Jogo pessoal. Não é pesquisa eleitoral.<br>Algumas cartas usam retratos artísticos com IA.</span><a href="./quem-disse-isso.html">Quem disse isso? ↗</a></footer>
+ </div>
  <nav class="race-nav" aria-label="Navegação dos duelos"><a href="./">⌂<span>Início</span></a><button type="button" id="nav-play" aria-current="page">◇<span>Duelos</span></button><button type="button" id="nav-roster">▦<span>Elenco</span></button><button type="button" id="nav-ranking">▥<span>Meu ranking</span></button></nav>
  <dialog id="race-profile" class="race-profile"><button type="button" id="profile-close" class="race-icon" aria-label="Fechar perfil">×</button><div id="profile-content"></div></dialog>
 </div>`;
@@ -125,7 +127,7 @@ function moveTo(view) {
     if (value) $("#" + id).setAttribute("aria-current", "page");
     else $("#" + id).removeAttribute("aria-current");
   }
-  window.scrollTo({ top: 0, behavior: "auto" });
+  $(".race-scroll-area").scrollTo({ top: 0, behavior: "auto" });
   const heading = $("#race-" + view).querySelector("h1,h2");
   if (heading) {
     heading.setAttribute("tabindex", "-1");

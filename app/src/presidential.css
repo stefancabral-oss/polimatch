@@ -23,7 +23,8 @@ body {
     ),
     linear-gradient(160deg, #043f30, #001e1a 70%);
   min-width: 320px;
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
 }
 button,
 input,
@@ -53,10 +54,22 @@ input:focus-visible {
 [hidden] {
   display: none !important;
 }
+#presidential-app {
+  height: 100%;
+}
 .presidential-shell {
-  max-width: 1440px;
-  margin: auto;
-  padding: 0 5.5% 110px;
+  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+/* Navigation owns its row; the browser's changing viewport never puts it
+   over the cards. Only this content region scrolls. */
+.race-scroll-area {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  padding: 0 max(5.5%, calc((100% - 1282px) / 2)) 20px;
 }
 .race-header {
   height: 90px;
@@ -338,20 +351,17 @@ h2 {
   color: var(--gold);
 }
 .race-nav {
-  position: fixed;
+  position: relative;
   z-index: 20;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(520px, calc(100% - 28px));
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  padding: 7px;
-  border: 1px solid #c2ae6b55;
-  border-radius: 18px;
-  background: #00251fea;
-  box-shadow: 0 9px 32px #0005;
-  backdrop-filter: blur(20px);
+  padding: 7px max(14px, calc((100% - 520px) / 2))
+    calc(7px + env(safe-area-inset-bottom));
+  border: 0;
+  border-top: 1px solid #c2ae6b55;
+  background: #00251f;
+  box-shadow: 0 -4px 20px #0002;
 }
 .race-nav button,
 .race-nav a {
@@ -778,8 +788,8 @@ h2 {
   }
 }
 @media (max-width: 640px) {
-  .presidential-shell {
-    padding: 0 20px calc(105px + env(safe-area-inset-bottom));
+  .race-scroll-area {
+    padding: 0 20px 16px;
   }
   .race-header {
     height: 72px;
@@ -939,10 +949,6 @@ h2 {
     gap: 8px;
     margin-top: 18px;
     padding: 20px 0;
-  }
-  .race-nav {
-    bottom: calc(10px + env(safe-area-inset-bottom));
-    border-radius: 16px;
   }
   .race-nav button,
   .race-nav a {
@@ -1132,7 +1138,7 @@ h2 {
   }
 }
 @media (max-width: 360px) {
-  .presidential-shell {
+  .race-scroll-area {
     padding-left: 14px;
     padding-right: 14px;
   }

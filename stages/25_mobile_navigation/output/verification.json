@@ -1,0 +1,10 @@
+{
+  "issue":255,
+  "date":"2026-10-23",
+  "frontendUnitTests":{"passed":214,"failed":0},
+  "build":"passed",
+  "navigationRegression":{"oldBuild":"fails: content must have a dedicated scroll region","newChromium":"passed","widths":[320,390,430,768,1440],"heights":[568,640,844,1000],"checks":["non-overlap","viewport-bottom","horizontal-overflow","44px-targets","four-destinations","scroll-reset","profile-focus-return"]},
+  "existingChromiumSmokes":{"presidentialDuels":"passed, two complete ten-round matches and recovery","tenChromas":"passed, profiles and image-error fallback"},
+  "webkit":"pending CI",
+  "production":"not yet deployed"
+}
