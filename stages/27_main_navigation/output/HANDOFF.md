@@ -22,3 +22,9 @@ continuam como entrega visual separada.
 
 Autorização: Stefan apontou persistência do problema no menu principal e pediu
 correção. Não se declara aprovação visual das artes ou conclusão sem deploy.
+
+## Ajuste encontrado no CI
+O cenário com Google habilitado precisava de 8px adicionais de folga no duelo
+móvel. Compactado apenas o espaçamento do cabeçalho nessa tela, preservando
+a altura das cartas e o mínimo de 12px entre a ação de trocar e o menu. Smoke
+com login, regressão dos quatro destinos e 16 viewports aprovados localmente.

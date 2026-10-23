@@ -457,7 +457,7 @@ try {
     throw new Error(`A anatomia móvel não reservou o rodapé fora do retrato: ${JSON.stringify(cardHierarchyEvidence.geometry)}`);
   }
   if (cardHierarchyEvidence.geometry.skipToNavGap < 12 || cardHierarchyEvidence.geometry.skipToNavGap > 40) {
-    throw new Error(`O espaço entre a rodada e a navegação não foi redistribuído pela nova carta: ${cardHierarchyEvidence.geometry.skipToNavGap}px`);
+    throw new Error(`O espaço entre a rodada e a navegação não foi redistribuído pela nova carta: ${JSON.stringify(cardHierarchyEvidence.geometry)}`);
   }
   if (cardHierarchyEvidence.typography.brand.display !== "none") {
     throw new Error("A assinatura textual microscópica reapareceu no card móvel");

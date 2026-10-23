@@ -490,6 +490,7 @@ button:focus-visible { outline: 3px solid #2a8d70; outline-offset: 3px; }
   .sound-toggle { width: 42px; height: 42px; }
   .app-scroll-area { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 16px; }
   .topbar { margin-bottom: 10px; padding-bottom: 9px; }
+  .app-shell[data-screen="duel"] .topbar { margin-bottom: 6px; padding-bottom: 5px; }
   .auth-card { padding: 26px 22px 22px; }
   .home-hero { min-height: auto; grid-template-columns: 1fr; gap: 8px; padding: 27px 20px 18px; border-radius: 27px; }
   .home-hero h1 { max-width: 430px; font-size: clamp(2.65rem, 13.4vw, 4.1rem); }
