@@ -114,3 +114,9 @@ consolidadas na conversa e uma nova camada visual de cartas TCG. Estágio ativo:
 `stages/22_presidential_chroma_duels/CONTEXT.md`. Esta curadoria tem temas próprios,
 não substitui snapshots históricos e exclui Michelle, Jair, Eduardo Bolsonaro e
 Romeu Zema. As regras de duas escolhas e confirmação online permanecem vigentes.
+
+## Correção do menu da corrida — issue #255
+Em 23/10/2026 Stefan apontou a navegação sobreposta às cartas no celular.
+Estágio 25: faixa inferior em linha própria, conteúdo rolável separado, sem
+mudar jogo ou pontuação. As Chromas especiais Lula 13 e Flávio 22 são artes
+do estágio 26, apresentadas para avaliação e ainda fora do runtime.
