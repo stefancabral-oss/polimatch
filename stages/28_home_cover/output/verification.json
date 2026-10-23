@@ -1,0 +1,1 @@
+{"issue":261,"date":"2026-10-23","unitTests":215,"build":"passed","scope":"main home cover only","people":["flavio-bolsonaro","lula","nikolas-ferreira","janja"],"assets":"four WebP derivatives, full 5:7 image, recorded SHA-256 and source masters","browserChecks":"see PR CI results and public QA before publication","humanVisualGate":"pending Stefan review"}

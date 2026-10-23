@@ -28,6 +28,14 @@ try{
   });
   await page.goto(base,{waitUntil:'domcontentloaded'});
   await page.locator('.bottom-nav:not([hidden])').waitFor();
+  await page.waitForFunction(()=>document.querySelectorAll('.home-race-preview .is-chroma-ready').length===4);
+  assert.deepEqual(await page.locator('.home-race-preview .tcg-name').allTextContents(),['Flávio Bolsonaro','Lula','Nikolas Ferreira','Janja']);
+  for(const image of await page.locator('.home-race-preview [data-chroma-art]').all()){
+   // The showcase is rotated; inspect the untransformed image box, not its
+   // axis-aligned visual bounding rectangle.
+   const g=await image.evaluate(img=>({loaded:img.naturalWidth,ratio:img.clientWidth/img.clientHeight}));
+   assert.ok(g.loaded>0);assert.ok(Math.abs(g.ratio-5/7)<.01);
+  }
   for(const height of [568,844,1000]){
    await page.setViewportSize({width,height});
    for(const screen of ['topics','duel','collection','ranking','topics']){
@@ -49,6 +57,14 @@ try{
    }
   }
   if(shots&&width===390){await page.setViewportSize({width,height:844});await page.locator('.app-scroll-area').evaluate(a=>a.scrollTop=0);await page.screenshot({path:`${shots}/${kind}-390-main-menu.png`});}
+  if(width===390){
+   await page.route('**/chromas/cover/flavio-*',route=>route.abort());
+   await page.reload();
+   await page.waitForFunction(()=>{const c=document.querySelector('.home-race-preview-1 .tcg-card'),img=c?.querySelector('[data-chroma-art]');return img?.complete&&!img.naturalWidth&&!c.classList.contains('is-chroma-ready');});
+   const fallback=page.locator('.home-race-preview-1 .tcg-art img');await fallback.evaluate(img=>img.decode());
+   assert.ok(await fallback.evaluate(img=>img.naturalWidth>0));
+   assert.equal(await page.locator('.home-race-preview-1 .tcg-name').innerText(),'Flávio Bolsonaro');
+  }
   assert.deepEqual(errors,[]);await context.close();console.log(`${kind} ${width}: four main destinations, three heights, scroll reset and no menu overlap passed`);
  }
 }finally{await browser.close();}
