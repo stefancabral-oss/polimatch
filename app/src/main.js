@@ -700,6 +700,7 @@ function duelMarkup() {
 
 function appMarkup() {
   return `<div class="app-shell" data-screen="connection">
+      <div class="app-scroll-area">
       ${headerMarkup()}
       <main class="connection" data-panel="connection"><p>Preparando o duelo…</p></main>
       <main class="screen home-screen" data-panel="topics" hidden></main>
@@ -708,6 +709,7 @@ function appMarkup() {
       <main class="screen collection-screen" data-panel="collection" hidden>${collectionContent()}</main>
       <main class="screen prediction-results-panel" data-panel="prediction-results" hidden></main>
       <main class="screen civic-screen" data-panel="civic" hidden></main>
+      </div>
       ${navMarkup()}
       <div class="nav-more-sheet" id="nav-more-sheet" role="group" aria-label="Mais telas" hidden></div>
     </div>
@@ -743,6 +745,7 @@ function captureRefs() {
   const panels = Object.fromEntries([...app.querySelectorAll("[data-panel]")].map((panel) => [panel.dataset.panel, panel]));
   return {
     shell: app.querySelector(".app-shell"),
+    scroller: app.querySelector(".app-scroll-area"),
     panels,
     topbar: app.querySelector(".topbar"),
     accountButton: app.querySelector("#account-button"),
@@ -1014,7 +1017,9 @@ function render() {
   renderHeader();
   const activePanel = state.ready ? state.screen : "connection";
   showPersistentPanel(refs.panels, activePanel);
+  const panelChanged = refs.shell.dataset.screen !== activePanel;
   refs.shell.dataset.screen = activePanel;
+  if (panelChanged) refs.scroller.scrollTop = 0;
   if (!state.ready) renderConnection();
   else {
     renderDuel();
@@ -1678,6 +1683,7 @@ function handleAppClick(event) {
 
   const button = event.target.closest?.("button");
   if (!button || !app.contains(button)) return;
+  if (refs.nav.contains(button) && button.dataset.screen) refs.scroller.scrollTop = 0;
 
   if (["close-modal", "close-modal-top"].includes(button.id)) {
     refs.modal.close();

@@ -55,7 +55,7 @@ function canonicalCard() {
 async function canonicalGeometry(page, viewport) {
   await page.setViewportSize(viewport);
   await page.setContent(`<!doctype html><html><head><style>${canonicalCss}</style></head><body>
-    <main class="app-shell"><section class="arena arena-four">${canonicalCard().repeat(4)}</section></main>
+    <main class="app-shell"><div class="app-scroll-area"><section class="arena arena-four">${canonicalCard().repeat(4)}</section></div></main>
   </body></html>`);
   return geometry(page, {
     card: ".candidate-card",
