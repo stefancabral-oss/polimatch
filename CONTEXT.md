@@ -130,3 +130,8 @@ Duelo, Coleção e Ranking, preservando navegação cívica e controles existent
 Em 23/10/2026 Stefan pediu Flávio, Lula, Nikolas e Janja na capa principal.
 Estágio 28 usa as artes especiais existentes Flávio azul/22 e Lula vermelha/13
 somente na capa, preservando jogos, inventário e as Malaquitas de Nikolas/Janja.
+
+## Vinte Chromas Políticos — issue #263
+Em 23/10/2026 Stefan solicitou refinar todas as Chromas da seção política.
+Estágio 29 renova as vinte artes da categoria politicos na corrida, com masters,
+fontes, prompts e derivados rastreáveis. Preserva capa, demais categorias e regras.

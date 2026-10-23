@@ -170,3 +170,8 @@ jobs:
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
         run: node app/e2e/main-navigation.mjs
+
+      - name: Validate all twenty political Chromas and image failure fallback
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+        run: node app/e2e/political-chromas.mjs

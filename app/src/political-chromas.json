@@ -1,0 +1,222 @@
+[
+  {
+    "id": "nikolas-ferreira",
+    "name": "Nikolas Ferreira",
+    "src": "/chromas/politicos/nikolas-ferreira-v02-f32ef78d-530.webp",
+    "srcset": "/chromas/politicos/nikolas-ferreira-v02-f32ef78d-530.webp 530w, /chromas/politicos/nikolas-ferreira-v02-f32ef78d-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "f32ef78d0fa286776f69fababcc2240dc2ddc1ab0527c1cd2ce4424860b31e02"
+  },
+  {
+    "id": "gustavo-gayer",
+    "name": "Gustavo Gayer",
+    "src": "/chromas/politicos/gustavo-gayer-v02-072a8c5d-530.webp",
+    "srcset": "/chromas/politicos/gustavo-gayer-v02-072a8c5d-530.webp 530w, /chromas/politicos/gustavo-gayer-v02-072a8c5d-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "072a8c5d9004f4e2e9a91f7a888348c4f1ad120817232196260181c2945c9af7"
+  },
+  {
+    "id": "jeffrey-chiquini",
+    "name": "Jeffrey Chiquini",
+    "src": "/chromas/politicos/jeffrey-chiquini-v02-05ac3449-530.webp",
+    "srcset": "/chromas/politicos/jeffrey-chiquini-v02-05ac3449-530.webp 530w, /chromas/politicos/jeffrey-chiquini-v02-05ac3449-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "05ac344995d765ce9f37f90547a3498c50509d2e39b4a6631a30e8f891d257ff"
+  },
+  {
+    "id": "bruno-zambelli",
+    "name": "Bruno Zambelli",
+    "src": "/chromas/politicos/bruno-zambelli-v02-58185ad1-530.webp",
+    "srcset": "/chromas/politicos/bruno-zambelli-v02-58185ad1-530.webp 530w, /chromas/politicos/bruno-zambelli-v02-58185ad1-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "58185ad1898f41ba1827e98cf7c1976d88b86d467c67b56fe12875e4d7f90ee5"
+  },
+  {
+    "id": "deltan-dallagnol",
+    "name": "Deltan Dallagnol",
+    "src": "/chromas/politicos/deltan-dallagnol-v02-8ebffab3-530.webp",
+    "srcset": "/chromas/politicos/deltan-dallagnol-v02-8ebffab3-530.webp 530w, /chromas/politicos/deltan-dallagnol-v02-8ebffab3-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "8ebffab378bc92ad552b38321bbe5d34503a400de8d17ec319bb49f2c6499c16"
+  },
+  {
+    "id": "lucas-pavanato",
+    "name": "Lucas Pavanato",
+    "src": "/chromas/politicos/lucas-pavanato-v02-4ddbcfba-530.webp",
+    "srcset": "/chromas/politicos/lucas-pavanato-v02-4ddbcfba-530.webp 530w, /chromas/politicos/lucas-pavanato-v02-4ddbcfba-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "4ddbcfbaa9f51535befc6d3e9d99d0cf8b9fd1279ea3744d4bcb9a9a692e41e1"
+  },
+  {
+    "id": "cabo-gilberto-silva",
+    "name": "Cabo Gilberto Silva",
+    "src": "/chromas/politicos/cabo-gilberto-silva-v02-f566d280-530.webp",
+    "srcset": "/chromas/politicos/cabo-gilberto-silva-v02-f566d280-530.webp 530w, /chromas/politicos/cabo-gilberto-silva-v02-f566d280-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "f566d280f5bfb370bd9f04534a99e7dd7cd1161784d0c060a9da57b635b14a91"
+  },
+  {
+    "id": "carlos-bolsonaro",
+    "name": "Carlos Bolsonaro",
+    "src": "/chromas/politicos/carlos-bolsonaro-v02-791c4490-530.webp",
+    "srcset": "/chromas/politicos/carlos-bolsonaro-v02-791c4490-530.webp 530w, /chromas/politicos/carlos-bolsonaro-v02-791c4490-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "791c44900f79dc40135e92e7b111fdc07eb3af4b453ddd39cd5f79a5cb505fdf"
+  },
+  {
+    "id": "guilherme-derrite",
+    "name": "Guilherme Derrite",
+    "src": "/chromas/politicos/guilherme-derrite-v02-d1b47010-530.webp",
+    "srcset": "/chromas/politicos/guilherme-derrite-v02-d1b47010-530.webp 530w, /chromas/politicos/guilherme-derrite-v02-d1b47010-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "d1b470100f69daf10ac53a166033834e64cb9275bb2e2ab899d8374ad3271f2b"
+  },
+  {
+    "id": "sergio-moro",
+    "name": "Sergio Moro",
+    "src": "/chromas/politicos/sergio-moro-v02-db6ae7e9-530.webp",
+    "srcset": "/chromas/politicos/sergio-moro-v02-db6ae7e9-530.webp 530w, /chromas/politicos/sergio-moro-v02-db6ae7e9-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "db6ae7e9ee1a28aad139316026849c06d2c2ed4757db525bedd3afbe716448be"
+  },
+  {
+    "id": "andre-janones",
+    "name": "André Janones",
+    "src": "/chromas/politicos/andre-janones-v02-531d1e8c-530.webp",
+    "srcset": "/chromas/politicos/andre-janones-v02-531d1e8c-530.webp 530w, /chromas/politicos/andre-janones-v02-531d1e8c-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "531d1e8c5b568033751219d19f587c2fc78c3f50b5daf1a9de08c4100909235d"
+  },
+  {
+    "id": "erika-hilton",
+    "name": "Erika Hilton",
+    "src": "/chromas/politicos/erika-hilton-v02-9dfa47c9-530.webp",
+    "srcset": "/chromas/politicos/erika-hilton-v02-9dfa47c9-530.webp 530w, /chromas/politicos/erika-hilton-v02-9dfa47c9-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "9dfa47c9c78fba27a134b86cdfb50bbc13c88c5511984ffc17f576aaa6fe08a6"
+  },
+  {
+    "id": "guilherme-boulos",
+    "name": "Guilherme Boulos",
+    "src": "/chromas/politicos/guilherme-boulos-v02-2869a20c-530.webp",
+    "srcset": "/chromas/politicos/guilherme-boulos-v02-2869a20c-530.webp 530w, /chromas/politicos/guilherme-boulos-v02-2869a20c-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "2869a20c0f80f5a39cb9b1f24359ff94f2583ecaf25bce15855d3b4ec30ee04f"
+  },
+  {
+    "id": "fernando-haddad",
+    "name": "Fernando Haddad",
+    "src": "/chromas/politicos/fernando-haddad-v02-0bc2c095-530.webp",
+    "srcset": "/chromas/politicos/fernando-haddad-v02-0bc2c095-530.webp 530w, /chromas/politicos/fernando-haddad-v02-0bc2c095-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "0bc2c095969903e6d86690e8c5400756139f4405760d6fdea27d83cac9099d11"
+  },
+  {
+    "id": "marina-silva",
+    "name": "Marina Silva",
+    "src": "/chromas/politicos/marina-silva-v02-85a5c7c2-530.webp",
+    "srcset": "/chromas/politicos/marina-silva-v02-85a5c7c2-530.webp 530w, /chromas/politicos/marina-silva-v02-85a5c7c2-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "85a5c7c21e0c7fdff5142ceb05c7db15a9c2a196cb09823cdefc20a0d05634c8"
+  },
+  {
+    "id": "geraldo-alckmin",
+    "name": "Geraldo Alckmin",
+    "src": "/chromas/politicos/geraldo-alckmin-v02-ce3a5fc8-530.webp",
+    "srcset": "/chromas/politicos/geraldo-alckmin-v02-ce3a5fc8-530.webp 530w, /chromas/politicos/geraldo-alckmin-v02-ce3a5fc8-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "ce3a5fc87286f76c9aa7c322552c71f242d92d3740f571b1e5e5733f149e93f4"
+  },
+  {
+    "id": "simone-tebet",
+    "name": "Simone Tebet",
+    "src": "/chromas/politicos/simone-tebet-v02-4a4fa582-530.webp",
+    "srcset": "/chromas/politicos/simone-tebet-v02-4a4fa582-530.webp 530w, /chromas/politicos/simone-tebet-v02-4a4fa582-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "4a4fa5829935ac2f21d252bd89e5ce50932f230d9b4f00c03e2170613a8e4767"
+  },
+  {
+    "id": "samia-bonfim",
+    "name": "Sâmia Bomfim",
+    "src": "/chromas/politicos/samia-bonfim-v02-c42cd25e-530.webp",
+    "srcset": "/chromas/politicos/samia-bonfim-v02-c42cd25e-530.webp 530w, /chromas/politicos/samia-bonfim-v02-c42cd25e-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "c42cd25ef12ad46039649b8854a25c974e01552e58fc2dfba37bbd5a3f68a220"
+  },
+  {
+    "id": "lindbergh-farias",
+    "name": "Lindbergh Farias",
+    "src": "/chromas/politicos/lindbergh-farias-v02-8b32449a-530.webp",
+    "srcset": "/chromas/politicos/lindbergh-farias-v02-8b32449a-530.webp 530w, /chromas/politicos/lindbergh-farias-v02-8b32449a-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "8b32449a15337fd9ce9a938d8f65b6fe753f1984025f6ec1ab0f1d4d318fbe31"
+  },
+  {
+    "id": "joao-campos",
+    "name": "João Campos",
+    "src": "/chromas/politicos/joao-campos-v02-47023fe1-530.webp",
+    "srcset": "/chromas/politicos/joao-campos-v02-47023fe1-530.webp 530w, /chromas/politicos/joao-campos-v02-47023fe1-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "47023fe155935c092ffdcc4b80d6fa3297c96e14508683eb27a8dac4a2fb6280"
+  }
+]

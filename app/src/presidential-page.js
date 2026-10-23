@@ -1,6 +1,7 @@
 import "./presidential.css";
 import "./tcg-card.css";
 import { installInauguralChromas } from './inaugural-chromas.js';
+import { presidentialChroma } from './political-chromas.js';
 import ROSTER from "../../shared/presidential-roster.json";
 import {
   categoryPeople,
@@ -18,7 +19,7 @@ import { selectOrderedCard } from "./ordered-selection.js";
 import { createSoundController } from "./sound.js";
 import { installChromaMotion } from "./chroma-motion.js";
 import {
-  tcgCardMarkup,
+  tcgCardMarkup as baseTcgCardMarkup,
   portraitMarkup,
   escapeCardText as e,
 } from "./tcg-card.js";
@@ -29,6 +30,10 @@ import {
   PRESIDENTIAL_SESSION_LENGTH as TOTAL,
   PRESIDENTIAL_STORAGE_KEY,
 } from "./presidential-session.js";
+
+function tcgCardMarkup(person, options = {}) {
+  return baseTcgCardMarkup(person, { ...options, chroma: presidentialChroma(person.id) });
+}
 
 validatePresidentialRoster(ROSTER);
 const root = document.querySelector("#presidential-app");

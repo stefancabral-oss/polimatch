@@ -1,0 +1,24 @@
+{
+  "issue": 263,
+  "date": "2026-10-23",
+  "artworks": 20,
+  "derivatives": 40,
+  "sha256_verified": 40,
+  "unit_tests": {
+    "passed": 217,
+    "failed": 0
+  },
+  "build": "passed",
+  "local_chromium": {
+    "widths": [
+      390,
+      1440
+    ],
+    "political_profiles": 20,
+    "inaugural_profiles": 10,
+    "fallback": "passed",
+    "profile_controls": "passed"
+  },
+  "ci_and_public_qa": "recorded in linked pull request after completion",
+  "human_visual_gate": "Stefan; not asserted by agent"
+}
