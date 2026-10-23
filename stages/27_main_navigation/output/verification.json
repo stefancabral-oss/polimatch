@@ -37,8 +37,17 @@
   "existingLocalChromium": {
     "responsiveLayout": "passed: 16 viewports, home/duel/ranking and compact-card scroll",
     "interactionSmoke": "passed: persistent DOM, focus, profile, vote and ranking",
-    "googleLoginInteraction": "passed after preserving >=12px clearance above navigation"
+    "googleLoginInteraction": "passed after preserving >=12px clearance above navigation",
+    "pilotCanonicalForm": "passed: mobile-390x844 and desktop-1000x800; immutable geometry preserved",
+    "civicNavigation": "passed: 13 scenarios",
+    "gameProgress": "passed: pairs, interruption, mirror and earned collection"
   },
   "webkit": "pending CI",
-  "production": "not yet deployed"
+  "production": "QA after CI and deployment; final deployment record in PR #260",
+  "remoteCI": {
+    "codeCommit": "64ef86c1b8b12d9a5b644f88cd734b2446e48515",
+    "designValidator": "passed: https://github.com/stefancabral-oss/polimatch/actions/runs/40031981935",
+    "chromium": "passed: https://github.com/stefancabral-oss/polimatch/actions/runs/40031981997/job/120682185778",
+    "webkit": "installation still running; final matrix required before merge; authoritative result in PR #260 checks"
+  }
 }

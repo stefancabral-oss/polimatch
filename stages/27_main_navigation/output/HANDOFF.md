@@ -28,3 +28,16 @@ O cenário com Google habilitado precisava de 8px adicionais de folga no duelo
 móvel. Compactado apenas o espaçamento do cabeçalho nessa tela, preservando
 a altura das cartas e o mínimo de 12px entre a ação de trocar e o menu. Smoke
 com login, regressão dos quatro destinos e 16 viewports aprovados localmente.
+
+## Contrato preservado e CI
+Removida a reserva artificial de largura da barra de rolagem para preservar
+as larguras canônicas das cartas. A fixture do piloto acompanha o novo wrapper
+sem mudar contratos, tolerâncias ou gates editoriais. Os dois cenários passaram.
+O smoke aguarda a pintura da rolagem antes de pressionar uma carta, e mantém
+a pressão até o perfil aparecer; os asserts de ausência de voto e foco seguem.
+
+No commit de código `64ef86c`, Design Validator e toda a matriz Chromium passaram
+no CI (runs 40031981935/40031981997). O WebKit ficou na instalação por tempo
+incomum; uma nova execução acompanha esta atualização de evidência, sem alterar
+código de produção. O resultado definitivo e o QA do deploy serão registrados
+na PR #260. Não declarar Safari ou publicação aprovados antes da confirmação.
