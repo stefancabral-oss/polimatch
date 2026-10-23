@@ -52,7 +52,6 @@ button:active { transform: scale(.975); }
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior-y: contain;
-  scrollbar-gutter: stable;
   padding: max(14px, env(safe-area-inset-top))
     max(var(--shell-gutter), calc((100% - var(--shell-max)) / 2 + var(--shell-gutter))) 18px;
 }

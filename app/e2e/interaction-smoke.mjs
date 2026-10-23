@@ -573,9 +573,13 @@ try {
   if (!shortSecondRowBox) throw new Error("A segunda linha não ficou acessível no viewport curto");
   await page.mouse.move(shortSecondRowBox.x + shortSecondRowBox.width / 2, shortSecondRowBox.y + shortSecondRowBox.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(520);
-  await page.mouse.up();
-  await page.locator("dialog[open]").waitFor();
+  try {
+    // Hold until the observable result; a fixed 520ms release races the 460ms
+    // application timer when WebKit is painting a newly scrolled layer in CI.
+    await page.locator("dialog[open]").waitFor({ state: "visible", timeout: 5000 });
+  } finally {
+    await page.mouse.up();
+  }
   await page.getByRole("button", { name: /^Fechar perfil de / }).click();
   await page.locator("dialog[open]").waitFor({ state: "hidden" });
   await page.setViewportSize({ width: 390, height: 844 });
@@ -588,9 +592,13 @@ try {
   if (!box) throw new Error("Carta de duelo não foi renderizada");
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(520);
-  await page.mouse.up();
-  await page.locator("dialog[open]").waitFor();
+  try {
+    // Hold until the observable result; a fixed 520ms release races the 460ms
+    // application timer when WebKit is painting a newly scrolled layer in CI.
+    await page.locator("dialog[open]").waitFor({ state: "visible", timeout: 5000 });
+  } finally {
+    await page.mouse.up();
+  }
   const taxonomy = page.locator(".profile-taxonomy");
   if (!await taxonomy.getByText("Cargo/função", { exact: true }).isVisible()
     || !await taxonomy.getByText("Partido", { exact: true }).isVisible()
@@ -613,9 +621,13 @@ try {
   if (!reopenBox) throw new Error("Não foi possível reabrir o perfil por pressão longa");
   await page.mouse.move(reopenBox.x + reopenBox.width / 2, reopenBox.y + reopenBox.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(520);
-  await page.mouse.up();
-  await page.locator("dialog[open]").waitFor();
+  try {
+    // Hold until the observable result; a fixed 520ms release races the 460ms
+    // application timer when WebKit is painting a newly scrolled layer in CI.
+    await page.locator("dialog[open]").waitFor({ state: "visible", timeout: 5000 });
+  } finally {
+    await page.mouse.up();
+  }
   await page.keyboard.press("Escape");
   await page.locator("dialog[open]").waitFor({ state: "hidden" });
   await page.waitForFunction(() => document.activeElement === document.querySelector(".candidate-card"));
