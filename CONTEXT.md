@@ -120,3 +120,8 @@ Em 23/10/2026 Stefan apontou a navegação sobreposta às cartas no celular.
 Estágio 25: faixa inferior em linha própria, conteúdo rolável separado, sem
 mudar jogo ou pontuação. As Chromas especiais Lula 13 e Flávio 22 são artes
 do estágio 26, apresentadas para avaliação e ainda fora do runtime.
+
+## Completar menu principal — issue #259
+Em 23/10/2026 Stefan mostrou que a página principal ainda conserva outro menu
+flutuante. Estágio 27 aplica a mesma faixa separada também ao shell de Início,
+Duelo, Coleção e Ranking, preservando navegação cívica e controles existentes.

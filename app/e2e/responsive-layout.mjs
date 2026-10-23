@@ -1,3 +1,4 @@
+import { scrollApp } from "./app-scroll.mjs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { chromium, webkit } from "playwright";
 import CATALOG from "../../shared/elections-2026.json" with { type: "json" };
@@ -119,24 +120,24 @@ async function screenMetrics(page, screen) {
 }
 
 async function compactDuelScrollMetrics(page) {
-  const maxScroll = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
+  const maxScroll = await page.evaluate(() => (document.querySelector(".app-scroll-area").scrollHeight - document.querySelector(".app-scroll-area").clientHeight));
   if (maxScroll <= 0) return null;
 
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await scrollApp(page, "end");
   await page.waitForFunction(() => Math.abs(
-    scrollY - (document.documentElement.scrollHeight - innerHeight),
+    document.querySelector(".app-scroll-area").scrollTop - ((document.querySelector(".app-scroll-area").scrollHeight - document.querySelector(".app-scroll-area").clientHeight)),
   ) <= 1);
   const metrics = await page.evaluate(() => {
     const readBox = (element) => element?.getBoundingClientRect().toJSON() || null;
     return {
-      scrollY,
-      maxScroll: document.documentElement.scrollHeight - innerHeight,
+      scrollY: document.querySelector(".app-scroll-area").scrollTop,
+      maxScroll: (document.querySelector(".app-scroll-area").scrollHeight - document.querySelector(".app-scroll-area").clientHeight),
       secondRow: [...document.querySelectorAll(".candidate-wrap")].slice(2).map(readBox),
       skip: readBox(document.querySelector("#skip-round")),
       navigation: readBox(document.querySelector(".bottom-nav")),
     };
   });
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await scrollApp(page);
   return metrics;
 }
 
@@ -177,7 +178,7 @@ async function goTo(screen) {
     await page.getByRole("button", { name: "Começar rodada", exact: true }).click();
   }
   if (screen === "duel") await page.locator(".candidate-card").first().waitFor();
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await scrollApp(page);
 }
 
 function assertResponsiveLayout(evidence) {

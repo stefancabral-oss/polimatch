@@ -1,3 +1,4 @@
+import { scrollApp } from "./app-scroll.mjs";
 import { chromium, webkit } from "playwright";
 import { writeFile } from "node:fs/promises";
 import CATALOG from "../../shared/elections-2026.json" with { type: "json" };
@@ -34,7 +35,7 @@ async function measureCardHierarchy(page) {
     const skip = bounds("#skip-round");
     const nav = bounds(".bottom-nav");
     return {
-      viewport: { width: innerWidth, height: innerHeight, scrollY, documentHeight: document.documentElement.scrollHeight },
+      viewport: { width: innerWidth, height: innerHeight, scrollY, documentHeight: document.querySelector(".app-scroll-area").scrollHeight },
       wrap: bounds(".candidate-wrap"),
       card: bounds(".candidate-card"),
       portrait: bounds(".candidate-card .portrait"),
@@ -462,12 +463,12 @@ try {
     throw new Error("A assinatura textual microscópica reapareceu no card móvel");
   }
   if (process.env.POLIMATCH_E2E_DUEL_SCREENSHOT) {
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await scrollApp(page);
     await page.screenshot({ path: process.env.POLIMATCH_E2E_DUEL_SCREENSHOT });
   }
 
   await page.setViewportSize({ width: 320, height: 568 });
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await scrollApp(page);
   const shortMobile = await page.evaluate(() => {
     const navTop = document.querySelector(".bottom-nav").getBoundingClientRect().top;
     const cards = [...document.querySelectorAll(".candidate-wrap")].map((wrap) => {
@@ -516,7 +517,7 @@ try {
     return {
       cards,
       navTop,
-      documentHeight: document.documentElement.scrollHeight,
+      documentHeight: document.querySelector(".app-scroll-area").scrollHeight,
       horizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
     };
   });
@@ -554,13 +555,13 @@ try {
     || invalidShortCards.length) {
     throw new Error(`A anatomia das cartas não foi preservada em 320 por 568: ${JSON.stringify({ ...shortMobile, invalidShortCards })}`);
   }
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await scrollApp(page, "end");
   const shortScroll = await page.evaluate(() => {
     const cards = [...document.querySelectorAll(".candidate-card")];
     const secondRow = cards.slice(2).map((card) => card.getBoundingClientRect().toJSON());
     const navTop = document.querySelector(".bottom-nav").getBoundingClientRect().top;
     const skipBottom = document.querySelector("#skip-round").getBoundingClientRect().bottom;
-    return { secondRow, navTop, skipBottom, scrollY, maxScroll: document.documentElement.scrollHeight - innerHeight };
+    return { secondRow, navTop, skipBottom, scrollY: document.querySelector(".app-scroll-area").scrollTop, maxScroll: (document.querySelector(".app-scroll-area").scrollHeight - document.querySelector(".app-scroll-area").clientHeight) };
   });
   if (shortScroll.scrollY < shortScroll.maxScroll - 1
     || shortScroll.secondRow.some(({ top, bottom }) => top < 0 || bottom >= shortScroll.navTop)
@@ -578,7 +579,7 @@ try {
   await page.getByRole("button", { name: /^Fechar perfil de / }).click();
   await page.locator("dialog[open]").waitFor({ state: "hidden" });
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await scrollApp(page);
 
   const firstCard = page.locator("[data-vote]").first();
   const firstId = await firstCard.getAttribute("data-vote");
@@ -702,7 +703,7 @@ try {
   const outcomeEvidence = await measureRoundOutcomes(page);
   assertOutcomeSemantics(outcomeEvidence, "390 × 844");
   await page.setViewportSize({ width: 320, height: 568 });
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await scrollApp(page, "end");
   const shortOutcome = await page.evaluate(() => {
     const navTop = document.querySelector(".bottom-nav").getBoundingClientRect().top;
     const skipBottom = document.querySelector("#skip-round").getBoundingClientRect().bottom;
@@ -733,7 +734,7 @@ try {
         messageFontSize: Number.parseFloat(getComputedStyle(outcome.querySelector("small")).fontSize),
       };
     });
-    return { cards, navTop, skipBottom, scrollY, maxScroll: document.documentElement.scrollHeight - innerHeight };
+    return { cards, navTop, skipBottom, scrollY: document.querySelector(".app-scroll-area").scrollTop, maxScroll: (document.querySelector(".app-scroll-area").scrollHeight - document.querySelector(".app-scroll-area").clientHeight) };
   });
   const invalidShortOutcomes = shortOutcome.cards.filter((card) => (
     Math.abs(card.width - shortOutcome.cards[0].width) > 2
@@ -755,7 +756,7 @@ try {
     throw new Error(`Ganho ou perda ficou recortado em 320 por 568: ${JSON.stringify({ ...shortOutcome, invalidShortOutcomes })}`);
   }
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await scrollApp(page);
   if (process.env.POLIMATCH_E2E_CARD_METRICS) {
     await writeFile(process.env.POLIMATCH_E2E_CARD_METRICS, `${JSON.stringify({ card: cardHierarchyEvidence, pending: pendingEvidence, outcomes: outcomeEvidence }, null, 2)}\n`);
   }
@@ -764,7 +765,7 @@ try {
     await page.evaluate(() => {
       document.activeElement?.blur();
       document.documentElement.style.scrollBehavior = "auto";
-      window.scrollTo(0, 0);
+      document.querySelector(".app-scroll-area").scrollTo(0, 0);
     });
     await page.waitForTimeout(60);
     await page.screenshot({ path: process.env.POLIMATCH_E2E_OUTCOME_SCREENSHOT });
@@ -846,7 +847,7 @@ try {
     await page.evaluate(() => {
       document.activeElement?.blur();
       document.documentElement.style.scrollBehavior = "auto";
-      window.scrollTo(0, 0);
+      document.querySelector(".app-scroll-area").scrollTo(0, 0);
     });
     await page.waitForTimeout(60);
     await page.screenshot({ path: process.env.POLIMATCH_E2E_PERSONAL_RANKING_SCREENSHOT });

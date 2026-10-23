@@ -1,0 +1,10 @@
+{
+  "issue":259,
+  "date":"2026-10-23",
+  "frontendUnitTests":{"passed":214,"failed":0},
+  "build":"passed",
+  "mainNavigation":{"oldBuild":"fails: main app requires its own content scroll area","chromium":"passed","widths":[320,390,768,1440],"heights":[568,844,1000],"screens":["topics","duel","collection","ranking"],"checks":["non-overlap","viewport-bottom","scroll-reset","44px-targets","no-horizontal-overflow"]},
+  "existingLocalChromium":{"responsiveLayout":"passed: 16 viewports, home/duel/ranking and compact-card scroll","interactionSmoke":"passed: persistent DOM, focus, profile, vote and ranking"},
+  "webkit":"pending CI",
+  "production":"not yet deployed"
+}
