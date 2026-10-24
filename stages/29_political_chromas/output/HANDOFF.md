@@ -28,3 +28,8 @@ carta como alvo. Mesmas asserções funcionais, sem alterar runtime do produto.
 As vinte artes carregaram e passaram identidade/geometria no WebKit; a simulação
 de falha foi corrigida para instalar o bloqueio antes de carregar novo documento,
 pois o WebKit conserva imagens já decodificadas ao reabrir um perfil.
+
+O smoke legado da home media o resultado transitório após a troca automática
+em runners lentos. O teste agora pausa o relógio somente nessa medição, preserva
+todas as asserções e avança/resume o timer para validar a próxima rodada.
+A validação das vinte Chromas passa a rodar primeiro, sem remover testes gerais.
