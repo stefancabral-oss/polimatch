@@ -32,6 +32,10 @@ try {
       await page.locator('#profile-close').click();
     }
     await page.route('**/chromas/politicos/gustavo-gayer-*',route=>route.abort());
+    // WebKit can retain already decoded images within a document despite routing.
+    // Start a fresh document with the failure installed before requesting this art.
+    await page.reload();
+    await page.locator('#race-show-roster').click();
     await page.locator('#roster-grid [data-profile="gustavo-gayer"]').click();
     await page.waitForFunction(()=>{
       const c=document.querySelector('.profile-tcg .tcg-card'),i=c?.querySelector('[data-chroma-art]');

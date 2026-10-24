@@ -24,3 +24,7 @@ CI WebKit revelou duas condições de tempo em testes existentes da home/quiz:
 feedback de 1050ms amostrado com espera fixa e Enter enviado pelo foco global.
 Amostragem de feedback agora é atômica e por estado, e Enter usa a própria
 carta como alvo. Mesmas asserções funcionais, sem alterar runtime do produto.
+
+As vinte artes carregaram e passaram identidade/geometria no WebKit; a simulação
+de falha foi corrigida para instalar o bloqueio antes de carregar novo documento,
+pois o WebKit conserva imagens já decodificadas ao reabrir um perfil.
