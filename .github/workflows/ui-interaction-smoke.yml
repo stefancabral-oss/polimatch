@@ -70,6 +70,11 @@ jobs:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
         run: node app/e2e/political-chromas.mjs
 
+      - name: Validate main daily Chromas and iPhone usable viewport
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+        run: node app/e2e/main-chromas-iphone.mjs
+
       - name: Run browser interaction smoke
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}

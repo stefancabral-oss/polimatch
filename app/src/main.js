@@ -1,3 +1,4 @@
+import { mainGameChroma, installMainChromas } from "./main-chromas.js";
 import { selectOrderedCard } from "./ordered-selection.js";
 import "./styles.css";
 import "./tcg-card.css";
@@ -30,6 +31,7 @@ import { createCivicShell } from "./civic/shell.js";
 
 const app = document.querySelector("#app");
 installInauguralChromas(app);
+installMainChromas(app);
 const sound = createSoundController();
 const state = {
   screen: "topics",
@@ -286,6 +288,7 @@ function profileProvenanceMarkup(candidate) {
 function candidateSlot(index) {
   return `<article class="candidate-wrap" data-candidate-slot="${index}" hidden>
     <button class="candidate-card basic-card vote-target" type="button" aria-disabled="true">
+      <img class="game-chroma-art" data-game-chroma sizes="(max-width: 699px) 45vw, 300px" width="1060" height="1484" alt="" decoding="async" hidden>
       <span class="card-material" aria-hidden="true"></span>
       <span class="card-facets" aria-hidden="true"></span>
       <span class="card-brand" aria-hidden="true">${brandSymbol("card-brand-symbol")}<b>PoliMatch</b></span>
@@ -326,6 +329,7 @@ function candidateSlotModel(candidate, { actionMode = "vote" } = {}) {
     selected: ordered ? selectionOrder > 0 : undefined,
     profileAccessibleName: `Conhecer ${candidate.name}`,
     initials: initials(candidate.name),
+    chroma: prediction ? null : mainGameChroma(candidate),
     photo: candidateCardArt(candidate),
     photoAlt: `Retrato de ${candidate.name}`,
     name: candidate.displayName || shortName(candidate.name),
@@ -729,6 +733,7 @@ function captureCandidateSlot(root) {
     profileButton: root.querySelector(".profile-trigger"),
     fallback: root.querySelector(".portrait-fallback"),
     image: root.querySelector(".portrait img"),
+    chromaImage: root.querySelector("[data-game-chroma]"),
     name: root.querySelector(".candidate-name"),
     affiliation: root.querySelector(".candidate-affiliation"),
     office: root.querySelector(".candidate-office"),

@@ -20,6 +20,9 @@ const session = {
 const ranking = candidates.map((candidate) => ({ ...candidate, elo: 1000, wins: 0, losses: 0, decisions: 0, rank: null, winRate: 0 }));
 const browser = await { chromium, webkit }[browserName].launch();
 const page = await browser.newPage({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" });
+// Exercise the documentary-photo reserve when a complete Chroma is unavailable.
+// Loaded Chromas are independently validated in main-chromas-iphone.mjs.
+await page.route(/\/chromas\/(politicos|inaugural|cover)\//, route => route.abort());
 const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
 await page.route(/\/api(?:\/|$)/, (route) => {

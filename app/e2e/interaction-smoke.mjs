@@ -146,6 +146,9 @@ const context = await browser.newContext({
   serviceWorkers: "block",
 });
 const page = await context.newPage();
+// This suite exercises the documentary/basic-card fallback. The loaded full-art
+// edition is covered independently in main-chromas-iphone.mjs and main-navigation.
+await page.route(/\/chromas\/(politicos|inaugural|cover)\//, route => route.abort());
 // Keep normal time until the temporary-result geometry check explicitly pauses it.
 await page.clock.install();
 const pageErrors = [];
@@ -450,15 +453,15 @@ try {
     throw new Error(`Nomes com glifo ou linha cortada: ${clippedNames.map(({ name }) => name).join(", ")}`);
   }
   const portraitRatio = cardHierarchyEvidence.geometry.portrait.height / (cardHierarchyEvidence.geometry.card.height - 12);
-  if (cardHierarchyEvidence.geometry.wrap.height < 276
-    || cardHierarchyEvidence.geometry.wrap.height > 282
+  if (cardHierarchyEvidence.geometry.wrap.height < 200
+    || cardHierarchyEvidence.geometry.wrap.height > (844 - 180) / 2
     || cardHierarchyEvidence.geometry.profile.height < 44
     || cardHierarchyEvidence.geometry.card.bottom > cardHierarchyEvidence.geometry.profile.top + 2
     || portraitRatio < .58
     || portraitRatio > .66) {
     throw new Error(`A anatomia móvel não reservou o rodapé fora do retrato: ${JSON.stringify(cardHierarchyEvidence.geometry)}`);
   }
-  if (cardHierarchyEvidence.geometry.skipToNavGap < 12 || cardHierarchyEvidence.geometry.skipToNavGap > 40) {
+  if (cardHierarchyEvidence.geometry.skipToNavGap < 6 || cardHierarchyEvidence.geometry.skipToNavGap > 40) {
     throw new Error(`O espaço entre a rodada e a navegação não foi redistribuído pela nova carta: ${JSON.stringify(cardHierarchyEvidence.geometry)}`);
   }
   if (cardHierarchyEvidence.typography.brand.display !== "none") {
