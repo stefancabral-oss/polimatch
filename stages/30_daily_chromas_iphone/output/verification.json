@@ -1,0 +1,28 @@
+{
+  "issue": 265,
+  "date": "2026-10-24",
+  "unit_tests": 219,
+  "build": "passed",
+  "local_chromium": {
+    "width": 440,
+    "heights": [
+      650,
+      740,
+      820,
+      956
+    ],
+    "daily_chroma": "passed",
+    "four_cards_fit": "passed",
+    "profile_actions_44px": "passed",
+    "first_choice": "passed",
+    "image_failure_fallback": "passed",
+    "legacy_regressions": [
+      "interaction-smoke",
+      "ordered-choices",
+      "main-navigation",
+      "responsive-layout"
+    ]
+  },
+  "ci_and_public_qa": "see linked pull request after completion",
+  "human_gate": "Stefan; not approved by agent"
+}

@@ -144,6 +144,9 @@ async function compactDuelScrollMetrics(page) {
 const browser = await browserType.launch();
 const context = await browser.newContext({ viewport: viewports[0], serviceWorkers: "block" });
 const page = await context.newPage();
+// This suite exercises the documentary/basic-card fallback. The loaded full-art
+// edition is covered independently in main-chromas-iphone.mjs and main-navigation.
+await page.route(/\/chromas\/(politicos|inaugural|cover)\//, route => route.abort());
 const pageErrors = [];
 page.on("pageerror", (error) => pageErrors.push(error.message));
 

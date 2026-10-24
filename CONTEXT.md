@@ -135,3 +135,10 @@ somente na capa, preservando jogos, inventário e as Malaquitas de Nikolas/Janja
 Em 23/10/2026 Stefan solicitou refinar todas as Chromas da seção política.
 Estágio 29 renova as vinte artes da categoria politicos na corrida, com masters,
 fontes, prompts e derivados rastreáveis. Preserva capa, demais categorias e regras.
+
+## Rodada diária com Chromas e encaixe no iPhone — issue #265
+Em 24/10/2026 Stefan reportou que a raiz ainda não ativava as novas artes e
+pediu reduzir a escala no iPhone 17 Pro Max. Estágio 30 aplica as edições
+existentes aos slots persistentes diários/livres/pares, mantendo a foto documental
+como reserva. A grade móvel usa o espaço restante real do shell. Sem mudar
+sessão diária, escolhas, ranking ou propriedade de itens da Coleção.

@@ -670,3 +670,37 @@ button:focus-visible { outline: 3px solid #2a8d70; outline-offset: 3px; }
 .home-race-preview{position:relative;min-width:0;z-index:1}.home-race-preview:nth-of-type(odd){transform:rotate(-5deg)}.home-race-preview:nth-of-type(even){transform:rotate(5deg) translateY(10px)}
 .home-race-preview .tcg-card{aspect-ratio:5/7}.home-race-preview .tcg-name{font-size:16px}.home-race-preview .tcg-caption{min-height:60px;padding:10px}.home-race-deck>p{position:absolute;bottom:0;left:0;right:0;margin:0;text-align:center;font-size:9px;color:#dbc38a}
 @media(max-width:600px){.home-race-deck{max-width:310px;gap:11px;padding:8px 10px 30px}.home-race-preview .tcg-name{font-size:12px}.home-race-preview .tcg-caption{min-height:46px;padding:7px}.home-race-preview .tcg-top{font-size:4px}.home-race-preview .tcg-category{font-size:4px}.home-race-preview .tcg-footer{font-size:3px}.home-race-preview .tcg-spark{bottom:57px}}
+
+/* Complete editions also belong to the persistent daily/free/pair slots. */
+.game-chroma-art { position:absolute; inset:0; z-index:6; width:100%; height:100%; object-fit:contain; opacity:0; pointer-events:none; }
+.candidate-card.is-chroma-ready { padding:0; border:0; border-radius:12px; background:transparent; box-shadow:none; }
+.candidate-card.is-chroma-ready .game-chroma-art { opacity:1; }
+.candidate-card.is-chroma-ready > :not(.game-chroma-art):not(.candidate-copy) { visibility:hidden; }
+.candidate-card.is-chroma-ready::before, .candidate-card.is-chroma-ready::after { display:none; }
+.candidate-card.is-chroma-ready .candidate-copy { position:absolute; z-index:7; inset:0; margin:0; padding:0; border:0; border-radius:0; background:none; box-shadow:none; pointer-events:none; }
+.candidate-card.is-chroma-ready .candidate-copy::after, .candidate-card.is-chroma-ready .candidate-copy > :not(.card-outcome) { display:none; }
+.candidate-card.is-chroma-ready .card-outcome { position:absolute; top:8px; right:8px; max-width:calc(100% - 16px); display:flex; flex-direction:column; align-items:center; gap:2px; margin:0; padding:5px 7px; border:1px solid #cfb76d; border-radius:8px; background:#fff9e9; box-shadow:0 2px 8px #001c17aa; }
+
+/* The arena consumes the space left by headings, controls, safe areas and menu.
+   Card width follows that actual height, so full artwork stays at 5:7. */
+@media (max-width: 699px) and (min-height: 650px) {
+ .app-scroll-area:has(> .duel-screen:not([hidden])) { display:flex; flex-direction:column; padding-bottom:8px; }
+ .app-scroll-area:has(> .duel-screen:not([hidden])) > .topbar { flex:none; margin-bottom:8px; padding-bottom:8px; }
+ .duel-screen:not([hidden]):has([data-duel-main]:not([hidden])) { flex:1; min-height:0; display:flex; flex-direction:column; gap:6px; }
+ .duel-screen .duel-head, .duel-screen .round-instruction, .duel-screen .round-feedback, .duel-screen .skip-button, .duel-screen .daily-fixed-note { flex:none; }
+ .duel-screen .arena-four { flex:1; min-height:300px; container-type:size; align-content:start; gap:8px; }
+ .duel-screen .arena-four .candidate-wrap { width:min(100%, calc((100cqh - 96px) * 5 / 14)); height:min(calc((100cqh - 8px) / 2), calc((100cqw - 8px) * 7 / 10 + 44px)); justify-self:center; align-self:start; grid-template-rows:minmax(0,1fr) 44px; }
+ .duel-screen .arena-four .candidate-card { height:100%; aspect-ratio:5/7; grid-template-rows:minmax(0,1fr) minmax(70px,35%); }
+ .duel-screen .arena-four .profile-trigger { min-height:44px; padding:6px 4px; font-size:11px; }
+ .duel-screen .arena-four .candidate-copy { padding:5px 7px; }
+ .duel-screen .arena-four .candidate-title > strong { min-height:0; font-size:13px; line-height:15px; }
+ .duel-screen .arena-four .candidate-affiliation, .duel-screen .arena-four .candidate-office { margin-top:1px; font-size:11px; line-height:12px; -webkit-line-clamp:1; }
+ .duel-screen .arena-four .candidate-card.is-chroma-ready .candidate-copy { padding:0; }
+ .duel-screen .daily-fixed-note { margin:0; padding:5px 8px; font-size:10px; }
+ .duel-screen .duel-head h1 { font-size:clamp(1.4rem,5.8vw,1.7rem); }
+ .duel-screen .round-instruction { margin:0; font-size:11px; }
+}
+
+.candidate-card.is-chroma-ready .card-outcome b { font:800 11px/14px Inter, sans-serif; white-space:nowrap; }
+.candidate-card.is-chroma-ready .card-outcome small { font:800 11px/13px Inter, sans-serif; letter-spacing:0; text-transform:none; }
+.candidate-card.is-chroma-ready.is-selected:not([class*="is-round-"]) .card-outcome small { display:none; }

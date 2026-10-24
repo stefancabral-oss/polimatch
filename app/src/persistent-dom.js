@@ -1,3 +1,4 @@
+import { patchGameChroma } from "./main-chromas.js";
 const OUTCOME_CLASSES = ["gain", "loss"];
 const CARD_STATE_CLASSES = ["is-selected", "is-round-winner", "is-round-loser"];
 
@@ -43,6 +44,7 @@ export function patchCandidateSlot(slot, model) {
     outcomeMessage,
   } = slot;
   root.hidden = !model;
+  patchGameChroma(button, slot.chromaImage, model?.chroma);
   delete button.dataset.vote;
   delete button.dataset.predict;
   delete profileButton.dataset.profile;
@@ -63,7 +65,7 @@ export function patchCandidateSlot(slot, model) {
 
   if (model.actionMode === "prediction") button.dataset.predict = model.id;
   else if (model.actionMode === "vote") button.dataset.vote = model.id;
-  button.setAttribute("aria-label", model.accessibleName);
+  button.setAttribute("aria-label", model.accessibleName + (model.chroma ? ", retrato artístico com IA" : ""));
   if (model.selected === undefined) button.removeAttribute("aria-pressed");
   else button.setAttribute("aria-pressed", String(model.selected));
   button.setAttribute("aria-disabled", String(Boolean(model.locked ?? model.busy)));
