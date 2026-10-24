@@ -1,0 +1,34 @@
+{
+  "stage": 33,
+  "issue": 271,
+  "base": "fe025d74916685005bb849499be3a14b2e5932cf",
+  "unit": {
+    "passed": 224,
+    "failed": 0
+  },
+  "build": {
+    "passed": true,
+    "distFiles": 319
+  },
+  "localBrowser": {
+    "engine": "chromium",
+    "widths": [
+      320,
+      440,
+      768,
+      1440
+    ],
+    "combinedQuiz": "passed",
+    "classicEditions": "passed",
+    "standaloneFacts": "passed",
+    "factRoundCount": 8,
+    "authorRoundCount": 28,
+    "fourNewArts": "passed",
+    "revealBeforeAnswer": "absent",
+    "artFailureReserve": "passed",
+    "storageBlocked": "passed"
+  },
+  "remoteCi": "recorded in PR after execution",
+  "publication": "recorded in PR after verification",
+  "humanGate": "pending"
+}

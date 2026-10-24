@@ -65,6 +65,11 @@ jobs:
           cat /tmp/polimatch-vite.log
           exit 1
 
+      - name: Validate combined authorship, factual reveal and latest quiz Chromas
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+        run: node app/e2e/quote-quiz-checked.mjs
+
       - name: Validate sourced Fato ou fake and every control
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}

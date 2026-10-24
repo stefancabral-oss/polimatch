@@ -10,7 +10,7 @@ try {
   const errors=[],api=[];
   page.on('pageerror',e=>errors.push(e.message));
   page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')) api.push(r.url());});
-  await page.goto(new URL('quem-disse-isso.html',origin).href);
+  await page.goto(new URL('quem-disse-isso.html?edicao=2',origin).href);
   await page.locator('[data-answer]').first().waitFor();
   assert.equal(await page.getByRole('button',{name:'Lula',exact:true}).count(),1);
   assert.equal(await page.getByRole('button',{name:'Flávio Bolsonaro',exact:true}).count(),1);
@@ -65,7 +65,7 @@ try {
  }
  const blocked=await browser.newPage();
  await blocked.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw new DOMException('blocked','SecurityError');}});});
- await blocked.goto(new URL('quem-disse-isso.html',origin).href);
+ await blocked.goto(new URL('quem-disse-isso.html?edicao=2',origin).href);
  await blocked.locator('[data-answer]').first().click();
  assert.match(await blocked.locator('.storage-note').first().innerText(),/Não foi possível salvar/);
  await blocked.locator('.reveal').waitFor();
