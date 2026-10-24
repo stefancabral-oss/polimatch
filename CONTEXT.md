@@ -148,3 +148,7 @@ Em 24/10/2026 Stefan solicitou jogo com falas pragmáticas do debate da Globo
 de 23/10/2026. Estágio 31 inclui autoria, revelação explicada e documentos
 consultáveis. Selecionar apenas verdadeiro/falso claros; não converter
 qualificações editoriais ou promessas em falsidade. Jogos e ranking preservados.
+
+## Capa dos duelos — issue #269
+Stefan pediu Flávio e Lula no lugar de Marçal e Erika na vitrine da arena
+independente. Estágio 32 reutiliza as artes especiais e preserva Nikolas/Janja.

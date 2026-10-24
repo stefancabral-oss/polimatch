@@ -2,6 +2,7 @@ import "./presidential.css";
 import "./tcg-card.css";
 import { installInauguralChromas } from './inaugural-chromas.js';
 import { presidentialChroma } from './political-chromas.js';
+import COVER_CHROMAS from './cover-chromas.json';
 import ROSTER from "../../shared/presidential-roster.json";
 import {
   categoryPeople,
@@ -76,19 +77,20 @@ function writeStorage() {
   root.querySelector("#storage-notice").hidden = !storageFailed;
 }
 
+const coverChromas = new Map(COVER_CHROMAS.map(art => [art.id, art]));
 const initialPreview = [
   "nikolas-ferreira",
   "janja",
-  "pablo-marcal",
-  "erika-hilton",
-].map((id) => byId.get(id));
+  "flavio-bolsonaro",
+  "lula",
+].map((id) => coverChromas.get(id) || byId.get(id));
 root.innerHTML = `<div class="presidential-shell">
  <div class="race-scroll-area">
  <header class="race-header"><a class="race-brand" href="./"><img src="./brand/symbol-flat.svg" alt=""><span>PoliMatch</span></a><span class="race-edition">Edição · 2026</span><button class="race-icon" id="race-sound" aria-label="Ativar som" type="button">♪</button></header>
  <main>
   <section id="race-lobby" class="race-lobby">
    <div class="race-intro"><p class="race-eyebrow">SEU BARALHO. SUA OPINIÃO.</p><h1>A corrida ganhou<br><em>novas cartas.</em></h1><p>Quem você leva para o seu ranking? Escolha duas pessoas por rodada. A primeira vem antes. As outras duas ficam empatadas.</p><button class="race-primary" id="race-start" type="button">Entrar na arena <span aria-hidden="true">↗</span></button><div class="race-stats"><span><b>${ROSTER.people.length}</b> pessoas</span><span><b>6</b> categorias</span><span><b>10</b> rodadas por partida</span></div></div>
-   <div class="race-showcase" aria-label="Prévia das cartas Chroma"><span class="showcase-orbit" aria-hidden="true"></span>${initialPreview.map((p, i) => `<div class="showcase-card showcase-card-${i}">${tcgCardMarkup(p, { decorative: true, category: "Corrida presidencial" })}</div>`).join("")}<span class="showcase-seal" aria-hidden="true">✦ CHROMA MALAQUITA</span></div>
+   <div class="race-showcase" aria-label="Prévia das cartas Chroma"><span class="showcase-orbit" aria-hidden="true"></span>${initialPreview.map((p, i) => `<div class="showcase-card showcase-card-${i}">${baseTcgCardMarkup(p, { decorative: true, category: "Corrida presidencial", chroma: coverChromas.get(p.id) || presidentialChroma(p.id) })}</div>`).join("")}<span class="showcase-seal" aria-hidden="true">✦ CHROMA MALAQUITA</span></div>
   </section>
   <section class="race-categories" aria-labelledby="categories-title"><div class="section-top"><div><p class="race-eyebrow">ESCOLHA SUA MESA</p><h2 id="categories-title">Cada universo, um duelo.</h2></div><button id="race-show-roster" class="race-text-button" type="button">Ver todo o elenco ↗</button></div><div class="category-grid">${ROSTER.categories
     .map((c, i) => {
