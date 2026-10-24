@@ -1,0 +1,903 @@
+[
+  {
+    "id": "nikolas-ferreira",
+    "name": "Nikolas Ferreira",
+    "src": "/chromas/politicos/nikolas-ferreira-v02-f32ef78d-530.webp",
+    "srcset": "/chromas/politicos/nikolas-ferreira-v02-f32ef78d-530.webp 530w, /chromas/politicos/nikolas-ferreira-v02-f32ef78d-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "f32ef78d0fa286776f69fababcc2240dc2ddc1ab0527c1cd2ce4424860b31e02",
+    "master": "stages/29_political_chromas/output/artwork/nikolas-ferreira-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/039.jpg",
+      "sha256": "0d45045f720e5aecccd8cfb890db14eb4b3e4e96b4eb6e81a3d415791b030499",
+      "source": "Acervo PoliMatch · nikolas-ferreira",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/nikolas-ferreira-v02-f32ef78d-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "36385b52947c0066cd5e68fb69d88be287c6f83bc416a01de9cf369d95dfc0f3",
+        "bytes": 151158,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/nikolas-ferreira-v02-f32ef78d-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "e1ceacd622d90ddf0a53588d3ffbc5fd4683161c3404272792cf76e9c3f05040",
+        "bytes": 478946,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "gustavo-gayer",
+    "name": "Gustavo Gayer",
+    "src": "/chromas/politicos/gustavo-gayer-v02-072a8c5d-530.webp",
+    "srcset": "/chromas/politicos/gustavo-gayer-v02-072a8c5d-530.webp 530w, /chromas/politicos/gustavo-gayer-v02-072a8c5d-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "072a8c5d9004f4e2e9a91f7a888348c4f1ad120817232196260181c2945c9af7",
+    "master": "stages/29_political_chromas/output/artwork/gustavo-gayer-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/presidential/gustavo-gayer.webp",
+      "sha256": "66ac8f45145300398c9eff3db06dac60baeb3788444e33fc3152eae3c8ac2d9a",
+      "source": "https://cdn.jornalopcao.com.br/assets/2025/09/19220906/7a785955-3cc8-4148-85ad-f876b29c7dad.webp",
+      "sourceUrl": "https://www.jornalopcao.com.br/ultimas-noticias/canal-de-gustavo-gayer-alcanca-6o-lugar-entre-canais-de-noticias-e-politica-no-brasil-747329/",
+      "credit": "Imagem publicada por www.jornalopcao.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+      "kind": "curated",
+      "width": 1425,
+      "height": 974,
+      "position": "50% 15%"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/gustavo-gayer-v02-072a8c5d-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "6a0f818ae35d298f5649c1918ecdd9e591016a77669d54fd290d3658002acd86",
+        "bytes": 153206,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/gustavo-gayer-v02-072a8c5d-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "164fba4c3c396d26d7454f73ffa5eefb83f09743afc3e2c967261f45e69a4ae6",
+        "bytes": 501890,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "jeffrey-chiquini",
+    "name": "Jeffrey Chiquini",
+    "src": "/chromas/politicos/jeffrey-chiquini-v02-05ac3449-530.webp",
+    "srcset": "/chromas/politicos/jeffrey-chiquini-v02-05ac3449-530.webp 530w, /chromas/politicos/jeffrey-chiquini-v02-05ac3449-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "05ac344995d765ce9f37f90547a3498c50509d2e39b4a6631a30e8f891d257ff",
+    "master": "stages/29_political_chromas/output/artwork/jeffrey-chiquini-v02.png",
+    "masterDimensions": [
+      1061,
+      1483
+    ],
+    "identitySource": {
+      "path": "/portraits/presidential/jeffrey-chiquini.jpg",
+      "sha256": "3cf1523d69bc3fa26f748d23de73f95c7b9ffbdfd393dfcef202d75d557f9341",
+      "source": "https://p2.trrsf.com/image/fget/cf/1200/1200/middle/images.terra.com/2025/07/14/412391673-kg2eljg6lvfpnoqew3mxagwepu.jpg",
+      "sourceUrl": "https://x.com/JeffreyChiquini",
+      "credit": "Imagem publicada por x.com. A autoria e a licença constam na fonte quando disponíveis.",
+      "kind": "curated",
+      "width": 1200,
+      "height": 1200
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/jeffrey-chiquini-v02-05ac3449-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "c8c37d44ae9312539b6715c3552f8ee3dcdffc7057088581c2951a57d809d7fd",
+        "bytes": 151894,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/jeffrey-chiquini-v02-05ac3449-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "61cfb95245c562dc16b29e8d705acda34612ebbd37a322de7a7e54d677f5e053",
+        "bytes": 453940,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "bruno-zambelli",
+    "name": "Bruno Zambelli",
+    "src": "/chromas/politicos/bruno-zambelli-v02-58185ad1-530.webp",
+    "srcset": "/chromas/politicos/bruno-zambelli-v02-58185ad1-530.webp 530w, /chromas/politicos/bruno-zambelli-v02-58185ad1-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "58185ad1898f41ba1827e98cf7c1976d88b86d467c67b56fe12875e4d7f90ee5",
+    "master": "stages/29_political_chromas/output/artwork/bruno-zambelli-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/presidential/bruno-zambelli.jpg",
+      "sha256": "36d5ac1d883abaf87a84ab00d968e31bfddb7839301bb73bc8afaca5ec559ca8",
+      "source": "https://static.wixstatic.com/media/8307fe_b42f7fb525794f45bdcef88bb3c1c82c~mv2.jpg/v1/fill/w_858%2Ch_1000%2Cal_c%2Cq_85%2Cusm_0.66_1.00_0.01/8307fe_b42f7fb525794f45bdcef88bb3c1c82c~mv2.jpg",
+      "sourceUrl": "https://www.elosocialsp.org/post/bruno-zambelli-salgado-deputado-estadual-sp-foi-indicado-e-aprovado-podendo-ser-aclamado-e-dipl",
+      "credit": "Imagem publicada por www.elosocialsp.org. A autoria e a licença constam na fonte quando disponíveis.",
+      "kind": "curated",
+      "width": 858,
+      "height": 1000
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/bruno-zambelli-v02-58185ad1-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "0c2e0b0284833a4bd101c4c884599fff17e8999e7b0a2a71be8e2ec4f5048cee",
+        "bytes": 144756,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/bruno-zambelli-v02-58185ad1-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "f2e2e5394b3a41a6558187f13991e137ca6472134cb9694cc071d8af4c7537a6",
+        "bytes": 458544,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "deltan-dallagnol",
+    "name": "Deltan Dallagnol",
+    "src": "/chromas/politicos/deltan-dallagnol-v02-8ebffab3-530.webp",
+    "srcset": "/chromas/politicos/deltan-dallagnol-v02-8ebffab3-530.webp 530w, /chromas/politicos/deltan-dallagnol-v02-8ebffab3-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "8ebffab378bc92ad552b38321bbe5d34503a400de8d17ec319bb49f2c6499c16",
+    "master": "stages/29_political_chromas/output/artwork/deltan-dallagnol-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/095.jpg",
+      "sha256": "c1d0763faf72bc735bf302d9aa49e982ad09a7adee15d8f02ebdcd5d6107ca07",
+      "source": "Acervo PoliMatch · deltan-dallagnol",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/deltan-dallagnol-v02-8ebffab3-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "bb8e860509c04764751dab92a1699e36460561c13c6bb8cb865e396e51df6ec5",
+        "bytes": 168828,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/deltan-dallagnol-v02-8ebffab3-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "77321f5f191706d417315bc4f0c69206b858b117e3c576490534dbda42954429",
+        "bytes": 537480,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "lucas-pavanato",
+    "name": "Lucas Pavanato",
+    "src": "/chromas/politicos/lucas-pavanato-v02-4ddbcfba-530.webp",
+    "srcset": "/chromas/politicos/lucas-pavanato-v02-4ddbcfba-530.webp 530w, /chromas/politicos/lucas-pavanato-v02-4ddbcfba-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "4ddbcfbaa9f51535befc6d3e9d99d0cf8b9fd1279ea3744d4bcb9a9a692e41e1",
+    "master": "stages/29_political_chromas/output/artwork/lucas-pavanato-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/presidential/lucas-pavanato.jpg",
+      "sha256": "7f397f3cb014ed0a5eff90a63d1a10a0b7d9e9cc185295415dbe38686c2d51f9",
+      "source": "https://www.rbsdirect.com.br/filestore/5/8/4/5/4/0/5_afb6afd66de655f/5045485_a20e83ecde58746.jpg?w=700",
+      "sourceUrl": "https://www.bnews.com.br/noticias/politica/bolsonaristas-se-queixam-do-pl-por-espaco-dado-vereador-ex-mbl.html",
+      "credit": "Imagem publicada por www.bnews.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+      "kind": "curated",
+      "width": 700,
+      "height": 466
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/lucas-pavanato-v02-4ddbcfba-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "22a2803ddef569885c232498a5b9d2de0ba1e8ce25086dd53235cbab3c429d68",
+        "bytes": 141880,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/lucas-pavanato-v02-4ddbcfba-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "bb5450e4c68e569bd10e4f17418fd03ba95181f8f6b64d58bad305d778240dcf",
+        "bytes": 412156,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "cabo-gilberto-silva",
+    "name": "Cabo Gilberto Silva",
+    "src": "/chromas/politicos/cabo-gilberto-silva-v02-f566d280-530.webp",
+    "srcset": "/chromas/politicos/cabo-gilberto-silva-v02-f566d280-530.webp 530w, /chromas/politicos/cabo-gilberto-silva-v02-f566d280-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "f566d280f5bfb370bd9f04534a99e7dd7cd1161784d0c060a9da57b635b14a91",
+    "master": "stages/29_political_chromas/output/artwork/cabo-gilberto-silva-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/presidential/cabo-gilberto-silva.jpg",
+      "sha256": "1e05674bde43441494e4ab27c87e363c8020ceaa8aed3d466b595f83c6734398",
+      "source": "https://www.camara.leg.br/midias/image/2023/08/img20230803134055166-768x473.jpg",
+      "sourceUrl": "https://www.polemicaparaiba.com.br/politica/psol-inclui-nome-de-cabo-gilberto-em-pedido-de-prisao-por-apoio-a-ato-golpista-em-brasilia-e-fala-em-impedir-posse-de-criminosos-eleitos/",
+      "credit": "Imagem publicada por www.polemicaparaiba.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+      "kind": "curated",
+      "width": 768,
+      "height": 473
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/cabo-gilberto-silva-v02-f566d280-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "c982e43b91b3b188a147ae47dd7598e893bb0763134dcb404cffcfbedf7d23d8",
+        "bytes": 157608,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/cabo-gilberto-silva-v02-f566d280-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "164bc10a222223a48e7d2d03446b186787be15e574777ef4159a90ea3a57e0a9",
+        "bytes": 471884,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "carlos-bolsonaro",
+    "name": "Carlos Bolsonaro",
+    "src": "/chromas/politicos/carlos-bolsonaro-v02-791c4490-530.webp",
+    "srcset": "/chromas/politicos/carlos-bolsonaro-v02-791c4490-530.webp 530w, /chromas/politicos/carlos-bolsonaro-v02-791c4490-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "791c44900f79dc40135e92e7b111fdc07eb3af4b453ddd39cd5f79a5cb505fdf",
+    "master": "stages/29_political_chromas/output/artwork/carlos-bolsonaro-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/065.jpg",
+      "sha256": "acfca8611e91b0718312ca818ad59311303851544b12f094b77e86f8382d725d",
+      "source": "Acervo PoliMatch · carlos-bolsonaro",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing",
+      "fit": "contain"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/carlos-bolsonaro-v02-791c4490-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "d4c438127afcfd9f819501facbfc5b5e915876df3568379c73dc56cd4158a550",
+        "bytes": 165208,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/carlos-bolsonaro-v02-791c4490-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "f5108114b0ccfd1207bff5abdf00c11318902387f893e8b46d9b28541159929c",
+        "bytes": 496324,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "guilherme-derrite",
+    "name": "Guilherme Derrite",
+    "src": "/chromas/politicos/guilherme-derrite-v02-d1b47010-530.webp",
+    "srcset": "/chromas/politicos/guilherme-derrite-v02-d1b47010-530.webp 530w, /chromas/politicos/guilherme-derrite-v02-d1b47010-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "d1b470100f69daf10ac53a166033834e64cb9275bb2e2ab899d8374ad3271f2b",
+    "master": "stages/29_political_chromas/output/artwork/guilherme-derrite-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/presidential/guilherme-derrite.jpg",
+      "sha256": "13a0ee54b5421db46a89e94621ca61b695157cf205367f8f9658b4525f402be5",
+      "source": "https://conteudo.imguol.com.br/c/noticias/5c/2026/09/21/21set2026---guilherme-derrite-pp-no-debate-uolfolha-1790008794383_v2_900x506.jpg",
+      "sourceUrl": "https://noticias.uol.com.br/eleicoes/2026/10/03/numero-de-derrite-para-o-senado-por-sp-e-dos-demais-candidatos-veja-lista.ghtm",
+      "credit": "Imagem publicada por noticias.uol.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+      "kind": "curated",
+      "width": 900,
+      "height": 506
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/guilherme-derrite-v02-d1b47010-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "d558aa872ba14b91cade6a70c94127f3c6096f34e6f7cd2f3884611d97783023",
+        "bytes": 158504,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/guilherme-derrite-v02-d1b47010-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "d281d00a552e16a66303ab49c30043d2b06866e802e5c844d730c3b80e173a8d",
+        "bytes": 498138,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "sergio-moro",
+    "name": "Sergio Moro",
+    "src": "/chromas/politicos/sergio-moro-v02-db6ae7e9-530.webp",
+    "srcset": "/chromas/politicos/sergio-moro-v02-db6ae7e9-530.webp 530w, /chromas/politicos/sergio-moro-v02-db6ae7e9-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "db6ae7e9ee1a28aad139316026849c06d2c2ed4757db525bedd3afbe716448be",
+    "master": "stages/29_political_chromas/output/artwork/sergio-moro-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/086.jpg",
+      "sha256": "f492e5fc9f4f5fcc5aae6e338fb05ce4b0064270d50b641e3c8c182e1fc43cb8",
+      "source": "Acervo PoliMatch · sergio-moro",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/sergio-moro-v02-db6ae7e9-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "0b02b84d19388ec13900e037d07c370fabfbeb2f5f2b65ea028924dc3d2608e9",
+        "bytes": 152536,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/sergio-moro-v02-db6ae7e9-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "f32ba51461da2a50f799165911e49928c1e738a299b344fdd034317c399002e5",
+        "bytes": 481136,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "andre-janones",
+    "name": "André Janones",
+    "src": "/chromas/politicos/andre-janones-v02-531d1e8c-530.webp",
+    "srcset": "/chromas/politicos/andre-janones-v02-531d1e8c-530.webp 530w, /chromas/politicos/andre-janones-v02-531d1e8c-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "531d1e8c5b568033751219d19f587c2fc78c3f50b5daf1a9de08c4100909235d",
+    "master": "stages/29_political_chromas/output/artwork/andre-janones-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/080.jpg",
+      "sha256": "28b576c9ea3cc2812b14b01f284fd71cd201ffd30f23c386b5d98ddaeddfca49",
+      "source": "Acervo PoliMatch · andre-janones",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/andre-janones-v02-531d1e8c-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "16aae0590b46ffc080f2b488f0a937be44e5b54d55e0fc7dc09560258196f4d3",
+        "bytes": 151308,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/andre-janones-v02-531d1e8c-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "7efe087e6f240818ea5dd8de0ea9c4d4ab1476311ade0f30a3613e8f057b36fd",
+        "bytes": 451442,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "erika-hilton",
+    "name": "Erika Hilton",
+    "src": "/chromas/politicos/erika-hilton-v02-9dfa47c9-530.webp",
+    "srcset": "/chromas/politicos/erika-hilton-v02-9dfa47c9-530.webp 530w, /chromas/politicos/erika-hilton-v02-9dfa47c9-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "9dfa47c9c78fba27a134b86cdfb50bbc13c88c5511984ffc17f576aaa6fe08a6",
+    "master": "stages/29_political_chromas/output/artwork/erika-hilton-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/presidential/erika-hilton.jpg",
+      "sha256": "961920a3dca7528e14a621d61595f3f2eb8dfc11d4ed632cf106d817d7cd66e1",
+      "source": "https://p2.trrsf.com/image/fget/cf/1548/0/images.terra.com/2026/09/30/189954144-capa-bons-fluidos-2026-09-30t083056508.jpg",
+      "sourceUrl": "https://hubpolitico.com.br/perfil/erikahilton/eleicoes/2026",
+      "credit": "Imagem publicada por hubpolitico.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+      "kind": "curated",
+      "width": 1548,
+      "height": 871
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/erika-hilton-v02-9dfa47c9-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "d5af55ac38760e91d44358d9ca9a2947cac7d3db66370084aff7ae90fa7633e0",
+        "bytes": 148076,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/erika-hilton-v02-9dfa47c9-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "4bff796f21d9a87dfff7f78df9285607576214acef728ff18e015f531de1ecc6",
+        "bytes": 444140,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "guilherme-boulos",
+    "name": "Guilherme Boulos",
+    "src": "/chromas/politicos/guilherme-boulos-v02-2869a20c-530.webp",
+    "srcset": "/chromas/politicos/guilherme-boulos-v02-2869a20c-530.webp 530w, /chromas/politicos/guilherme-boulos-v02-2869a20c-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "2869a20c0f80f5a39cb9b1f24359ff94f2583ecaf25bce15855d3b4ec30ee04f",
+    "master": "stages/29_political_chromas/output/artwork/guilherme-boulos-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/048.jpg",
+      "sha256": "64e42b5c5405d64e346f2943b3acb212a6f7b5bda66826e8a43a130fea59631d",
+      "source": "Acervo PoliMatch · guilherme-boulos",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing",
+      "fit": "contain"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/guilherme-boulos-v02-2869a20c-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "b2a66dfb87091730507db3ffe26839d27afd50913eaa720c83326e4a1d76602d",
+        "bytes": 158888,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/guilherme-boulos-v02-2869a20c-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "d3a9ce72ba3353e320374bfdc2c53dd7638bea4b78122129f00217a976ec8901",
+        "bytes": 495468,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "fernando-haddad",
+    "name": "Fernando Haddad",
+    "src": "/chromas/politicos/fernando-haddad-v02-0bc2c095-530.webp",
+    "srcset": "/chromas/politicos/fernando-haddad-v02-0bc2c095-530.webp 530w, /chromas/politicos/fernando-haddad-v02-0bc2c095-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "0bc2c095969903e6d86690e8c5400756139f4405760d6fdea27d83cac9099d11",
+    "master": "stages/29_political_chromas/output/artwork/fernando-haddad-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/012.jpg",
+      "sha256": "ee6788b8146ed5e5cfdabe850239ce3a2b081fbaf13757d5cd8e17402c12df23",
+      "source": "Acervo PoliMatch · fernando-haddad",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/fernando-haddad-v02-0bc2c095-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "13d1889c1b85542b3f062a2149ec6c86c22ecd433331eb4b240f7d669287f813",
+        "bytes": 151840,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/fernando-haddad-v02-0bc2c095-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "3feed76609db384c273fbd9bf3819dea092ba7a54761f71bf6d9301fadba6f70",
+        "bytes": 464920,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "marina-silva",
+    "name": "Marina Silva",
+    "src": "/chromas/politicos/marina-silva-v02-85a5c7c2-530.webp",
+    "srcset": "/chromas/politicos/marina-silva-v02-85a5c7c2-530.webp 530w, /chromas/politicos/marina-silva-v02-85a5c7c2-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "85a5c7c21e0c7fdff5142ceb05c7db15a9c2a196cb09823cdefc20a0d05634c8",
+    "master": "stages/29_political_chromas/output/artwork/marina-silva-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/033.jpg",
+      "sha256": "7c22b5ecbb8fe8a7f9a95b7922699db6f066abf9e0b79df14df7458f4efa20c7",
+      "source": "Acervo PoliMatch · marina-silva",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/marina-silva-v02-85a5c7c2-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "a6a4c76318f52de5e5295feef5edbae84b9d9cf80731146b12b7f9b1acdc2916",
+        "bytes": 155058,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/marina-silva-v02-85a5c7c2-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "b4096b7adc223153a156698c91c3ca9d8f6c378899d0b3e11a760232a1436482",
+        "bytes": 462456,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "geraldo-alckmin",
+    "name": "Geraldo Alckmin",
+    "src": "/chromas/politicos/geraldo-alckmin-v02-ce3a5fc8-530.webp",
+    "srcset": "/chromas/politicos/geraldo-alckmin-v02-ce3a5fc8-530.webp 530w, /chromas/politicos/geraldo-alckmin-v02-ce3a5fc8-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "ce3a5fc87286f76c9aa7c322552c71f242d92d3740f571b1e5e5733f149e93f4",
+    "master": "stages/29_political_chromas/output/artwork/geraldo-alckmin-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/008.jpg",
+      "sha256": "bb1a69cb6402210a98d8d00346921a4034703a35c1495c4c3fff072514ac46b3",
+      "source": "Acervo PoliMatch · geraldo-alckmin",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing",
+      "fit": "contain"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/geraldo-alckmin-v02-ce3a5fc8-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "776ff7d3c466ebf93b263d1e11cc31d5c88c4965707389a59cfa2d4d0fcfa872",
+        "bytes": 147766,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/geraldo-alckmin-v02-ce3a5fc8-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "7a748a0e3a3838a8e3206fd75f5820acbf2f68d1316ded96c0a984e0fd43b820",
+        "bytes": 443660,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "simone-tebet",
+    "name": "Simone Tebet",
+    "src": "/chromas/politicos/simone-tebet-v02-4a4fa582-530.webp",
+    "srcset": "/chromas/politicos/simone-tebet-v02-4a4fa582-530.webp 530w, /chromas/politicos/simone-tebet-v02-4a4fa582-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "4a4fa5829935ac2f21d252bd89e5ce50932f230d9b4f00c03e2170613a8e4767",
+    "master": "stages/29_political_chromas/output/artwork/simone-tebet-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/034.jpg",
+      "sha256": "7d69c694abb9be7ab985f06a4e10c7735c02bfdeeefc29153e108a25b574ea3b",
+      "source": "Acervo PoliMatch · simone-tebet",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing",
+      "fit": "contain"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/simone-tebet-v02-4a4fa582-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "c3f18980d582ce048a4e4a304714a0a62350cba4157d3d1d0e41039247cd47c1",
+        "bytes": 149086,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/simone-tebet-v02-4a4fa582-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "a61df7b1857cedc9405a5d0a2dc8e2949b7bfef68a26fbd05edf3fa8a425ec43",
+        "bytes": 453282,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "samia-bonfim",
+    "name": "Sâmia Bomfim",
+    "src": "/chromas/politicos/samia-bonfim-v02-c42cd25e-530.webp",
+    "srcset": "/chromas/politicos/samia-bonfim-v02-c42cd25e-530.webp 530w, /chromas/politicos/samia-bonfim-v02-c42cd25e-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "c42cd25ef12ad46039649b8854a25c974e01552e58fc2dfba37bbd5a3f68a220",
+    "master": "stages/29_political_chromas/output/artwork/samia-bonfim-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/presidential/samia-bonfim.jpg",
+      "sha256": "ddb2be71bf2f7f20fe121e9a214b66eaf28f2f5afeedc982f3a08a956d47d9f5",
+      "source": "https://samiabomfim.com.br/static/97e66f99adbe3139f36e56832f570a3e/7d509/bg-podcast.jpg",
+      "sourceUrl": "https://samiabomfim.com.br/",
+      "credit": "Imagem publicada por samiabomfim.com.br. A autoria e a licença constam na fonte quando disponíveis.",
+      "kind": "curated",
+      "width": 720,
+      "height": 720
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/samia-bonfim-v02-c42cd25e-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "28d17c7034cbaf36c0feedd885f1b927812ec18aee56a13bcf81f4962067a440",
+        "bytes": 160834,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/samia-bonfim-v02-c42cd25e-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "07664368b10841733f20fea37effdb4f07915d411b0b64c9aebebb8cd89c1c54",
+        "bytes": 483456,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "lindbergh-farias",
+    "name": "Lindbergh Farias",
+    "src": "/chromas/politicos/lindbergh-farias-v02-8b32449a-530.webp",
+    "srcset": "/chromas/politicos/lindbergh-farias-v02-8b32449a-530.webp 530w, /chromas/politicos/lindbergh-farias-v02-8b32449a-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "8b32449a15337fd9ce9a938d8f65b6fe753f1984025f6ec1ab0f1d4d318fbe31",
+    "master": "stages/29_political_chromas/output/artwork/lindbergh-farias-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/046.jpg",
+      "sha256": "faa89896fd2665e8872a19d028e980761839a7c34c8a9cbb066ab1c2beea8e31",
+      "source": "Acervo PoliMatch · lindbergh-farias",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/lindbergh-farias-v02-8b32449a-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "975716875efccbe10e8a9544684422544cbbf87ee9171b8543b5a52036f50eeb",
+        "bytes": 153572,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/lindbergh-farias-v02-8b32449a-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "1e46eb1aff03613dde88e56498532dc0876ec888e9544499f482e0729baa39f4",
+        "bytes": 460770,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": "joao-campos",
+    "name": "João Campos",
+    "src": "/chromas/politicos/joao-campos-v02-47023fe1-530.webp",
+    "srcset": "/chromas/politicos/joao-campos-v02-47023fe1-530.webp 530w, /chromas/politicos/joao-campos-v02-47023fe1-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "aiEdited": true,
+    "edition": "malaquita-politicos-v2",
+    "masterSha256": "47023fe155935c092ffdcc4b80d6fa3297c96e14508683eb27a8dac4a2fb6280",
+    "master": "stages/29_political_chromas/output/artwork/joao-campos-v02.png",
+    "masterDimensions": [
+      1060,
+      1484
+    ],
+    "identitySource": {
+      "path": "/portraits/017.jpg",
+      "sha256": "dcba3108226083df56089ca8f912007cac1a1e3a560cc4a0cbef11ec20f386e6",
+      "source": "Acervo PoliMatch · joao-campos",
+      "sourceUrl": "https://github.com/stefancabral-oss/polimatch/blob/main/CREDITS.md",
+      "credit": "Créditos do acervo PoliMatch",
+      "kind": "existing"
+    },
+    "variants": [
+      {
+        "src": "/chromas/politicos/joao-campos-v02-47023fe1-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "49249ff8199ef869be9cb586b0902cb4bcf5b6e9f16f019cdcf919f4530c3f99",
+        "bytes": 166330,
+        "quality": 90
+      },
+      {
+        "src": "/chromas/politicos/joao-campos-v02-47023fe1-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "f8ed2930ffb8e26d0130a5429af2d3ebeb5080371a04761c0a1e503beddfe2e7",
+        "bytes": 542042,
+        "quality": 90
+      }
+    ],
+    "visualReview": "face, name, complete border and caption inspected",
+    "generator": "built-in image_gen"
+  }
+]

@@ -35,7 +35,7 @@ try {
       await page.locator('#profile-close').click();
     }
     // Both responsive variants fail: retain the actual person's original photo/name.
-    await page.route('**/chromas/inaugural/nikolas-*',route=>route.abort());
+    await page.route('**/chromas/**/nikolas-*',route=>route.abort());
     await page.reload();
     await page.waitForFunction(()=>{const c=document.querySelector('.showcase-card-0 .tcg-card');return c && !c.classList.contains('is-chroma-ready') && c.querySelector('[data-chroma-art]').complete;});
     assert.equal(await page.locator('.showcase-card-0 .tcg-name').evaluate(n=>getComputedStyle(n).display),'block');

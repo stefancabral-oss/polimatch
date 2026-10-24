@@ -146,6 +146,8 @@ const context = await browser.newContext({
   serviceWorkers: "block",
 });
 const page = await context.newPage();
+// Keep normal time until the temporary-result geometry check explicitly pauses it.
+await page.clock.install();
 const pageErrors = [];
 const roundVoteRequests = [];
 let failNextRoundVote = false;
@@ -686,6 +688,9 @@ try {
 
   const selectedWinnerId = await votingCard.getAttribute("data-vote");
   holdNextSuccessfulRoundVote = true;
+  // Assertions and viewport measurements must observe one confirmation, even
+  // when a slow runner needs longer than its automatic advance interval.
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.keyboard.press("Enter");
   await page.locator(".round-instruction", { hasText: "Confirmando sua escolha…" }).waitFor();
   if (await page.locator('.candidate-card[aria-disabled="true"]').count() !== 4) throw new Error("Os quatro votos não ficaram temporariamente indisponíveis durante a confirmação");
@@ -715,7 +720,8 @@ try {
   const outcomeEvidence = await measureRoundOutcomes(page);
   assertOutcomeSemantics(outcomeEvidence, "390 × 844");
   await page.setViewportSize({ width: 320, height: 568 });
-  await scrollApp(page, "end");
+  await page.locator('.app-scroll-area').evaluate(area => area.scrollTo(0, area.scrollHeight));
+  await page.clock.runFor(50); // paint the nested scroller without expiring the result
   const shortOutcome = await page.evaluate(() => {
     const navTop = document.querySelector(".bottom-nav").getBoundingClientRect().top;
     const skipBottom = document.querySelector("#skip-round").getBoundingClientRect().bottom;
@@ -768,7 +774,8 @@ try {
     throw new Error(`Ganho ou perda ficou recortado em 320 por 568: ${JSON.stringify({ ...shortOutcome, invalidShortOutcomes })}`);
   }
   await page.setViewportSize({ width: 390, height: 844 });
-  await scrollApp(page);
+  await page.locator('.app-scroll-area').evaluate(area => area.scrollTo(0, 0));
+  await page.clock.runFor(50);
   if (process.env.POLIMATCH_E2E_CARD_METRICS) {
     await writeFile(process.env.POLIMATCH_E2E_CARD_METRICS, `${JSON.stringify({ card: cardHierarchyEvidence, pending: pendingEvidence, outcomes: outcomeEvidence }, null, 2)}\n`);
   }
@@ -782,6 +789,9 @@ try {
     await page.waitForTimeout(60);
     await page.screenshot({ path: process.env.POLIMATCH_E2E_OUTCOME_SCREENSHOT });
   }
+  // Advance the application timer and retain the original next-round checks.
+  await page.clock.runFor(1100);
+  await page.clock.resume();
   await page.locator(".card-outcome").first().waitFor({ state: "hidden", timeout: 2500 });
   await page.locator(".round-instruction", { hasText: "Nova rodada disponível" }).waitFor();
   const persistence = await page.evaluate(() => {

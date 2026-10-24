@@ -65,6 +65,11 @@ jobs:
           cat /tmp/polimatch-vite.log
           exit 1
 
+      - name: Validate all twenty political Chromas and image failure fallback
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+        run: node app/e2e/political-chromas.mjs
+
       - name: Run browser interaction smoke
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}

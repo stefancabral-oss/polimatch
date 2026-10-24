@@ -20,8 +20,8 @@ try {
   assert.ok(cardBoxes.every(b=>b.w>=130 && b.h>=180));
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   for(let i=0;i<QUESTIONS.length;i++){
-   await page.locator(`[data-answer="${QUESTIONS[i].author}"]`).focus();
-   await page.keyboard.press('Enter');
+   // Bind the keyboard action to the answer so WebKit cannot send it to a stale focus target.
+   await page.locator(`[data-answer="${QUESTIONS[i].author}"]`).press('Enter');
    await page.locator('.reveal').waitFor();
    assert.match(await page.locator('.reveal').innerText(),/Acertou na mosca!/i);
    assert.equal(await page.locator('[data-answer]:disabled').count(),2);
