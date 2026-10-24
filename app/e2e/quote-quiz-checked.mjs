@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict';
 import {mkdir} from 'node:fs/promises';
 import {chromium,webkit} from 'playwright';
-import {COMBINED_EDITION,COMBINED_QUESTIONS as questions,PEOPLE,EDITION} from '../src/quote-quiz-data.js';
+import {REVIEWED_EDITION as COMBINED_EDITION,REVIEWED_QUESTIONS as questions,PEOPLE,EDITION} from '../src/quote-quiz-data.js';
 import {storageKeyFor} from '../src/quote-quiz.js';
 import {quizChroma} from '../src/quiz-chromas.js';
 const kind=process.env.POLIMATCH_E2E_BROWSER||'chromium';
 const base=process.env.POLIMATCH_E2E_URL||'http://127.0.0.1:4173/';
 const shots=process.env.POLIMATCH_CHECKED_SCREENSHOTS;
+const total=questions.length, checks=questions.filter(q=>q.fact).length;
 if(shots)await mkdir(shots,{recursive:true});
 const browser=await {chromium,webkit}[kind].launch();
 try{
@@ -15,7 +16,7 @@ try{
   const errors=[],api=[],seen=new Set();page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/'))api.push(r.url());});
   await page.goto(new URL('quem-disse-isso.html',base).href);
   await page.locator('[data-answer]').first().waitFor();
-  assert.match(await page.locator('.progress').innerText(),/1 de 28/);
+  assert.equal(await page.locator('.progress').innerText(),`1 de ${total}`);
   const oldProgress=JSON.stringify({edition:EDITION,answers:['lula'],index:0});
   await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:storageKeyFor(EDITION),value:oldProgress});
   let checked=0;
@@ -43,37 +44,43 @@ try{
     assert.equal(await page.locator('.fact-sources').count(),0);
     assert.equal(await page.locator('[data-check]').count(),3);
     if(checked===0){await page.reload();await page.locator('[data-check]').first().waitFor();assert.equal(await page.locator('.fact-stamp').count(),0);}
-    const value=checked===1?'fake':checked===2?'skip':q.fact.verdict;
+    const value=checked===1?(q.fact.verdict==='fato'?'fake':'fato'):checked===2?'skip':q.fact.verdict;
     await page.locator(`[data-check="${value}"]`).click();
     await page.locator('.fact-stamp').waitFor();
     assert.equal(await page.locator('.fact-stamp').innerText(),q.fact.verdict.toUpperCase());
     assert.equal(await page.locator('[data-check]').count(),0);
     assert.equal(await page.locator('.fact-sources a').count(),q.fact.sources.length);
-    for(const [j,s] of q.fact.sources.entries())assert.equal(await page.locator('.fact-sources a').nth(j).getAttribute('href'),s.url);
+    for(const [j,s] of q.fact.sources.entries()){
+     const a=page.locator('.fact-sources a').nth(j);assert.equal(await a.getAttribute('href'),s.url);
+     await page.context().route(s.url.split('#')[0],route=>route.fulfill({status:200,contentType:'text/html',body:'<p>External navigation fixture</p>'}));
+     const pending=page.waitForEvent('popup');await a.click();const popup=await pending;await popup.waitForLoadState('domcontentloaded');assert.equal(popup.url(),s.url);await popup.close();
+    }
+    if(q.fact.id==='desenrola-primeiro-mes')assert.match(await page.locator('.quiz-fact-reveal').innerText(),/Enganoso na fala completa/);
     const stamp=await page.locator('.fact-stamp').evaluate(n=>{const r=n.getBoundingClientRect();return {size:parseFloat(getComputedStyle(n).fontSize),left:r.left,right:r.right,w:innerWidth};});
     assert.ok(stamp.size>=48&&stamp.left>=0&&stamp.right<=stamp.w);
     if(checked===1)assert.match(await page.locator('.quiz-fact-reveal>.eyebrow').innerText(),/errou a checagem/i);
     if(checked===2)assert.match(await page.locator('.quiz-fact-reveal>.eyebrow').innerText(),/sem responder/i);
     if(checked===0){await page.reload();await page.locator('.fact-stamp').waitFor();assert.equal(await page.locator('.fact-stamp').innerText(),'FAKE');}
+    await page.waitForFunction(()=>document.querySelectorAll('[data-answer].has-loaded-chroma').length===2);
     if(shots&&checked<2)await page.screenshot({path:`${shots}/${kind}-${width}-${q.fact.verdict}.png`,fullPage:true});
     checked++;
    }else assert.equal(await page.locator('.fact-stamp').count(),0,'authorship alone must never invent a factual verdict');
    await page.locator('#next').click();
   }
-  assert.equal(checked,8);assert.equal(seen.size,4);
-  assert.match(await page.locator('#result-title').innerText(),/26.*de 28/s);
-  assert.match(await page.locator('.checked-result').innerText(),/6 de 8.*1 puladas/s);
+  assert.equal(checked,checks);assert.equal(seen.size,4);
+  assert.match(await page.locator('#result-title').innerText(),new RegExp(`${total-2}.*de ${total}`,'s'));
+  assert.match(await page.locator('.checked-result').innerText(),new RegExp(`${checks-2} de ${checks}.*1 puladas`,'s'));
   await page.reload();await page.locator('#share').waitFor();
   await page.evaluate(()=>{Object.defineProperty(navigator,'share',{configurable:true,value:undefined});Object.defineProperty(navigator,'clipboard',{configurable:true,value:undefined});});
-  await page.locator('#share').click();assert.match(await page.locator('#share-copy').inputValue(),/26 de 28/);assert.match(await page.locator('#share-copy').inputValue(),/6 de 8/);assert.match(await page.locator('#share-copy').inputValue(),/edicao=3/);
+  await page.locator('#share').click();assert.match(await page.locator('#share-copy').inputValue(),new RegExp(`${total-2} de ${total}`));assert.match(await page.locator('#share-copy').inputValue(),new RegExp(`${checks-2} de ${checks}`));assert.match(await page.locator('#share-copy').inputValue(),/edicao=4/);
   await page.getByText('Rever frases, propostas e fontes',{exact:true}).click();
-  assert.equal(await page.locator('.review>ol>li').count(),28);assert.equal(await page.locator('.review-verdict').count(),8);
+  assert.equal(await page.locator('.review>ol>li').count(),total);assert.equal(await page.locator('.review-verdict').count(),checks);
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),storageKeyFor(EDITION)),oldProgress);
-  await page.locator('#restart').click();assert.match(await page.locator('.progress').innerText(),/1 de 28/);assert.equal(await page.locator('.reveal').count(),0);
+  await page.locator('#restart').click();assert.equal(await page.locator('.progress').innerText(),`1 de ${total}`);assert.equal(await page.locator('.reveal').count(),0);
   assert.deepEqual(JSON.parse(await page.evaluate(key=>localStorage.getItem(key),storageKeyFor(COMBINED_EDITION))).verdicts,{});
-  await page.getByRole('link',{name:'Jogar edição anterior',exact:true}).click();await page.locator('.reveal').waitFor();assert.match(await page.locator('.progress').innerText(),/1 de 20/);
+  await page.getByRole('link',{name:'Jogar edição anterior',exact:true}).click();await page.locator('[data-answer]').first().waitFor();assert.match(await page.locator('.progress').innerText(),/1 de 28/);await page.locator('[data-answer="lula"]').click();await page.locator('[data-check="fake"]').click();await page.locator('#next').click();await page.reload();assert.match(await page.locator('.progress').innerText(),/2 de 28/);await page.getByRole('link',{name:'Jogar edição anterior',exact:true}).click();await page.locator('.reveal').waitFor();assert.match(await page.locator('.progress').innerText(),/1 de 20/);
   assert.deepEqual(errors,[]);assert.deepEqual(api,[]);await page.close();
-  console.log(`${kind} ${width}: 28 authors, 8 independent checks, skip, large truthful verdicts, latest 4 Chromas, sources, reload, review, replay and preserved old progress passed`);
+  console.log(`${kind} ${width}: ${total} authors, ${checks} independent checks, skip, large truthful verdicts, latest 4 Chromas, sources, reload, review, replay and preserved old progress passed`);
  }
  const broken=await browser.newPage();
  await broken.route('**/chromas/cover/lula-*',route=>route.abort());

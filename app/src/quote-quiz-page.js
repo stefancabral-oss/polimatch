@@ -1,14 +1,15 @@
 import './quote-quiz.css';
 import './fact-check.css';
 import './quote-quiz-checked.css';
-import {EDITION, COMBINED_EDITION, LEGACY_EDITION, editionFor} from './quote-quiz-data.js';
+import {EDITION, COMBINED_EDITION, REVIEWED_EDITION, LEGACY_EDITION, editionFor} from './quote-quiz-data.js';
 import {portraitSlot} from './photos.js';
 import {quizChroma} from './quiz-chromas.js';
 import {freshGame, restoreGame, answerQuestion, answerCheck, checkScore, nextQuestion, scoreGame, shareText, formatQuizDate, storageKeyFor} from './quote-quiz.js';
 
 const requested=new URLSearchParams(location.search).get('edicao');
-const edition = editionFor(requested==='1'?LEGACY_EDITION:requested==='2'?EDITION:COMBINED_EDITION);
-const combined=edition.id===COMBINED_EDITION;
+const edition = editionFor(requested==='1'?LEGACY_EDITION:requested==='2'?EDITION:requested==='3'?COMBINED_EDITION:REVIEWED_EDITION);
+const combined=[COMBINED_EDITION,REVIEWED_EDITION].includes(edition.id);
+const reviewed=edition.id===REVIEWED_EDITION;
 const {questions,people} = edition;
 const storageKey = storageKeyFor(edition.id);
 const root = document.querySelector('#quiz');
@@ -44,7 +45,7 @@ function cards(question,answered) {
 }
 function checkedEvidence(q){
   const fact=q.fact;
-  return `<p class="checked-claim"><strong>O que foi checado</strong>${escape(fact.statement)}</p><h3>Por quê?</h3><p>${escape(fact.explanation)}</p><p class="fact-scope"><strong>O recorte importa.</strong>${escape(fact.scope)}</p><h3>Confira as provas</h3><ol class="fact-sources">${fact.sources.map(s=>`<li><span class="eyebrow">${s.kind==='speech'?'Registro da fala':'Prova e contexto'}</span><a href="${escape(s.url)}" target="_blank" rel="noopener noreferrer">${escape(s.label)} ↗<span class="sr-only"> (abre em outra aba)</span></a><p>${escape(s.locator)}</p></li>`).join('')}</ol><p class="fact-checked">Checagem citada: ${escape(fact.originalVerdict)} · fontes consultadas em 24/10/2026.</p>`;
+  return `<p class="checked-claim"><strong>O que foi checado</strong>${escape(fact.statement)}</p><h3>Por quê?</h3><p>${escape(fact.explanation)}</p><p class="fact-scope"><strong>O recorte importa.</strong>${escape(fact.scope)}</p><h3>Confira as provas</h3><ol class="fact-sources">${fact.sources.map(s=>`<li><span class="eyebrow">${s.kind==='speech'?'Registro da fala':'Prova e contexto'}</span><a href="${escape(s.url)}" target="_blank" rel="noopener noreferrer">${escape(s.label)} ↗<span class="sr-only"> (abre em outra aba)</span></a><p>${escape(s.locator)}</p></li>`).join('')}</ol><p class="fact-checked">${fact.reviewed?'Conclusão sobre este recorte':'Checagem citada'}: ${escape(fact.originalVerdict)}${fact.sourceVerdict?` · No site consultado: ${escape(fact.sourceVerdict)}.`:''} · fontes consultadas em ${escape(fact.checkedAt||'24/10/2026')}.</p>`;
 }
 function checkReveal(q){
   const value=state.verdicts?.[q.id];
@@ -96,8 +97,8 @@ function render(focus='') {
     <details class="rules"><summary>Como funciona a pontuação?</summary><p>100 pontos por autor certo. Cada autor certo seguido acrescenta 25 de bônus, até 100 de bônus por pergunta. Um erro de autoria encerra a sequência. ${combined?'Cada checagem certa soma mais 100 pontos; pular não pontua. Autoria e verdade do conteúdo têm resultados separados.':''} Este jogo mede conhecimento e não altera seu ranking de preferências.</p></details>
     <p class="storage-note">${canSave?'Progresso salvo neste navegador.':'Não foi possível salvar neste navegador. Você pode continuar jogando nesta aba.'} Edição ${edition.number} · ${questions.length} perguntas.</p>
     <p class="storage-note" id="quiz-art-note">Cartas com retratos artísticos com IA.</p>
-    <details class="rules editorial-note"><summary>Sobre as falas desta edição</summary><p>${edition.id!==LEGACY_EDITION?'Curadoria de episódios polêmicos e falas históricas de Lula, propostas do plano de Flávio e participações de Janja e Nikolas. Inclui linguagem ofensiva em registros históricos.':''} As falas mantêm a autoria e recebem contexto após responder. Reconhecer o autor não confirma a afirmação. Propostas são resumos identificados, sem aspas, e não medidas já realizadas.</p>${combined?'<p>São 20 itens presidenciais e 8 afirmações checadas do debate de 23/10/2026. Somente os oito itens têm veredito factual publicado. Opiniões e promessas não recebem FAKE por erro de autoria. As checagens mantêm recorte e fontes; esta seleção não mede quem mentiu mais. Você pode responder ou ver as provas sem responder.</p>':''}</details>
-    </main><footer><a href="./quem-disse-isso.html?edicao=${combined?'2':edition.id===EDITION?'1':'2'}">${edition.id===LEGACY_EDITION?'Jogar edição presidencial':'Jogar edição anterior'}</a>${!combined?'<a href="./quem-disse-isso.html">Jogar edição com checagem</a>':''}<a href="./fato-ou-fake.html">Fato ou fake? · Debate da Globo</a></footer></div>`;
+    <details class="rules editorial-note"><summary>Sobre as falas desta edição</summary><p>${edition.id!==LEGACY_EDITION?'Curadoria de episódios polêmicos e falas históricas de Lula, propostas do plano de Flávio e participações de Janja e Nikolas. Inclui linguagem ofensiva em registros históricos.':''} As falas mantêm a autoria e recebem contexto após responder. Reconhecer o autor não confirma a afirmação. Propostas são resumos identificados, sem aspas, e não medidas já realizadas.</p>${combined?`<p>São 20 itens presidenciais e ${questions.filter(q=>q.fact).length} afirmações checadas do debate de 23/10/2026. Somente esses itens recebem veredito factual. Opiniões e promessas não recebem FAKE por erro de autoria. Esta seleção não mede quem mentiu mais. Você pode responder ou ver as provas sem responder.</p>${reviewed?'<p>O Mentiras do Lula foi consultado como ponto de partida; ele se identifica como propaganda eleitoral de Flávio Bolsonaro. Conferimos conclusões com registros estatísticos, legislação, pesquisa original e gravação. Falso, enganoso e equivocado não são sinônimos. No Desenrola, a pergunta verifica apenas a data legal, com a ressalva completa depois da resposta. Os números de mercados e de Wi-Fi ficaram fora desta revisão até conciliar as bases e períodos; isso não os torna falsos.</p>':'<p>Edição anterior preservada. Para a curadoria com provas conferidas, abra a edição atual.</p>'}`:''}</details>
+    </main><footer><a href="./quem-disse-isso.html?edicao=${reviewed?'3':combined?'2':edition.id===EDITION?'1':'2'}">${edition.id===LEGACY_EDITION?'Jogar edição presidencial':'Jogar edição anterior'}</a>${!reviewed?'<a href="./quem-disse-isso.html">Jogar edição atual com checagem</a>':''}<a href="./fato-ou-fake.html">Fato ou fake? · edição anterior</a></footer></div>`;
   if (focus) root.querySelector(focus)?.focus();
 }
 root.addEventListener('click',async event=>{

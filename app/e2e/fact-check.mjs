@@ -68,7 +68,7 @@ try{
   assert.equal(await page.evaluate(()=>localStorage.getItem('polimatch.quote-quiz.v1:sentinel')),'preserved');
   assert.equal(JSON.parse(await page.evaluate(key=>localStorage.getItem(key),FACT_STORAGE_KEY)).answers.length,0);
   await page.getByRole('link',{name:'Jogar Quem disse isso?',exact:true}).click();await page.locator('[data-answer]').first().waitFor();
-  await page.getByRole('link',{name:'Fato ou fake? · Debate da Globo',exact:true}).click();await page.locator('[data-verdict]').first().waitFor();
+  await page.getByRole('link',{name:'Fato ou fake? · edição anterior',exact:true}).click();await page.locator('[data-verdict]').first().waitFor();
   assert.deepEqual(errors,[]);assert.deepEqual(api,[]);
   assert.equal(await page.getByRole('link',{name:'Voltar ao início',exact:true}).getAttribute('href'),'./');
   await page.close();
