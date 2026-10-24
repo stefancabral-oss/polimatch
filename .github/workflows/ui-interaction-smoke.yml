@@ -65,6 +65,11 @@ jobs:
           cat /tmp/polimatch-vite.log
           exit 1
 
+      - name: Validate sourced Fato ou fake and every control
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+        run: node app/e2e/fact-check.mjs
+
       - name: Validate all twenty political Chromas and image failure fallback
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}

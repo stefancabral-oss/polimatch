@@ -73,7 +73,7 @@ function render(focus='') {
     <details class="rules"><summary>Como funciona a pontuação?</summary><p>100 pontos por acerto. Cada acerto seguido acrescenta 25 de bônus, até 100 de bônus por pergunta. Um erro encerra a sequência. Este jogo mede conhecimento e não altera seu ranking de preferências.</p></details>
     <p class="storage-note">${canSave?'Progresso salvo neste navegador.':'Não foi possível salvar neste navegador. Você pode continuar jogando nesta aba.'} Edição ${edition.number} · ${questions.length} perguntas.</p>
     <details class="rules editorial-note"><summary>Sobre as falas desta edição</summary><p>${edition.id===EDITION?'Curadoria de episódios polêmicos e falas históricas de Lula, propostas do plano de Flávio e participações de Janja e Nikolas. Inclui linguagem ofensiva em registros históricos.':''} As falas mantêm a autoria e recebem contexto após responder. Reconhecer o autor não confirma a afirmação. Propostas são resumos identificados, sem aspas, e não medidas já realizadas.</p></details>
-    </main><footer><a href="./quem-disse-isso.html?edicao=${edition.id===EDITION?'1':'2'}">${edition.id===EDITION?'Jogar edição anterior':'Jogar edição presidencial'}</a><span>Conhecimento, uma frase por vez.</span></footer></div>`;
+    </main><footer><a href="./quem-disse-isso.html?edicao=${edition.id===EDITION?'1':'2'}">${edition.id===EDITION?'Jogar edição anterior':'Jogar edição presidencial'}</a><a href="./fato-ou-fake.html">Fato ou fake? · Debate da Globo</a></footer></div>`;
   if (focus) root.querySelector(focus)?.focus();
 }
 root.addEventListener('click',async event=>{
