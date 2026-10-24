@@ -20,3 +20,7 @@ e falha de arte. Testes legados de anatomia passam a declarar explicitamente a
 fotografia de reserva e substituem a altura fixa por limites de encaixe.
 Regressões locais de duas escolhas/dez rodadas, navegação e 16 viewports passaram.
 CI Chromium/WebKit e publicação serão registrados na PR. Gate visual com Stefan.
+
+A verificação de recuperação fotográfica também força a indisponibilidade da
+arte completa para medir explicitamente as quatro fotografias de reserva.
+O teste em 820px inclui reserva equivalente aos insets superior/inferior do iOS.

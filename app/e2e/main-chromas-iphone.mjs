@@ -25,7 +25,9 @@ try {
    if(path.includes('-vote'))votes++;
    return route.fulfill({json});
   });
-  await page.goto(base);await page.locator('.bottom-nav [data-screen="duel"]').click();
+  await page.goto(base);
+  if(height===820)await page.addStyleTag({content:'.app-scroll-area{padding-top:62px!important}.bottom-nav{padding-bottom:40px!important}'});
+  await page.locator('.bottom-nav [data-screen="duel"]').click();
   await page.waitForFunction(()=>document.querySelectorAll('[data-panel="duel"] .is-chroma-ready').length===3);
   const inspect=()=>page.evaluate(()=>{
    const area=document.querySelector('.app-scroll-area'),nav=document.querySelector('.bottom-nav').getBoundingClientRect();
