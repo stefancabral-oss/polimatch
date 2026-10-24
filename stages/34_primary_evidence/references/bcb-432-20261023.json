@@ -1,0 +1,10 @@
+{
+  "source": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=23/10/2026&dataFinal=23/10/2026",
+  "checkedAt": "2026-10-24",
+  "data": [
+    {
+      "data": "23/10/2026",
+      "valor": "13.75"
+    }
+  ]
+}

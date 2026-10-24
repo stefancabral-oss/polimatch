@@ -1,7 +1,9 @@
 import * as legacy from "./quote-quiz-legacy.js";
 import {FACT_EDITION} from './fact-check-data.js';
+import {REVIEWED_FACT_EDITION} from './fact-check-reviewed.js';
 export const EDITION = "presidential-02";
 export const COMBINED_EDITION = 'presidential-checked-03';
+export const REVIEWED_EDITION = 'presidential-primary-04';
 export const PEOPLE = Object.freeze([
  {id:"lula", name:"Lula", personId:1},
  {id:"flavio", name:"Flávio Bolsonaro", personId:2},
@@ -330,7 +332,14 @@ export const DEBATE_QUESTIONS = Object.freeze(FACT_EDITION.questions.map((fact,i
  sourceLabel:fact.sources[0].label,choices:Object.freeze(i%2?['flavio','lula']:['lula','flavio']),fact
 })));
 export const COMBINED_QUESTIONS = Object.freeze(DEBATE_QUESTIONS.flatMap((q,i)=>[q,...QUESTIONS.slice(i*2,i*2+2)]).concat(QUESTIONS.slice(DEBATE_QUESTIONS.length*2)));
+export const REVIEWED_DEBATE_QUESTIONS = Object.freeze(REVIEWED_FACT_EDITION.questions.map((fact,i)=>Object.freeze({
+ id:`debate-${fact.id}`,author:fact.speaker,quote:fact.quizSummary,kind:'fact',
+ date:REVIEWED_FACT_EDITION.date,context:fact.explanation,sourceUrl:fact.sources[0].url,
+ sourceLabel:fact.sources[0].label,choices:Object.freeze(i%2?['flavio','lula']:['lula','flavio']),fact
+})));
+export const REVIEWED_QUESTIONS = Object.freeze(REVIEWED_DEBATE_QUESTIONS.flatMap((q,i)=>[q,...QUESTIONS.slice(i*2,i*2+2)]).concat(QUESTIONS.slice(REVIEWED_DEBATE_QUESTIONS.length*2)));
 export const EDITIONS = Object.freeze({
+ [REVIEWED_EDITION]: Object.freeze({id:REVIEWED_EDITION,number:'4',label:'Corrida presidencial + provas conferidas',people:PEOPLE,questions:REVIEWED_QUESTIONS}),
  [COMBINED_EDITION]: Object.freeze({id:COMBINED_EDITION,number:'3',label:'Corrida presidencial + Fato ou fake',people:PEOPLE,questions:COMBINED_QUESTIONS}),
  [EDITION]: Object.freeze({id:EDITION, number:"2", label:"Corrida presidencial", people:PEOPLE, questions:QUESTIONS}),
  [legacy.EDITION]: Object.freeze({id:legacy.EDITION, number:"1", label:"Lula ou Flávio?", people:legacy.PEOPLE, questions:Object.freeze(legacy.QUESTIONS.map(q=>Object.freeze({...q,kind:"quote",choices:Object.freeze(["lula","flavio"])})))}),

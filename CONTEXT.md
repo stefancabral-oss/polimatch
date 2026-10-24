@@ -157,3 +157,9 @@ independente. Estágio 32 reutiliza as artes especiais e preserva Nikolas/Janja.
 Stefan pediu juntar autoria e checagem no Quem disse isso, com selo grande e
 resposta livre, e usar as artes novas nas cartas. Estágio 33 preserva edições
 anteriores, fontes e separação entre erro de autoria e falsidade do conteúdo.
+
+## Checagem documental — issue #273
+Stefan autorizou validar a pauta do Mentiras do Lula contra documentos e dados
+originais e incorporar as conclusões sustentadas. Estágio 34 registra 13 itens
+do debate e oito anteriores; edição 4 preserva versões/progresso e restringe
+o selo aos recortes verificáveis. Sem transformar ausência de prova em falso.

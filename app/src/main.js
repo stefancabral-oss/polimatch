@@ -424,7 +424,7 @@ function topicsContent() {
     </section>
     <section class="home-topic" aria-labelledby="quote-quiz-title">
       <div class="home-topic-heading"><div><p class="eyebrow">Agora com Fato ou fake · Novas Chromas</p><h2 id="quote-quiz-title">Quem disse isso?</h2></div></div>
-      <p>28 frases e propostas da corrida. Escolha quem falou e, nas oito afirmações checadas do debate da Globo, responda Fato ou Fake. Depois, veja o selo, a explicação e as provas.</p>
+      <p>27 frases e propostas da corrida. Escolha quem falou e, nas sete afirmações checadas do debate da Globo, responda Fato ou Fake. Depois, veja o selo, a explicação e os documentos conferidos.</p>
       <a class="home-topic-cta" href="./quem-disse-isso.html"><span>Reconhecer e checar as falas</span><b aria-hidden="true">→</b></a>
     </section>
     <section class="home-topic" aria-labelledby="home-topic-title">

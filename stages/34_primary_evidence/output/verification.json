@@ -1,0 +1,39 @@
+{
+  "checkedAt": "2026-10-24",
+  "base": "7ec1c61097def830e62cae9c92ba0a24bea00959",
+  "unitTests": {
+    "passed": 226,
+    "failed": 0
+  },
+  "build": {
+    "passed": true,
+    "pilotExcluded": true
+  },
+  "chromium": {
+    "widths": [
+      320,
+      440,
+      768,
+      1440
+    ],
+    "completedQuestionsPerWidth": 27,
+    "factChecksPerWidth": 7,
+    "controls": [
+      "authorship",
+      "fact",
+      "skip",
+      "every source anchor popup",
+      "next",
+      "restore",
+      "review",
+      "restart",
+      "share fallback",
+      "previous editions",
+      "storage blocked",
+      "art failure"
+    ]
+  },
+  "remoteCi": "pending; see PR for final evidence",
+  "publication": "pending; see PR for actual deployed commit and live QA",
+  "humanGate": "not self-approved"
+}
