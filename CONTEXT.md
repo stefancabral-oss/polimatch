@@ -152,3 +152,8 @@ qualificações editoriais ou promessas em falsidade. Jogos e ranking preservado
 ## Capa dos duelos — issue #269
 Stefan pediu Flávio e Lula no lugar de Marçal e Erika na vitrine da arena
 independente. Estágio 32 reutiliza as artes especiais e preserva Nikolas/Janja.
+
+## Quiz combinado e Chromas — issue #271
+Stefan pediu juntar autoria e checagem no Quem disse isso, com selo grande e
+resposta livre, e usar as artes novas nas cartas. Estágio 33 preserva edições
+anteriores, fontes e separação entre erro de autoria e falsidade do conteúdo.

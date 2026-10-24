@@ -1,5 +1,7 @@
 import * as legacy from "./quote-quiz-legacy.js";
+import {FACT_EDITION} from './fact-check-data.js';
 export const EDITION = "presidential-02";
+export const COMBINED_EDITION = 'presidential-checked-03';
 export const PEOPLE = Object.freeze([
  {id:"lula", name:"Lula", personId:1},
  {id:"flavio", name:"Flávio Bolsonaro", personId:2},
@@ -312,7 +314,24 @@ export const QUESTIONS = Object.freeze([
     "kind": "quote"
   }
 ].map(q => Object.freeze({...q, choices:Object.freeze(q.choices)})));
+const debateSummaries = [
+ 'A economia brasileira não cresceu mais de 3% ao ano entre 2011 e 2022.',
+ 'Até dezembro de 2022, instalamos mais de 21 mil pontos de internet pelo Wi-Fi Brasil.',
+ 'O Brasil abriu 700 novos mercados para produtos agropecuários desde 2023.',
+ 'O governo atual defende não prender quem rouba celular para comprar cerveja.',
+ 'Quando nosso governo assumiu, em 2023, havia cerca de 33 milhões de brasileiros passando fome.',
+ 'A taxa básica de juros está em torno de 14% ao ano.',
+ 'Nosso governo fez a Lei Geral da Micro e Pequena Empresa.',
+ 'Nós fizemos o novo Marco Legal do Saneamento.'
+];
+export const DEBATE_QUESTIONS = Object.freeze(FACT_EDITION.questions.map((fact,i)=>Object.freeze({
+ id:`debate-${fact.id}`,author:fact.speaker,quote:debateSummaries[i],kind:'fact',
+ date:FACT_EDITION.date,context:fact.explanation,sourceUrl:fact.sources[0].url,
+ sourceLabel:fact.sources[0].label,choices:Object.freeze(i%2?['flavio','lula']:['lula','flavio']),fact
+})));
+export const COMBINED_QUESTIONS = Object.freeze(DEBATE_QUESTIONS.flatMap((q,i)=>[q,...QUESTIONS.slice(i*2,i*2+2)]).concat(QUESTIONS.slice(DEBATE_QUESTIONS.length*2)));
 export const EDITIONS = Object.freeze({
+ [COMBINED_EDITION]: Object.freeze({id:COMBINED_EDITION,number:'3',label:'Corrida presidencial + Fato ou fake',people:PEOPLE,questions:COMBINED_QUESTIONS}),
  [EDITION]: Object.freeze({id:EDITION, number:"2", label:"Corrida presidencial", people:PEOPLE, questions:QUESTIONS}),
  [legacy.EDITION]: Object.freeze({id:legacy.EDITION, number:"1", label:"Lula ou Flávio?", people:legacy.PEOPLE, questions:Object.freeze(legacy.QUESTIONS.map(q=>Object.freeze({...q,kind:"quote",choices:Object.freeze(["lula","flavio"])})))}),
 });
