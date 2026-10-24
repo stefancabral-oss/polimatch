@@ -1,0 +1,38 @@
+{
+  "stage": 32,
+  "issue": 269,
+  "base": "97e9c6f312578aaac531e33055f1b8915e1577a8",
+  "build": "passed",
+  "coverImages": {
+    "widths": [
+      440,
+      1440
+    ],
+    "loaded": 4,
+    "identities": [
+      "nikolas-ferreira",
+      "janja",
+      "flavio-bolsonaro",
+      "lula"
+    ]
+  },
+  "navigation": {
+    "widths": [
+      320,
+      390,
+      430,
+      768,
+      1440
+    ],
+    "heights": [
+      568,
+      640,
+      844,
+      1000
+    ],
+    "status": "passed"
+  },
+  "ci": "recorded in PR after execution",
+  "production": "recorded in PR after verification",
+  "humanGate": "pending"
+}
