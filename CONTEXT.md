@@ -142,3 +142,9 @@ pediu reduzir a escala no iPhone 17 Pro Max. Estágio 30 aplica as edições
 existentes aos slots persistentes diários/livres/pares, mantendo a foto documental
 como reserva. A grade móvel usa o espaço restante real do shell. Sem mudar
 sessão diária, escolhas, ranking ou propriedade de itens da Coleção.
+
+## Fato ou fake — issue #267
+Em 24/10/2026 Stefan solicitou jogo com falas pragmáticas do debate da Globo
+de 23/10/2026. Estágio 31 inclui autoria, revelação explicada e documentos
+consultáveis. Selecionar apenas verdadeiro/falso claros; não converter
+qualificações editoriais ou promessas em falsidade. Jogos e ranking preservados.

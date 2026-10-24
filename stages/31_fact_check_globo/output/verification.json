@@ -1,0 +1,28 @@
+{
+  "stage": 31,
+  "issue": 267,
+  "base": "a0d9d1c894ca4279bdbd3f2d43c020c0a0649357",
+  "unit": {
+    "passed": 221,
+    "failed": 0
+  },
+  "build": {
+    "status": "passed",
+    "distFiles": 317
+  },
+  "localBrowser": {
+    "engine": "chromium",
+    "widths": [
+      320,
+      390,
+      440,
+      1440
+    ],
+    "factCheck": "passed",
+    "quoteQuizRegression": "passed",
+    "sourceAnchors": "popup actions validated; external content mocked, sources separately researched"
+  },
+  "ci": "pending",
+  "deployment": "pending",
+  "humanGate": "pending"
+}

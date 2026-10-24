@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   base: "./",
-  build: {rollupOptions: {input: {main: "index.html", quoteQuiz: "quem-disse-isso.html", presidential: "duelos-da-corrida.html"}}},
+  build: {rollupOptions: {input: {main: "index.html", quoteQuiz: "quem-disse-isso.html", factCheck: "fato-ou-fake.html", presidential: "duelos-da-corrida.html"}}},
   define: {
     __POLIMATCH_ASSET_VERSION__: JSON.stringify(process.env.SOURCE_COMMIT || process.env.GITHUB_SHA || Date.now().toString(36)),
   },

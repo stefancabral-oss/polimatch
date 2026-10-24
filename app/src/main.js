@@ -422,6 +422,11 @@ function topicsContent() {
       <p>${PRESIDENTIAL_ROSTER.people.length} pessoas em seis categorias. Políticos, empresários, influenciadores, artistas, internacionais e lideranças. Escolha duas por rodada e forme o seu ranking.</p>
       <a class="home-topic-cta" href="./duelos-da-corrida.html"><span>Entrar na arena</span><b aria-hidden="true">→</b></a>
     </section>
+    <section class="home-topic" aria-labelledby="fact-check-title">
+      <div class="home-topic-heading"><div><p class="eyebrow">Debate da Globo · 23/10/2026</p><h2 id="fact-check-title">Fato ou fake?</h2></div></div>
+      <p>O que Lula e Flávio disseram confere? Oito afirmações, explicações e provas para você consultar depois de responder.</p>
+      <a class="home-topic-cta" href="./fato-ou-fake.html"><span>Conferir as falas</span><b aria-hidden="true">→</b></a>
+    </section>
     <section class="home-topic" aria-labelledby="quote-quiz-title">
       <div class="home-topic-heading"><div><p class="eyebrow">Novo jogo · Corrida presidencial</p><h2 id="quote-quiz-title">Quem disse isso?</h2></div></div>
       <p>Gafes históricas, falas da campanha e propostas oficiais. Lula, Flávio, Janja ou Nikolas: você reconhece as vozes? Veja a fonte e o contexto depois de responder.</p>
