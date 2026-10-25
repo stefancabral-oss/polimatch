@@ -1,0 +1,68 @@
+{
+  "checkedAt": "2026-10-24",
+  "status": "inventory-and-triage-verified-factual-audit-partial",
+  "checks": {
+    "json_parses": true,
+    "exactly_133_distinct_ids": true,
+    "all_original_indices_covered_once": true,
+    "markdown_covers_all_ids_once": true,
+    "site_verdict_counts": true,
+    "phases_not_inflated": true,
+    "no_automatic_source_endorsement": true,
+    "no_new_publication": true,
+    "no_invented_speech_dates": true,
+    "source_links_https": true,
+    "evidence_ids_resolve": true,
+    "bcb_documents_downloaded": true,
+    "html_reader_success_separate_from_download_timeouts": true
+  },
+  "counts": {
+    "totalInventoried": 133,
+    "previousStageItems": 13,
+    "newHistoricalItems": 120,
+    "newNarrowPropositionsChecked": 3,
+    "newHistoricalItemsNotIndependentlyResolved": 117,
+    "newQuizQuestionsPublished": 0,
+    "originalRecordingsVerifiedThisStage": 0,
+    "clusters": 37,
+    "siteVerdicts": {
+      "falso": 31,
+      "enganoso": 72,
+      "equivocado": 30
+    }
+  },
+  "runtimeChanged": false,
+  "buildRun": false,
+  "buildReason": "Documentation-only stage; no application or dependency changes.",
+  "deployed": false,
+  "humanGate": "pending",
+  "limits": [
+    "No new historical recording independently verified.",
+    "117 new historical items remain unverified.",
+    "Three narrow propositions checked; complete quotes are not automatically false."
+  ],
+  "files": {
+    "CONTEXT.md": "eef87f021c44281859613dee247caaf9c9d37d35f309a2c089aea6c9e4ff32de",
+    "output/AUDIT.md": "14162b3106851ae409d0c068a0a4dddbfb71d8b13bc29e35e782a2ae0818d296",
+    "output/HANDOFF.md": "744fe1ae0fbf93c9cec48baf1cef6ef06c6286b3650343abff8ce25cca65d02b",
+    "references/historical-audit.json": "58af306dba7cf0e4cca45eb44ef49e83a284c98d9f4620f4d3397f356c0721fa",
+    "references/primary-source-receipts.json": "bed8631186b4d86e7eb5263a44837ed5fabf77801d32e2814f4ec93c5585ad36"
+  },
+  "handoffUpdate": {
+    "date": "2026-10-25",
+    "scope": "handoff-only; no new research, build or deploy",
+    "remotePrVerified": {
+      "number": 276,
+      "draft": true,
+      "merged": false,
+      "headBeforeHandoff": "64c4f3ba35d9715f648135d4c85d762bc593416d"
+    },
+    "publishedPrVerified": {
+      "number": 274,
+      "merged": true,
+      "mergeCommit": "7c0bb27d55b756f62cf20398aabcd180b8c54203"
+    },
+    "productionLastConfirmedAt": "2026-10-24",
+    "productionRecheckedLive": false
+  }
+}
