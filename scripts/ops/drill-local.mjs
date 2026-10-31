@@ -78,9 +78,22 @@ async function sha256File(path) {
   return hash.digest("hex");
 }
 
+// pg_restore e psql (libpq) leem destino também do ambiente: PGHOSTADDR ou
+// PGSERVICE passariam por cima do host da URL conferida pela guarda.
+const LIBPQ_TARGET_VARIABLES = ["PGHOST", "PGHOSTADDR", "PGPORT", "PGDATABASE", "PGSERVICE", "PGSERVICEFILE"];
+
+function libpqEnvironment(env = process.env) {
+  const clean = { ...env };
+  for (const name of LIBPQ_TARGET_VARIABLES) delete clean[name];
+  return clean;
+}
+
 function run(argv, { stdinFile, onLine } = {}) {
   return new Promise((resolvePromise, reject) => {
-    const child = spawn(argv[0], argv.slice(1), { stdio: [stdinFile ? "pipe" : "ignore", "pipe", "pipe"] });
+    const child = spawn(argv[0], argv.slice(1), {
+      env: libpqEnvironment(),
+      stdio: [stdinFile ? "pipe" : "ignore", "pipe", "pipe"],
+    });
     let stderr = "";
     child.stderr.on("data", (chunk) => { stderr = (stderr + chunk).slice(-8000); });
     if (onLine) createInterface({ input: child.stdout, crlfDelay: Infinity }).on("line", onLine);

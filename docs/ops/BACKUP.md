@@ -154,6 +154,9 @@ O primeiro ensaio com dump real de produção é Ação do Stefan.
    ```
 
    Para `.sql.gz` do Dokploy: `gunzip -c arquivo.sql.gz > arquivo.dump` antes.
+   Se o ensaio apontar `dumpFormat` `plain+gzip`, o arquivo é SQL puro e o
+   `pg_restore` não o lê: recriar o banco vazio e carregar com
+   `gunzip -c arquivo.sql.gz | docker exec -i <container-do-banco> psql -X -v ON_ERROR_STOP=1 --single-transaction --dbname=postgresql://usuario@/banco`.
    Nunca restaurar tabelas avulsas (`pg_restore -t` ou `-L` parcial) num banco
    que a API vai usar.
 5. Subir a API de um release igual ou posterior ao piso de rollback
