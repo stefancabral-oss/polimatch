@@ -132,7 +132,9 @@ async function openPage(browser, server, { width = 390, height = 844, blockStora
 }
 
 async function assertHomeShell(page, label) {
-  await page.getByRole("heading", { name: "Quem representa o Brasil que você imagina?" }).waitFor({ timeout: 3000 });
+  // A prova de que a capa não espera a API é a API retida (holdApi) com zero
+  // respostas entregues, não o prazo; o prazo só cobre o WebKit frio do CI.
+  await page.getByRole("heading", { name: "Quem representa o Brasil que você imagina?" }).waitFor({ timeout: 15000 });
   const shell = await page.evaluate(() => {
     const visible = (element) => Boolean(element && element.getClientRects().length && getComputedStyle(element).visibility !== "hidden");
     const navLabels = [...document.querySelectorAll(".bottom-nav .nav-button")].filter(visible).map((button) => button.textContent.trim());
