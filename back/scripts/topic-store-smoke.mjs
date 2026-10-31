@@ -4,9 +4,9 @@ import pg from "pg";
 import CATALOG from "../../shared/elections-2026.json" with { type: "json" };
 import { createTopicStore, recoveryKeyHash } from "../src/topic-store.js";
 import { createApprovedTestRegistry } from "../test-support/editorial-fixtures.js";
+import { requireDisposableDatabase } from "../test-support/disposable-db.js";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) throw new Error("DATABASE_URL é obrigatória para o smoke de integração");
+const connectionString = requireDisposableDatabase();
 const candidateRegistry = createApprovedTestRegistry();
 
 const seed = new pg.Pool({ connectionString });

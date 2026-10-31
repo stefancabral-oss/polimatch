@@ -85,6 +85,8 @@ jobs:
           --health-retries 5
     env:
       DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/polimatch_test
+      # Os smokes apagam dados: só rodam com esta opção, host local e banco *_test.
+      POLIMATCH_DISPOSABLE_DB: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -110,3 +112,6 @@ jobs:
         run: node back/scripts/civic-schema-smoke.mjs
         env:
           CIVIC_DISPOSABLE_TEST: '1'
+      # Último passo: recria o schema public para reproduzir a restauração parcial.
+      - name: Prove a partial restore aborts the API without changing rows
+        run: node back/scripts/partial-restore-smoke.mjs

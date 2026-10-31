@@ -5,10 +5,10 @@ import CATALOG from '../../shared/elections-2026.json' with {type:'json'};
 import {createApprovedTestRegistry} from '../test-support/editorial-fixtures.js';
 import {createTopicStore} from '../src/topic-store.js';
 import {projectVoteResponseV2} from '../src/aggregate-publication.js';
+import {requireDisposableDatabase} from '../test-support/disposable-db.js';
 
 // Never point this smoke at production; CI provides a disposable PostgreSQL database.
-const connection=process.env.DATABASE_URL;
-if (!connection) throw new Error('DATABASE_URL is required (disposable test database)');
+const connection=requireDisposableDatabase();
 const store=createTopicStore(connection,{candidateRegistry:createApprovedTestRegistry(CATALOG.map(p=>p.id)),clock:()=>new Date('2033-09-17T15:00:00Z')});
 const audit=new pg.Pool({connectionString:connection});
 await store.init();

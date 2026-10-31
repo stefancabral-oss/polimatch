@@ -7,9 +7,8 @@ import {
 } from "../src/candidates.js";
 import ROSTER from "../../shared/presidential-roster.json" with { type: "json" };
 import { projectVoteResponseV2 } from "../src/aggregate-publication.js";
-const connection = process.env.DATABASE_URL;
-if (!connection)
-  throw new Error("DATABASE_URL is required (disposable database only)");
+import { requireDisposableDatabase } from "../test-support/disposable-db.js";
+const connection = requireDisposableDatabase();
 const options = { clock: () => new Date("2036-10-21T12:00:00Z") };
 const old = createTopicStore(connection, {
   ...options,
