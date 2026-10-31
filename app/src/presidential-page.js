@@ -19,6 +19,13 @@ import { confirmedVoteData } from "./vote-response.js";
 import { selectOrderedCard } from "./ordered-selection.js";
 import { createSoundController } from "./sound.js";
 import { installChromaMotion } from "./chroma-motion.js";
+import { safeStorage } from "./safe-storage.js";
+import {
+  IDENTITY_NOTICE_COPY,
+  identityNoticeFromError,
+  isPlayerIssuanceLimit,
+  quotaResetSentence,
+} from "./identity-notice.js";
 import {
   tcgCardMarkup as baseTcgCardMarkup,
   portraitMarkup,
@@ -60,20 +67,17 @@ let saved = {};
 let identityPromise;
 let rosterAll = false;
 try {
-  saved = JSON.parse(localStorage.getItem(PRESIDENTIAL_STORAGE_KEY) || "{}");
+  saved = JSON.parse(safeStorage.get(PRESIDENTIAL_STORAGE_KEY) || "{}");
   if (!saved || typeof saved !== "object" || Array.isArray(saved)) saved = {};
 } catch {
-  storageFailed = true;
+  saved = {};
 }
+storageFailed = !safeStorage.persistent;
 
 function writeStorage() {
   if (!session || !recoveryKey) return;
   saved[category.id] = { ...session, identity: recoveryKey };
-  try {
-    localStorage.setItem(PRESIDENTIAL_STORAGE_KEY, JSON.stringify(saved));
-  } catch {
-    storageFailed = true;
-  }
+  if (!safeStorage.set(PRESIDENTIAL_STORAGE_KEY, JSON.stringify(saved))) storageFailed = true;
   root.querySelector("#storage-notice").hidden = !storageFailed;
 }
 
@@ -218,20 +222,13 @@ function patchTable() {
 async function ensureIdentity(topicId) {
   if (!identityPromise)
     identityPromise = (async () => {
-      try {
-        recoveryKey = localStorage.getItem(identityKey) || "";
-      } catch {
-        storageFailed = true;
-      }
+      recoveryKey = safeStorage.get(identityKey) || "";
       if (!recoveryKey) {
         const player = await createPlayer();
         recoveryKey = player.recoveryKey;
-        try {
-          localStorage.setItem(identityKey, recoveryKey);
-        } catch {
-          storageFailed = true;
-        }
+        if (!safeStorage.set(identityKey, recoveryKey)) storageFailed = true;
       }
+      if (!safeStorage.persistent) storageFailed = true;
       return recoveryKey;
     })().catch((error) => {
       identityPromise = null;
@@ -300,12 +297,18 @@ async function loadCategory(id, { play = false } = {}) {
   } catch (error) {
     if (requestEpoch !== epoch) return;
     $("#race-table").setAttribute("aria-busy", "false");
+    status("");
+    // A cota de jogos novos da rede não é falha de conexão: tem texto próprio
+    // e aponta o login Google da página inicial, que não usa essa cota.
+    const quota = isPlayerIssuanceLimit(error);
     showError(
-      error.status === 401
-        ? "Sua sessão precisa ser recuperada. Volte ao início e entre novamente para continuar com seu histórico."
-        : error.message || "Não foi possível carregar seu jogo.",
+      quota
+        ? `${IDENTITY_NOTICE_COPY.quotaHeading} Entre com Google em Início para jogar agora e guardar seu histórico. ${quotaResetSentence(identityNoticeFromError(error).retryAt)}`
+        : error.status === 401
+          ? "Sua sessão precisa ser recuperada. Volte ao início e entre novamente para continuar com seu histórico."
+          : error.message || "Não foi possível carregar seu jogo.",
     );
-    $("#race-start").textContent = "Tentar conectar novamente ↗";
+    if (!quota) $("#race-start").textContent = "Tentar conectar novamente ↗";
   }
 }
 async function choose(id) {
@@ -442,8 +445,9 @@ function renderRoster(query = "") {
 }
 function renderRanking() {
   if (!ready) {
-    $("#ranking-note").textContent =
-      "Conecte para carregar seu ranking desta categoria.";
+    $("#ranking-note").textContent = recoveryKey || safeStorage.get(identityKey)
+      ? "Conecte para carregar seu ranking desta categoria."
+      : "Entre na arena para começar seu ranking desta categoria.";
     $("#ranking-list").innerHTML = "";
     return;
   }
@@ -631,7 +635,9 @@ window.addEventListener("online", () => {
     status("Conexão restabelecida. Confirme novamente a rodada pendente.");
 });
 window.addEventListener("storage", (event) => {
-  if (event.key === identityKey && event.newValue !== recoveryKey) {
+  // Sem identidade carregada nesta aba não há conta a proteger: a chave nova
+  // de outra aba será lida quando a pessoa entrar na arena.
+  if (event.key === identityKey && recoveryKey && event.newValue !== recoveryKey) {
     epoch++;
     ready = false;
     busy = false;
@@ -647,4 +653,6 @@ $("#race-sound").setAttribute(
 );
 $("#race-sound").setAttribute("aria-pressed", String(sound.enabled));
 installChromaMotion($(".race-showcase"));
-loadCategory(category.id);
+// Uma visita que só olha a capa não escreve nada: sem chave salva, o jogador
+// anônimo nasce quando a pessoa entra na arena ou escolhe uma categoria.
+if (safeStorage.get(identityKey)) loadCategory(category.id);

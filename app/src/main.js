@@ -25,10 +25,14 @@ import { confirmedVoteData } from "./vote-response.js";
 import { formatAggregateCopy, MIRROR_COPY, PREDICTION_REVEAL_COPY, PUBLIC_RANKING_COPY, WITHHELD_COPY } from "./aggregate-copy.js";
 import { markPortraitFailed, markPortraitLoaded, patchCandidateSlot, showPersistentPanel } from "./persistent-dom.js";
 import { compactTaxonomyLabel } from "../../shared/catalog-taxonomy.js";
+import { safeStorage } from "./safe-storage.js";
+import { IDENTITY_NOTICE_COPY, identityNoticeFromError, quotaNoticeActive, quotaResetSentence } from "./identity-notice.js";
 // Áreas cívicas (Candidatos/Notícias, épico #206): integração por hooks explícitos,
 // sem tocar no motor de votação. Contrato em stages/17_candidate_news/app/A01-contract.md.
 import { createCivicShell } from "./civic/shell.js";
 
+const IDENTITY_STORAGE_KEY = "polimatch:v3:recovery-key";
+const COACH_STORAGE_KEY = "polimatch:v4:round-coach";
 const app = document.querySelector("#app");
 installInauguralChromas(app);
 installMainChromas(app);
@@ -107,8 +111,13 @@ const state = {
   selectionIds: [],
   showCoach: false,
   busy: false,
+  // `ready` indica só que o catálogo do jogo carregou. A capa e a navegação são
+  // pintadas antes disso, e a identidade é resolvida à parte, sob demanda.
   ready: false,
   error: "",
+  errorUnreachable: false,
+  // Recusa ao criar o jogador anônimo (cota da rede ou falha), exibida na capa.
+  identityNotice: null,
   soundEnabled: sound.enabled,
 };
 let resultTimer;
@@ -378,12 +387,17 @@ function authOverlay() {
   </div>`;
 }
 
+function availableCountLabel() {
+  return state.ready ? String(state.candidates.length) : "—";
+}
+
 function topicsContent() {
-  const availableCandidates = state.candidates;
   const preview = HOME_COVER_PEOPLE.map((candidate, index) => {
     return `<article class="home-race-preview home-race-preview-${index + 1}" aria-hidden="true">${tcgCardMarkup(candidate, {decorative:true, chroma:homeCoverChroma(candidate.id)})}</article>`;
   }).join("");
-  const availableCount = availableCandidates.length;
+  // A capa é pintada antes de qualquer resposta da API. Os contadores começam
+  // como "—" e só os nós de progresso mudam quando os dados chegam.
+  const availableCount = availableCountLabel();
   const dailyAnswered = Number(state.dailySession?.progress?.answered) || 0;
   const dailyTotal = Number(state.dailySession?.progress?.total) || 10;
   const dailyComplete = state.dailySession?.status === "completed";
@@ -391,9 +405,6 @@ function topicsContent() {
     ? formatAggregateCopy(PREDICTION_REVEAL_COPY.resumeTemplate, { slot: state.dailySession.pendingPrediction.slot, total: dailyTotal })
     : dailyComplete ? "Ver fechamento de hoje" : dailyAnswered ? `Continuar · ${dailyAnswered}/${dailyTotal}` : "Jogar rodada do dia";
   const predictionReveal = aggregateAvailable("prediction-reveal");
-  const aggregateTrust = aggregateAvailable("global-ranking")
-    ? `<span>${formatAggregateCopy(PUBLIC_RANKING_COPY.homeCountTemplate, { count: `<strong>${state.globalDuels}</strong>` })}</span>`
-    : `<span><strong>${state.personalDuels}</strong> escolhas no seu ranking</span>`;
   return `<section class="home-hero">
       <div class="home-hero-copy">
         <p class="eyebrow">Sua opinião em movimento</p>
@@ -404,10 +415,11 @@ function topicsContent() {
           <button class="home-ranking-link" type="button" id="open-ranking">${PUBLIC_RANKING_COPY.homeCta}</button>
           <button class="home-ranking-link" type="button" id="open-prediction-results">${PREDICTION_REVEAL_COPY.homeCta}</button>
         </div>
+        <div class="home-notice-slot" data-home-notice hidden></div>
         <div class="home-trust" aria-label="Informações da edição">
           <span><strong data-daily-progress>${dailyAnswered}/${dailyTotal}</strong> rodada do dia</span>
-          <span><strong>${availableCount}</strong> perfis disponíveis nesta edição</span>
-          <span><strong data-global-duels>${state.globalDuels}</strong> escolhas confirmadas</span>
+          <span><strong data-available-count>${availableCount}</strong> perfis disponíveis nesta edição</span>
+          <span><strong data-global-duels>${state.ready ? state.globalDuels : "—"}</strong> escolhas confirmadas</span>
         </div>
       </div>
       <div class="home-deck home-race-deck" aria-label="Prévia das cartas Chroma da corrida">
@@ -447,7 +459,7 @@ function topicsContent() {
 
     <section class="home-next" aria-label="Perfis disponíveis nesta edição">
       <p class="eyebrow">Todos no ar</p>
-      <div><strong>Políticos + influenciadores</strong><span>${availableCount} perfis disponíveis nesta edição</span><small>Disponível</small></div>
+      <div><strong>Políticos + influenciadores</strong><span><span data-available-count>${availableCount}</span> perfis disponíveis nesta edição</span><small>Disponível</small></div>
     </section>
     <p class="legal-note home-legal" data-withheld-home>${WITHHELD_COPY.comparisonUnavailable} ${WITHHELD_COPY.homeSuffix}</p>
   `;
@@ -575,7 +587,7 @@ function dailyPredictionResultsScreen() {
 }
 
 function dailyLoadingContent() {
-  if (state.gameMode === "daily" && (state.dailyLoading || state.dailyLoadError)) {
+  if (state.gameMode === "daily" && (state.dailyLoading || state.dailyLoadError || !state.dailySession)) {
     const error = state.dailyLoadError
       ? `<p>${escapeHtml(state.dailyLoadError)}</p><button class="primary" id="retry-daily" type="button">${PREDICTION_REVEAL_COPY.retry}</button><button class="secondary" id="daily-loading-free" type="button">Ir para o modo livre</button>`
       : '<p>Atualizando o baralho do dia…</p>';
@@ -662,7 +674,7 @@ function collectionContent() {
 }
 
 function navMarkup() {
-  return `<nav class="bottom-nav" aria-label="Navegação principal" hidden>
+  return `<nav class="bottom-nav" aria-label="Navegação principal">
     <button class="nav-button" type="button" data-screen="topics">Início</button>
     <button class="nav-button" type="button" data-screen="duel">Duelo</button>
     <button class="nav-button" type="button" data-screen="collection" hidden>Coleção</button>
@@ -673,9 +685,30 @@ function navMarkup() {
   </nav>`;
 }
 
-function connectionContent() {
-  if (!state.error) return "<p>Preparando o duelo…</p>";
-  return `<section class="panel"><p class="eyebrow">Conexão necessária</p><h1>Não conseguimos falar com o servidor.</h1><p>${escapeHtml(state.error)}. Nenhuma escolha será registrada enquanto a conexão não voltar.</p><button class="primary" id="retry" type="button">${PREDICTION_REVEAL_COPY.retry}</button></section>`;
+/**
+ * Aviso da capa. Nunca substitui hero, navegação nem os links dos quizzes:
+ * catálogo fora do ar, cota de jogos novos da rede e armazenamento bloqueado
+ * são problemas diferentes e cada um diz o que a pessoa pode fazer.
+ */
+function homeNoticeContent() {
+  const notice = state.identityNotice;
+  if (state.error) {
+    const heading = state.errorUnreachable ? "Não conseguimos falar com o servidor." : "O jogo não carregou agora.";
+    return `<section class="home-notice" role="alert" aria-labelledby="home-notice-title"><p class="eyebrow">${state.errorUnreachable ? "Conexão necessária" : "Jogo indisponível"}</p><h2 id="home-notice-title" tabindex="-1">${heading}</h2><p>${escapeHtml(state.error)} Nenhuma escolha é registrada enquanto o jogo não carrega; os quizzes continuam abertos.</p><button class="primary" id="retry" type="button">${PREDICTION_REVEAL_COPY.retry}</button></section>`;
+  }
+  if (notice?.kind === "quota") {
+    const google = googleClientId()
+      ? `<button class="primary" id="notice-google" type="button">${IDENTITY_NOTICE_COPY.quotaGoogle}</button>`
+      : `<p>${IDENTITY_NOTICE_COPY.quotaWithoutGoogle}</p>`;
+    return `<section class="home-notice is-quota" role="alert" aria-labelledby="home-notice-title"><p class="eyebrow">${IDENTITY_NOTICE_COPY.quotaEyebrow}</p><h2 id="home-notice-title" tabindex="-1">${IDENTITY_NOTICE_COPY.quotaHeading}</h2><p>${IDENTITY_NOTICE_COPY.quotaBody}</p><p data-quota-reset>${escapeHtml(quotaResetSentence(notice.retryAt))}</p>${google}<small>${IDENTITY_NOTICE_COPY.quotaQuiz}</small></section>`;
+  }
+  if (notice?.kind === "failure") {
+    return `<section class="home-notice" role="alert" aria-labelledby="home-notice-title"><p class="eyebrow">${IDENTITY_NOTICE_COPY.failureEyebrow}</p><h2 id="home-notice-title" tabindex="-1">${IDENTITY_NOTICE_COPY.failureHeading}</h2><p>${IDENTITY_NOTICE_COPY.failureBody}</p><button class="primary" id="retry-identity" type="button">${IDENTITY_NOTICE_COPY.failureRetry}</button></section>`;
+  }
+  if (state.recoveryKey && !safeStorage.persistent) {
+    return `<section class="home-notice is-storage" role="status"><p class="eyebrow">${IDENTITY_NOTICE_COPY.storageEyebrow}</p><p>${IDENTITY_NOTICE_COPY.storageBody}</p></section>`;
+  }
+  return "";
 }
 
 function duelMarkup() {
@@ -702,11 +735,10 @@ function duelMarkup() {
 }
 
 function appMarkup() {
-  return `<div class="app-shell" data-screen="connection">
+  return `<div class="app-shell" data-screen="topics">
       <div class="app-scroll-area">
       ${headerMarkup()}
-      <main class="connection" data-panel="connection"><p>Preparando o duelo…</p></main>
-      <main class="screen home-screen" data-panel="topics" hidden></main>
+      <main class="screen home-screen" data-panel="topics"></main>
       <main class="screen duel-screen" data-panel="duel" hidden>${duelMarkup()}</main>
       <main class="screen ranking-screen" data-panel="ranking" hidden>${rankingMarkup()}</main>
       <main class="screen collection-screen" data-panel="collection" hidden>${collectionContent()}</main>
@@ -798,7 +830,7 @@ function captureRefs() {
     coachDescription: app.querySelector("[data-coach-description]"),
     overlays: app.querySelector("[data-overlay-root]"),
     liveRegion: app.querySelector(".app-live-region"),
-    connectionMarkup: "<p>Preparando o duelo…</p>",
+    homeNoticeMarkup: "",
     overlayMarkup: "",
     topicsMounted: false,
     duelAuxMarkup: "",
@@ -824,11 +856,13 @@ function renderHeader() {
   refs.soundToggle.querySelector("span").textContent = state.soundEnabled ? "♪" : "♪̸";
 }
 
-function renderConnection() {
-  const markup = connectionContent();
-  if (markup === refs.connectionMarkup) return;
-  refs.panels.connection.innerHTML = markup;
-  refs.connectionMarkup = markup;
+function renderHomeNotice() {
+  const slot = refs.panels.topics.querySelector("[data-home-notice]");
+  const markup = homeNoticeContent();
+  slot.hidden = !markup;
+  if (markup === refs.homeNoticeMarkup) return;
+  slot.innerHTML = markup;
+  refs.homeNoticeMarkup = markup;
 }
 
 function renderTopics() {
@@ -847,20 +881,24 @@ function renderTopics() {
   refs.panels.topics.querySelector("[data-home-selection-title]").textContent = state.gameFeatures.orderedChoices ? "Escolha duas, em ordem" : "Escolha sua preferida";
   refs.panels.topics.querySelector("[data-home-selection-description]").textContent = state.gameFeatures.orderedChoices ? "A primeira vale mais. O segundo toque confirma a rodada." : "Um toque confirma a sua decisão.";
   refs.panels.topics.querySelector("[data-daily-progress]").textContent = `${dailyAnswered}/${dailyTotal}`;
+  refs.panels.topics.querySelectorAll("[data-available-count]").forEach((node) => { node.textContent = availableCountLabel(); });
   const publicRanking = aggregateAvailable("global-ranking");
   const prediction = aggregateAvailable("prediction-reveal");
   refs.panels.topics.querySelector("#open-ranking").textContent = publicRanking ? PUBLIC_RANKING_COPY.homeCta : "Ver meu ranking";
   refs.panels.topics.querySelector("#open-prediction-results").hidden = !prediction;
   refs.panels.topics.querySelector("#open-prediction-results").textContent = PREDICTION_REVEAL_COPY.homeCta;
+  const duelCount = !state.ready ? "—" : publicRanking ? state.globalDuels : state.personalDuels;
   refs.panels.topics.querySelector("[data-global-duels]").parentElement.innerHTML = publicRanking
-    ? formatAggregateCopy(PUBLIC_RANKING_COPY.homeCountTemplate, { count: `<strong data-global-duels>${state.globalDuels}</strong>` })
-    : `<strong data-global-duels>${state.personalDuels}</strong> escolhas no seu ranking`;
+    ? formatAggregateCopy(PUBLIC_RANKING_COPY.homeCountTemplate, { count: `<strong data-global-duels>${duelCount}</strong>` })
+    : `<strong data-global-duels>${duelCount}</strong> escolhas no seu ranking`;
   refs.panels.topics.querySelector("[data-withheld-home]").hidden = publicRanking || prediction;
+  renderHomeNotice();
 }
 
 function renderDuel() {
   const daily = state.gameMode === "daily";
-  const loading = daily && (state.dailyLoading || state.dailyLoadError);
+  // Sem sessão diária (identidade ainda não resolvida) o duelo mostra espera.
+  const loading = daily && (state.dailyLoading || state.dailyLoadError || !state.dailySession);
   const prediction = daily && !loading && aggregateAvailable("prediction-reveal") && Boolean(state.dailySession?.pendingPrediction);
   const completed = daily && !loading && !prediction && state.dailySession?.status === "completed";
   const pair = ["warmup", "tiebreak"].includes(state.gameMode);
@@ -980,7 +1018,8 @@ function renderCollection() {
 }
 
 function renderNavigation() {
-  refs.nav.hidden = !state.ready;
+  // A navegação existe desde a primeira pintura: não depende da API.
+  refs.nav.hidden = false;
   refs.navButtons.forEach((button) => {
     if (button.dataset.screen === "collection") button.hidden = !state.gameFeatures.collection;
     const active = button.dataset.screen === state.screen;
@@ -1019,19 +1058,16 @@ function renderCoach() {
 
 function render() {
   renderHeader();
-  const activePanel = state.ready ? state.screen : "connection";
+  const activePanel = state.screen;
   showPersistentPanel(refs.panels, activePanel);
   const panelChanged = refs.shell.dataset.screen !== activePanel;
   refs.shell.dataset.screen = activePanel;
   if (panelChanged) refs.scroller.scrollTop = 0;
-  if (!state.ready) renderConnection();
-  else {
-    renderDuel();
-    if (state.screen === "topics") renderTopics();
-    if (state.screen === "ranking") renderRanking();
-    if (state.screen === "collection") renderCollection();
-    if (state.screen === "prediction-results") renderPredictionResults();
-  }
+  renderDuel();
+  if (state.screen === "topics") renderTopics();
+  if (state.screen === "ranking") renderRanking();
+  if (state.screen === "collection") renderCollection();
+  if (state.screen === "prediction-results") renderPredictionResults();
   renderNavigation();
   civicShell?.sync();
   renderCoach();
@@ -1092,7 +1128,7 @@ async function refreshDailySession(identity, { showCoach = false } = {}) {
     if (state.dailyLoadEpoch !== loadEpoch || !isCurrentVoteIdentity(state, identity)) return false;
     installDailySession(session);
     state.showCoach = showCoach && state.dailySession.status === "active"
-      && localStorage.getItem("polimatch:v4:round-coach") !== "seen";
+      && safeStorage.get(COACH_STORAGE_KEY) !== "seen";
     render();
     return true;
   } catch (error) {
@@ -1107,6 +1143,10 @@ async function refreshDailySession(identity, { showCoach = false } = {}) {
 
 async function enterDuel(mode = state.gameMode) {
   if (state.busy) return;
+  if (!state.ready || !state.recoveryKey) {
+    if (!await prepareIdentityForPlay(mode)) return;
+    if (state.busy) return;
+  }
   if (state.gameFeatures.pairs && mode === "daily" && !state.warmupSkipped && state.personalDuels < 3) return enterPairMode("warmup");
   if (["warmup", "tiebreak"].includes(mode)) return enterPairMode(mode);
   sound.play("enter");
@@ -1122,7 +1162,7 @@ async function enterDuel(mode = state.gameMode) {
   if (mode === "free") {
     state.dailyLoading = false;
     if (previousMode !== "free" || state.round.length !== 4) prepareFreeRound();
-    state.showCoach = localStorage.getItem("polimatch:v4:round-coach") !== "seen";
+    state.showCoach = safeStorage.get(COACH_STORAGE_KEY) !== "seen";
     render();
     return;
   }
@@ -1432,7 +1472,8 @@ async function answerDailyPrediction(candidateId, { retry = false } = {}) {
 
 async function openDailyPredictionResults() {
   if (state.predictionResultsLoading) return;
-  if (!aggregateAvailable("prediction-reveal")) {
+  // Sem jogador ainda não há palpites: a tela mostra o estado vazio, sem criar ninguém.
+  if (!aggregateAvailable("prediction-reveal") || !state.recoveryKey) {
     state.screen = "prediction-results";
     state.predictionResultsLoading = false;
     state.predictionResultsError = "";
@@ -1562,7 +1603,7 @@ async function restoreVoteSession() {
       recoveryKey = created.recoveryKey;
       state.recoveryKey = recoveryKey;
       state.sessionRecoveryMode = "load";
-      localStorage.setItem("polimatch:v3:recovery-key", recoveryKey);
+      safeStorage.set(IDENTITY_STORAGE_KEY, recoveryKey);
     }
     const restoringDailyVote = state.gameMode === "daily";
     const [personal, dailySession] = await Promise.all([
@@ -1708,7 +1749,7 @@ function handleAppClick(event) {
     }
     return;
   }
-  if (button.id === "account-button") {
+  if (button.id === "account-button" || button.id === "notice-google") {
     sound.play("navigation");
     state.authOpen = true;
     state.authError = "";
@@ -1747,6 +1788,11 @@ function handleAppClick(event) {
   if (button.id === "retry") {
     sound.play("navigation");
     initialize();
+    return;
+  }
+  if (button.id === "retry-identity") {
+    state.identityNotice = null;
+    enterDuel("daily");
     return;
   }
   if (["start-election", "start-election-secondary"].includes(button.id)) {
@@ -1834,7 +1880,7 @@ function handleAppClick(event) {
   }
   if (button.id === "dismiss-coach") {
     sound.play("navigation");
-    localStorage.setItem("polimatch:v4:round-coach", "seen");
+    safeStorage.set(COACH_STORAGE_KEY, "seen");
     state.showCoach = false;
     refs.coachDialog.close();
     return;
@@ -1912,7 +1958,7 @@ function installEvents() {
     }
   });
   refs.coachDialog.addEventListener("close", () => {
-    localStorage.setItem("polimatch:v4:round-coach", "seen");
+    safeStorage.set(COACH_STORAGE_KEY, "seen");
     state.showCoach = false;
     setTimeout(() => refs.slots[0]?.button.focus(), 0);
   });
@@ -1989,9 +2035,8 @@ async function handleGoogleCredential(response) {
   }
   clearVoteTimers();
   resetPendingVoteForIdentityChange(state);
-  localStorage.setItem("polimatch:v3:recovery-key", result.sessionToken);
-  state.recoveryKey = result.sessionToken;
-  state.account = result.account;
+  safeStorage.set(IDENTITY_STORAGE_KEY, result.sessionToken);
+  installIdentity(result.sessionToken, { ...result.player, account: result.account });
   state.authNotice = result.merge?.status === "combined"
     ? result.merge.dailyConflict
       ? `Suas ${result.merge.anonymousChoices} escolhas recentes foram reunidas ao histórico. Havia duas sessões para a rodada do dia; a sessão anônima recente continua ativa e a anterior permanece no histórico.`
@@ -1999,15 +2044,18 @@ async function handleGoogleCredential(response) {
     : result.merge?.status === "alreadyCombined" ? "Suas escolhas já estavam reunidas; o acesso foi recuperado." : "";
   state.predictionResults = null;
   state.predictionResultsError = "";
-  state.personalRanking = rankingForCatalog(result.player, state.candidates);
-  state.personalRankingPolicy = result.player.rankingPolicy || state.personalRankingPolicy;
-  state.playerVersion = result.player.version;
-  state.personalDuels = Number(result.player.duels) || 0;
   state.gameMode = "daily";
   state.dailyLoading = true;
   state.authBusy = false;
   sound.play("confirm");
   render();
+  // O login é a saída de quem ficou sem jogo novo na rede ou sem catálogo.
+  // Se o app ainda não estava pronto, a inicialização termina com a sessão
+  // nova e a capa volta com navegação, sem tocar em "Tentar novamente".
+  if (!state.ready) {
+    await initialize();
+    return;
+  }
   // A identidade já foi confirmada e persistida. Uma indisponibilidade só do
   // serviço diário não pode desfazer o login nem bloquear ranking/modo livre.
   await refreshDailySession({ epoch: state.identityEpoch, recoveryKey: state.recoveryKey });
@@ -2022,111 +2070,236 @@ async function signOut() {
   try {
     await revokeSessionBeforeClearing(state.recoveryKey, {
       endSession,
-      clearLocalSession: () => localStorage.removeItem("polimatch:v3:recovery-key"),
+      clearLocalSession: () => safeStorage.remove(IDENTITY_STORAGE_KEY),
     });
-    const player = await ensurePlayer();
-    clearVoteTimers();
-    resetPendingVoteForIdentityChange(state);
-    state.recoveryKey = player.recoveryKey;
-    state.account = null;
-    state.authNotice = "";
-    state.predictionResults = null;
-    state.predictionResultsError = "";
-    state.personalRanking = rankingForCatalog(player.personal, state.candidates);
-    state.personalRankingPolicy = player.personal.rankingPolicy || state.personalRankingPolicy;
-    state.playerVersion = player.personal.version;
-    state.personalDuels = Number(player.personal.duels) || 0;
-    state.gameMode = "daily";
-    state.dailyLoading = true;
-    state.authBusy = false;
-    state.authOpen = false;
-    state.result = "Você saiu. Um jogo novo começou neste aparelho.";
-    state.resultTone = "";
-    state.pendingWinnerId = "";
-    state.roundId = crypto.randomUUID();
-    render();
-    announceStatus(state.result);
-    // A sessão antiga já foi revogada e a identidade anônima já está ativa.
-    // O diário tem retry próprio e jamais pode restaurar visualmente a conta.
-    await refreshDailySession({ epoch: state.identityEpoch, recoveryKey: state.recoveryKey });
   } catch (error) {
     state.authBusy = false;
     state.authError = error.message || "Não foi possível sair agora.";
     state.authErrorKind = "session";
     render();
+    return;
   }
+  clearVoteTimers();
+  resetPendingVoteForIdentityChange(state);
+  clearIdentity();
+  const playing = state.screen === "duel";
+  state.authNotice = "";
+  state.authBusy = false;
+  state.authOpen = false;
+  state.gameMode = "daily";
+  state.dailyLoading = playing;
+  // Fora do duelo nenhum jogador anônimo é criado aqui: ele só nasce na
+  // próxima ação que precisar de identidade.
+  state.result = playing ? "Você saiu. Um jogo novo começou neste aparelho." : "Você saiu. Um jogo anônimo novo começa na sua próxima escolha.";
+  state.resultTone = "";
+  render();
+  announceStatus(state.result);
+  if (!playing) return;
+  try {
+    await ensureIdentity({ create: true });
+  } catch (error) {
+    state.identityNotice = identityNoticeFromError(error);
+    showHomeNotice();
+    return;
+  }
+  if (!state.recoveryKey) return;
+  // A sessão antiga já foi revogada e a identidade anônima já está ativa.
+  // O diário tem retry próprio e jamais pode restaurar visualmente a conta.
+  await refreshDailySession({ epoch: state.identityEpoch, recoveryKey: state.recoveryKey });
 }
 
-async function ensurePlayer() {
-  const storageKey = "polimatch:v3:recovery-key";
-  let recoveryKey = localStorage.getItem(storageKey) || "";
-  if (!recoveryKey) {
-    const created = await createPlayer();
-    recoveryKey = created.recoveryKey;
-    localStorage.setItem(storageKey, recoveryKey);
+// Ranking pessoal recebido antes do catálogo: é filtrado quando o elenco chega.
+let pendingPersonal = null;
+
+function installIdentity(recoveryKey, personal) {
+  state.recoveryKey = recoveryKey;
+  state.playerVersion = personal.version ?? 0;
+  state.personalRanking = rankingForCatalog(personal, state.candidates);
+  state.personalRankingPolicy = personal.rankingPolicy || null;
+  state.account = personal.account || null;
+  state.personalDuels = Number(personal.duels) || 0;
+  state.identityNotice = null;
+  pendingPersonal = state.ready ? null : personal;
+}
+
+function clearIdentity() {
+  pendingPersonal = null;
+  state.recoveryKey = "";
+  state.account = null;
+  state.playerVersion = 0;
+  state.personalRanking = [];
+  state.personalRankingPolicy = null;
+  state.personalDuels = 0;
+  state.predictionResults = null;
+  state.predictionResultsError = "";
+}
+
+async function restoreOrCreateIdentity({ create }) {
+  const epoch = state.identityEpoch;
+  const changed = () => Number(state.identityEpoch || 0) !== epoch;
+  const stored = safeStorage.get(IDENTITY_STORAGE_KEY) || "";
+  if (stored) {
+    try {
+      const personal = await loadPlayerRanking(stored);
+      if (changed()) return Boolean(state.recoveryKey);
+      installIdentity(stored, personal);
+      return true;
+    } catch (error) {
+      // A chave é a única credencial do jogador e não é exibida em lugar nenhum:
+      // descartá-la apaga o ranking pessoal para sempre. Só um 401 prova que ela
+      // não vale mais. Qualquer outra falha — 500, 503, tempo esgotado, rede fora —
+      // é passageira, e nesses casos a chave precisa sobreviver.
+      if (error?.status !== 401) throw error;
+      if (safeStorage.get(IDENTITY_STORAGE_KEY) === stored) safeStorage.remove(IDENTITY_STORAGE_KEY);
+    }
+  }
+  if (!create || changed()) return Boolean(state.recoveryKey);
+  const created = await createPlayer();
+  if (!created?.recoveryKey) throw new TypeError("resposta de sessão inválida");
+  // Um login concluído enquanto o POST viajava vence: a chave anônima é descartada.
+  if (changed()) return Boolean(state.recoveryKey);
+  safeStorage.set(IDENTITY_STORAGE_KEY, created.recoveryKey);
+  const personal = await loadPlayerRanking(created.recoveryKey);
+  if (changed()) return Boolean(state.recoveryKey);
+  installIdentity(created.recoveryKey, personal);
+  return true;
+}
+
+let identityTask = null;
+
+/**
+ * Resolve o jogador sob demanda, como o ensureIdentity da corrida.
+ *
+ * Uma visita que só olha a capa não escreve nada no servidor. Com `create`, a
+ * primeira ação que precisa de identidade (jogar, votar) cria o jogador
+ * anônimo uma única vez, mesmo com toques repetidos.
+ */
+async function ensureIdentity({ create = true } = {}) {
+  if (state.recoveryKey) return true;
+  if (identityTask && (identityTask.create || !create)) return identityTask.promise;
+  if (identityTask) {
+    // Uma leitura da chave salva já está em curso: só cria se ela não bastar.
+    await identityTask.promise.catch(() => false);
+    if (state.recoveryKey) return true;
+    if (identityTask?.create) return identityTask.promise;
+  }
+  const task = { create, promise: null };
+  task.promise = restoreOrCreateIdentity({ create }).finally(() => {
+    if (identityTask === task) identityTask = null;
+  });
+  identityTask = task;
+  return task.promise;
+}
+
+let catalogTask = null;
+
+function loadGameCatalog() {
+  if (state.ready) return Promise.resolve();
+  if (!catalogTask) catalogTask = fetchGameCatalog().finally(() => { catalogTask = null; });
+  return catalogTask;
+}
+
+async function fetchGameCatalog() {
+  const capabilitiesRequest = loadCapabilities()
+    .then(validateCapabilities)
+    .catch(() => PERSONAL_ONLY_CAPABILITIES);
+  const [candidates, capabilities, gameFeatures] = await Promise.all([loadCandidates(), capabilitiesRequest, loadGameCapabilities().catch(() => ({}))]);
+  const catalog = catalogForTopic(candidates);
+  if (catalog.length < 4) throw new Error("O elenco ainda não está disponível.");
+  state.gameFeatures = gameFeatures?.version === 1 ? gameFeatures : {};
+  installCapabilities(capabilities);
+  let snapshot = null;
+  if (aggregateAvailable("global-ranking")) {
+    try {
+      snapshot = await loadRanking();
+    } catch {
+      installCapabilities(withAggregateScopeWithheld(state.capabilities, "global-ranking"));
+    }
+  }
+  state.candidates = catalog;
+  state.ranking = snapshot ? rankingForCatalog(snapshot, state.candidates) : [];
+  state.globalDuels = snapshot ? Number(snapshot.duels) || 0 : 0;
+  if (pendingPersonal) state.personalRanking = rankingForCatalog(pendingPersonal, state.candidates);
+  pendingPersonal = null;
+  state.error = "";
+  state.errorUnreachable = false;
+  state.ready = true;
+}
+
+function catalogFailure(error) {
+  state.errorUnreachable = Boolean(error?.unreachable);
+  // Mensagens de exceção podem vir em inglês do navegador; a capa usa texto próprio.
+  state.error = state.errorUnreachable
+    ? "Verifique sua conexão e tente de novo."
+    : "O catálogo do jogo não respondeu como esperado.";
+}
+
+function showHomeNotice() {
+  state.screen = "topics";
+  state.dailyLoading = false;
+  render();
+  const heading = refs.panels.topics.querySelector("#home-notice-title");
+  heading?.scrollIntoView?.({ block: "center" });
+  heading?.focus({ preventScroll: true });
+  sound.play("error");
+}
+
+/** Catálogo e identidade para quem tocou em jogar; recusas voltam para a capa. */
+async function prepareIdentityForPlay(mode) {
+  if (quotaNoticeActive(state.identityNotice)) {
+    showHomeNotice();
+    return false;
+  }
+  state.identityNotice = null;
+  state.screen = "duel";
+  if (mode === "daily") {
+    state.gameMode = "daily";
+    state.dailyLoading = true;
+    state.dailyLoadError = "";
+  }
+  render();
+  try {
+    await loadGameCatalog();
+  } catch (error) {
+    catalogFailure(error);
+    showHomeNotice();
+    return false;
   }
   try {
-    return { recoveryKey, personal: await loadPlayerRanking(recoveryKey) };
+    await ensureIdentity({ create: true });
   } catch (error) {
-    // A chave é a única credencial do jogador e não é exibida em lugar nenhum:
-    // descartá-la apaga o ranking pessoal para sempre. Só um 401 prova que ela
-    // não vale mais. Qualquer outra falha — 500, 503, tempo esgotado, rede fora —
-    // é passageira, e nesses casos a chave precisa sobreviver.
-    if (error?.status !== 401) throw error;
-    localStorage.removeItem(storageKey);
-    const created = await createPlayer();
-    localStorage.setItem(storageKey, created.recoveryKey);
-    return { recoveryKey: created.recoveryKey, personal: await loadPlayerRanking(created.recoveryKey) };
+    state.identityNotice = identityNoticeFromError(error);
+    showHomeNotice();
+    return false;
   }
+  if (!state.recoveryKey || state.screen !== "duel") return false;
+  return true;
 }
 
 async function initialize() {
   state.error = "";
-  state.ready = false;
+  state.errorUnreachable = false;
   render();
-  let identity = null;
+  // Uma chave já salva é só lida, em paralelo ao catálogo. Sem chave, nada é
+  // escrito no servidor: o jogador anônimo nasce na primeira ação que precisa dele.
+  const identityRestore = state.recoveryKey ? null : ensureIdentity({ create: false }).catch(() => false);
   try {
-    const capabilitiesRequest = loadCapabilities()
-      .then(validateCapabilities)
-      .catch(() => PERSONAL_ONLY_CAPABILITIES);
-    const [candidates, player, capabilities, gameFeatures] = await Promise.all([loadCandidates(), ensurePlayer(), capabilitiesRequest, loadGameCapabilities().catch(() => ({}))]);
-    state.gameFeatures = gameFeatures?.version === 1 ? gameFeatures : {};
-    installCapabilities(capabilities);
-    let snapshot = null;
-    if (aggregateAvailable("global-ranking")) {
-      try {
-        snapshot = await loadRanking();
-      } catch {
-        installCapabilities(withAggregateScopeWithheld(state.capabilities, "global-ranking"));
-      }
-    }
-    state.candidates = catalogForTopic(candidates);
-    if (state.candidates.length < 4) throw new Error("O elenco ainda não está disponível");
-    state.ranking = snapshot ? rankingForCatalog(snapshot, state.candidates) : [];
-    state.globalDuels = snapshot ? Number(snapshot.duels) || 0 : 0;
-    state.recoveryKey = player.recoveryKey;
-    state.playerVersion = player.personal.version;
-    state.personalRanking = rankingForCatalog(player.personal, state.candidates);
-    state.personalRankingPolicy = player.personal.rankingPolicy || null;
-    state.account = player.personal.account || null;
-    state.personalDuels = Number(player.personal.duels) || 0;
-    state.rankingView = "personal";
-    state.gameMode = "daily";
-    state.dailyLoading = true;
-    state.pendingWinnerId = "";
-    state.resultTone = "";
-    state.ready = true;
-    identity = { epoch: state.identityEpoch, recoveryKey: state.recoveryKey };
+    await loadGameCatalog();
   } catch (error) {
-    state.error = error.message || "Falha desconhecida";
+    catalogFailure(error);
   }
   render();
   // Deep link cívico aberto antes do jogo ficar pronto é resolvido agora, sem
   // interferir na rodada: o shell só troca `state.screen`.
   if (state.ready) civicShell?.start();
-  // Catálogo, identidade e ranking pessoal são o núcleo do app. Agregados são
-  // opcionais e fail-closed; sua ausência nunca derruba o jogo pessoal.
-  if (identity) await refreshDailySession(identity);
+  if (identityRestore) {
+    await identityRestore;
+    render();
+  }
+  // Catálogo e ranking pessoal são o núcleo do app. Agregados são opcionais e
+  // fail-closed; sua ausência nunca derruba o jogo pessoal. A rodada do dia só
+  // é lida para quem já tem identidade, para atualizar o progresso da capa.
+  if (state.ready && state.recoveryKey) await refreshDailySession({ epoch: state.identityEpoch, recoveryKey: state.recoveryKey });
 }
 
 function pairStatusContent() {
@@ -2219,6 +2392,11 @@ async function confirmDiscard(candidateId) {
 
 async function loadCollection() {
   if (!state.gameFeatures.collection || state.busy) return;
+  if (!state.recoveryKey) {
+    // Inventário de quem ainda não jogou é vazio; abrir a tela não cria jogador.
+    state.screen = "collection"; state.collection = []; state.collectionLoading = false; state.collectionError = ""; render();
+    return;
+  }
   const identity = { epoch: state.identityEpoch, recoveryKey: state.recoveryKey };
   state.screen = "collection"; state.collectionLoading = true; state.collectionError = ""; render();
   try {
