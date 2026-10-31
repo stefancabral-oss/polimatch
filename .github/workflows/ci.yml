@@ -40,6 +40,10 @@ jobs:
               # Testes do back importam o módulo de retratos do app e leem o B02 do estágio 17.
               - 'app/src/photos.js'
               - 'stages/17_candidate_news/output/**'
+              # A API confere o sha256 dos retratos e a imagem copia a pasta; o
+              # .dockerignore define o contexto do docker build da API.
+              - 'app/public/portraits/**'
+              - '.dockerignore'
               - 'stages/10_rebuild_eleicoes_2026/input/polimatch-catalogo-125.json'
               - 'stages/10_rebuild_eleicoes_2026/input/polimatch-perfis-editoriais-125.json'
               - 'stages/10_rebuild_eleicoes_2026/input/polimatch-taxonomia-125.json'
@@ -67,8 +71,9 @@ jobs:
               - 'stages/12_quality_gate_main/references/card-art-pilot-recognition-rules.schema.json'
               - 'stages/12_quality_gate_main/references/card-art-pilot-response-bundle.schema.json'
               - 'stages/12_quality_gate_main/references/card-art-pilot-results.schema.json'
-              - '.github/workflows/design-validator.yml'
-              - '.github/workflows/ci.yml'
+              # ci-workflows.test.js lê todos os workflows e o ruleset de main.
+              - '.github/workflows/**'
+              - 'docs/ops/ruleset-main.json'
             ui_smoke:
               - 'app/**'
               # `shared/` entra no bundle do app (domain.js importa elo.js), então

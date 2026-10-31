@@ -49,6 +49,16 @@ test("the path filter is pinned to a commit and only consulted for pull requests
     assert.match(changes, new RegExp(`\\n {12}${filter}:\\n`), filter);
     assert.match(changes, new RegExp(`${filter}: \\$\\{\\{ steps\\.filter\\.outputs\\.${filter} \\}\\}`), filter);
   }
+  // Dependências cruzadas: os testes do app leem todos os workflows e o ruleset;
+  // a API confere os retratos de app/public e usa o .dockerignore da raiz.
+  const design = `${block(changes, "\n            design:\n", "\n            ui_smoke:\n")}\n`;
+  for (const path of [".github/workflows/**", "docs/ops/ruleset-main.json", "back/src/**"]) {
+    assert.ok(design.includes(`- '${path}'\n`), `design: ${path}`);
+  }
+  const backShared = `${block(changes, "\n            back_shared:\n", "\n            design:\n")}\n`;
+  for (const path of ["app/src/photos.js", "app/public/portraits/**", ".dockerignore", ".github/workflows/ci.yml"]) {
+    assert.ok(backShared.includes(`- '${path}'\n`), `back_shared: ${path}`);
+  }
 });
 
 test("ci-gate always runs and depends on every other job", () => {
@@ -95,6 +105,21 @@ test("ci-gate requires every suite to run and pass on push to main and manual ru
     assert.equal(runGate(event, { changes: "success", ...allSuites("success"), "back-shared": "skipped" }).status, 1, event);
     assert.equal(runGate(event, { changes: "success", ...allSuites("success"), "back-shared": "failure" }).status, 1, event);
   }
+});
+
+test("the main ruleset requires exactly the check emitted by the ci-gate job", () => {
+  const ruleset = JSON.parse(readFileSync(new URL("../../docs/ops/ruleset-main.json", import.meta.url), "utf8"));
+  const gateName = block(ci, "\n  ci-gate:\n", "# ci-gate:end").match(/\n {4}name: (\S+)\n/)[1];
+  const rules = Object.fromEntries(ruleset.rules.map((rule) => [rule.type, rule.parameters ?? {}]));
+  assert.equal(ruleset.target, "branch");
+  assert.equal(ruleset.enforcement, "active");
+  assert.deepEqual(ruleset.conditions.ref_name.include, ["~DEFAULT_BRANCH"]);
+  assert.deepEqual(ruleset.bypass_actors, []);
+  assert.deepEqual(Object.keys(rules).sort(), ["deletion", "non_fast_forward", "pull_request", "required_status_checks"]);
+  assert.equal(rules.pull_request.required_approving_review_count, 0);
+  assert.equal(rules.pull_request.required_review_thread_resolution, true);
+  // 15368 é o app GitHub Actions: um status de mesmo nome vindo de outra origem não vale.
+  assert.deepEqual(rules.required_status_checks.required_status_checks, [{ context: gateName, integration_id: 15368 }]);
 });
 
 test("CI builds must carry the commit SHA into the app and the API images", () => {
