@@ -11,6 +11,7 @@ on:
       - 'stages/10_rebuild_eleicoes_2026/input/polimatch-taxonomia-125.json'
       - 'docs/editorial/**'
       - 'package.json'
+      - '.dockerignore'
       - '.github/workflows/back-shared.yml'
   workflow_dispatch:
 
@@ -50,6 +51,16 @@ jobs:
         run: |
           docker build --file back/Dockerfile --build-arg SOURCE_COMMIT="$GITHUB_SHA" --tag polimatch-api:recovery .
           docker run --rm --entrypoint node polimatch-api:recovery --input-type=module -e 'import assert from "node:assert/strict"; import {PRODUCTION_CANDIDATE_REGISTRY as registry} from "./src/candidates.js"; import {EMBEDDED_RELEASE_REVISION} from "./src/release-identity.js"; assert.equal(registry.candidatesForTopic("eleicoes-2026").length,54); assert.match(EMBEDDED_RELEASE_REVISION,/^[a-f0-9]{40}$/); console.log("54 verified photographs and release identity packaged");'
+      - name: Verify API image excludes integration smokes and test support
+        run: |
+          docker run --rm --entrypoint ls polimatch-api:recovery scripts | tee "$RUNNER_TEMP/image-scripts.txt"
+          grep -qx 'civic-migrate.mjs' "$RUNNER_TEMP/image-scripts.txt"
+          if grep -E -- '-smoke\.mjs$' "$RUNNER_TEMP/image-scripts.txt"; then
+            echo "A imagem da API não pode carregar smokes de integração" >&2
+            exit 1
+          fi
+          docker run --rm --entrypoint sh polimatch-api:recovery -c 'test -d src && test ! -e test-support'
+          echo "smokes e test-support fora da imagem"
 
   shared-data:
     name: shared-data
