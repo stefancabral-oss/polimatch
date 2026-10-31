@@ -1,0 +1,57 @@
+{
+  "drill": "polimatch-restore-drill/v1",
+  "checkedAt": "2026-10-31T20:48:34.806Z",
+  "dumpFile": "polimatch-20261031T204710Z.dump",
+  "dumpSha256": "3d542ad9d483b309784c1065193668db01c8aeaa3683558ddb8f217532ed1331",
+  "dumpFormat": "custom",
+  "dumpCounts": {
+    "tables": 44,
+    "totalRows": 7400
+  },
+  "manifest": {
+    "file": "polimatch-20261031T204710Z.manifest.json",
+    "createdAt": "2026-10-31T20:47:10Z",
+    "releaseRevision": "7c0bb27d55b756f62cf20398aabcd180b8c54203",
+    "sha256Matches": true,
+    "countsMatchDump": true
+  },
+  "restore": {
+    "exitCode": 0,
+    "durationMs": 156
+  },
+  "counts": {
+    "tables": 44,
+    "totalRows": 7400,
+    "matchDump": true,
+    "mismatches": [],
+    "sample": {
+      "public.anonymous_players": 30,
+      "public.player_identities": 4,
+      "public.choice_rounds": 126,
+      "public.votes": 400,
+      "public.daily_answers": 96
+    }
+  },
+  "boot": {
+    "health": 200,
+    "resetApplied": false,
+    "revision": null,
+    "healthyAfterMs": 522,
+    "changes": [
+      {
+        "table": "public.player_pools",
+        "before": 162,
+        "after": 210,
+        "allowed": true
+      },
+      {
+        "table": "public.player_stats",
+        "before": 6082,
+        "after": 6930,
+        "allowed": true
+      }
+    ]
+  },
+  "result": "pass",
+  "failures": []
+}

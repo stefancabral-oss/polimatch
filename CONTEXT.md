@@ -163,3 +163,9 @@ Stefan autorizou validar a pauta do Mentiras do Lula contra documentos e dados
 originais e incorporar as conclusões sustentadas. Estágio 34 registra 13 itens
 do debate e oito anteriores; edição 4 preserva versões/progresso e restringe
 o selo aos recortes verificáveis. Sem transformar ausência de prova em falso.
+
+## Proteger o banco — issue #279
+A auditoria de 30/10/2026 apontou falta de backup externo e de restauração
+provada. Estágio 37: reset da edição só em banco vazio, smokes restritos a
+banco descartável e fora da imagem, backup com manifesto, ensaio de
+restauração e docs/ops. Painéis, bucket e ensaio com dump real ficam com Stefan.
