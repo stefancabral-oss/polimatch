@@ -164,7 +164,8 @@ test("public reference check reports a missing manifest icon and a missing page 
 
 test("the build verifies public references and CI smokes the real nginx image", () => {
   assert.match(packageJson.scripts.build, /vite build && .*node scripts\/verify-public-refs\.mjs$/);
-  const build = workflow.indexOf("docker build --file app/Dockerfile --tag polimatch-app:pilot-176 .");
+  // O ICM 45 (#287) acrescenta build-args do release entre o Dockerfile e a tag.
+  const build = workflow.search(/docker build --file app\/Dockerfile (?:.* )?--tag polimatch-app:pilot-176 \./);
   const run = workflow.indexOf("docker run");
   const copy = workflow.indexOf("docker cp");
   const smoke = workflow.indexOf("node app/scripts/smoke-nginx.mjs");
