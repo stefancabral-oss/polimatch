@@ -38,6 +38,8 @@ test("outras falhas não usam o texto de cota", () => {
 test("o horário de liberação é mostrado no fuso de São Paulo", () => {
   const midnight = Date.parse("2026-10-31T03:00:00Z");
   assert.equal(quotaResetLabel(midnight), "às 00:00 (horário de Brasília)");
+  // Relógio do aparelho alguns segundos atrás do servidor.
+  assert.equal(quotaResetLabel(midnight - 20_000), "às 00:00 (horário de Brasília)");
   assert.equal(
     quotaResetSentence(midnight),
     "Novos jogos anônimos nesta rede voltam a ser liberados às 00:00 (horário de Brasília).",

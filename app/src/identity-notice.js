@@ -47,12 +47,15 @@ export function quotaNoticeActive(notice, now = Date.now()) {
 
 export function quotaResetLabel(retryAt, timeZone = QUOTA_TIME_ZONE) {
   if (!Number.isFinite(retryAt)) return "amanhã";
+  // O prazo chega em segundos e é somado ao relógio deste aparelho; alguns
+  // segundos de diferença não podem transformar meia-noite em 23:59.
+  const minute = Math.round(retryAt / 60000) * 60000;
   const time = new Intl.DateTimeFormat("pt-BR", {
     timeZone,
     hour: "2-digit",
     minute: "2-digit",
     hourCycle: "h23",
-  }).format(new Date(retryAt));
+  }).format(new Date(minute));
   return `às ${time} (horário de Brasília)`;
 }
 
