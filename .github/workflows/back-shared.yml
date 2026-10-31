@@ -12,6 +12,7 @@ on:
       - 'docs/editorial/**'
       - 'package.json'
       - '.dockerignore'
+      - 'scripts/ops/**'
       - '.github/workflows/back-shared.yml'
   workflow_dispatch:
 
@@ -123,6 +124,23 @@ jobs:
         run: node back/scripts/civic-schema-smoke.mjs
         env:
           CIVIC_DISPOSABLE_TEST: '1'
+      # pg_dump/pg_restore do próprio container, como no cron da VPS via docker exec.
+      - name: Back up with manifest and rehearse the restore
+        env:
+          PG_CONTAINER: ${{ job.services.postgres.id }}
+          DRILL_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/polimatch_drill_test
+        run: |
+          export PG_DUMP="docker exec -i $PG_CONTAINER pg_dump" PG_RESTORE="docker exec -i $PG_CONTAINER pg_restore"
+          BACKUP_DATABASE_URL="$DATABASE_URL" BACKUP_DIR="$RUNNER_TEMP/backups" BACKUP_RELEASE_REVISION="$GITHUB_SHA" \
+            bash scripts/ops/pg-backup-vps.sh
+          dump=$(ls "$RUNNER_TEMP"/backups/polimatch-*.dump)
+          node scripts/ops/drill-local.mjs "$dump" --report "$RUNNER_TEMP/drill.json"
+          cp "$dump" "$RUNNER_TEMP/adulterado.dump"
+          sed 's/"public.votes": [0-9]*/"public.votes": -1/' "${dump%.dump}.manifest.json" > "$RUNNER_TEMP/adulterado.manifest.json"
+          if node scripts/ops/drill-local.mjs "$RUNNER_TEMP/adulterado.dump" --skip-boot > /dev/null; then
+            echo "o drill aceitou um manifesto com contagem divergente" >&2
+            exit 1
+          fi
       # Último passo: recria o schema public para reproduzir a restauração parcial.
       - name: Prove a partial restore aborts the API without changing rows
         run: node back/scripts/partial-restore-smoke.mjs
