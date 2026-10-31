@@ -6,8 +6,9 @@
 - Issue: #280
 - Branch: `fix/edge-delivery` (a partir de main 7c0bb27)
 - PR: ainda não aberta. Push e PR ficam com o Stefan.
-- Último commit: 1d2adc0 (código). Este HANDOFF e o `verification.json` entram
-  no commit seguinte da mesma branch.
+- Último commit: 1d2adc0 é o último de código. O estágio foi registrado em
+  e1938db, e a revisão independente entrou no commit seguinte, só com
+  documentação (este HANDOFF e o `verification.json`).
 
 ## Entregue
 
@@ -62,10 +63,12 @@
 
 ## Não entregue / pendente
 
-- Compressão da API: o issue cita "compressão também na API", mas a API não
-  passa por este nginx e o estágio não mexe em `back/`. `/api/candidates` segue
-  com cerca de 86 KB sem gzip. Opções: middleware `compress` do Traefik no
-  router da API (painel) ou `compression()` no Express num estágio de back.
+- Compressão da API: o issue lista "compressão também na API" entre os
+  entregáveis, mas a API não passa por este nginx e esta PR não mexe em
+  `back/`. `/api/candidates` segue com cerca de 86 KB sem gzip. Opções:
+  middleware `compress` do Traefik no router da API ou `compression()` no
+  Express num estágio de back. Por isso, e pelo www, a PR só referencia o #280,
+  que continua aberto.
 - Cache-Control e `maxAge` de CORS da API.
 - Pré-compressão no build (`gzip_static`) e brotli. Hoje o gzip é feito a cada
   requisição. Com o tráfego atual o custo é pequeno.
@@ -127,6 +130,48 @@
 - Não executado localmente: `docker build` e `docker run`, porque não há Docker
   na máquina. O passo novo do design-validator só roda no CI.
 
+### Revisão independente (31/10)
+
+Outra sessão refez as provas a partir da branch, sem confiar nos números acima:
+
+- `npm test --prefix app` 237/237; `test:card-art-pilot-contract` 64/64;
+  `node --test shared/*.test.js` 93/93; `npm test --prefix back` 232/232;
+  `npm test` na raiz passa.
+- `npm run build --prefix app` (limpo e com o `VITE_GOOGLE_CLIENT_ID` do CI):
+  324 arquivos no dist, 36 referências locais em 5 HTML e 1 manifesto, nenhuma
+  ausente. O verificador falha num dist sem `icons/icon-512.png` e no dist de
+  7c0bb27 (três PNG ausentes).
+- `edge-delivery.test.js` numa cópia com o `nginx.conf` e o `sw.js` de 7c0bb27:
+  5 de 11 falham.
+- Smoke contra o nginx do Homebrew com o `app/nginx.conf` real (só `listen` e
+  `root` trocados) servindo o dist mais o `50x.html` padrão da imagem, como no
+  container: 13 de 13. Com o `nginx.conf` de 7c0bb27: 5 de 13.
+- Casos extras com curl: `/`, `/?utm=1`, `/index.html`, as páginas `.html` e
+  caminhos sem extensão saem com `no-cache`; `/assets/main-*.js?v=1` sai com
+  gzip e `immutable`; `/nao-existe.html`, `/favicon.ico`, `/assets/` e
+  `/portraits/` dão 404; `/icon.svg` sai com gzip.
+- gzip medido nos sete JS e CSS da home: 413.720 → 118.556 B (−71%).
+- Lista completa do UI Interaction Smoke do CI (25 execuções, com a variante
+  Google), em Chromium 140 e WebKit:
+  - nginx com a config nova, Chromium: 25 de 25;
+  - nginx com a config nova, WebKit: 20 de 25. interaction-smoke (as duas
+    variantes), accessible-profile e civic-navigation falham na navegação por
+    Tab e no retorno de foco, com a mesma mensagem que dão no build de 7c0bb27
+    servido pela config de 7c0bb27. fact-check falhou uma vez ao abrir o
+    `<details>` e passou nas 6 repetições seguintes; no build de 7c0bb27
+    falhou 1 de 6 execuções, por timeout. É instabilidade do WebKit local, não
+    da mudança;
+  - `vite preview` (o servidor do CI), Chromium: 25 de 25;
+  - `vite preview`, WebKit: 21 de 25. Falham só os mesmos quatro roteiros de
+    Tab e foco, com as mesmas mensagens.
+- Service worker, Playwright contra o nginx local depois de uma visita e um
+  reload: com o `sw.js` novo, 0 de 7 JS e CSS passam pelo worker no Chromium e
+  no WebKit; com o de 7c0bb27, 7 de 7. `caches.keys()` vazio nos dois. No
+  Chromium, `Page.getInstallabilityErrors` e os erros do manifesto continuam
+  vazios sem o listener de fetch.
+- Varredura do texto público (diff, commits, HANDOFF e `verification.json`):
+  nenhum IP, lista de portas ou detalhe de exploração.
+
 ## Riscos conhecidos
 
 - Mudança de comportamento: arquivo com extensão estática que não existe agora
@@ -138,9 +183,9 @@
 - Retratos e Chromas ficam até um dia em cache. Uma foto trocada com o mesmo nome
   e sem `?v=` (os retratos da capa) pode demorar até um dia para aparecer.
 - `add_header` dentro de um `location` anula os `add_header` do nível do
-  `server`. Quando o ICM 51 colocar cabeçalhos de segurança no server, vai
-  precisar repeti-los em cada location com `add_header` (ou usar um include) e
-  acrescentar a checagem ao smoke.
+  `server`. O ICM 51 prevê os cabeçalhos de segurança no Traefik. Se algum
+  deles for posto neste nginx, precisa ser repetido em cada location com
+  `add_header` (ou vir de um include), e o smoke deve passar a conferi-lo.
 - A prova local usa o nginx 1.31.5 do Homebrew, e a imagem usa o
   `nginx:1.27-alpine`. As diretivas são as mesmas, mas a prova na imagem real é
   o passo do CI, que ainda não rodou.
@@ -195,7 +240,12 @@
 5. Só depois disso, apagar o registro curinga (`*`) e conferir que
    `dig +short qualquercoisa.polimatch.com.br` volta vazio.
 6. Push da branch `fix/edge-delivery` e PR citando #280. Confirmar no log do
-   Design Validator que o passo "Smoke the nginx image" passou com 13 de 13.
+   Design Validator que o passo "Smoke the nginx image" passou com 13 de 13
+   (lá a checagem de páginas HTML conta 6, porque a imagem também traz o
+   `50x.html` padrão do nginx). Confirmar o UI Interaction Smoke verde no
+   WebKit, porque os roteiros com Tab e foco (interaction-smoke,
+   accessible-profile e civic-navigation) não passam no macOS e só o CI prova
+   esses.
 7. Depois do merge e do deploy, conferir em produção:
    - `curl -sI -H 'Accept-Encoding: gzip' https://polimatch.com.br/assets/<main>.js`
      com `content-encoding: gzip` e `immutable`;

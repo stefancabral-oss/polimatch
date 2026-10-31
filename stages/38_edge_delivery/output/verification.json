@@ -7,7 +7,8 @@
   "commits": [
     "b2b6f3c",
     "5018581",
-    "1d2adc0"
+    "1d2adc0",
+    "e1938db"
   ],
   "tests": {
     "appUnit": {
@@ -190,12 +191,65 @@
     },
     {
       "criterion": "compressão da API",
-      "result": "not delivered; fora deste estágio (ver HANDOFF)"
+      "result": "not delivered; entregável do #280 que fica aberto (Traefik ou Express, decisão do Stefan; ver HANDOFF)"
     }
   ],
   "notRunLocally": [
     "docker build e docker run (sem Docker na máquina); o passo novo do design-validator roda no CI"
   ],
+  "independentReview": {
+    "checkedAt": "2026-10-31",
+    "note": "outra sessão refez as provas a partir da branch; só documentação mudou depois de e1938db",
+    "unit": {
+      "app": { "passed": 237, "failed": 0 },
+      "cardArtPilotContract": { "passed": 64, "failed": 0 },
+      "shared": { "passed": 93, "failed": 0 },
+      "back": { "passed": 232, "failed": 0 },
+      "rootNpmTest": "passa"
+    },
+    "build": {
+      "passed": true,
+      "distFiles": 324,
+      "publicRefs": "36 referências em 5 HTML e 1 manifesto, nenhuma ausente",
+      "withoutIcon512": "verificador falha (exit 1)",
+      "baseDist7c0bb27": "verificador falha: três PNG ausentes"
+    },
+    "edgeStaticTestsAgainstBase": { "passed": 6, "failed": 5 },
+    "smokeNginx": {
+      "server": "nginx 1.31.5 local com app/nginx.conf real (só listen e root trocados), dist mais o 50x.html padrão da imagem",
+      "newConfig": { "passed": 13, "failed": 0, "htmlPages": 6 },
+      "baseConfig7c0bb27": { "passed": 5, "failed": 8 }
+    },
+    "gzipHomeJsCss": { "files": 7, "identity": 413720, "gzip": 118556 },
+    "e2eFullCiList": {
+      "runs": 25,
+      "chromiumVersion": "140.0.7339.16",
+      "nginxNewConfig": {
+        "chromium": { "passed": 25, "failed": 0 },
+        "webkit": {
+          "passed": 20,
+          "failed": 5,
+          "failedSameAsBase": ["interaction-smoke", "interaction-smoke (Google)", "accessible-profile", "civic-navigation"],
+          "flaky": "fact-check: 1 falha ao abrir o details, depois 6 de 6; no build de 7c0bb27, 1 falha em 6 execuções",
+          "note": "as quatro falham na navegação por Tab e no retorno de foco com a mesma mensagem no build e na config de 7c0bb27; o CI Ubuntu é a referência"
+        }
+      },
+      "vitePreview": {
+        "chromium": { "passed": 25, "failed": 0 },
+        "webkit": {
+          "passed": 21,
+          "failed": 4,
+          "failedSameAsBase": ["interaction-smoke", "interaction-smoke (Google)", "accessible-profile", "civic-navigation"]
+        }
+      }
+    },
+    "serviceWorker": {
+      "assetResponsesServedByWorker": { "newChromium": "0/7", "newWebkit": "0/7", "base7c0bb27Chromium": "7/7", "base7c0bb27Webkit": "7/7" },
+      "chromiumInstallabilityErrors": [],
+      "chromiumManifestErrors": []
+    },
+    "publicTextScan": "sem IP, lista de portas ou detalhe de exploração no diff, nos commits e nos documentos"
+  },
   "remoteCi": "pending",
   "publication": "pending; deploy e conferência em produção com o Stefan",
   "humanGate": "not self-approved"
