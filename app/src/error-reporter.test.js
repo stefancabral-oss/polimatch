@@ -89,6 +89,7 @@ test("each report stays within 2 KB even with multibyte text", () => {
   const report = buildClientErrorReport({ kind: "error", error, source: "é".repeat(500), build: SHA, page: `/${"ê".repeat(500)}` });
   assert.ok(new TextEncoder().encode(JSON.stringify(report)).length <= MAX_REPORT_BYTES);
   assert.ok(report.message.length > 0);
+  assert.equal(buildClientErrorReport({ kind: "error", message: "x", source: "undefined" }).source, null);
 });
 
 test("repeated errors are sent once and a page sends at most five reports", () => {

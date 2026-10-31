@@ -50,7 +50,8 @@ export function buildClientErrorReport({ kind, error = null, message = "", sourc
     page: scrubText(String(page || "/").split(/[?#]/)[0], LIMITS.page),
     kind,
     message: scrubText(message || (error instanceof Error ? error.message : ""), LIMITS.message),
-    source: source ? scrubText(source, LIMITS.source) : null,
+    // O WebKit informa "undefined" como arquivo de código avaliado.
+    source: source && source !== "undefined" ? scrubText(source, LIMITS.source) : null,
     line: position(line),
     column: position(column),
     stack: error instanceof Error && typeof error.stack === "string" ? scrubText(error.stack, LIMITS.stack) : null,
