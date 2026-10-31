@@ -145,7 +145,8 @@ App:
 - Dockerfile: `app/Dockerfile`;
 - porta: `80`;
 - build arg: `VITE_API_URL=https://api.polimatch.com.br`;
-- para ativar o botão oficial: `VITE_GOOGLE_CLIENT_ID=<mesmo OAuth Web Client ID>`.
+- para ativar o botão oficial: `VITE_GOOGLE_CLIENT_ID=<mesmo OAuth Web Client ID>`;
+- revisão do release: `--build-arg SOURCE_COMMIT=<mesmo SHA completo da API>`; o build grava `/version.json` e a meta `polimatch-release`. Sem ele, o app sai com `sha: "unknown"`. O Dokploy não preenche esse valor sozinho; veja [Release e CI](docs/ops/RELEASE.md).
 
 No Google Cloud, o cliente OAuth deve ser do tipo aplicação Web e autorizar a origem JavaScript `https://polimatch.com.br`. Se as duas variáveis de Google estiverem ausentes, o jogo anônimo continua funcionando e nenhuma entrada quebrada é exibida.
 

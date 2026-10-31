@@ -15,6 +15,12 @@ ARG VITE_API_URL
 ARG VITE_GOOGLE_CLIENT_ID
 ENV VITE_API_URL=${VITE_API_URL}
 ENV VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+# SHA completo do commit; o Vite grava dist/version.json e a meta polimatch-release.
+# Sem ele o build sai com "unknown"; POLIMATCH_REQUIRE_RELEASE=1 torna a ausência um erro.
+ARG SOURCE_COMMIT=""
+ARG POLIMATCH_REQUIRE_RELEASE=""
+ENV SOURCE_COMMIT=${SOURCE_COMMIT}
+ENV POLIMATCH_REQUIRE_RELEASE=${POLIMATCH_REQUIRE_RELEASE}
 RUN npm run build --prefix app
 
 FROM nginx:1.27-alpine
