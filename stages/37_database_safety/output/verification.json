@@ -286,7 +286,7 @@
       "result": "met"
     },
     {
-      "criterion": "hPanel: backup semanal ativo e data do último",
+      "criterion": "Painel do provedor da VPS: backup semanal ativo e data do último",
       "result": "needs-stefan"
     },
     {

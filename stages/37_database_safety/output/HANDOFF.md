@@ -78,7 +78,7 @@ Commits:
 
 ## Ação do Stefan
 
-1. **hPanel:** abrir a VPS em Backups e anotar se o backup semanal automático
+1. **Painel do provedor da VPS:** abrir a VPS em Backups e anotar se o backup semanal automático
    está ativo, a data do último e a retenção. Guardar captura. Isso não
    substitui o backup lógico.
 2. **Bucket externo:** criar bucket privado em Cloudflare R2 ou Backblaze B2,

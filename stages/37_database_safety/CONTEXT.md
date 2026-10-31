@@ -22,7 +22,7 @@ e eram empacotados na imagem da API. Não havia backup lógico nem ensaio.
 ## Fora de escopo
 Migrações versionadas fora do boot, NOT VALID nas constraints, backfill
 preguiçoso, staging, rollback de par por SHA e job de compatibilidade N-1:
-achados API-04 e OPS-12 seguem para outros estágios. Painéis (hPanel,
+achados API-04 e OPS-12 seguem para outros estágios. Painéis (provedor da VPS,
 Dokploy, bucket, DNS) e ensaio com dump real ficam com o Stefan.
 
 ## Critérios de aceite

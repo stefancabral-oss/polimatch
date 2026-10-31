@@ -14,7 +14,7 @@ tempo, quem acessa, como ensaiar a restauração e como restaurar num incidente.
 | RTO (tempo para voltar a jogar) | 2 h | ainda não medido; registrar no primeiro ensaio de reconstrução |
 | Idade máxima do último dump no bucket | 26 h | conferir semanalmente e por monitor |
 
-O backup semanal do provedor da VPS (hPanel) restaura a máquina inteira e não
+O backup semanal do provedor da VPS restaura a máquina inteira e não
 substitui o backup lógico: perde até 7 dias e volta também código, painel e
 certificados.
 
