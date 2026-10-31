@@ -1,0 +1,126 @@
+{
+  "checkedAt": "2026-10-31",
+  "base": "7c0bb27d55b756f62cf20398aabcd180b8c54203",
+  "unitTests": {
+    "app": {
+      "passed": 244,
+      "failed": 0,
+      "baseline": 226,
+      "new": [
+        "release-identity.test.js: 9",
+        "ci-workflows.test.js: 8",
+        "photos.test.js: 1"
+      ]
+    },
+    "back": {
+      "passed": 232,
+      "failed": 0
+    },
+    "shared": {
+      "passed": 93,
+      "failed": 0,
+      "taxonomy": "validated"
+    },
+    "cardArtPilotContract": {
+      "passed": 64,
+      "failed": 0
+    },
+    "editorialVerify": "passed"
+  },
+  "build": {
+    "withSourceCommit": "dist/version.json and polimatch-release meta carry the SHA",
+    "withoutSha": "rc 0, warning, sha unknown",
+    "requiredWithoutSha": "rc 1",
+    "malformedSha": "rc 1",
+    "githubShaRequired": "rc 0",
+    "sameCommitTwice": "dist identical except version.json builtAt",
+    "differentSha": "only the four HTML files and version.json differ; no JS or CSS asset changes",
+    "shaInJsChunks": false,
+    "photosChunk": {
+      "beforeKb": 0.65,
+      "afterKb": 10.36,
+      "afterGzipKb": 3.41,
+      "hashedImages": 216
+    },
+    "pilotExcluded": true
+  },
+  "releaseChain": {
+    "app": "SOURCE_COMMIT -> Vite -> dist/version.json and meta; served by local app/nginx.conf as application/json",
+    "api": "back/Dockerfile RUN line with SOURCE_COMMIT -> release-identity.js -> GET /api/health revision equals SHA; short SHA rejected; empty gives null",
+    "dockerImage": "ci-only"
+  },
+  "apiImageCheck": "back-shared inline assertion run against a temp copy with the back/Dockerfile RUN line: passes with EXPECTED_RELEASE equal to the SHA and fails with a different SHA",
+  "portraitUrls": {
+    "source": "sha256 prefix of each file, equal to shared/photo-recovery-manifest.json and shared/presidential-roster.json",
+    "runtimeSample": [
+      "/portraits/001.jpg?v=a791320d",
+      "/portraits/002.jpg?v=ed10021c"
+    ],
+    "dateNowRemoved": true
+  },
+  "e2e": {
+    "target": "local vite preview of the CI-like build (POLIMATCH_REQUIRE_RELEASE=1, GITHUB_SHA set), the 25 node scripts of ui-interaction-smoke.yml",
+    "notRunLocally": [
+      "card-art-pilot-form-smoke (serves stage 12 references, not the build; unaffected)"
+    ],
+    "chromium": {
+      "passed": 25,
+      "failed": 0,
+      "browser": "cached Chromium 140.0.7339.16 (revision 1187) mapped to the 1193 path through PLAYWRIGHT_BROWSERS_PATH in a temp folder"
+    },
+    "webkit": {
+      "passed": 20,
+      "failed": 5,
+      "failedScripts": [
+        "interaction-smoke",
+        "interaction-smoke (Google)",
+        "accessible-profile",
+        "civic-navigation",
+        "fact-check"
+      ],
+      "deterministicOnBase7c0bb27": [
+        "interaction-smoke",
+        "interaction-smoke (Google)",
+        "accessible-profile",
+        "civic-navigation"
+      ],
+      "intermittentOnHeadAndBase": {
+        "fact-check": "head 2/4 runs passed, base 3/4",
+        "quote-quiz-checked": "head 7/9 runs passed, base 11/12"
+      },
+      "cause": "Tab focus in macOS WebKit (same message on base) and timing flakes present on base; not a regression"
+    },
+    "servedPortraitUrls": "quem-disse-isso.html requests /portraits/001.jpg?v=a791320d and /portraits/002.jpg?v=ed10021c, equal to the manifest; /version.json served as application/json with the build SHA"
+  },
+  "workflows": {
+    "actionlint": "actionlint 2.0.6 (wasm, temp folder), one file per process: 0 problems in 5 files; negative control detected",
+    "yamlParse": "5 files and the inner filter text parse",
+    "pathFilterSimulation": "picomatch with dot:true: docs and stage-only changes skip every suite; app/public/portraits, .dockerignore and workflow files reach back_shared/design as intended",
+    "gateMutations": "accepting failure, replacing always() or renaming the required check fails ci-workflows.test.js",
+    "pathsFilter": "dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d (v4.0.3)"
+  },
+  "acceptance": {
+    "appDockerfileSourceCommit": "met",
+    "versionJsonAndMeta": "met locally; image check ci-only",
+    "missingShaDoesNotBreakDokploy": "met (fail-by-default from the issue text is opt-in via POLIMATCH_REQUIRE_RELEASE=1; deviation recorded in HANDOFF for Stefan)",
+    "failWhenRequired": "met",
+    "portraitUrlsDeterministic": "met",
+    "pushToMainAndCiGate": "ci-only",
+    "skippedCountsFailedBlocks": "met by test of the gate script; live behaviour ci-only",
+    "imageVersionEqualsGithubSha": "ci-only",
+    "rulesetPrepared": "met",
+    "rulesetActive": "needs-stefan",
+    "deleteBranchOnMerge": "needs-stefan",
+    "productionRevisionEqualsMain": "needs-stefan (Dokploy does not inject the SHA; see docs/ops/RELEASE.md)",
+    "checkRunsOnEveryMainCommit": "ci-only after merge"
+  },
+  "independentReview": {
+    "result": "re-ran unit, build, determinism, e2e and workflow checks",
+    "fixes": [
+      "path filters: app/public/portraits and .dockerignore reach back_shared; all workflows and the ruleset reach design",
+      "test that the ruleset requires the exact ci-gate check name from GitHub Actions"
+    ]
+  },
+  "remoteCi": "pending",
+  "humanGate": "not self-approved"
+}
