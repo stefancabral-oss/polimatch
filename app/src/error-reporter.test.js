@@ -8,6 +8,7 @@ import {
   beaconSender,
   buildClientErrorReport,
   installErrorReporter,
+  releaseBuild,
   scrubText,
 } from "./error-reporter.js";
 
@@ -143,4 +144,17 @@ test("every page entry installs the reporter before any other module", async () 
     const firstImport = source.split("\n").find((line) => line.startsWith("import "));
     assert.match(firstImport, /^import ["']\.\/install-error-reporter\.js["'];$/, entry);
   }
+});
+
+test("build do relato vem da meta do release e, sem ela, da versão de assets", () => {
+  const withMeta = {
+    querySelector: (selector) => (selector === 'meta[name="polimatch-release"]'
+      ? { getAttribute: (name) => (name === "content" ? SHA : null) }
+      : null),
+  };
+  assert.equal(releaseBuild(withMeta, "lq2x0abc"), SHA);
+  assert.equal(releaseBuild({ querySelector: () => null }, "lq2x0abc"), "lq2x0abc");
+  const emptyMeta = { querySelector: () => ({ getAttribute: () => "" }) };
+  assert.equal(releaseBuild(emptyMeta, "lq2x0abc"), "lq2x0abc");
+  assert.equal(releaseBuild(undefined), "unknown");
 });

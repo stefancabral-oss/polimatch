@@ -132,7 +132,7 @@ envia por `sendBeacon`, como `text/plain`, um objeto de no máximo 2 KB com:
 
 | Campo | Conteúdo |
 | --- | --- |
-| `build` | identificação do build da página: o `SOURCE_COMMIT` do build; enquanto o deploy não passa esse valor (ICM 45), vem o carimbo de horário do build |
+| `build` | identificação do build da página: o SHA da meta `polimatch-release` que o ICM 45 grava no HTML; sem a meta, o `SOURCE_COMMIT` do build ou, enquanto o deploy não passa esse valor, o carimbo de horário do build |
 | `page` | caminho da página, sem query string nem fragmento |
 | `kind` | `error`, `unhandledrejection` ou `preload` (import dinâmico que falhou, como um chunk antigo depois de um deploy) |
 | `message` | mensagem do erro, até 300 caracteres |

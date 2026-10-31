@@ -4,6 +4,9 @@
 export const CLIENT_ERROR_PATH = "/api/client-errors";
 export const MAX_REPORT_BYTES = 2048;
 export const MAX_REPORTS_PER_PAGE = 5;
+// O ICM 45 (#287) grava o SHA do release nesta meta de cada página, e não no
+// JS, para os assets com hash não mudarem a cada commit.
+export const RELEASE_META_NAME = "polimatch-release";
 
 const LIMITS = Object.freeze({ build: 64, page: 120, message: 300, source: 200, stack: 1200 });
 const TOKEN_PATTERN = /\bpm[2s]_[A-Za-z0-9_-]{16,}/g;
@@ -18,6 +21,11 @@ function withoutQuery(token) {
   if (cut <= 0 || !token.slice(0, cut).includes("/")) return token;
   const suffix = /(?::\d+){0,2}\)?$/.exec(token.slice(cut))?.[0] || "";
   return token.slice(0, cut) + suffix;
+}
+
+export function releaseBuild(doc, fallback = "unknown") {
+  const content = doc?.querySelector?.(`meta[name="${RELEASE_META_NAME}"]`)?.getAttribute("content");
+  return content || fallback;
 }
 
 export function scrubText(value, limit) {
