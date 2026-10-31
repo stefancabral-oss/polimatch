@@ -13,6 +13,7 @@ import { candidatePublicPayload } from "./editorial-gate.js";
 import { EMBEDDED_RELEASE_REVISION } from "./release-identity.js";
 import { DAILY_SESSION_RULESET } from "./daily-session.js";
 import { isTransientDatabaseError } from "./database-resilience.js";
+import { CLIENT_ERROR_MAX_BYTES, createClientErrorLimiter, normalizeClientErrorReport } from "./client-error-report.js";
 import { createLogger } from "./logger.js";
 
 const WITHHELD_COPY = AGGREGATE_PUBLIC_COPY_POLICY.withheld.copy;
@@ -142,6 +143,7 @@ export function createHttpApp({
   logger = DEFAULT_LOGGER,
   clock = () => new Date(),
   aggregatePublication,
+  clientErrorLimiter = createClientErrorLimiter(),
 } = {}) {
   if (!store) throw new Error("store é obrigatório");
   if (!googleIdentity) throw new Error("googleIdentity é obrigatório");
@@ -214,6 +216,28 @@ export function createHttpApp({
     // O corpo não é lido; a conexão não deve ser reaproveitada com ele pendente.
     res.set("Connection", "close");
     return next(error);
+  });
+  // Relatos de erro do navegador chegam por sendBeacon como text/plain. A rota
+  // fica antes do parser JSON geral para que o teto de 2 KB valha para
+  // qualquer tipo de corpo.
+  app.post("/api/client-errors", express.text({
+    type: ["text/plain", "application/json"],
+    limit: CLIENT_ERROR_MAX_BYTES,
+    inflate: false,
+  }), (req, res) => {
+    try {
+      if (!clientErrorLimiter.take(networkPseudonym(req.ip || req.socket?.remoteAddress, voterNetworkSecret))) {
+        throw Object.assign(new Error("relatos de erro demais; tente mais tarde"), {
+          status: 429,
+          code: "CLIENT_ERROR_RATE_LIMITED",
+          retryAfterSeconds: 60,
+        });
+      }
+      logger.warn?.({ event: "client_error", requestId: req.requestId, ...normalizeClientErrorReport(req.body) });
+      res.status(204).end();
+    } catch (error) {
+      sendError(req, res, error);
+    }
   });
   app.use(express.json({ limit: "32kb", inflate: false }));
 

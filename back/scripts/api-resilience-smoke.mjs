@@ -4,7 +4,8 @@
 //    conexões pelo banco e o /api/health seguinte responde 200;
 // 3. corpos comprimidos ou malformados recebem 4xx sem derrubar nada;
 // 4. espera por trava vira 503 com Retry-After em vez de pendurar;
-// 5. uma linha JSON por requisição, 429 contável com o código, sem IP/token;
+// 5. uma linha JSON por requisição, 429 contável com o código, sem IP/token,
+//    e relato de erro do navegador registrado com o build;
 // 6. SIGTERM encerra em ordem com código 0.
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
@@ -223,6 +224,14 @@ try {
   assert.equal((await refused.json()).code, "PLAYER_ISSUANCE_LIMIT");
   const state = await fetch(`${baseUrl}/api/player/state?topic=eleicoes-2026`, { headers: { Authorization: `Bearer ${keys[0]}` } });
   assert.equal(state.status, 200);
+  // Relato de erro do navegador, no formato do sendBeacon (text/plain).
+  const clientBuild = "f".repeat(40);
+  const clientError = await fetch(`${baseUrl}/api/client-errors`, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=UTF-8" },
+    body: JSON.stringify({ build: clientBuild, page: "/index.html", kind: "error", message: "erro forçado no smoke", line: 1, column: 2 }),
+  });
+  assert.equal(clientError.status, 204);
   await sleep(200);
 
   const lines = stdout.slice();
@@ -240,11 +249,15 @@ try {
   assert.ok(requests.some((entry) => entry.status === 503 && entry.code === "DATABASE_UNAVAILABLE"));
   assert.ok(entries().some((entry) => entry.event === "request_failed" && entry.errorCode === "55P03" && typeof entry.error === "string"));
   assert.ok(requests.some((entry) => entry.status === 415 && entry.code === "UNSUPPORTED_CONTENT_ENCODING"));
+  const clientReports = entries().filter((entry) => entry.event === "client_error");
+  assert.equal(clientReports.length, 1);
+  assert.equal(clientReports[0].build, clientBuild);
+  assert.equal(clientReports[0].message, "erro forçado no smoke");
   const joined = lines.join("\n");
   for (const key of keys) assert.equal(joined.includes(key), false);
   assert.equal(joined.includes("Bearer "), false);
   assert.equal(requests.some((entry) => JSON.stringify(entry).includes("127.0.0.1")), false);
-  evidence.logs = { requestLines: requests.length, status429Lines: quotaLines.length, allLinesJson: true };
+  evidence.logs = { requestLines: requests.length, status429Lines: quotaLines.length, clientErrorLines: clientReports.length, allLinesJson: true };
 
   // --- 6. Encerramento ordenado --------------------------------------------
   child.kill("SIGTERM");
@@ -259,4 +272,4 @@ try {
 }
 
 console.log(JSON.stringify({ smoke: "api-resilience", ...evidence }));
-console.log("Resiliência da API comprovada: pool sobrevive a conexões encerradas e transações abertas, /api/health volta a 200 sem reiniciar, corpos inesperados recebem 4xx, trava vira 503 e cada requisição gera uma linha JSON sem IP nem token.");
+console.log("Resiliência da API comprovada: pool sobrevive a conexões encerradas e transações abertas, /api/health volta a 200 sem reiniciar, corpos inesperados recebem 4xx, trava vira 503, cada requisição gera uma linha JSON sem IP nem token e o relato de erro do navegador chega ao log com o build.");
