@@ -16,9 +16,9 @@
 - **Cadeia da API conferida localmente.** A linha `RUN` do `back/Dockerfile`, executada com `SOURCE_COMMIT=<SHA>` numa cópia temporária, grava `release-identity.js`, e `GET /api/health` responde `revision` igual ao SHA. SHA curto falha; vazio grava `""` (`revision: null`).
 - **CI em push para main.** Novo `.github/workflows/ci.yml` dispara em todo pull request e em todo push para main, sem filtro de caminho no gatilho. O job `changes` usa `dorny/paths-filter` fixado no commit da v4.0.3 e só roda em pull request. As quatro suítes viraram workflows reutilizáveis (`workflow_call`) e continuam com disparo manual.
 - **`ci-gate`.** Sempre roda. Em pull request aceita `success` ou `skipped`. Em push e execução manual exige `success`. `failure` e `cancelled` derrubam o gate. Se o `changes` falhar, o gate também cai.
-- **Filtros com dependências cruzadas conhecidas.** `back_shared` passa a incluir `app/src/photos.js` e as saídas do estágio 17, que os testes do back leem. `design` inclui `back/src/**` e as evidências dos estágios 23 e 29, que os testes do app leem.
+- **Filtros com dependências cruzadas conhecidas.** `back_shared` passa a incluir `app/src/photos.js` e as saídas do estágio 17, que os testes do back leem, e `app/public/portraits/**` e `.dockerignore`, porque a API confere o sha256 dos retratos e a imagem da API copia essa pasta. `design` inclui `back/src/**`, as evidências dos estágios 23 e 29, todos os workflows e `docs/ops/ruleset-main.json`, que os testes do app leem.
 - **Release conferido no CI.** O design validator confere `dist/version.json`, `version.json` dentro da imagem do app e a meta contra `GITHUB_SHA`. O smoke confere `/version.json` no preview. O back-shared confere `EMBEDDED_RELEASE_REVISION == GITHUB_SHA` na imagem da API.
-- **Ruleset preparado, não aplicado.** `docs/ops/ruleset-main.json` exige PR, `ci-gate` vindo do app GitHub Actions (id 15368) e conversas resolvidas, e bloqueia force-push e deleção. Não exige segundo revisor e não tem bypass. Os comandos exatos estão em `docs/ops/RELEASE.md`.
+- **Ruleset preparado, não aplicado.** `docs/ops/ruleset-main.json` exige PR, `ci-gate` vindo do app GitHub Actions (id 15368) e conversas resolvidas, e bloqueia force-push e deleção. Não exige segundo revisor e não tem bypass. Os comandos exatos estão em `docs/ops/RELEASE.md`. Um teste confere que o check exigido tem o mesmo nome do job `ci-gate`: se o job for renomeado, o teste falha antes de o ruleset passar a esperar um check que nunca aparece.
 - **Documentação.** `docs/ops/RELEASE.md` cobre release, Dokploy, CI e ruleset. O README ganhou o build-arg `SOURCE_COMMIT` do app.
 
 ## Não entregue / pendente
@@ -37,7 +37,7 @@
      - ICM 50 (recomendado): imagem construída no CI com o SHA e Dokploy com fonte "Docker image".
      - Provisório: autodeploy desligado e, antes de cada deploy, em API e app → Environment → Build Time Arguments, `SOURCE_COMMIT=<SHA completo de origin/main>`, o mesmo nos dois.
 
-     Não deixar um valor fixo com o autodeploy ligado.
+     Não deixar um valor fixo com o autodeploy ligado. Quando o SHA chegar ao build em todo deploy, passar também `POLIMATCH_REQUIRE_RELEASE=1` ao build do app, para que um deploy sem SHA falhe em vez de publicar `unknown` (veja a decisão sobre falha por padrão abaixo).
   7. Depois do próximo deploy feito com o SHA: `curl -s https://api.polimatch.com.br/api/health | jq -r .revision` e `curl -s https://polimatch.com.br/version.json | jq -r .sha` iguais a `git rev-parse origin/main`.
   8. Opcional: ligar `strict_required_status_checks_policy` no JSON, se quiser exigir branch atualizada antes do merge. A troca é revalidar o CI a cada merge.
 - O aceite "revision e sha iguais a origin/main no próximo deploy" depende do passo 6. Sem ele, a produção continua com `null`/`unknown`, agora sem quebrar o build.
@@ -48,7 +48,7 @@
 
 ## Testes executados
 
-- `npm test --prefix app`: 243/243. Eram 226; os 17 novos estão em `release-identity.test.js` (9), `ci-workflows.test.js` (7) e `photos.test.js` (+1).
+- `npm test --prefix app`: 244/244. Eram 226; os 18 novos estão em `release-identity.test.js` (9), `ci-workflows.test.js` (8) e `photos.test.js` (+1).
 - `npm test --prefix back`: 232/232.
 - `npm run test:shared`: 93/93, mais a taxonomia validada.
 - `npm run test:card-art-pilot-contract --prefix app`: 64/64.
@@ -61,15 +61,16 @@
   - `GITHUB_SHA` com a opção ligada: rc 0.
 - Determinismo: dois builds do mesmo commit têm `dist` idêntico, exceto `version.json`. Um SHA diferente muda só os quatro HTML e o `version.json`. Nenhum JS contém o SHA.
 - Navegador sobre o build servido pelo `app/nginx.conf` local: `/version.json` sai como `application/json`; antes da mudança, o preview devolvia o HTML de fallback. A página do quiz pede `/portraits/001.jpg?v=a791320d` e `/portraits/002.jpg?v=ed10021c`, iguais ao manifesto.
-- E2E do smoke contra o preview local:
-  - Chromium: 26/26.
-  - WebKit: 21/26. As cinco falhas (`quote-quiz-checked`, `interaction-smoke` com e sem Google, `accessible-profile` e `civic-navigation`) se repetem com a mesma mensagem no build de main@7c0bb27. São foco por Tab no WebKit do macOS e um tempo esgotado já presente em main, não regressão. No CI, Linux.
-  - O Chromium local é o 140.0.7339.16 em cache (revisão 1187), mapeado para o caminho que o Playwright 1.55.1 espera.
+- E2E do smoke contra o preview local de um build igual ao do CI (`POLIMATCH_REQUIRE_RELEASE=1` e `GITHUB_SHA`), com os 25 scripts node do `ui-interaction-smoke.yml`. O `card-art-pilot-form-smoke` não rodou localmente: ele serve as referências do estágio 12, não o build, e não é afetado.
+  - Chromium: 25/25.
+  - WebKit: 20/25 na rodada completa. Quatro falhas são fixas e se repetem com a mesma mensagem no build de main@7c0bb27: `interaction-smoke` com e sem Google, `accessible-profile` e `civic-navigation` (foco por Tab no WebKit do macOS). A quinta, `fact-check`, é intermitente nos dois builds: passou em 2 de 4 rodadas na branch e em 3 de 4 em main. `quote-quiz-checked` também oscila nos dois (7 de 9 na branch, 11 de 12 em main), por tempo esgotado ou por ler o texto de compartilhamento logo depois do clique. Nenhuma dessas falhas envolve retratos ou `version.json`; não é regressão. No CI, Linux.
+  - O Chromium local é o 140.0.7339.16 em cache (revisão 1187), mapeado por `PLAYWRIGHT_BROWSERS_PATH` numa pasta temporária para o caminho que o Playwright 1.55.1 espera.
+- Imagem da API: a asserção inline do `back-shared.yml`, rodada numa cópia temporária depois da linha `RUN` do `back/Dockerfile`, passa com `EXPECTED_RELEASE` igual ao SHA e falha com outro SHA.
 - Workflows:
-  - actionlint (build wasm via npm, em pasta temporária): 0 problemas nos cinco arquivos; um controle negativo foi detectado;
+  - actionlint 2.0.6 (wasm, em pasta temporária, um arquivo por processo): 0 problemas nos cinco arquivos; um controle negativo foi detectado;
   - parse YAML dos cinco arquivos e do texto de filtros;
-  - simulação dos filtros com picomatch (`dot: true`, como o dorny);
-  - mutações no gate (aceitar `failure`, trocar `always()`) derrubam `ci-workflows.test.js`.
+  - simulação dos filtros com picomatch (`dot: true`, como o dorny): mudanças só em docs ou estágios dispensam todas as suítes; retratos, `.dockerignore` e workflows chegam às suítes certas;
+  - mutações no gate (aceitar `failure`, trocar `always()`, renomear o check exigido no ruleset) derrubam `ci-workflows.test.js`.
 
 ## Riscos conhecidos
 
@@ -83,6 +84,7 @@
 
 ## Decisões tomadas
 
+- **Desvio do texto da issue: falha sem SHA é opt-in.** A issue pedia que o `vite.config` falhasse sem `SOURCE_COMMIT` em build de produção, com escape para dev. Ficou ao contrário: por padrão o build segue com `unknown` e um aviso, e só falha com `POLIMATCH_REQUIRE_RELEASE=1`. Motivo: hoje o Dokploy constrói `app/Dockerfile` sem build-args, e a falha por padrão derrubaria o deploy de produção no primeiro merge. O CI já liga a opção. Quando o SHA passar no deploy (passo 6 acima), basta passar também `POLIMATCH_REQUIRE_RELEASE=1` ao build do app para chegar ao comportamento pedido. Precisa do aceite do Stefan no gate.
 - Workflows reutilizáveis chamados por `ci.yml`, em vez de `push` em cada arquivo. O `ci-gate` precisa estar no mesmo run das suítes para enxergar o resultado, e gatilhos duplicados rodariam tudo duas vezes. O efeito pedido (todas as suítes em todo push para main, sem filtro) fica garantido pelo `ci.yml`.
 - `import.meta.env.VITE_RELEASE` foi testado e descartado. O app referencia `import.meta.env` inteiro (`google-login.js`, `civic/shell.js`), e o SHA entraria no chunk principal, mudando o nome do JS a cada commit, inclusive nos que só mexem no back. A revisão fica exposta na meta `polimatch-release` e em `/version.json`.
 - Hash de oito caracteres hexadecimais, só nas pastas que passam por `photos.js`. As demais Chromas já trazem o hash no nome.

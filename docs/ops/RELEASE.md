@@ -48,6 +48,8 @@ Caminhos possíveis:
 2. **Provisório, deploy manual:** com o autodeploy desligado nos dois serviços, antes de cada deploy abrir API e app → Environment → Build Time Arguments e definir `SOURCE_COMMIT=<SHA completo de origin/main>` (o mesmo SHA nos dois), salvar, clicar em Deploy e conferir com os comandos acima.
 3. **Nada:** o build continua passando e a produção continua com `revision: null` e `sha: "unknown"`.
 
+A issue pedia que o build do app falhasse sem `SOURCE_COMMIT`. Isso ficou atrás de `POLIMATCH_REQUIRE_RELEASE=1` porque hoje o Dokploy constrói sem o SHA, e um build que falha por padrão derrubaria o deploy. Quando o SHA chegar ao build em todo deploy (caminho 1 ou 2), passe também `POLIMATCH_REQUIRE_RELEASE=1` ao build do app: a partir daí um deploy sem SHA falha em vez de publicar `unknown`.
+
 ## CI
 
 `.github/workflows/ci.yml` é o ponto de entrada:
