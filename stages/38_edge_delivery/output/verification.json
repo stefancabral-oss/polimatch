@@ -1,0 +1,202 @@
+{
+  "issue": 280,
+  "icm": 38,
+  "checkedAt": "2026-10-31",
+  "base": "7c0bb27d55b756f62cf20398aabcd180b8c54203",
+  "branch": "fix/edge-delivery",
+  "commits": [
+    "b2b6f3c",
+    "5018581",
+    "1d2adc0"
+  ],
+  "tests": {
+    "appUnit": {
+      "command": "npm test --prefix app",
+      "passed": 237,
+      "failed": 0,
+      "baseline": 226,
+      "new": 11
+    },
+    "cardArtPilotContract": {
+      "command": "npm run test:card-art-pilot-contract --prefix app",
+      "passed": 64,
+      "failed": 0
+    },
+    "shared": {
+      "command": "node --test shared/*.test.js",
+      "passed": 93,
+      "failed": 0
+    },
+    "backUnit": {
+      "command": "npm test --prefix back",
+      "passed": 232,
+      "failed": 0,
+      "note": "sem mudança em back/"
+    },
+    "rootNpmTest": {
+      "command": "npm test",
+      "passed": true,
+      "note": "editorial:verify, shared + taxonomia, back e app"
+    },
+    "edgeStaticTestsAgainstBase": {
+      "command": "node --test src/edge-delivery.test.js com nginx.conf e sw.js de 7c0bb27",
+      "passed": 6,
+      "failed": 5
+    }
+  },
+  "build": {
+    "command": "npm run build --prefix app",
+    "passed": true,
+    "publicRefs": "36 referências locais em 5 HTML e 1 manifesto, nenhuma ausente",
+    "withoutManifestIcon": "falha (exit 1): manifest.webmanifest: ./icons/icon-512.png",
+    "verifierAgainstBaseDist": "falha: index.html e manifest.webmanifest apontam para três PNG ausentes"
+  },
+  "nginx": {
+    "syntax": "nginx -t ok no app/nginx.conf real dentro de um http {} igual ao da imagem (nginx 1.31.5 local, sem root)",
+    "imageVersion": "nginx:1.27-alpine (prova na imagem só no CI)",
+    "smoke": {
+      "command": "node app/scripts/smoke-nginx.mjs <url local> --dist app/dist",
+      "newConfig": {
+        "passed": 13,
+        "failed": 0
+      },
+      "baseConfig7c0bb27SameDist": {
+        "passed": 5,
+        "failed": 8,
+        "failedChecks": [
+          "/ no-cache",
+          "HTML no-cache",
+          "gzip nos JS e CSS",
+          "immutable nos assets",
+          "gzip no SVG",
+          "404 para arquivo ausente",
+          "cache de retratos e Chromas",
+          "no-cache no caminho sem extensão"
+        ]
+      },
+      "baseConfig7c0bb27WithoutIconsRobotsSitemap": {
+        "passed": 1,
+        "failed": 12
+      }
+    },
+    "gzipTransferBytes": {
+      "main.js": {
+        "identity": 195200,
+        "gzip": 60348
+      },
+      "main.css": {
+        "identity": 79946,
+        "gzip": 18321
+      },
+      "tcg-card.js": {
+        "identity": 116586,
+        "gzip": 32570
+      },
+      "homeJsCss": {
+        "identity": 413596,
+        "gzip": 118487
+      }
+    }
+  },
+  "serviceWorker": {
+    "fetchHandler": false,
+    "assetResponsesServedByWorker": {
+      "newChromium": "0/7",
+      "newWebkit": "0/7",
+      "base7c0bb27Chromium": "7/7",
+      "base7c0bb27Webkit": "7/7"
+    },
+    "cachesAfterReload": []
+  },
+  "e2e": {
+    "chromiumVersion": "140.0.7339.16 (revisão em cache, via PLAYWRIGHT_BROWSERS_PATH)",
+    "vitePreview": {
+      "chromium": {
+        "passed": [
+          "interaction-smoke",
+          "accessible-profile",
+          "main-navigation",
+          "responsive-layout",
+          "presidential-navigation"
+        ]
+      },
+      "webkit": {
+        "passed": [
+          "main-navigation",
+          "responsive-layout",
+          "presidential-navigation"
+        ],
+        "failedSameAsBase": [
+          "interaction-smoke",
+          "accessible-profile"
+        ],
+        "note": "falham na navegação por Tab também no build de 7c0bb27; no macOS o WebKit só foca campos com Tab; o CI Ubuntu roda os dois"
+      }
+    },
+    "nginxNewConfig": {
+      "chromium": {
+        "passed": [
+          "interaction-smoke",
+          "accessible-profile",
+          "main-navigation",
+          "responsive-layout"
+        ]
+      },
+      "webkit": {
+        "passed": [
+          "main-navigation",
+          "responsive-layout",
+          "presidential-navigation"
+        ]
+      }
+    }
+  },
+  "acceptance": [
+    {
+      "criterion": "www com certificado válido e 301 para o apex",
+      "result": "needs-stefan"
+    },
+    {
+      "criterion": "/assets/inexistente.js responde 404",
+      "result": "met locally; CI pending; produção depois do deploy"
+    },
+    {
+      "criterion": "/assets/main-*.js com gzip e cache-control immutable",
+      "result": "met locally; CI pending; produção depois do deploy"
+    },
+    {
+      "criterion": "/ com cache-control no-cache",
+      "result": "met locally; CI pending; produção depois do deploy"
+    },
+    {
+      "criterion": "/robots.txt text/plain",
+      "result": "met locally; CI pending; produção depois do deploy"
+    },
+    {
+      "criterion": "/icons/icon-192.png image/png",
+      "result": "met locally; CI pending; produção depois do deploy"
+    },
+    {
+      "criterion": "sw.js sem handler de fetch",
+      "result": "met"
+    },
+    {
+      "criterion": "reverter app/nginx.conf faz o job falhar",
+      "result": "met locally (smoke 5/13 com a config de 7c0bb27); job do CI pending"
+    },
+    {
+      "criterion": "remover um ícone do manifesto faz o build falhar",
+      "result": "met"
+    },
+    {
+      "criterion": "compressão da API",
+      "result": "not delivered; fora deste estágio (ver HANDOFF)"
+    }
+  ],
+  "notRunLocally": [
+    "docker build e docker run (sem Docker na máquina); o passo novo do design-validator roda no CI"
+  ],
+  "remoteCi": "pending",
+  "publication": "pending; deploy e conferência em produção com o Stefan",
+  "humanGate": "not self-approved"
+}
