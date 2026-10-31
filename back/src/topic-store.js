@@ -1,6 +1,5 @@
 import { orderedChoiceComparisons, ORDERED_PAIR_POINTS, ORDERED_CHOICE_RULESET } from "../../shared/ordered-choice.js";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import pg from "pg";
 import { isRoundZebra } from "../../shared/player-feedback.js";
 import { sessionMirror, compareSessionWithCut } from "../../shared/session-mirror.js";
 import { gameProgressStore, installGameSchema } from "./game-progress.js";
@@ -24,7 +23,8 @@ import {
   validateEditionDate,
 } from "./daily-session.js";
 import { personalRankingFromRows } from "./personal-ranking.js";
-const { Pool } = pg;
+import { applyMigrationTimeouts, createDatabasePool } from "./database-resilience.js";
+import { createLogger } from "./logger.js";
 const RESET_MIGRATION_ID = "20260913_eleicoes_2026_clean_start";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const RECOVERY_KEY_PATTERN = /^pm2_[A-Za-z0-9_-]{43}$/;
@@ -1804,12 +1804,14 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
   candidateRegistry = PRODUCTION_CANDIDATE_REGISTRY,
   hooks = {},
   collectionEnabled = process.env.COLLECTION_ENABLED !== "false",
+  env = process.env,
+  logger = createLogger(),
 } = {}) {
   if (!connectionString) throw new Error("DATABASE_URL é obrigatória");
   if (!candidateRegistry?.topicsById || typeof candidateRegistry.candidatesForTopic !== "function") {
     throw new Error("candidateRegistry é obrigatório");
   }
-  const pool = new Pool({ connectionString, max: Number(process.env.PG_POOL_MAX) || 10 });
+  const pool = createDatabasePool(connectionString, { env, logger });
   const candidateCatalog = (topicId) => candidateRegistry.candidatesForTopic(topicId);
   const registryRanking = (queryable, topicId, options = {}) => selectRanking(queryable, topicId, {
     ...options,
@@ -1821,6 +1823,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
       const client = await pool.connect();
       try {
         await client.query("BEGIN");
+        await applyMigrationTimeouts(client);
         const migration = await createCleanSchema(client, candidateRegistry, clockInstant(clock));
         await installGameSchema(client);
         await client.query("COMMIT");
