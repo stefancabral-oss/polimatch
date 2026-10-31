@@ -15,6 +15,10 @@ Dokploy dependem de contas e painéis do Stefan e estão marcados como
 - A API grava no stdout uma linha JSON por requisição e uma linha por evento
   relevante (boot, erro de banco, falha 5xx, encerramento). Detalhes em
   [Campos do log](#campos-do-log).
+- As quatro páginas do app relatam erros do navegador (erro de execução,
+  promessa rejeitada sem tratamento e falha de import dinâmico) para
+  `POST /api/client-errors`, e a API grava uma linha `client_error` com o build
+  da página. Detalhes em [Erros do navegador](#erros-do-navegador).
 
 ## Ação do Stefan 1 — monitor externo com alerta em até 5 minutos
 
@@ -116,9 +120,41 @@ Outros eventos:
 | `pg_pool_error` | o banco encerrou ou perdeu uma conexão (`scope` `idle` ou `checked-out`); a API continua |
 | `database_ready`, `listening` | boot concluído |
 | `boot_failed` | o boot falhou; o processo sai com código 1 |
+| `client_error` | erro relatado pelo navegador, com `requestId` e os campos de [Erros do navegador](#erros-do-navegador) |
 | `unhandled_rejection` | promessa rejeitada sem tratamento; registrada, a API continua |
 | `uncaught_exception` | exceção não capturada; a API fecha servidor e pool e sai com código 1 |
 | `shutdown_started`, `shutdown_completed`, `shutdown_failed`, `shutdown_forced` | encerramento ordenado (SIGTERM, falha fatal) |
+
+## Erros do navegador
+
+Cada página instala o relato antes de qualquer outro módulo. O navegador
+envia por `sendBeacon`, como `text/plain`, um objeto de no máximo 2 KB com:
+
+| Campo | Conteúdo |
+| --- | --- |
+| `build` | identificação do build da página: o `SOURCE_COMMIT` do build; enquanto o deploy não passa esse valor (ICM 45), vem o carimbo de horário do build |
+| `page` | caminho da página, sem query string nem fragmento |
+| `kind` | `error`, `unhandledrejection` ou `preload` (import dinâmico que falhou, como um chunk antigo depois de um deploy) |
+| `message` | mensagem do erro, até 300 caracteres |
+| `source`, `line`, `column` | arquivo e posição, quando o navegador informa |
+| `stack` | stack curta, até 1200 caracteres |
+
+Nada do jogador entra no relato: nem chave de recuperação, nem voto, nome ou
+conteúdo do armazenamento local. Query string e fragmento saem das URLs,
+tokens são mascarados no navegador e de novo na API, e a API descarta
+qualquer campo fora da lista. Cada página envia no máximo 5 relatos e não
+repete o mesmo erro. A API aceita até 10 relatos por minuto por rede
+(pseudônimo HMAC, nunca o IP) e 120 por minuto no total; acima disso responde
+`429` com `CLIENT_ERROR_RATE_LIMITED`.
+
+Para testar em produção depois do deploy, abrir o console do navegador em
+`https://polimatch.com.br/` e rodar
+`setTimeout(() => { throw new Error("teste de alerta") })`. A linha aparece em
+segundos:
+
+```sh
+docker logs --since 10m <api> 2>&1 | grep '"event":"client_error"' | grep 'teste de alerta'
+```
 
 ## Consultas úteis no servidor
 
@@ -139,6 +175,9 @@ docker logs --since 24h <api> 2>&1 | grep '"event":"request_failed"'
 
 # banco instável ou travado
 docker logs --since 24h <api> 2>&1 | grep -E '"event":"pg_pool_error"|"code":"DATABASE_UNAVAILABLE"'
+
+# erros do navegador por build e mensagem
+docker logs --since 24h <api> 2>&1 | grep '"event":"client_error"' | grep -o '"build":"[^"]*".*"message":"[^"]*"' | sort | uniq -c | sort -rn | head
 
 # falhas do processo
 docker logs --since 24h <api> 2>&1 | grep -E '"event":"(boot_failed|uncaught_exception|unhandled_rejection|shutdown_forced)"'
@@ -171,6 +210,5 @@ repetir.
 
 ## Pendente
 
-- Captura de erros do navegador (`error`, `unhandledrejection`,
-  `vite:preloadError`) com envio ao back: depende do SHA do build no cliente,
-  que chega com o ICM 45.
+- O campo `build` dos relatos do navegador e o `rev` da API só trazem o SHA do
+  commit depois que o ICM 45 passar `SOURCE_COMMIT` no build do app e da API.
