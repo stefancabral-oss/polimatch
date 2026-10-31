@@ -1,11 +1,9 @@
 name: Civic Planning
 
+# Chamado por ci.yml (pull_request filtrado por caminho, push para main sem filtro);
+# workflow_dispatch continua disponível para execução manual.
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'stages/17_candidate_news/**'
-      - '.github/workflows/civic-planning.yml'
+  workflow_call:
   workflow_dispatch:
 
 permissions:
