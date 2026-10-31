@@ -17,6 +17,8 @@
  *      armazenamento, não de rede, sem texto em inglês.
  *   5. O botão de conta mostra o avatar (≥ 24 px) e tem alvo ≥ 44 px em 375,
  *      390 e 440 px de largura.
+ *   6. Quem já tem chave salva e entra com Google enquanto ela ainda é lida
+ *      leva a chave anônima ao login, para as escolhas serem reunidas.
  */
 import assert from "node:assert/strict";
 import { chromium, webkit } from "playwright";
@@ -33,6 +35,7 @@ if (!browserType) throw new Error(`Navegador não suportado: ${browserName}`);
 const GENERIC_SERVER_ERROR = "Não conseguimos falar com o servidor";
 const SESSION_TOKEN = `pms_${"s".repeat(43)}`;
 const ANONYMOUS_KEY = `pm2_${"f".repeat(43)}`;
+const STORED_KEY = `pm2_${"k".repeat(43)}`;
 const AVATAR_URL = "https://lh3.googleusercontent.com/a/polimatch-e2e";
 const AVATAR_PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
@@ -44,7 +47,7 @@ const ranking = () => candidates.map((candidate) => ({ ...candidate, elo: 1000, 
 const GOOGLE_STUB = "window.google={accounts:{id:{initialize(options){window.__polimatchGoogleCallback=options.callback},renderButton(element){const button=document.createElement('button');button.type='button';button.textContent='Continuar com Google';button.addEventListener('click',()=>window.__polimatchGoogleCallback({credential:'mock-google-id-token'}));element.replaceChildren(button)}}}};";
 
 /** Servidor simulado com contadores. `player` decide a resposta do POST. */
-function createServer({ player = "created", candidatesFailures = 0, holdApi = false } = {}) {
+function createServer({ player = "created", candidatesFailures = 0, holdApi = false, storedStateDelayMs = 0 } = {}) {
   const server = {
     playerPosts: 0,
     requests: [],
@@ -84,6 +87,9 @@ function createServer({ player = "created", candidatesFailures = 0, holdApi = fa
       return send(201, { recoveryKey: ANONYMOUS_KEY });
     }
     if (pathname === "/api/player/state") {
+      if (storedStateDelayMs && request.headers().authorization === `Bearer ${STORED_KEY}`) {
+        await new Promise((resume) => setTimeout(resume, storedStateDelayMs));
+      }
       const signedIn = request.headers().authorization === `Bearer ${SESSION_TOKEN}`;
       return send(200, { version: 0, duels: 0, ranking: ranking(), ...(signedIn ? { account: { displayName: "Bia Teste", avatarUrl: AVATAR_URL } } : {}) });
     }
@@ -101,7 +107,7 @@ function createServer({ player = "created", candidatesFailures = 0, holdApi = fa
   return server;
 }
 
-async function openPage(browser, server, { width = 390, height = 844, blockStorage = false } = {}) {
+async function openPage(browser, server, { width = 390, height = 844, blockStorage = false, storedKey = "" } = {}) {
   const context = await browser.newContext({ viewport: { width, height }, serviceWorkers: "block" });
   const page = await context.newPage();
   const pageErrors = [];
@@ -113,6 +119,11 @@ async function openPage(browser, server, { width = 390, height = 844, blockStora
         get() { throw new DOMException("The operation is insecure.", "SecurityError"); },
       });
     });
+  }
+  if (storedKey) {
+    await page.addInitScript((key) => {
+      if (!localStorage.getItem("polimatch:v3:recovery-key")) localStorage.setItem("polimatch:v3:recovery-key", key);
+    }, storedKey);
   }
   await page.route("https://accounts.google.com/gsi/client", (route) => route.fulfill({ contentType: "application/javascript", body: GOOGLE_STUB }));
   await page.route("https://lh3.googleusercontent.com/**", (route) => route.fulfill({ contentType: "image/png", body: AVATAR_PNG }));
@@ -290,6 +301,22 @@ try {
       assert.equal(server.playerPosts, 0, `${width}px: visita passiva criou jogador`);
       await context.close();
     }
+  });
+
+  await scenario("login durante a leitura da chave salva leva o jogo anônimo junto", async () => {
+    const server = createServer({ storedStateDelayMs: 2500 });
+    const { context, page, pageErrors } = await openPage(browser, server, { storedKey: STORED_KEY });
+    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
+    await assertHomeShell(page, "capa com a chave salva ainda em leitura");
+    await page.getByRole("button", { name: "Entrar com Google" }).click();
+    await signInWithGoogleStub(page);
+    const login = server.requests.find(({ method, pathname }) => method === "POST" && pathname === "/api/auth/google");
+    assert.ok(login, "o login não chegou ao servidor");
+    assert.equal(login.authorization, `Bearer ${STORED_KEY}`, "o login saiu sem a chave anônima salva e não reuniria as escolhas");
+    assert.equal(server.playerPosts, 0, "o login criou jogador anônimo");
+    assert.equal(await page.evaluate(() => localStorage.getItem("polimatch:v3:recovery-key")), SESSION_TOKEN);
+    assert.ok(pageErrors.length === 0, `erros na página: ${pageErrors.join(" | ")}`);
+    await context.close();
   });
 } finally {
   await browser.close();

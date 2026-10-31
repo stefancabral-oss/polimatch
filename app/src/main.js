@@ -2022,6 +2022,12 @@ async function handleGoogleCredential(response) {
   state.authError = "";
   state.authErrorKind = "";
   render();
+  // A capa abre antes de a chave salva ser lida. Se a pessoa entra com Google
+  // nesse intervalo, a leitura termina primeiro: sem a chave anônima o login
+  // grava a sessão por cima dela e as escolhas anteriores nunca são reunidas.
+  if (!state.recoveryKey && (identityTask || safeStorage.get(IDENTITY_STORAGE_KEY))) {
+    await ensureIdentity({ create: false }).catch(() => false);
+  }
   let result;
   try {
     result = await exchangeGoogleCredential(response.credential, state.recoveryKey);
