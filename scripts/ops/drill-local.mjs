@@ -224,7 +224,7 @@ async function bootApi(connectionString, timeoutMs) {
   const healthyAfterMs = health?.status === 200 ? Date.now() - started : null;
   if (!exit) child.kill("SIGTERM");
   const result = await exited;
-  const reset = /resetApplied:\s*(true|false)/.exec(output);
+  const reset = /"?resetApplied"?:\s*(true|false)/.exec(output);
   return {
     port,
     healthStatus: health?.status ?? null,

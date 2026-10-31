@@ -93,7 +93,7 @@ try {
   // Banco vazio de verdade: o boot inicializa normalmente.
   const fresh = await bootApi();
   assert.equal(fresh.healthStatus, 200, fresh.output);
-  assert.match(fresh.output, /resetApplied: true/);
+  assert.match(fresh.output, /"?resetApplied"?:\s*true/);
   assert.equal(fresh.code, 0, fresh.output);
 
   const store = createTopicStore(connectionString, { candidateRegistry: registry });
@@ -155,7 +155,7 @@ try {
   }
   const restored = await bootApi();
   assert.equal(restored.healthStatus, 200, restored.output);
-  assert.match(restored.output, /resetApplied: false/);
+  assert.match(restored.output, /"?resetApplied"?:\s*false/);
   assert.equal(restored.code, 0, restored.output);
   assert.deepEqual(await tableCounts(), healthy);
 
@@ -163,7 +163,7 @@ try {
   await audit.query("TRUNCATE schema_migrations");
   const authorized = await bootApi({ allowReset: true });
   assert.equal(authorized.healthStatus, 200, authorized.output);
-  assert.match(authorized.output, /resetApplied: true/);
+  assert.match(authorized.output, /"?resetApplied"?:\s*true/);
   const afterReset = await tableCounts();
   assert.equal(afterReset.anonymous_players, 0);
   assert.equal(afterReset.votes, 0);
