@@ -7,7 +7,8 @@
 - Branch: `fix/first-visit` (a partir de `main` em 7c0bb27)
 - PR: não aberta nesta rodada (ver "Ação do Stefan")
 - Último commit: ver `git log fix/first-visit`; os commits de código são
-  873da23, 1d85cff, f2d65c7 e e38945d, e o registro do estágio vem por último.
+  873da23, 1d85cff, f2d65c7, e38945d e 98b8967 (correção da revisão
+  independente), e os registros do estágio vêm por último.
 
 ## Entregue
 
@@ -31,6 +32,10 @@
   próxima jogada. Outras falhas (5xx, rede) preservam a chave, como antes.
 - Sair da conta fora do duelo não cria jogador; dentro do duelo cria, porque a
   pessoa está jogando.
+- Entrar com Google enquanto a chave salva ainda está sendo lida espera a
+  leitura terminar e leva a chave anônima ao login, para as escolhas serem
+  reunidas à conta. Sem isso, a sessão Google era gravada por cima da chave e o
+  histórico anônimo se perdia (achado da revisão independente, commit 98b8967).
 
 **Saída quando a cota da rede acaba**
 - 429 `PLAYER_ISSUANCE_LIMIT` mostra na capa "Muitos jogos novos nesta rede
@@ -77,7 +82,8 @@
   `POST /api/player` (página principal e corrida), aviso da cota com Google e
   horário, login que libera o jogo sem novo POST, login que inicializa o app
   sem catálogo, armazenamento bloqueado sem texto de rede, avatar ≥ 24 px e
-  alvo ≥ 44 px em 375, 390 e 440.
+  alvo ≥ 44 px em 375, 390 e 440, e login durante a leitura da chave salva
+  levando a chave anônima (6 cenários).
 - Unitários: `safe-storage.test.js`, `identity-notice.test.js`, janela
   editorial em `topic-store.test.js`, rota Google sem emissão anônima em
   `http-app.test.js`.
@@ -105,6 +111,14 @@
 - O botão de som segue com 42 × 42 no celular, e no desktop o botão de conta
   com rótulo segue com altura mínima de 40 px.
 - AAAA/IPv6 na origem continua fora deste estágio.
+- Duelos da corrida: depois da recusa da cota, um novo toque em "Entrar na
+  arena" repete o `POST /api/player` (a página principal não repete antes da
+  liberação). Só gasta uma requisição; a mensagem continua a mesma.
+- Se a leitura da chave salva falhar por erro passageiro (5xx, rede) e a pessoa
+  entrar com Google, o login segue sem a chave anônima, como já acontecia em
+  `main`; com a leitura em curso, o login agora espera.
+- Com o catálogo fora do ar, os botões cívicos da navegação (quando ativos)
+  esperam o catálogo carregar para abrir.
 
 ## Testes executados
 
@@ -142,6 +156,26 @@
   1,98 s, com o h1 pintado cerca de 3,9 s antes da primeira resposta da API.
 - Capturas em `stages/40_first_visit/references/`: capa no WebKit com o avatar
   visível e o aviso da cota no Chromium e no WebKit, todas em 390 px.
+
+**Revisão independente (31/10/2026)**, refeita do zero, sem aproveitar os
+números acima:
+- `npm test --prefix app`: 236 aprovados; `npm test --prefix back`: 235
+  aprovados, sem e com `DATABASE_URL`; `node --test shared/*.test.js`: 93
+  aprovados; `validate:taxonomy` ok; `test:card-art-pilot-contract`: 64
+  aprovados; build com e sem `VITE_GOOGLE_CLIENT_ID` ok.
+- PostgreSQL 16 descartável, banco novo, ordem do CI: os 6 smokes aprovados; o
+  `vote-abuse` também passou repetido no mesmo banco.
+- E2E do workflow mais `first-visit.mjs` (6 cenários): Chromium 27/27, antes e
+  depois da correção 98b8967. WebKit 23/27: `interaction-smoke` (com e sem
+  Google), `accessible-profile` e `civic-navigation` falham na asserção de
+  navegação por Tab; os mesmos quatro scripts de `main` (7c0bb27) falham na
+  mesma asserção contra o build de `main`, então é o WebKit local do macOS.
+- O cenário 6 novo de `first-visit.mjs` falhou contra o build anterior à
+  correção (login sem a chave) e passa depois, no Chromium e no WebKit. O
+  `first-visit.mjs` inteiro falha contra o build de `main` no primeiro cenário.
+- LCP com `measure-home-lcp.mjs` contra `vite preview`, mediana de 3: `main`
+  9,98 s; esta branch 1,98 s, com o h1 pintado antes da primeira resposta da
+  API (cerca de 5,85 s).
 
 ## Riscos conhecidos
 
