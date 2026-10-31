@@ -1,0 +1,188 @@
+{
+  "checkedAt": "2026-10-31",
+  "base": "7c0bb27d55b756f62cf20398aabcd180b8c54203",
+  "branch": "fix/api-resilience",
+  "issue": 281,
+  "unitTests": {
+    "back": {
+      "command": "npm test --prefix back",
+      "passed": 261,
+      "failed": 0,
+      "newTests": 29,
+      "newFiles": [
+        "back/src/logger.test.js",
+        "back/src/database-resilience.test.js",
+        "back/src/process-guards.test.js",
+        "back/src/http-hardening.test.js"
+      ]
+    },
+    "shared": {
+      "command": "npm run test:shared",
+      "passed": 93,
+      "failed": 0,
+      "taxonomy": "passed"
+    },
+    "app": {
+      "command": "npm test --prefix app",
+      "passed": 226,
+      "failed": 0
+    },
+    "editorialVerify": "passed"
+  },
+  "build": {
+    "app": true,
+    "pilotExcluded": true
+  },
+  "integration": {
+    "database": "PostgreSQL 16.14 local e descartável, banco novo",
+    "order": "igual ao job back-integration-postgres",
+    "smokes": {
+      "topic-store-smoke": "passed",
+      "ordered-choices-smoke": "passed",
+      "presidential-duels-smoke": "passed",
+      "vote-abuse-smoke": "passed",
+      "game-progress-smoke": "passed",
+      "civic-schema-smoke": "passed",
+      "api-resilience-smoke": "passed"
+    },
+    "apiResilienceSmoke": {
+      "command": "npm run test:resilience --prefix back",
+      "runs": 10,
+      "failures": 0,
+      "consecutivePassesOnFinalVersion": 3,
+      "durationSeconds": 4,
+      "pool": {
+        "sessionSettings": "statement_timeout, lock_timeout, idle_in_transaction_session_timeout e application_name aplicados",
+        "statementTimeout": "57014, classificado como passageiro",
+        "migrationTimeouts": ["2min dentro da transação", "300ms depois do COMMIT"],
+        "idleInTransactionWhileCheckedOut": "registrado, processo vivo",
+        "idleClientTerminated": "registrado, pool reconecta"
+      },
+      "terminate": {
+        "terminatedBackends": 1,
+        "nextHealthStatus": 200,
+        "samePid": true
+      },
+      "bodies": {
+        "compressedBody": 415,
+        "malformedJson": 400,
+        "oversized": 413,
+        "healthAfter": 200
+      },
+      "lockTimeout": {
+        "configuredMs": 1000,
+        "status": 503,
+        "code": "DATABASE_UNAVAILABLE",
+        "retryAfter": "5",
+        "elapsedMs": 1005
+      },
+      "logs": {
+        "requestLines": 15,
+        "allLinesJson": true,
+        "status429Lines": 1,
+        "status429Code": "PLAYER_ISSUANCE_LIMIT",
+        "tokenOrIpInLog": false
+      },
+      "sigterm": {
+        "exitCode": 0
+      }
+    }
+  },
+  "baselineReproduction": {
+    "source": "main@7c0bb27 extraído por git archive em diretório temporário",
+    "afterTerminate": "health 000; processo encerrado com Unhandled 'error' event",
+    "xPoweredBy": "X-Powered-By: Express",
+    "thisBranch": "health 200; mesmo pid; sem x-powered-by"
+  },
+  "npmAudit": {
+    "command": "npm audit --omit=dev (back/)",
+    "before": {
+      "critical": 1,
+      "high": 1,
+      "moderate": 1
+    },
+    "after": {
+      "total": 0
+    },
+    "fullAuditAfter": 0,
+    "fix": "npm audit fix, sem --force; body-parser 2.4.0, proxy-addr 2.0.8, qs 6.17.1; override de qs ^6.17.1",
+    "lockfileConsistent": "npm ci limpo aprovado"
+  },
+  "e2e": {
+    "applicable": false,
+    "reason": "app/ e shared/ idênticos a main; o workflow de UI não roda para esta branch",
+    "localAttempt": {
+      "chromium": "não executado: revisão 1193 do Playwright ausente no cache local (há 1187)",
+      "webkit": "falha nos passos de Tab do teclado do WebKit no macOS; mesmo código de main, ambiente diferente do CI (Linux)"
+    }
+  },
+  "acceptance": [
+    {
+      "criterion": "Depois de pg_terminate_backend, o /api/health seguinte responde 200 sem reiniciar o processo",
+      "result": "met",
+      "evidence": "api-resilience-smoke: 1 conexão encerrada, health 200, mesmo pid; main reproduzido morrendo"
+    },
+    {
+      "criterion": "Corpos malformados ou com codificação inesperada recebem 4xx sem derrubar o processo",
+      "result": "met",
+      "evidence": "http-hardening.test.js (6 codificações, 3 JSON inválidos, 413, charset) e smoke contra a API real"
+    },
+    {
+      "criterion": "npm audit --omit=dev em back/ sem high ou critical",
+      "result": "met",
+      "evidence": "0 avisos depois de npm audit fix"
+    },
+    {
+      "criterion": "Respostas sem x-powered-by",
+      "result": "met localmente; produção depende de deploy",
+      "evidence": "teste unitário e smoke; conferência em produção na lista do Stefan"
+    },
+    {
+      "criterion": "Pool com ouvinte de erro, prazos de conexão, consulta, trava e transação parada, sem quebrar a migração de boot",
+      "result": "met",
+      "evidence": "database-resilience.test.js, smoke e os seis smokes anteriores aprovados"
+    },
+    {
+      "criterion": "Handlers de unhandledRejection e uncaughtException com política clara",
+      "result": "met",
+      "evidence": "process-guards.test.js (7 casos) e boot com falha saindo com código 1"
+    },
+    {
+      "criterion": "Uma linha JSON por requisição sem IP e sem Authorization; 5xx com stack e requestId; 429 com o código",
+      "result": "met localmente",
+      "evidence": "http-hardening.test.js e smoke: grep '\"status\":429' conta 1 linha com PLAYER_ISSUANCE_LIMIT"
+    },
+    {
+      "criterion": "Transação bloqueada responde 503 em vez de ficar pendurada",
+      "result": "met",
+      "evidence": "smoke: tabela travada, 503 DATABASE_UNAVAILABLE em cerca de 1,0 s com lock_timeout de 1 s"
+    },
+    {
+      "criterion": "Parar a API gera alerta em até 5 min",
+      "result": "needs-stefan",
+      "evidence": "passo a passo em docs/ops/MONITORING.md"
+    },
+    {
+      "criterion": "Notificador do Dokploy para falha de build e deploy",
+      "result": "needs-stefan",
+      "evidence": "passo a passo em docs/ops/MONITORING.md"
+    },
+    {
+      "criterion": "Throw forçado no navegador aparece no log com o SHA do build",
+      "result": "not-met",
+      "evidence": "adiado até o ICM 45 colocar o SHA no cliente"
+    },
+    {
+      "criterion": "5xx provocado em staging gera evento",
+      "result": "partial",
+      "evidence": "5xx gera request_failed com stack e requestId no log; não há staging nem rastreador de erros"
+    },
+    {
+      "criterion": "Smoke de resiliência no CI",
+      "result": "ci-only",
+      "evidence": "passo novo no job back-integration-postgres"
+    }
+  ],
+  "remoteCi": "pending",
+  "humanGate": "not self-approved"
+}
