@@ -24,3 +24,8 @@ O `back/scripts/partial-restore-smoke.mjs` repete o cenário no CI sem
 depender do cliente do PostgreSQL. Executado contra o `topic-store.js` e o
 `server.js` da main, ele falha na asserção do boot bloqueado (a API sobe com
 código 0); nesta branch passa.
+
+Revisão independente, mesmo dia: o cenário foi refeito sobre o dump do
+espelho do CI (mesmos smokes). As contagens antes do boot e o efeito na main
+foram os mesmos da tabela acima; nesta branch, as 30 tabelas do schema public
+ficaram iguais (a execução original comparou 26).

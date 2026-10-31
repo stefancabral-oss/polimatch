@@ -6,7 +6,7 @@
 - Issue: #279
 - Branch: `fix/database-safety` (base main `7c0bb27`)
 - PR: não aberta; a branch só tem commits locais
-- Último commit de código: `59ecc0c` (este HANDOFF entra no commit seguinte)
+- Último commit de código: `7fa8b69` (este HANDOFF entra no commit seguinte)
 
 Commits:
 
@@ -15,6 +15,8 @@ Commits:
 - `f324830` Tira os smokes e o test-support da imagem da API
 - `4ea2490` Adiciona backup com manifesto e ensaio de restauração do PostgreSQL
 - `59ecc0c` Documenta backup externo, ensaio de restauração, DR e piso de rollback
+- `4df3d9c` Registra o estágio 37 com handoff, verificação e evidências
+- `7fa8b69` Restringe o ensaio ao banco conferido pela guarda (revisão)
 
 ## Entregue
 
@@ -52,6 +54,9 @@ Commits:
   manifesto e dump, sobe a API desta cópia e exige `/api/health` 200,
   `resetApplied:false` e nenhuma perda de linhas no boot. Também no CI, com o
   `pg_dump` do container e um caso de manifesto adulterado que precisa reprovar.
+  O `pg_restore`/`psql` do ensaio roda sem `PGHOST`, `PGHOSTADDR`, `PGPORT`,
+  `PGDATABASE`, `PGSERVICE` e `PGSERVICEFILE` do shell, para que o libpq não
+  troque o destino conferido pela guarda.
 - **Docs.** `docs/ops/BACKUP.md` (destino R2/B2, 30 diários + 12 mensais,
   acesso restrito pelo `sub`/nome/avatar do Google, Dokploy ou cron, ensaio
   mensal, runbook de incidente, registro de ensaios), `docs/ops/DR.md`
@@ -110,8 +115,8 @@ Todos em 31/10/2026, macOS, Node 22.13, PostgreSQL 16.14 local e descartável
   backup + ensaio (com `pg_dump`/`pg_restore` por pipe no lugar do
   `docker exec`), manifesto adulterado reprovado e restauração parcial: ok.
 - Restauração parcial real (`pg_restore -L`): na main, 30→0 jogadores,
-  126→0 rodadas, 400→0 votos e health 200; nesta branch, saída 1 e 0 de 26
-  contagens alteradas (`references/partial-restore-reproduction.md`).
+  126→0 rodadas, 400→0 votos e health 200; nesta branch, saída 1 e nenhuma
+  contagem alterada (`references/partial-restore-reproduction.md`).
 - `partial-restore-smoke.mjs` contra o código da main: falha como esperado.
 - Guarda: `NODE_ENV=production node back/scripts/topic-store-smoke.mjs` sai
   com 2 e o log do PostgreSQL não registra nenhuma conexão nova; host remoto
@@ -129,6 +134,42 @@ Todos em 31/10/2026, macOS, Node 22.13, PostgreSQL 16.14 local e descartável
   builds anteriores aos da Playwright 1.55.1 e foram apontados por
   `PLAYWRIGHT_BROWSERS_PATH`, sem baixar nada.
 
+### Revisão independente (31/10/2026)
+
+Refeito por outro agente, em PostgreSQL 16.14 descartável próprio, depois do
+commit `7fa8b69`:
+
+- `npm test --prefix back`: 245/245; a main `7c0bb27` (export completo) dá
+  232/232, então são 13 testes novos. `npm test --prefix app`: 226/226.
+  `node --test shared/*.test.js`: 93/93; taxonomia e `editorial:verify` ok.
+- Espelho do job `back-integration-postgres` com banco recriado: 6 smokes,
+  backup (44 tabelas, 7400 linhas), ensaio `pass` (restauração 0, health 200,
+  `resetApplied:false`), manifesto adulterado reprovado e
+  `partial-restore-smoke` ok.
+- Restauração parcial com `pg_restore -L` (sem os dados de
+  `schema_migrations` e `daily_answers`) sobre o dump do espelho: nesta
+  branch a API sai com `SCHEMA_RESET_BLOCKED`, sem health, e as 30 tabelas do
+  schema public ficam iguais; com o `server.js` da main, health 200,
+  `resetApplied: true` e 6 tabelas mudam (jogadores 30→0, rodadas 126→0,
+  votos 400→0, `ranking_stats` 231→160, `ranking_pools` 8→7,
+  `schema_migrations` 0→3).
+- Guarda: `NODE_ENV=production` com banco local (`topic-store-smoke`), host
+  remoto (`npm run test:integration`), banco sem `_test` (`vote-abuse-smoke`
+  e ensaio) e falta da opção (`partial-restore-smoke`) saem com 2; o log do
+  PostgreSQL (`log_connections`) ficou com o mesmo número de conexões.
+- Ensaio também com `.sql.gz` custom e SQL puro gzip (estilo Dokploy): `pass`.
+  Backup de banco sem a linha da migração: recusado.
+- Achado e corrigido: com `PGHOSTADDR` no shell, o `pg_restore` do ensaio
+  restaurava no endereço da variável e não no banco conferido (o libpq usa a
+  variável quando a URL não define `hostaddr`). Depois de `7fa8b69`, o mesmo
+  ensaio com `PGHOSTADDR` e `PGSERVICE` definidos passa contra o banco local.
+- E2E com build de `app/` e `vite preview` local: `ordered-choices`,
+  `vote-recovery`, `interaction-smoke` e `accessible-profile` passam em
+  Chromium; em WebKit passam `ordered-choices` e `vote-recovery`, e
+  `interaction-smoke`/`accessible-profile` falham na navegação por Tab, como
+  na execução original (WebKit do macOS; `app/` e `shared/` iguais à main, e
+  o workflow de UI não roda nesta PR).
+
 ## Riscos conhecidos
 
 - Até o deploy desta branch, a produção mantém o comportamento antigo.
@@ -142,6 +183,9 @@ Todos em 31/10/2026, macOS, Node 22.13, PostgreSQL 16.14 local e descartável
   de merge são prováveis.
 - Os formatos do Dokploy (`.sql.gz` com dump custom ou SQL puro) foram
   testados com dumps gerados localmente, não com um arquivo do painel.
+- Com `DRILL_API_PORT` ou `SMOKE_API_PORT` fixos e outra API já escutando na
+  porta, o ensaio e o smoke reprovam (não há falso positivo, porque exigem o
+  log do próprio processo). O padrão é porta livre escolhida na hora.
 
 ## Decisões tomadas
 
@@ -156,6 +200,9 @@ Todos em 31/10/2026, macOS, Node 22.13, PostgreSQL 16.14 local e descartável
   `--immutable` e nunca apaga remotamente.
 - O ensaio aceita como mudança do boot apenas crescimento de catálogo e
   estatísticas e poda de cotas vencidas; qualquer outra diferença reprova.
+- O ensaio é `scripts/ops/drill-local.mjs`, e não o `drill-local.sh` citado
+  na issue: em Node ele roda igual no CI e na máquina do ensaio e usa a mesma
+  guarda de banco descartável dos smokes.
 - O teste `topic-store-smoke.mjs` mudou de propósito: o legado com linhas
   agora precisa ser recusado sem autorização e só é resetado com ela. Nenhum
   teste foi removido ou afrouxado.
