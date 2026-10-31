@@ -12,6 +12,8 @@ import { PRODUCTION_CANDIDATE_REGISTRY } from "./candidates.js";
 import { candidatePublicPayload } from "./editorial-gate.js";
 import { EMBEDDED_RELEASE_REVISION } from "./release-identity.js";
 import { DAILY_SESSION_RULESET } from "./daily-session.js";
+import { isTransientDatabaseError } from "./database-resilience.js";
+import { createLogger } from "./logger.js";
 
 const WITHHELD_COPY = AGGREGATE_PUBLIC_COPY_POLICY.withheld.copy;
 
@@ -77,12 +79,67 @@ function safeStatus(error) {
   return Number.isInteger(status) && status >= 400 && status < 600 ? status : 500;
 }
 
+// Erros do body-parser chegam com `type`; o contrato público usa códigos
+// estáveis e mensagens fixas, sem ecoar trechos do corpo recebido.
+const BODY_PARSER_ERRORS = Object.freeze({
+  "entity.parse.failed": { status: 400, code: "INVALID_JSON", message: "corpo JSON inválido" },
+  "entity.too.large": { status: 413, code: "PAYLOAD_TOO_LARGE", message: "corpo da requisição grande demais" },
+  "encoding.unsupported": { status: 415, code: "UNSUPPORTED_CONTENT_ENCODING", message: "codificação de corpo não suportada" },
+  "charset.unsupported": { status: 415, code: "UNSUPPORTED_CHARSET", message: "charset não suportado" },
+  "request.aborted": { status: 400, code: "REQUEST_ABORTED", message: "requisição interrompida" },
+  "request.size.invalid": { status: 400, code: "INVALID_BODY_LENGTH", message: "tamanho do corpo inconsistente" },
+});
+
+function publicBodyParserError(error) {
+  const mapped = BODY_PARSER_ERRORS[error?.type];
+  if (!mapped || !Number.isInteger(Number(error?.status)) || Number(error.status) >= 500) return null;
+  return Object.assign(new Error(mapped.message), { status: mapped.status, code: mapped.code });
+}
+
+// O cliente nunca comprime o corpo das requisições. Recusar qualquer
+// Content-Encoding diferente de identity antes de ler o corpo evita
+// descompressão de dados não autenticados.
+function rejectsContentEncoding(req) {
+  const encoding = req.get("content-encoding");
+  if (encoding === undefined) return false;
+  return String(encoding).trim().toLowerCase() !== "identity";
+}
+
+const DATABASE_RETRY_AFTER_SECONDS = 5;
+const MAX_LOGGED_PATH_LENGTH = 120;
+// Mantém o comportamento anterior quando nenhum logger é injetado: só avisos
+// e falhas aparecem. O servidor injeta o logger completo, com uma linha por
+// requisição.
+const DEFAULT_LOGGER = createLogger({ level: "warn" });
+
+function matchedRoute(req) {
+  return req.route?.path ? `${req.baseUrl || ""}${req.route.path}` : null;
+}
+
+function requestLogEntry(req, res, startedAt, { aborted = false } = {}) {
+  const route = matchedRoute(req);
+  const entry = {
+    event: "http_request",
+    requestId: req.requestId,
+    method: req.method,
+    route,
+    status: res.statusCode,
+    ms: Math.round(Number(process.hrtime.bigint() - startedAt) / 1e5) / 10,
+    code: res.locals.errorCode || null,
+  };
+  // Sem rota casada (404, corpo recusado antes do roteamento), o caminho
+  // ajuda a diagnosticar clientes antigos. Nunca inclui query string.
+  if (!route) entry.path = String(req.path || "").slice(0, MAX_LOGGED_PATH_LENGTH);
+  if (aborted) entry.aborted = true;
+  return entry;
+}
+
 export function createHttpApp({
   store,
   googleIdentity,
   candidateRegistry = PRODUCTION_CANDIDATE_REGISTRY,
   env = process.env,
-  logger = console,
+  logger = DEFAULT_LOGGER,
   clock = () => new Date(),
   aggregatePublication,
 } = {}) {
@@ -108,10 +165,31 @@ export function createHttpApp({
   }
 
   const app = express();
+  app.disable("x-powered-by");
   app.set("trust proxy", configuredProxyHops);
   app.use((req, res, next) => {
     req.requestId = randomUUID();
     res.set("X-Request-Id", req.requestId);
+    const startedAt = process.hrtime.bigint();
+    // Guarda o `code` de qualquer resposta de erro em JSON para a linha de
+    // log, inclusive as que não passam por sendError (origem, publicação).
+    const json = res.json.bind(res);
+    res.json = (body) => {
+      if (res.statusCode >= 400 && typeof body?.code === "string") res.locals.errorCode = body.code;
+      return json(body);
+    };
+    // Uma linha JSON por requisição, só com campos explícitos: nada de IP,
+    // cabeçalhos, query string ou corpo.
+    let logged = false;
+    const logRequest = (aborted) => {
+      if (logged) return;
+      logged = true;
+      try {
+        logger.info?.(requestLogEntry(req, res, startedAt, { aborted }));
+      } catch {}
+    };
+    res.once("finish", () => logRequest(false));
+    res.once("close", () => logRequest(!res.writableFinished));
     next();
   });
   app.use((req, res, next) => {
@@ -128,18 +206,40 @@ export function createHttpApp({
       callback(null, isAllowedBrowserOrigin(origin, allowedOrigins, { production }));
     },
   }));
-  app.use(express.json({ limit: "32kb" }));
+  app.use((req, res, next) => {
+    if (!rejectsContentEncoding(req)) return next();
+    const error = new Error(BODY_PARSER_ERRORS["encoding.unsupported"].message);
+    error.status = 415;
+    error.code = "UNSUPPORTED_CONTENT_ENCODING";
+    // O corpo não é lido; a conexão não deve ser reaproveitada com ele pendente.
+    res.set("Connection", "close");
+    return next(error);
+  });
+  app.use(express.json({ limit: "32kb", inflate: false }));
 
-  function sendError(req, res, error) {
-    const status = safeStatus(error);
+  function sendError(req, res, rawError) {
+    const error = publicBodyParserError(rawError) || rawError;
+    const transientDatabase = safeStatus(error) >= 500 && isTransientDatabaseError(error);
+    const status = transientDatabase ? 503 : safeStatus(error);
     if (status >= 500) {
       logger.error?.({
         event: "request_failed",
         requestId: req.requestId,
         method: req.method,
         path: req.path,
+        status,
+        errorCode: error?.code === undefined ? null : String(error.code),
         error: error?.stack || error?.message || String(error),
       });
+      if (transientDatabase) {
+        // Banco lento, travado ou reconectando: o cliente pode repetir.
+        res.set("Retry-After", String(DATABASE_RETRY_AFTER_SECONDS));
+        return res.status(503).json({
+          error: "serviço temporariamente indisponível",
+          code: "DATABASE_UNAVAILABLE",
+          requestId: req.requestId,
+        });
+      }
       return res.status(status).json({ error: "erro interno", code: "INTERNAL_ERROR", requestId: req.requestId });
     }
 
