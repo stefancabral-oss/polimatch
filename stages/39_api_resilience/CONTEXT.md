@@ -21,14 +21,20 @@ existe nenhum alerta externo.
 - npm audit fix em back/ sem --force; app.disable('x-powered-by').
 - Uma linha JSON por requisição (método, rota, status, ms, código, requestId,
   revisão), sem IP e sem Authorization; 5xx com stack; 429 com o código.
+- Erros do navegador: as quatro páginas do app capturam error,
+  unhandledrejection e vite:preloadError e enviam por sendBeacon um relato de
+  até 2 KB, sem dados do jogador, para POST /api/client-errors, com limite por
+  rede e global. A API registra uma linha client_error com o build da página.
 - docs/ops/MONITORING.md com o passo a passo do monitor externo e dos avisos
   do Dokploy, que são ação do Stefan.
 
 ## Fora de escopo
-Captura de erros no navegador (depende do SHA do build no cliente, ICM 45).
+SHA do commit no build do app e da API (ICM 45): até lá o relato do navegador
+traz o carimbo de horário do build. Sentry/GlitchTip.
 Compressão, 404 em JSON e cabeçalhos de segurança da API (ICM 38).
 Dependabot e npm audit no CI (ICM 52). Rotação de logs do Docker (ICM 41).
-SOURCE_COMMIT no deploy (ICM 45). Mudanças no app, no jogo ou no ranking.
+Mudanças de comportamento no app, no jogo ou no ranking (o app só ganha o
+relato de erros).
 
 ## Critérios de aceite
 - Smoke local: depois de pg_terminate_backend, a chamada seguinte a
@@ -40,6 +46,8 @@ SOURCE_COMMIT no deploy (ICM 45). Mudanças no app, no jogo ou no ranking.
 - Parar a API gera alerta em até 5 min (Stefan).
 - Recusas 429 contáveis no log com o código; 5xx registrado com stack e
   requestId.
+- Um throw forçado no navegador aparece no log da API com o build da página em
+  menos de 1 min.
 
 ## Dependências e gate
 Nenhuma dependência de código. Monitor externo, destino dos alertas e

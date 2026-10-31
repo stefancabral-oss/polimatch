@@ -6,15 +6,18 @@
   "unitTests": {
     "back": {
       "command": "npm test --prefix back",
-      "passed": 261,
+      "passed": 268,
       "failed": 0,
-      "newTests": 29,
+      "newTests": 36,
       "newFiles": [
         "back/src/logger.test.js",
         "back/src/database-resilience.test.js",
         "back/src/process-guards.test.js",
-        "back/src/http-hardening.test.js"
-      ]
+        "back/src/http-hardening.test.js",
+        "back/src/client-error-report.test.js"
+      ],
+      "fromMain": 232,
+      "existingTestsChanged": 0
     },
     "shared": {
       "command": "npm run test:shared",
@@ -24,8 +27,13 @@
     },
     "app": {
       "command": "npm test --prefix app",
-      "passed": 226,
-      "failed": 0
+      "passed": 235,
+      "failed": 0,
+      "fromMain": 226,
+      "newTests": 9,
+      "newFiles": [
+        "app/src/error-reporter.test.js"
+      ]
     },
     "editorialVerify": "passed"
   },
@@ -34,7 +42,7 @@
     "pilotExcluded": true
   },
   "integration": {
-    "database": "PostgreSQL 16.14 local e descartável, banco novo",
+    "database": "PostgreSQL 16.14 local e descartável, banco novo, lc_messages=C",
     "order": "igual ao job back-integration-postgres",
     "smokes": {
       "topic-store-smoke": "passed",
@@ -47,14 +55,17 @@
     },
     "apiResilienceSmoke": {
       "command": "npm run test:resilience --prefix back",
-      "runs": 10,
+      "runs": 4,
       "failures": 0,
       "consecutivePassesOnFinalVersion": 3,
       "durationSeconds": 4,
       "pool": {
         "sessionSettings": "statement_timeout, lock_timeout, idle_in_transaction_session_timeout e application_name aplicados",
         "statementTimeout": "57014, classificado como passageiro",
-        "migrationTimeouts": ["2min dentro da transação", "300ms depois do COMMIT"],
+        "migrationTimeouts": [
+          "2min dentro da transação",
+          "300ms depois do COMMIT"
+        ],
         "idleInTransactionWhileCheckedOut": "registrado, processo vivo",
         "idleClientTerminated": "registrado, pool reconecta"
       },
@@ -74,18 +85,27 @@
         "status": 503,
         "code": "DATABASE_UNAVAILABLE",
         "retryAfter": "5",
-        "elapsedMs": 1005
+        "elapsedMs": 1006
       },
       "logs": {
-        "requestLines": 15,
+        "requestLines": 16,
         "allLinesJson": true,
         "status429Lines": 1,
         "status429Code": "PLAYER_ISSUANCE_LIMIT",
-        "tokenOrIpInLog": false
+        "tokenOrIpInLog": false,
+        "clientErrorLines": 1,
+        "clientErrorBuild": "o build enviado"
       },
       "sigterm": {
         "exitCode": 0
       }
+    },
+    "manualScenarios": {
+      "postgresStopped": "health 503 DATABASE_UNAVAILABLE com Retry-After 5; depois de religado, 200 no mesmo processo",
+      "terminateDuringLockedRequest": "requisição 503, processo vivo, health seguinte 200",
+      "compressedBodyChunked": "415 com Connection: close, processo vivo",
+      "sigtermWithRequestInFlight": "requisição termina com 201, shutdown_completed",
+      "bootFailures": "sem DATABASE_URL, banco inacessível, PG_LOCK_TIMEOUT_MS=5s ou segredo curto: boot_failed e saída 1"
     }
   },
   "baselineReproduction": {
@@ -109,11 +129,34 @@
     "lockfileConsistent": "npm ci limpo aprovado"
   },
   "e2e": {
-    "applicable": false,
-    "reason": "app/ e shared/ idênticos a main; o workflow de UI não roda para esta branch",
-    "localAttempt": {
-      "chromium": "não executado: revisão 1193 do Playwright ausente no cache local (há 1187)",
-      "webkit": "falha nos passos de Tab do teclado do WebKit no macOS; mesmo código de main, ambiente diferente do CI (Linux)"
+    "applicable": true,
+    "target": "vite preview, lista do workflow de interface mais client-error-report (26 por navegador); smoke do formulário do piloto #176 não rodado, não carrega as páginas do app",
+    "localChromium": "headless 1187 do cache via preload local não versionado (Playwright 1.55.1 pede 1193)",
+    "chromium": {
+      "passed": 26,
+      "failed": 0
+    },
+    "webkit": {
+      "passed": 21,
+      "failed": 5,
+      "sameOnMain": [
+        "interaction-smoke",
+        "interaction-smoke (Google)",
+        "accessible-profile",
+        "civic-navigation"
+      ],
+      "reason": "passos de Tab e foco do WebKit no macOS; main 7c0bb27 construído em diretório temporário falha igual; o CI roda WebKit no Linux",
+      "factCheck": "um timeout na rodada completa; com vite preview sob carga também falha às vezes em main (1 de 5); servidor estático alternando main e branch: 6 de 6 em cada"
+    },
+    "afterLastChange": {
+      "build": "sem SOURCE_COMMIT, como no Dokploy",
+      "passedInBothBrowsers": [
+        "client-error-report",
+        "quote-quiz-checked",
+        "quote-quiz",
+        "main-navigation",
+        "presidential-navigation"
+      ]
     }
   },
   "acceptance": [
@@ -153,6 +196,11 @@
       "evidence": "http-hardening.test.js e smoke: grep '\"status\":429' conta 1 linha com PLAYER_ISSUANCE_LIMIT"
     },
     {
+      "criterion": "Captura de error, unhandledrejection e vite:preloadError enviada por sendBeacon a um endpoint com limite, até 2 KB e sem dados do jogador",
+      "result": "met",
+      "evidence": "error-reporter.test.js (9), client-error-report.test.js (7), e2e client-error-report em Chromium e WebKit, smoke de resiliência"
+    },
+    {
       "criterion": "Transação bloqueada responde 503 em vez de ficar pendurada",
       "result": "met",
       "evidence": "smoke: tabela travada, 503 DATABASE_UNAVAILABLE em cerca de 1,0 s com lock_timeout de 1 s"
@@ -168,21 +216,73 @@
       "evidence": "passo a passo em docs/ops/MONITORING.md"
     },
     {
-      "criterion": "Throw forçado no navegador aparece no log com o SHA do build",
-      "result": "not-met",
-      "evidence": "adiado até o ICM 45 colocar o SHA no cliente"
+      "criterion": "Throw forçado no navegador aparece no log com o SHA do build em menos de 1 min",
+      "result": "met localmente; em produção o build só traz o SHA depois do ICM 45",
+      "evidence": "prova ponta a ponta: linha client_error com build = SOURCE_COMMIT em cerca de 110 ms, Chromium e WebKit; e2e client-error-report no workflow de interface compara com github.sha"
     },
     {
       "criterion": "5xx provocado em staging gera evento",
       "result": "partial",
-      "evidence": "5xx gera request_failed com stack e requestId no log; não há staging nem rastreador de erros"
+      "evidence": "5xx gera request_failed com stack e requestId no log; erros do navegador geram client_error; não há staging nem rastreador de erros externo"
     },
     {
       "criterion": "Smoke de resiliência no CI",
       "result": "ci-only",
-      "evidence": "passo novo no job back-integration-postgres"
+      "evidence": "passo novo no job back-integration-postgres; passo client-error-report no workflow de interface (Chromium e WebKit)"
     }
   ],
   "remoteCi": "pending",
-  "humanGate": "not self-approved"
+  "humanGate": "not self-approved",
+  "clientErrorReport": {
+    "endpoint": "POST /api/client-errors",
+    "transport": "sendBeacon, text/plain, até 2 KB",
+    "fields": [
+      "build",
+      "page",
+      "kind",
+      "message",
+      "source",
+      "line",
+      "column",
+      "stack"
+    ],
+    "kinds": [
+      "error",
+      "unhandledrejection",
+      "preload"
+    ],
+    "limits": {
+      "perPage": 5,
+      "perNetworkPerMinute": 10,
+      "globalPerMinute": 120,
+      "overLimit": "429 CLIENT_ERROR_RATE_LIMITED"
+    },
+    "endToEnd": {
+      "setup": "src/server.js em modo produção, APP_ORIGINS local, páginas do build (SOURCE_COMMIT fixo) servidas na mesma origem",
+      "browsers": [
+        "chromium",
+        "webkit"
+      ],
+      "pages": [
+        "/quem-disse-isso.html",
+        "/"
+      ],
+      "result": "throw forçado virou linha client_error com build igual ao SOURCE_COMMIT",
+      "elapsedMs": [
+        105,
+        107,
+        109,
+        107
+      ],
+      "unexpectedReports": 0
+    }
+  },
+  "review": {
+    "independentReview": true,
+    "changes": [
+      "captura de erros do navegador implementada (estava adiada para o ICM 45, que não a inclui)",
+      "requestId na linha client_error",
+      "verificação refeita do zero"
+    ]
+  }
 }
