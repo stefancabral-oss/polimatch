@@ -90,6 +90,7 @@ test("service worker and manifest keep their dedicated locations", () => {
   const manifestBlock = locationBlock("= /manifest.webmanifest");
   assert.match(manifestBlock, /default_type application\/manifest\+json;/);
   assert.match(manifestBlock, /no-cache/);
+  assert.match(locationBlock("= /version.json"), /add_header Cache-Control "no-cache";/);
 });
 
 test("service worker only installs and never intercepts requests", () => {

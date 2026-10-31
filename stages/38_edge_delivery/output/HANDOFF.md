@@ -216,6 +216,9 @@ Outra sessão refez as provas a partir da branch, sem confiar nos números acima
   próprios (o `__POLIMATCH_ASSET_VERSION__` muda) e o dist do runner não serve
   de referência.
 - O smoke não confere cabeçalhos de segurança. Essa parte entra com o ICM 51.
+- `/version.json` ganhou location própria com `no-cache`, para ficar pronto
+  quando o ICM 45 (#287) passar a gerar o arquivo. Enquanto ele não existir, a
+  rota responde 404, como qualquer estático ausente.
 
 ## Ação do Stefan
 
