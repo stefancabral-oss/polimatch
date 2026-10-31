@@ -7,7 +7,18 @@ const store = createTopicStore();
 const googleIdentity = createGoogleIdentityVerifier();
 const app = createHttpApp({ store, googleIdentity });
 
-const migration = await store.init();
+let migration;
+try {
+  migration = await store.init();
+} catch (error) {
+  // Sem esquema confirmado a API não escuta: o healthcheck falha e nada é gravado.
+  console.error("Inicialização do PostgreSQL interrompida; API encerrada sem atender", {
+    code: error.code,
+    message: error.message,
+  });
+  await store.close().catch(() => {});
+  process.exit(1);
+}
 console.log("PostgreSQL Eleições 2026 inicializado", migration);
 
 const server = app.listen(PORT, "0.0.0.0", () => {

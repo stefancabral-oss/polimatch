@@ -438,7 +438,51 @@ export function persistedRoundChannels(row) {
   };
 }
 
-async function createCleanSchema(client, candidateRegistry, maintenanceNow) {
+// O reset da edição só pode recriar um banco vazio. Se a linha de
+// schema_migrations sumiu (restauração parcial, tabela truncada), qualquer
+// linha existente indica dados reais: a inicialização para em vez de apagar.
+export function assertSchemaResetAllowed(populatedTables, { allowReset = false } = {}) {
+  if (!populatedTables.length || allowReset) return;
+  const listed = populatedTables.slice(0, 8).join(", ");
+  const more = populatedTables.length > 8 ? ` e mais ${populatedTables.length - 8}` : "";
+  const error = new Error(
+    `reset destrutivo bloqueado: schema_migrations não registra ${RESET_MIGRATION_ID}, `
+    + `mas há linhas em ${listed}${more}. Restaure o dump completo, incluindo `
+    + "schema_migrations, ou defina POLIMATCH_ALLOW_RESET=1 somente para apagar esses dados de propósito.",
+  );
+  error.code = "SCHEMA_RESET_BLOCKED";
+  error.populatedTables = [...populatedTables];
+  throw error;
+}
+
+export function schemaResetAllowedFromEnvironment(env = process.env) {
+  return env.POLIMATCH_ALLOW_RESET === "1";
+}
+
+const quoteIdentifier = (name) => `"${String(name).replaceAll('"', '""')}"`;
+
+async function populatedSchemaTables(client) {
+  // Mesmo search_path usado pelos DROP/CREATE sem esquema explícito abaixo.
+  const tables = await client.query(`
+    SELECT namespace.nspname AS schema_name, class.relname AS table_name
+    FROM pg_class AS class
+    JOIN pg_namespace AS namespace ON namespace.oid = class.relnamespace
+    WHERE class.relkind IN ('r', 'p')
+      AND namespace.nspname = ANY(current_schemas(false))
+      AND class.relname <> 'schema_migrations'
+    ORDER BY namespace.nspname, class.relname
+  `);
+  const populated = [];
+  for (const { schema_name: schemaName, table_name: tableName } of tables.rows) {
+    const sample = await client.query(
+      `SELECT 1 FROM ${quoteIdentifier(schemaName)}.${quoteIdentifier(tableName)} LIMIT 1`,
+    );
+    if (sample.rowCount) populated.push(`${schemaName}.${tableName}`);
+  }
+  return populated;
+}
+
+async function createCleanSchema(client, candidateRegistry, maintenanceNow, { allowReset = false } = {}) {
   await client.query(`
     CREATE TABLE IF NOT EXISTS schema_migrations (
       id text PRIMARY KEY,
@@ -447,6 +491,7 @@ async function createCleanSchema(client, candidateRegistry, maintenanceNow) {
   `);
   const applied = await client.query("SELECT 1 FROM schema_migrations WHERE id = $1", [RESET_MIGRATION_ID]);
   if (!applied.rowCount) {
+    assertSchemaResetAllowed(await populatedSchemaTables(client), { allowReset });
     await client.query(`
       DROP TABLE IF EXISTS vote_reversals CASCADE;
       DROP TABLE IF EXISTS choice_rounds CASCADE;
@@ -1804,6 +1849,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
   candidateRegistry = PRODUCTION_CANDIDATE_REGISTRY,
   hooks = {},
   collectionEnabled = process.env.COLLECTION_ENABLED !== "false",
+  allowSchemaReset = schemaResetAllowedFromEnvironment(),
 } = {}) {
   if (!connectionString) throw new Error("DATABASE_URL é obrigatória");
   if (!candidateRegistry?.topicsById || typeof candidateRegistry.candidatesForTopic !== "function") {
@@ -1821,7 +1867,9 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
       const client = await pool.connect();
       try {
         await client.query("BEGIN");
-        const migration = await createCleanSchema(client, candidateRegistry, clockInstant(clock));
+        const migration = await createCleanSchema(client, candidateRegistry, clockInstant(clock), {
+          allowReset: allowSchemaReset === true,
+        });
         await installGameSchema(client);
         await client.query("COMMIT");
         return migration;
