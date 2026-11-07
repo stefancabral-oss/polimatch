@@ -1,0 +1,113 @@
+{
+  "checkedAt": "2026-10-31",
+  "issue": 282,
+  "base": "7c0bb27d55b756f62cf20398aabcd180b8c54203",
+  "branch": "fix/first-visit",
+  "unitTests": {
+    "app": { "command": "npm test --prefix app", "passed": 236, "failed": 0, "new": 10 },
+    "back": { "command": "npm test --prefix back", "passed": 235, "failed": 0, "new": 3 },
+    "shared": { "command": "node --test shared/*.test.js", "passed": 93, "failed": 0 }
+  },
+  "build": { "passed": true, "pilotExcluded": true },
+  "backendSmokes": {
+    "database": "PostgreSQL 16 descartável, TimeZone Etc/UTC, banco novo, ordem do CI",
+    "passed": [
+      "topic-store-smoke",
+      "ordered-choices-smoke",
+      "presidential-duels-smoke",
+      "vote-abuse-smoke",
+      "game-progress-smoke",
+      "civic-schema-smoke"
+    ],
+    "failed": [],
+    "voteAbuse": {
+      "createPlayerSameNetwork": 5,
+      "created": 3,
+      "rejected": 2,
+      "quotaRejectionsDailyDelta": 2,
+      "retryAfterSecondsAt2330Brasilia": 1800,
+      "windowStart": "2026-10-25T03:00:00.000Z",
+      "legacyUtcBucketInherited": true,
+      "googleNewSubjectWithoutTokenConsumesNetworkQuota": false,
+      "aggregateKeptAfter9SimulatedDays": true,
+      "repeatedOnSameDatabase": true
+    }
+  },
+  "e2e": {
+    "server": "vite preview local com API simulada por rota",
+    "chromium": {
+      "scripts": 27,
+      "passed": 27,
+      "failed": 0
+    },
+    "webkit": {
+      "scripts": 27,
+      "passed": 23,
+      "failed": 4,
+      "failedScripts": ["interaction-smoke", "interaction-smoke (Google)", "accessible-profile", "civic-navigation"],
+      "note": "As quatro falham na mesma asserção de navegação por Tab no WebKit do macOS também em main 7c0bb27, antes desta mudança. O CI em Linux decide."
+    },
+    "firstVisit": {
+      "script": "app/e2e/first-visit.mjs",
+      "browsers": ["chromium", "webkit"],
+      "scenarios": [
+        "capa pintada antes da API e visita passiva sem POST /api/player",
+        "cota da rede esgotada mostra saída pelo Google e libera o jogo após o login",
+        "login com o catálogo fora do ar inicializa o app sem Tentar novamente",
+        "armazenamento bloqueado não vira falha de rede",
+        "avatar visível e alvo de 44 px no botão de conta em 375, 390 e 440",
+        "login durante a leitura da chave salva leva o jogo anônimo junto"
+      ],
+      "failsOnBase": true,
+      "loginScenarioFailsBeforeReviewFix": true,
+      "wiredInWorkflow": ".github/workflows/ui-interaction-smoke.yml"
+    },
+    "updatedForLazyIdentity": ["presidential-duels.mjs", "prediction-identity.mjs", "vote-recovery.mjs (cenário 3)"]
+  },
+  "lcp": {
+    "tool": "app/scripts/measure-home-lcp.mjs (Chromium + CDP; não é o Lighthouse)",
+    "throttling": { "latencyMs": 562.5, "downloadKbps": 1474.56, "uploadKbps": 675, "cpuSlowdown": 4 },
+    "apiDelayMsPerResponse": 4000,
+    "staticServer": "local com gzip",
+    "runs": 3,
+    "baseMedianMs": 9972,
+    "branchMedianMs": 1984,
+    "branchLcpElement": "H1 Quem representa o Brasil que você imagina?",
+    "branchFirstApiResponseMs": 5849,
+    "paintedBeforeAnyApiResponse": true
+  },
+  "acceptance": [
+    { "criterion": "429 PLAYER_ISSUANCE_LIMIT: hero, navegação, links dos quizzes e Entrar com Google; sem 'Não conseguimos falar com o servidor'", "result": "met", "evidence": "first-visit.mjs, Chromium e WebKit" },
+    { "criterion": "Após o callback do Google (stub), capa com navegação sem tocar em Tentar novamente", "result": "met", "evidence": "first-visit.mjs, cenários 2 e 3, Chromium e WebKit" },
+    { "criterion": "Visita sem interação não gera POST /api/player", "result": "met", "evidence": "first-visit.mjs cenários 1 e 5 (página principal e Duelos da corrida); presidential-duels.mjs e prediction-identity.mjs" },
+    { "criterion": ".account-avatar ≥ 24 px em 375, 390 e 440, Chromium e WebKit", "result": "met", "evidence": "first-visit.mjs cenário 5; alvo ≥ 44 px" },
+    { "criterion": "localStorage bloqueado não aparece como falha de rede nem com texto em inglês", "result": "met", "evidence": "app/src/safe-storage.js com testes; first-visit.mjs cenário 4, Chromium e WebKit" },
+    { "criterion": "Login com Google durante a leitura da chave salva leva a chave anônima (escolhas reunidas)", "result": "met", "evidence": "first-visit.mjs cenário 6, Chromium e WebKit; correção 98b8967 da revisão independente" },
+    { "criterion": "Smoke vote-abuse: 5 createPlayer na mesma rede → contagem 2 em quota_rejections_daily", "result": "met", "evidence": "vote-abuse-smoke.mjs em PostgreSQL 16 descartável" },
+    { "criterion": "Login Google de subject novo sem token não consome a cota de rede", "result": "met", "evidence": "vote-abuse-smoke.mjs e http-app.test.js" },
+    { "criterion": "Janela da cota de rede no dia editorial de São Paulo", "result": "met", "evidence": "topic-store.test.js (23h30 → 2026-10-25T03:00Z) e vote-abuse-smoke.mjs" },
+    { "criterion": "LCP móvel ≤ 2,5 s com throttling e API simulada, pintado antes de qualquer resposta de /api/", "result": "partial", "evidence": "1,98 s com throttling equivalente no Chromium, antes da primeira resposta da API; Lighthouse real e produção pendentes" },
+    { "criterion": "CI remoto (UI Interaction Smoke e Backend and Shared)", "result": "pending", "evidence": "branch local, sem push" }
+  ],
+  "independentReview": {
+    "checkedAt": "2026-10-31",
+    "fix": "98b8967: o login com Google feito durante a leitura da chave salva espera a leitura e leva a chave anônima",
+    "unitTests": { "app": 236, "back": 235, "shared": 93, "cardArtPilotContract": 64, "failed": 0 },
+    "build": { "withGoogleClientId": true, "withoutGoogleClientId": true, "pilotExcluded": true },
+    "backendSmokes": { "database": "PostgreSQL 16 descartável, banco novo, ordem do CI", "passed": 6, "failed": 0, "voteAbuseRepeatedOnSameDatabase": true },
+    "e2e": {
+      "chromium": { "scripts": 27, "passed": 27, "failed": 0 },
+      "webkit": {
+        "scripts": 27,
+        "passed": 23,
+        "failed": 4,
+        "failedScripts": ["interaction-smoke", "interaction-smoke (Google)", "accessible-profile", "civic-navigation"],
+        "sameFailuresOnBaseBuild": true
+      },
+      "firstVisitFailsOnBaseBuild": true
+    },
+    "lcp": { "server": "vite preview", "runs": 3, "baseMedianMs": 9980, "branchMedianMs": 1980, "branchFirstApiResponseMs": 5853, "paintedBeforeAnyApiResponse": true }
+  },
+  "remoteCi": "pending",
+  "humanGate": "not self-approved"
+}

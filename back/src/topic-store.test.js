@@ -23,6 +23,8 @@ import {
   validateDailyCutRecord,
   validateDailyCutResults,
   materializeDailyEdition,
+  networkIssuanceWindow,
+  QUOTA_REJECTION_RETENTION_DAYS,
 } from "./topic-store.js";
 import {
   DAILY_SESSION_RULESET,
@@ -697,4 +699,27 @@ test('ordered feedback uses the first preference even when its table position fo
   const replay=persistedRoundChannels({winner_id:'a',selection_ids:['a','b'],feedback_scope:'personal',feedback:result.personalFeedback,global_feedback:result.globalFeedback});
   assert.equal(replay.personalFeedback.outcomes.find(p=>p.id==='b').selectionOrder,2);
   if(replay.globalEvent) assert.equal(replay.globalEvent.winnerDelta,24);
+});
+
+test("cota de jogos novos por rede usa o dia editorial de São Paulo", () => {
+  const lateEvening = networkIssuanceWindow(new Date("2026-10-25T23:30:00-03:00"));
+  assert.deepEqual(lateEvening, {
+    day: "2026-10-25",
+    windowStart: "2026-10-25T03:00:00.000Z",
+    windowEnd: "2026-10-26T03:00:00.000Z",
+    retryAfterSeconds: 1800,
+  });
+  // 22h em Brasília já é outro dia em UTC; a janela continua sendo a de 25/10.
+  const afterUtcMidnight = networkIssuanceWindow("2026-10-26T01:00:00.000Z");
+  assert.equal(afterUtcMidnight.day, "2026-10-25");
+  assert.equal(afterUtcMidnight.windowStart, "2026-10-25T03:00:00.000Z");
+  assert.equal(afterUtcMidnight.retryAfterSeconds, 2 * 3600);
+  const justOpened = networkIssuanceWindow("2026-10-26T03:00:00.000Z");
+  assert.equal(justOpened.day, "2026-10-26");
+  assert.equal(justOpened.retryAfterSeconds, 86400);
+  assert.throws(() => networkIssuanceWindow("não é data"), TypeError);
+});
+
+test("agregado de recusas de cota é retido por mais de um ano", () => {
+  assert.ok(QUOTA_REJECTION_RETENTION_DAYS >= 400);
 });

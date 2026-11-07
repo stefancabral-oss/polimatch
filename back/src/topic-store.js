@@ -52,6 +52,61 @@ export const VOTE_ABUSE_LIMITS = Object.freeze({
   roundsPerPlayerPerDay: 30,
 });
 
+// Recusas por cota ficam só em agregado diário: dia, escopo, código e
+// contagem. Sem rede, pseudônimo ou jogador, para medir o efeito da cota sem
+// criar um registro de quem foi barrado.
+export const QUOTA_REJECTION_RETENTION_DAYS = 400;
+
+/**
+ * Janela da cota de jogos novos por rede: o dia editorial de São Paulo, o
+ * mesmo das cotas por jogador. Antes era `date_trunc('day', now())` no fuso
+ * da sessão do PostgreSQL (UTC), e a cota virava às 21h de Brasília.
+ */
+export function networkIssuanceWindow(instant) {
+  const date = instant instanceof Date ? instant : new Date(instant);
+  if (Number.isNaN(date.getTime())) throw new TypeError("instante inválido para a cota de rede");
+  const day = editorialDateKey(date);
+  const { opensAt, closesAt } = editionWindow(day);
+  return {
+    day,
+    windowStart: opensAt,
+    windowEnd: closesAt,
+    retryAfterSeconds: Math.max(1, Math.ceil((Date.parse(closesAt) - date.getTime()) / 1000)),
+  };
+}
+
+// Na troca do dia UTC pelo dia editorial, o bucket legado (meia-noite UTC) que
+// se sobrepõe à janela nova é herdado, limitado ao teto. Assim o dia do deploy
+// nunca abre uma segunda franquia de jogos novos para a mesma rede.
+async function carryForwardLegacyNetworkQuota(client, subjectHash, { windowStart, windowEnd }) {
+  await client.query(
+    `INSERT INTO abuse_quota_counters (scope, subject_hash, window_start, used)
+     SELECT 'network-player-day', $1, $2::timestamptz,
+            LEAST($4, COALESCE(SUM(used), 0)::integer)
+     FROM abuse_quota_counters
+     WHERE scope = 'network-player-day'
+       AND subject_hash = $1
+       AND window_start = date_trunc('day', window_start AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'
+       AND window_start <> $2::timestamptz
+       AND window_start < $3::timestamptz
+       AND window_start + interval '1 day' > $2::timestamptz
+     HAVING COALESCE(SUM(used), 0) > 0
+     ON CONFLICT (scope, subject_hash, window_start) DO NOTHING`,
+    [subjectHash, windowStart, windowEnd, VOTE_ABUSE_LIMITS.anonymousPlayersPerNetworkPerDay],
+  );
+}
+
+async function recordQuotaRejection(queryable, { day, scope, code }) {
+  await queryable.query(
+    `INSERT INTO quota_rejections_daily (day, scope, code, count)
+     VALUES ($1::date, $2, $3, 1)
+     ON CONFLICT (day, scope, code) DO UPDATE
+     SET count = quota_rejections_daily.count + 1,
+         updated_at = now()`,
+    [day, scope, code],
+  );
+}
+
 function quotaError(message, code, retryAfterSeconds) {
   const error = new Error(message);
   error.status = 429;
@@ -492,6 +547,15 @@ async function createCleanSchema(client, candidateRegistry, maintenanceNow) {
       used integer NOT NULL DEFAULT 0 CHECK (used >= 0),
       updated_at timestamptz NOT NULL DEFAULT now(),
       PRIMARY KEY (scope, subject_hash, window_start)
+    );
+
+    CREATE TABLE IF NOT EXISTS quota_rejections_daily (
+      day date NOT NULL,
+      scope text NOT NULL,
+      code text NOT NULL,
+      count bigint NOT NULL DEFAULT 0 CHECK (count >= 0),
+      updated_at timestamptz NOT NULL DEFAULT now(),
+      PRIMARY KEY (day, scope, code)
     );
 
     ALTER TABLE abuse_quota_counters
@@ -945,6 +1009,12 @@ async function createCleanSchema(client, candidateRegistry, maintenanceNow) {
   }
   // Retention must use the same clock as vote admission and editorial windows.
   await client.query("DELETE FROM abuse_quota_counters WHERE window_start < $1::timestamptz - interval '8 days'", [maintenanceNow.toISOString()]);
+  // Os contadores por rede duram 8 dias; o agregado de recusas fica mais de um
+  // ano para comparar o efeito da cota entre períodos.
+  await client.query(
+    "DELETE FROM quota_rejections_daily WHERE day < $1::date - $2::integer",
+    [editorialDateKey(maintenanceNow), QUOTA_REJECTION_RETENTION_DAYS],
+  );
   return { resetApplied: !applied.rowCount, migrationId: RESET_MIGRATION_ID };
 }
 
@@ -1846,23 +1916,34 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
       }
       const recoveryKey = createRecoveryKey();
       const playerId = randomUUID();
+      const issuance = networkIssuanceWindow(clockInstant(clock));
       const client = await pool.connect();
       try {
         await client.query("BEGIN");
+        await carryForwardLegacyNetworkQuota(client, normalizedNetworkHash, issuance);
         await consumeQuota(client, {
           scope: "network-player-day",
           subjectHash: normalizedNetworkHash,
-          window: "day",
+          windowStart: issuance.windowStart,
           limit: VOTE_ABUSE_LIMITS.anonymousPlayersPerNetworkPerDay,
           code: "PLAYER_ISSUANCE_LIMIT",
           message: "limite diário de novos jogadores nesta rede atingido",
-          retryAfterSeconds: 86400,
+          retryAfterSeconds: issuance.retryAfterSeconds,
         });
         await createPlayerRecords(client, playerId, recoveryKeyHash(recoveryKey), candidateRegistry);
         await client.query("COMMIT");
         return { recoveryKey };
       } catch (error) {
         await client.query("ROLLBACK");
+        if (error?.code === "PLAYER_ISSUANCE_LIMIT") {
+          // Fora da transação revertida, para a recusa não sumir junto. Uma
+          // falha ao contar não pode trocar a resposta 429 por um erro 500.
+          await recordQuotaRejection(client, {
+            day: issuance.day,
+            scope: "network-player-day",
+            code: "PLAYER_ISSUANCE_LIMIT",
+          }).catch(() => {});
+        }
         throw error;
       } finally {
         client.release();
