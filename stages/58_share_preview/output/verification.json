@@ -1,0 +1,123 @@
+{
+  "issue": 300,
+  "trackingIssue": 316,
+  "icm": 58,
+  "checkedAt": "2026-11-07T04:20:00Z",
+  "base": "32c9276f54a5baacf8a367c19cde677d27451dc3",
+  "branch": "stefancabral-oss/share-preview-html-3d6d",
+  "productionUntouched": true,
+  "reconciliation": "fast-forward 7c0bb27..32c9276; sem commit publicado antes, sem rebase e sem force-push",
+  "red": {
+    "command": "node --test src/share-preview.test.js",
+    "cwd": "app",
+    "when": "antes de inserir as metas no HTML",
+    "passed": 5,
+    "failed": 1,
+    "failure": "cada entrada do build traz a prévia no HTML inicial: as quatro páginas sem og:title, og:description, og:url, og:image, og:locale e twitter:card"
+  },
+  "tests": {
+    "appUnit": {
+      "command": "npm test",
+      "cwd": "app",
+      "passed": 245,
+      "failed": 0,
+      "baselineFrom311": 237,
+      "new": 8
+    },
+    "edgeDeliveryStillPasses": {
+      "command": "node --test src/share-preview.test.js src/edge-delivery.test.js",
+      "cwd": "app",
+      "passed": 19,
+      "failed": 0
+    }
+  },
+  "build": {
+    "command": "npm run build",
+    "cwd": "app",
+    "exitCode": 0,
+    "sharePreview": "Prévia de compartilhamento ok em 4 páginas",
+    "publicRefs": "verified 36 local references in 5 HTML files and 1 manifest(s): none missing",
+    "editorial": "Assets editoriais íntegros: 0; Fotografias de recuperação íntegras: 54",
+    "portraits": "Retratos prontos: 99/125",
+    "presidential": "104 identities verified"
+  },
+  "localPreview": {
+    "command": "npm run preview -- --host 127.0.0.1 --port 4174 --strictPort",
+    "cwd": "app",
+    "server": "vite preview do dist, descartável",
+    "pages": [
+      {
+        "path": "/",
+        "status": 200,
+        "contentType": "text/html",
+        "bytes": 2269,
+        "sha256": "031464d1a4f146e9402d629bbfe6297a10d568738fc876e1fccec7421fa692fc",
+        "ogTitle": "PoliMatch — Eleições 2026",
+        "ogDescription": "Escolhas rápidas entre pessoas públicas nas Eleições 2026.",
+        "ogUrl": "https://polimatch.com.br/",
+        "ogImage": "https://polimatch.com.br/brand/logo-volumetric.png",
+        "ogLocale": "pt_BR",
+        "twitterCard": "summary_large_image",
+        "imageBeforeScript": true
+      },
+      {
+        "path": "/quem-disse-isso.html",
+        "status": 200,
+        "contentType": "text/html;charset=utf-8",
+        "bytes": 2223,
+        "sha256": "74b9ba59a0fc359e76c84073f1a03b035dc767c7046001782a123d0cf612b3ef",
+        "ogUrl": "https://polimatch.com.br/quem-disse-isso.html",
+        "imageBeforeScript": true
+      },
+      {
+        "path": "/fato-ou-fake.html",
+        "status": 200,
+        "contentType": "text/html;charset=utf-8",
+        "bytes": 2067,
+        "sha256": "771c6ec05fe9d1825c27304132343420475bff4bafa437a8e80f8549f5f3993e",
+        "ogUrl": "https://polimatch.com.br/fato-ou-fake.html",
+        "imageBeforeScript": true
+      },
+      {
+        "path": "/duelos-da-corrida.html",
+        "status": 200,
+        "contentType": "text/html;charset=utf-8",
+        "bytes": 2103,
+        "sha256": "134b4e51c2cd560325a08b91fc394a1ba8b2d08faa2a8a0e3aa85a283cc9c9ca",
+        "ogUrl": "https://polimatch.com.br/duelos-da-corrida.html",
+        "imageBeforeScript": true
+      }
+    ],
+    "image": {
+      "path": "/brand/logo-volumetric.png",
+      "status": 200,
+      "contentType": "image/png",
+      "bytes": 604325,
+      "width": 1600,
+      "height": 1000,
+      "pngSignature": true,
+      "source": "app/public/brand/logo-volumetric.png, bytes inalterados"
+    },
+    "mergedEdgeFilesOnThisPreview": {
+      "robots.txt": "200 text/plain",
+      "sitemap.xml": "200 text/xml"
+    },
+    "notNginx": "vite preview ainda devolve o HTML do app para arquivo ausente (/version.json e /brand/inexistente.png, 200 text/html). O 404 desses casos é o nginx da #311 e só vale depois do deploy dessa main."
+  },
+  "productionObserved": {
+    "when": "2026-11-07T04:01:46Z",
+    "home": "200 text/html, 1189 bytes, sha256 326e962fbd951998a8a55c86ff7af4afb891a4481438ed7546a9d8605fd46f5d, sem og:",
+    "robotsAndSitemap": "200 text/html idêntico à home",
+    "afterMerge": "a checagem informada após o merge 32c9276 continuou igual; publicação não confirmada",
+    "existingImage": "GET /brand/logo-volumetric.png em produção já respondia 200 image/png, content-length 604325"
+  },
+  "notRun": [
+    "suíte e2e de browser",
+    "smoke Docker da imagem nginx",
+    "deploy e GET de produção depois deste build"
+  ],
+  "humanGate": {
+    "status": "pending",
+    "by": null
+  }
+}
