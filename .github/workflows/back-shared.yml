@@ -110,3 +110,5 @@ jobs:
         run: node back/scripts/civic-schema-smoke.mjs
         env:
           CIVIC_DISPOSABLE_TEST: '1'
+      - name: Prove the API survives dropped connections, bad bodies and lock waits
+        run: npm run test:resilience --prefix back

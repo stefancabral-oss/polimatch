@@ -136,6 +136,7 @@ API:
 - antes de publicar qualquer decisão editorial, injetar `EDITORIAL_AUTHORITY_PUBLIC_JWK`, `EDITORIAL_AUTHORITY_ISSUER`, `EDITORIAL_AUTHORITY_KEY_ID` e `EDITORIAL_AUTHORITY_RECEIPTS`; recibos inválidos ou ausentes mantêm default-deny;
 - origem padrão de produção: somente `https://polimatch.com.br`; ambientes adicionais exigem `APP_ORIGINS=https://polimatch.com.br,https://staging.exemplo`;
 - healthcheck: `GET /api/health`.
+- logs: uma linha JSON por requisição no stdout, sem IP nem token, e uma linha `client_error` para cada erro relatado pelo navegador em `POST /api/client-errors`; prazos do banco ajustáveis por `PG_*_TIMEOUT_MS`. Campos, consultas e o alarme externo estão em [Monitoramento e alertas](docs/ops/MONITORING.md);
 - revisão do release: construa a imagem da API com `--build-arg SOURCE_COMMIT=<SHA completo do checkout>`; o Dockerfile grava a revisão no artefato e a receipt deve conter o mesmo `releaseRevision`;
 - publicação agregada: `AGGREGATE_AUTHORITY_RECEIPTS=<array JSON>` é a única entrada operacional. JWK, emissor e `keyId` precisam estar previamente pinados no artefato versionado; enquanto o keyring estiver vazio ou qualquer vínculo falhar, todos os escopos permanecem bloqueados.
 

@@ -1,3 +1,4 @@
+import "./install-error-reporter.js";
 import { mainGameChroma, installMainChromas } from "./main-chromas.js";
 import { selectOrderedCard } from "./ordered-selection.js";
 import "./styles.css";

@@ -1,0 +1,288 @@
+{
+  "checkedAt": "2026-10-31",
+  "base": "7c0bb27d55b756f62cf20398aabcd180b8c54203",
+  "branch": "fix/api-resilience",
+  "issue": 281,
+  "unitTests": {
+    "back": {
+      "command": "npm test --prefix back",
+      "passed": 268,
+      "failed": 0,
+      "newTests": 36,
+      "newFiles": [
+        "back/src/logger.test.js",
+        "back/src/database-resilience.test.js",
+        "back/src/process-guards.test.js",
+        "back/src/http-hardening.test.js",
+        "back/src/client-error-report.test.js"
+      ],
+      "fromMain": 232,
+      "existingTestsChanged": 0
+    },
+    "shared": {
+      "command": "npm run test:shared",
+      "passed": 93,
+      "failed": 0,
+      "taxonomy": "passed"
+    },
+    "app": {
+      "command": "npm test --prefix app",
+      "passed": 235,
+      "failed": 0,
+      "fromMain": 226,
+      "newTests": 9,
+      "newFiles": [
+        "app/src/error-reporter.test.js"
+      ]
+    },
+    "editorialVerify": "passed"
+  },
+  "build": {
+    "app": true,
+    "pilotExcluded": true
+  },
+  "integration": {
+    "database": "PostgreSQL 16.14 local e descartável, banco novo, lc_messages=C",
+    "order": "igual ao job back-integration-postgres",
+    "smokes": {
+      "topic-store-smoke": "passed",
+      "ordered-choices-smoke": "passed",
+      "presidential-duels-smoke": "passed",
+      "vote-abuse-smoke": "passed",
+      "game-progress-smoke": "passed",
+      "civic-schema-smoke": "passed",
+      "api-resilience-smoke": "passed"
+    },
+    "apiResilienceSmoke": {
+      "command": "npm run test:resilience --prefix back",
+      "runs": 4,
+      "failures": 0,
+      "consecutivePassesOnFinalVersion": 3,
+      "durationSeconds": 4,
+      "pool": {
+        "sessionSettings": "statement_timeout, lock_timeout, idle_in_transaction_session_timeout e application_name aplicados",
+        "statementTimeout": "57014, classificado como passageiro",
+        "migrationTimeouts": [
+          "2min dentro da transação",
+          "300ms depois do COMMIT"
+        ],
+        "idleInTransactionWhileCheckedOut": "registrado, processo vivo",
+        "idleClientTerminated": "registrado, pool reconecta"
+      },
+      "terminate": {
+        "terminatedBackends": 1,
+        "nextHealthStatus": 200,
+        "samePid": true
+      },
+      "bodies": {
+        "compressedBody": 415,
+        "malformedJson": 400,
+        "oversized": 413,
+        "healthAfter": 200
+      },
+      "lockTimeout": {
+        "configuredMs": 1000,
+        "status": 503,
+        "code": "DATABASE_UNAVAILABLE",
+        "retryAfter": "5",
+        "elapsedMs": 1006
+      },
+      "logs": {
+        "requestLines": 16,
+        "allLinesJson": true,
+        "status429Lines": 1,
+        "status429Code": "PLAYER_ISSUANCE_LIMIT",
+        "tokenOrIpInLog": false,
+        "clientErrorLines": 1,
+        "clientErrorBuild": "o build enviado"
+      },
+      "sigterm": {
+        "exitCode": 0
+      }
+    },
+    "manualScenarios": {
+      "postgresStopped": "health 503 DATABASE_UNAVAILABLE com Retry-After 5; depois de religado, 200 no mesmo processo",
+      "terminateDuringLockedRequest": "requisição 503, processo vivo, health seguinte 200",
+      "compressedBodyChunked": "415 com Connection: close, processo vivo",
+      "sigtermWithRequestInFlight": "requisição termina com 201, shutdown_completed",
+      "bootFailures": "sem DATABASE_URL, banco inacessível, PG_LOCK_TIMEOUT_MS=5s ou segredo curto: boot_failed e saída 1"
+    }
+  },
+  "baselineReproduction": {
+    "source": "main@7c0bb27 extraído por git archive em diretório temporário",
+    "afterTerminate": "health 000; processo encerrado com Unhandled 'error' event",
+    "xPoweredBy": "X-Powered-By: Express",
+    "thisBranch": "health 200; mesmo pid; sem x-powered-by"
+  },
+  "npmAudit": {
+    "command": "npm audit --omit=dev (back/)",
+    "before": {
+      "critical": 1,
+      "high": 1,
+      "moderate": 1
+    },
+    "after": {
+      "total": 0
+    },
+    "fullAuditAfter": 0,
+    "fix": "npm audit fix, sem --force; body-parser 2.4.0, proxy-addr 2.0.8, qs 6.17.1; override de qs ^6.17.1",
+    "lockfileConsistent": "npm ci limpo aprovado"
+  },
+  "e2e": {
+    "applicable": true,
+    "target": "vite preview, lista do workflow de interface mais client-error-report (26 por navegador); smoke do formulário do piloto #176 não rodado, não carrega as páginas do app",
+    "localChromium": "headless 1187 do cache via preload local não versionado (Playwright 1.55.1 pede 1193)",
+    "chromium": {
+      "passed": 26,
+      "failed": 0
+    },
+    "webkit": {
+      "passed": 21,
+      "failed": 5,
+      "sameOnMain": [
+        "interaction-smoke",
+        "interaction-smoke (Google)",
+        "accessible-profile",
+        "civic-navigation"
+      ],
+      "reason": "passos de Tab e foco do WebKit no macOS; main 7c0bb27 construído em diretório temporário falha igual; o CI roda WebKit no Linux",
+      "factCheck": "um timeout na rodada completa; com vite preview sob carga também falha às vezes em main (1 de 5); servidor estático alternando main e branch: 6 de 6 em cada"
+    },
+    "afterLastChange": {
+      "build": "sem SOURCE_COMMIT, como no Dokploy",
+      "passedInBothBrowsers": [
+        "client-error-report",
+        "quote-quiz-checked",
+        "quote-quiz",
+        "main-navigation",
+        "presidential-navigation"
+      ]
+    }
+  },
+  "acceptance": [
+    {
+      "criterion": "Depois de pg_terminate_backend, o /api/health seguinte responde 200 sem reiniciar o processo",
+      "result": "met",
+      "evidence": "api-resilience-smoke: 1 conexão encerrada, health 200, mesmo pid; main reproduzido morrendo"
+    },
+    {
+      "criterion": "Corpos malformados ou com codificação inesperada recebem 4xx sem derrubar o processo",
+      "result": "met",
+      "evidence": "http-hardening.test.js (6 codificações, 3 JSON inválidos, 413, charset) e smoke contra a API real"
+    },
+    {
+      "criterion": "npm audit --omit=dev em back/ sem high ou critical",
+      "result": "met",
+      "evidence": "0 avisos depois de npm audit fix"
+    },
+    {
+      "criterion": "Respostas sem x-powered-by",
+      "result": "met localmente; produção depende de deploy",
+      "evidence": "teste unitário e smoke; conferência em produção na lista do Stefan"
+    },
+    {
+      "criterion": "Pool com ouvinte de erro, prazos de conexão, consulta, trava e transação parada, sem quebrar a migração de boot",
+      "result": "met",
+      "evidence": "database-resilience.test.js, smoke e os seis smokes anteriores aprovados"
+    },
+    {
+      "criterion": "Handlers de unhandledRejection e uncaughtException com política clara",
+      "result": "met",
+      "evidence": "process-guards.test.js (7 casos) e boot com falha saindo com código 1"
+    },
+    {
+      "criterion": "Uma linha JSON por requisição sem IP e sem Authorization; 5xx com stack e requestId; 429 com o código",
+      "result": "met localmente",
+      "evidence": "http-hardening.test.js e smoke: grep '\"status\":429' conta 1 linha com PLAYER_ISSUANCE_LIMIT"
+    },
+    {
+      "criterion": "Captura de error, unhandledrejection e vite:preloadError enviada por sendBeacon a um endpoint com limite, até 2 KB e sem dados do jogador",
+      "result": "met",
+      "evidence": "error-reporter.test.js (9), client-error-report.test.js (7), e2e client-error-report em Chromium e WebKit, smoke de resiliência"
+    },
+    {
+      "criterion": "Transação bloqueada responde 503 em vez de ficar pendurada",
+      "result": "met",
+      "evidence": "smoke: tabela travada, 503 DATABASE_UNAVAILABLE em cerca de 1,0 s com lock_timeout de 1 s"
+    },
+    {
+      "criterion": "Parar a API gera alerta em até 5 min",
+      "result": "needs-stefan",
+      "evidence": "passo a passo em docs/ops/MONITORING.md"
+    },
+    {
+      "criterion": "Notificador do Dokploy para falha de build e deploy",
+      "result": "needs-stefan",
+      "evidence": "passo a passo em docs/ops/MONITORING.md"
+    },
+    {
+      "criterion": "Throw forçado no navegador aparece no log com o SHA do build em menos de 1 min",
+      "result": "met localmente; em produção o build só traz o SHA depois do ICM 45",
+      "evidence": "prova ponta a ponta: linha client_error com build = SOURCE_COMMIT em cerca de 110 ms, Chromium e WebKit; e2e client-error-report no workflow de interface compara com github.sha"
+    },
+    {
+      "criterion": "5xx provocado em staging gera evento",
+      "result": "partial",
+      "evidence": "5xx gera request_failed com stack e requestId no log; erros do navegador geram client_error; não há staging nem rastreador de erros externo"
+    },
+    {
+      "criterion": "Smoke de resiliência no CI",
+      "result": "ci-only",
+      "evidence": "passo novo no job back-integration-postgres; passo client-error-report no workflow de interface (Chromium e WebKit)"
+    }
+  ],
+  "remoteCi": "pending",
+  "humanGate": "not self-approved",
+  "clientErrorReport": {
+    "endpoint": "POST /api/client-errors",
+    "transport": "sendBeacon, text/plain, até 2 KB",
+    "fields": [
+      "build",
+      "page",
+      "kind",
+      "message",
+      "source",
+      "line",
+      "column",
+      "stack"
+    ],
+    "kinds": [
+      "error",
+      "unhandledrejection",
+      "preload"
+    ],
+    "limits": {
+      "perPage": 5,
+      "perNetworkPerMinute": 10,
+      "globalPerMinute": 120,
+      "overLimit": "429 CLIENT_ERROR_RATE_LIMITED"
+    },
+    "endToEnd": {
+      "setup": "src/server.js em modo produção, APP_ORIGINS local, páginas do build (SOURCE_COMMIT fixo) servidas na mesma origem",
+      "browsers": [
+        "chromium",
+        "webkit"
+      ],
+      "pages": [
+        "/quem-disse-isso.html",
+        "/"
+      ],
+      "result": "throw forçado virou linha client_error com build igual ao SOURCE_COMMIT",
+      "elapsedMs": [
+        105,
+        107,
+        109,
+        107
+      ],
+      "unexpectedReports": 0
+    }
+  },
+  "review": {
+    "independentReview": true,
+    "changes": [
+      "captura de erros do navegador implementada (estava adiada para o ICM 45, que não a inclui)",
+      "requestId na linha client_error",
+      "verificação refeita do zero"
+    ]
+  }
+}
