@@ -3,9 +3,9 @@ import { createHash, randomUUID } from "node:crypto";
 import pg from "pg";
 import { createTopicStore, recoveryKeyHash, VOTE_ABUSE_LIMITS } from "../src/topic-store.js";
 import { createApprovedTestRegistry } from "../test-support/editorial-fixtures.js";
+import { requireDisposableDatabase } from "../test-support/disposable-db.js";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) throw new Error("DATABASE_URL é obrigatória para o smoke de abuso");
+const connectionString = requireDisposableDatabase();
 
 const candidateRegistry = createApprovedTestRegistry();
 const store = createTopicStore(connectionString, { candidateRegistry });

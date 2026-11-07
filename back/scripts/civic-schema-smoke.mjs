@@ -3,7 +3,9 @@ import { createHash } from 'node:crypto';
 import pg from 'pg';
 import { migrateCivic, rollbackEmptyCivic, insertCivicFixture } from '../src/civic-schema.js';
 import { civicFixture } from '../../shared/civic-fixtures.js';
+import { requireDisposableDatabase } from '../test-support/disposable-db.js';
 
+requireDisposableDatabase();
 if (!process.env.DATABASE_URL || process.env.CIVIC_DISPOSABLE_TEST !== '1') throw new Error('Requires disposable DATABASE_URL and CIVIC_DISPOSABLE_TEST=1');
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const quote = name => '"' + name.replaceAll('"', '""') + '"';

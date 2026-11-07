@@ -23,6 +23,9 @@ import {
   validateDailyCutRecord,
   validateDailyCutResults,
   materializeDailyEdition,
+  assertSchemaResetAllowed,
+  schemaResetAllowedFromEnvironment,
+  CLEAN_START_MIGRATION,
 } from "./topic-store.js";
 import {
   DAILY_SESSION_RULESET,
@@ -697,4 +700,27 @@ test('ordered feedback uses the first preference even when its table position fo
   const replay=persistedRoundChannels({winner_id:'a',selection_ids:['a','b'],feedback_scope:'personal',feedback:result.personalFeedback,global_feedback:result.globalFeedback});
   assert.equal(replay.personalFeedback.outcomes.find(p=>p.id==='b').selectionOrder,2);
   if(replay.globalEvent) assert.equal(replay.globalEvent.winnerDelta,24);
+});
+
+test("reset da edição só recria banco vazio ou com autorização explícita", () => {
+  assert.doesNotThrow(() => assertSchemaResetAllowed([]));
+  assert.doesNotThrow(() => assertSchemaResetAllowed(["public.votes"], { allowReset: true }));
+  const tables = ["public.anonymous_players", "public.choice_rounds", "public.votes"];
+  assert.throws(() => assertSchemaResetAllowed(tables), (error) => {
+    assert.equal(error.code, "SCHEMA_RESET_BLOCKED");
+    assert.deepEqual(error.populatedTables, tables);
+    assert.match(error.message, new RegExp(CLEAN_START_MIGRATION));
+    assert.match(error.message, /public\.votes/);
+    assert.match(error.message, /POLIMATCH_ALLOW_RESET=1/);
+    return true;
+  });
+  const many = Array.from({ length: 11 }, (_, index) => `public.t${index}`);
+  assert.throws(() => assertSchemaResetAllowed(many), /public\.t7 e mais 3\./);
+});
+
+test("autorização de reset exige POLIMATCH_ALLOW_RESET=1 literal", () => {
+  assert.equal(schemaResetAllowedFromEnvironment({}), false);
+  assert.equal(schemaResetAllowedFromEnvironment({ POLIMATCH_ALLOW_RESET: "true" }), false);
+  assert.equal(schemaResetAllowedFromEnvironment({ POLIMATCH_ALLOW_RESET: "0" }), false);
+  assert.equal(schemaResetAllowedFromEnvironment({ POLIMATCH_ALLOW_RESET: "1" }), true);
 });

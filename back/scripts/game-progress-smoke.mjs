@@ -4,10 +4,10 @@ import pg from "pg";
 import CATALOG from "../../shared/elections-2026.json" with { type: "json" };
 import { createApprovedTestRegistry } from "../test-support/editorial-fixtures.js";
 import { createTopicStore } from "../src/topic-store.js";
+import { requireDisposableDatabase } from "../test-support/disposable-db.js";
 
 // Run only against the disposable database provided by the integration workflow.
-const connection = process.env.DATABASE_URL;
-if (!connection) throw new Error("DATABASE_URL is required (disposable test database)");
+const connection = requireDisposableDatabase();
 const approvedRegistry = createApprovedTestRegistry(CATALOG.map(person => person.id));
 const withdrawn = new Set();
 const registry = { ...approvedRegistry, candidatesForTopic: topic => approvedRegistry.candidatesForTopic(topic).filter(person => !withdrawn.has(person.id)) };
