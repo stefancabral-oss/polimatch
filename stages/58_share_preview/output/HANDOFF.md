@@ -7,7 +7,7 @@
 - Acompanhamento: #316, continua aberto
 - Base: `32c9276` (#311 já mesclada em main)
 - Branch: `stefancabral-oss/share-preview-html-3d6d`
-- PR: o link entra no commit seguinte a este handoff, no mesmo envio
+- PR: https://github.com/stefancabral-oss/polimatch/pull/317
 - Produção: não foi alterada. O deploy continua com o Stefan
 
 ## O que foi reproduzido

@@ -5,6 +5,7 @@
   "checkedAt": "2026-11-07T04:20:00Z",
   "base": "32c9276f54a5baacf8a367c19cde677d27451dc3",
   "branch": "stefancabral-oss/share-preview-html-3d6d",
+  "pullRequest": "https://github.com/stefancabral-oss/polimatch/pull/317",
   "productionUntouched": true,
   "reconciliation": "fast-forward 7c0bb27..32c9276; sem commit publicado antes, sem rebase e sem force-push",
   "red": {
