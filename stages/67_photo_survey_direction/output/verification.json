@@ -5,7 +5,7 @@
   "checkedAt": "2026-11-13T01:12:00Z",
   "base": "5e52ba8c38929ca9ee552f32feccea18eb8add43",
   "branch": "icm/67-photo-survey-direction",
-  "pullRequest": "PR_URL_PENDENTE",
+  "pullRequest": "https://github.com/stefancabral-oss/polimatch/pull/319",
   "productionUntouched": true,
   "docsOnly": {
     "command": "git diff --name-only origin/main | grep -E '^(app|back|shared)/'",

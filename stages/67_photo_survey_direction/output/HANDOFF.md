@@ -7,7 +7,7 @@
 - Relacionada: #277, com a Q1 respondida em comentário de 12/11/2026
 - Base: `5e52ba8` (#317 já mesclada em main)
 - Branch: `icm/67-photo-survey-direction`
-- PR: PR_URL_PENDENTE
+- PR: https://github.com/stefancabral-oss/polimatch/pull/319
 - Produção: não foi alterada
 
 ## O que este lote entrega
