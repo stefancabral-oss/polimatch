@@ -333,6 +333,17 @@ Um agente independente conferiu a junção, somente leitura: nenhum defeito de
 código na junção, nenhuma linha perdida dos dois lados, e a guarda nova do
 smoke de resiliência atende ao teste que a exige.
 
+## Publicação em produção — 13/11/2026
+
+Por instrução do Stefan em conversa ("Sim, cópia e API" e depois "Sim, publica"), com ele logado no painel, a API e depois o app foram publicados no commit `7a4c9db`. Quem executou o deploy foi o agente, clicando em Deploy no painel, a pedido dele. É uma exceção pontual, autorizada por ele naquela conversa, à frase "nenhum agente publica em produção" do gate abaixo; a regra não muda.
+
+- API: deploy concluído em 52 s. Consultas de fora a cada 5 s durante a troca responderam 200.
+- `/api/health` sem `x-powered-by` e com `x-request-id`. No log: `"event":"database_ready"`, `"event":"listening"` e uma linha `"event":"http_request"` por requisição.
+- App: deploy concluído em 42 s. As quatro páginas e os arquivos que elas referenciam respondem 200, e o build traz o relator de erros.
+- Não conferido: um erro de teste do navegador chegando como `"event":"client_error"`.
+- O `rev` do log e o `revision` do `/api/health` seguem `null`: o Dokploy ainda constrói sem `SOURCE_COMMIT` (issue #287).
+- Continuam com o Stefan: monitor externo, teste do alarme, avisos do Dokploy e a decisão sobre o logger. A issue #281 segue aberta.
+
 ## Human gate
 
 - Decisão: `aprovado`

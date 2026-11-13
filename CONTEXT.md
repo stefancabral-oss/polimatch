@@ -206,5 +206,6 @@ O limite de 3 por rede continua até a decisão Q4 da #277.
 Auditoria de maturidade de 30/10/2026. Estágio 45: o build do app grava o SHA
 do commit em `/version.json` e na meta `polimatch-release`, os retratos usam o
 hash do conteúdo como versão e o `ci.yml` roda em todo PR e em todo push para
-`main`, com o check único `ci-gate`. O ruleset de `main` e a chegada do SHA ao
-build do Dokploy ficam com Stefan (docs/ops/RELEASE.md).
+`main`, com o check único `ci-gate`. O ruleset de `main` foi aplicado em
+13/11/2026. A chegada do SHA ao build do Dokploy fica com Stefan
+(docs/ops/RELEASE.md).
