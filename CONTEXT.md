@@ -39,7 +39,7 @@ Em 12/11/2026 Stefan respondeu à Q1 da #277 com um caminho fora das três opç�
 - Cada pesquisa é um conjunto de fotos e uma pergunta curta, com começo e fim. Só foto e nome, sem texto para ler.
 - Qualquer pessoa joga. A escolha só entra na pesquisa com cadastro por CPF.
 - Quem jogou vê os cinco primeiros. Só a resposta somada sai do PoliMatch, nunca o dado de uma pessoa.
-- Abre com Política, Famosos e influenciadores, e Futebol.
+- Abre com Política, Famosos e influenciadores, e Futebol. A decisão 0002 fixou a ordem das três primeiras construções: política, celebridades e influenciadores, roupas.
 - Os jogos de leitura e a parte cívica e de notícias ficam no ar sem trabalho novo.
 - Telas novas minimalistas: fundo neutro e um único verde. Na hora do voto vale a carta com moldura, no mesmo padrão para todas as cartas da pesquisa (decisão 0002, de 13/11/2026, que alterou o "foto sem moldura" da 0001).
 
@@ -52,7 +52,7 @@ Antes de propor ou alterar tela, regra de voto ou cadastro, ler o registro de de
 As decisões desta lista descrevem o que está no ar. A referência para o que não se aplica à direção nova é a tabela do registro de decisão. A marca "Substituída para as telas da pesquisa por foto" aparece só nas principais, como atalho.
 
 - O frontend anterior foi rejeitado e será substituído, não remendado.
-- A direção de arte `Malaquita 2026 / Digital First` enviada em 13/09/2026 está aprovada e é a referência visual oficial. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.
+- A direção de arte `Malaquita 2026 / Digital First` enviada em 13/09/2026 está aprovada e é a referência visual oficial. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318), com a ressalva da decisão 0002: as cartas com moldura valem nessas telas. Segue valendo para o que está no ar.
 - O shell usa malaquita escura; porcelana aparece em placas de nome e superfícies editoriais; ouro indica progresso e raridade.
 - Cards têm moldura facetada, fotografia dominante, marca pequena, raridade no canto e placa inferior clara.
 - Chromas ampliam luz, cor e materialidade progressivamente; o efeito prismático máximo é reservado à Chroma comemorativa.

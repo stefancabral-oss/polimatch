@@ -11,6 +11,9 @@
       "references/etapa1-1-voto.jpg",
       "references/etapa1-2-final.jpg",
       "references/etapa1-3-confirmacao.jpg"
+    ],
+    "notYetApproved": [
+      "references/etapa1-0-entrada.jpg (drawn after the independent review)"
     ]
   },
   "decision": "docs/decisions/0002-ordem-de-construcao-e-cartas-com-moldura.md",
@@ -24,8 +27,16 @@
   "facts": {
     "politicalCardsWithCommonFrame": 20,
     "source": "app/public/chromas/politicos, arquivos -530.webp e -1060.webp",
-    "specialFrameCards": ["lula", "flavio-bolsonaro"],
-    "currentGame": "10 telas de 4 cartas por dia, duas escolhas em ordem, sem voltar, gravação imutável por tela (back/src/daily-session.js, back/src/topic-store.js)"
+    "specialFrameCards": [
+      "lula",
+      "flavio-bolsonaro"
+    ],
+    "currentGame": "10 telas de 4 cartas por dia, duas escolhas em ordem, sem voltar, gravação imutável por tela (back/src/daily-session.js, back/src/topic-store.js)",
+    "cardPhotoOrigin": {
+      "existing (Acervo PoliMatch, origem não registrada)": 12,
+      "curated (foto de veículo ou de site)": 8,
+      "source": "shared/presidential-roster.json, campo photo.kind"
+    }
   },
   "tests": {
     "app": "286 passed, 0 failed",
@@ -39,5 +50,20 @@
     "delivery68d": "não iniciada",
     "delivery68e": "não iniciada"
   },
-  "humanGate": "pendente; merge só por instrução do Stefan para este PR"
+  "humanGate": "pendente; merge só por instrução do Stefan para este PR",
+  "independentReview": {
+    "mode": "agente separado, somente leitura",
+    "result": "sem bloqueio",
+    "appliedAfterReview": [
+      "tela de entrada acrescentada ao formato e às referências",
+      "desfazer vale até a confirmação; trocar depois fica para outra etapa",
+      "critérios de aceite por entrega, com resposta forjada, sorteio uniforme, tabelas imutáveis, janela e troca de identidade",
+      "página nova fora do sitemap e com noindex; testes que fixam a lista de páginas ajustados na 68c",
+      "troca da entrada do site só na 68e, com critério próprio",
+      "condições de publicação com os bloqueios #284, #283, #279 e #285",
+      "origem das imagens das 20 cartas registrada",
+      "frases da raiz e da decisão 0002 alinhadas"
+    ]
+  },
+  "pr": 325
 }

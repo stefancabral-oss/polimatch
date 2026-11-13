@@ -34,8 +34,7 @@ Palavras dele, transcritas de conversa por voz:
    ser o padrão das telas de voto. Condição: todas as cartas de uma mesma
    pesquisa usam o mesmo padrão de moldura, para ninguém sair em vantagem.
 3. **Ninguém de fora antes de testar.** Nenhuma pessoa ou empresa é chamada
-   antes de o aplicativo funcionar por inteiro, testado por agentes. O contato
-   com marcas fica suspenso até lá.
+   antes de o aplicativo funcionar por inteiro, testado por agentes.
 4. **A construção começa agora.** A primeira etapa ([ICM 68] #324) corre em
    paralelo ao que resta do programa de maturidade (#309).
 
@@ -46,11 +45,19 @@ Palavras dele, transcritas de conversa por voz:
 | "Decisão", item 8; tabela, linhas "Chromas na rodada" e "Direção de arte" | Foto sem moldura na hora do voto. | Carta com moldura, no mesmo padrão para todas as cartas da pesquisa. O resto do visual da tela continua: fundo neutro, um único verde, sem enfeite além das cartas. |
 | "Pendências", "Ordem do trabalho (#309)" | Maturidade primeiro: os bloqueios de [ICM 36] a [ICM 44] antes de qualquer etapa de produto. | A etapa 1 começa agora, em paralelo. Os bloqueios continuam abertos e nenhum é dispensado por esta decisão. |
 | "Etapas seguintes propostas" | Medir o uso ([ICM 60]), depois o servidor da pesquisa e por fim as telas, com a [ICM 65] antes do servidor. | A etapa 1 traz regras, servidor e tela da primeira pesquisa, em módulos e tabelas novos, sem depender da divisão do `topic-store.js`. A [ICM 60] e a [ICM 65] seguem no programa de maturidade. |
-| "Decisão", item 6 | Assuntos de abertura: Política, Famosos e influenciadores, Futebol. | Ordem de construção: Política, celebridades e influenciadores, roupas. Futebol não foi tratado nesta decisão. |
+| "Decisão", item 6 | Assuntos de abertura: Política, Famosos e influenciadores, Futebol. | A lista de assuntos de abertura não foi revista. Esta decisão fixa só a ordem das três primeiras construções (política, celebridades e influenciadores, roupas) e acrescenta roupas, que não estava na lista. |
+
+A regra do jogo atual "carta padrão neutra para todos; Chroma como
+personalização pessoal" (`CONTEXT.md`, "Decisões atuais aprovadas";
+`README.md`, "Produto atual") continua valendo para o que está no ar. Na
+pesquisa por foto a ideia é a mesma por outro caminho: todas as cartas de uma
+pesquisa têm a mesma moldura.
 
 ## O que não muda
 
-- Os itens 1 a 5 e 7 da decisão 0001. Em particular o item 3: a escolha só
+- Os itens 1 a 5 e 7 da decisão 0001. O item 2 diz que a pesquisa "permite
+  desfazer a escolha": na etapa 1 isso vale até a confirmação, e trocar depois
+  de confirmar fica para uma etapa própria. Em particular o item 3: a escolha só
   entra na pesquisa com cadastro por CPF. A etapa 1 não tem cadastro por CPF;
   ela grava a escolha ligada à identidade que o jogo já usa, e se essas
   escolhas contam no resultado fica para a etapa do cadastro.
@@ -71,10 +78,17 @@ Palavras dele, transcritas de conversa por voz:
   para a tela. A moldura é da carta, não da interface.
 - **O protótipo de 12/11/2026 continua como referência do fluxo**, não do
   visual das cartas: ele usa rostos fictícios e fotos sem moldura.
+- **Origem das imagens.** Das 20 cartas de política, 12 vêm do acervo do
+  PoliMatch, sem origem registrada, e 8 de fotos de veículos ou de sites. A
+  pendência de fotos da 0001 e a [ICM 42] #284 continuam valendo para elas.
+- **Bloqueios de maturidade.** Nenhum é dispensado. Os que pesam na
+  publicação da etapa 1 estão em "Condições de publicação" do contexto do
+  estágio 68: imagens (#284), privacidade (#283), backup (#279) e a edição
+  Eleições 2026 (#285).
 
 ## Referências
 
 - `stages/68_photo_survey_politics/`: contexto, handoff e verificação da
   etapa 1.
 - `stages/68_photo_survey_politics/references/`: as três telas que o Stefan
-  aprovou em 13/11/2026.
+  aprovou em 13/11/2026 e a tela de entrada, desenhada depois.

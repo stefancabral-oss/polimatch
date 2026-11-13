@@ -5,13 +5,13 @@
 - Estado: `em andamento`. A entrega 68a (registro) está pronta para gate.
 - Issue: #324
 - Branch desta entrega: `icm/68-photo-survey-politics` (base main `77104a3`)
-- PR: ver a issue #324
+- PR: #325
 
 ## Entregue (68a — registro)
 
 - `docs/decisions/0002-ordem-de-construcao-e-cartas-com-moldura.md`: a decisão do Stefan de 13/11/2026 sobre a ordem de construção e as cartas com moldura no voto, com o que ela altera na decisão 0001.
 - `stages/68_photo_survey_politics/CONTEXT.md`: formato, regras, entregas, fora de escopo e critérios de aceite da etapa 1.
-- `stages/68_photo_survey_politics/references/`: as três telas aprovadas.
+- `stages/68_photo_survey_politics/references/`: as três telas aprovadas e a de entrada, desenhada depois e ainda a aprovar.
 - `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md`: marca nos quatro pontos alterados. Nada foi apagado.
 - `CONTEXT.md`, `README.md` e `AGENTS.md` da raiz: apontam para a decisão 0002 e para esta etapa.
 
@@ -25,10 +25,16 @@
 - `npm test --prefix app` e `npm run test:shared` na branch, para confirmar que a mudança de documentação não quebra nenhum teste que leia esses arquivos. Os números estão no `verification.json`.
 - O PR não altera `app/`, `back/` nem `shared/`.
 
+## Revisão independente
+
+Um agente separado, somente leitura, revisou este PR em 13/11/2026 e não achou bloqueio. Correções aplicadas depois dela: a tela de entrada, que faltava no formato; a regra do desfazer, que vale até a confirmação; critérios de aceite por entrega, com os que faltavam (resposta forjada, sorteio uniforme, tabelas imutáveis, janela, troca de identidade); a página nova fora do sitemap e os testes que fixam a lista de páginas; a troca da entrada do site só na 68e; e as condições de publicação, com os bloqueios de maturidade que pesam nesta etapa.
+
 ## Riscos conhecidos
 
 - A decisão 0002 muda a ordem "maturidade primeiro" da 0001. Os bloqueios de maturidade continuam abertos (#278, #279, #280, #281, #283, #284, #285 e #286) e correm em paralelo.
 - A primeira pesquisa fica sem Lula e Flávio Bolsonaro, porque as cartas deles têm moldura diferente das outras 20.
+- Das 20 cartas, 8 vêm de fotos de veículos ou de sites. Sem refazer essas 8 ou sem a confirmação do Stefan, a publicação (68e) não acontece com elas, e com 12 cartas o formato de 16 não fecha.
+- "Uma resposta por jogador" não é "uma por pessoa": quem apaga os dados do aparelho pode responder de novo, dentro da cota de rede. O cadastro por CPF é o que resolve.
 - A etapa grava escolha política ligada à identidade do jogo, como o jogo atual já faz. A [ICM 41] #283, de privacidade, continua aberta.
 
 ## Decisões tomadas
@@ -55,6 +61,9 @@ Escolhas de desenho do agente, dentro do que ele aprovou, a confirmar neste gate
 ## Ação do Stefan
 
 - Revisar e decidir o merge do PR da 68a.
+- Aprovar a tela de entrada, que não estava entre as três que ele viu.
+- Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
+- Confirmar as condições de publicação propostas no contexto do estágio.
 - Dizer se quer cartas de Lula e Flávio Bolsonaro no padrão comum, para entrarem numa próxima pesquisa.
 
 ## Human gate
