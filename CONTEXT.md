@@ -30,26 +30,26 @@ Desde 12/11/2026, por decisão do Stefan, a direção do PoliMatch é ser uma pe
 
 Essa direção ainda não está no ar. O que está em produção continua sendo o jogo casual de comparação descrito nesta página, e as decisões abaixo seguem valendo para ele até que cada etapa da direção nova passe pelo gate humano.
 
-Norte anterior, mantido como histórico: "PoliMatch é um jogo casual de comparação entre personalidades públicas. Não é pesquisa eleitoral. O produto deve ser simples de jogar, visualmente próprio, colecionável e agradável no celular." A frase "Não é pesquisa eleitoral" deixa de valer como definição do produto. O texto que a substitui depende da revisão jurídica (Q5 da #277), e este repositório não afirma nenhum enquadramento até lá.
+Norte anterior, mantido como histórico: "PoliMatch é um jogo casual de comparação entre personalidades públicas. Não é pesquisa eleitoral. O produto deve ser simples de jogar, visualmente próprio, colecionável e agradável no celular." A frase "Não é pesquisa eleitoral" continua valendo, e exibida, no que está no ar. Ela deixa de valer para a direção nova: o texto que a substitui ali depende da revisão jurídica (Q5 da #277), e até lá o repositório não afirma nenhum enquadramento para a pesquisa por foto.
 
 ## Direção nova: pesquisa de preferência por foto — issue #318
 
 Em 12/11/2026 Stefan respondeu à Q1 da #277 com um caminho fora das três opções. Estágio `stages/67_photo_survey_direction/CONTEXT.md`. Resumo da decisão:
 
-- Cada pesquisa é um conjunto de fotos e uma pergunta curta, com começo e fim. Só foto, sem leitura.
+- Cada pesquisa é um conjunto de fotos e uma pergunta curta, com começo e fim. Só foto e nome, sem texto para ler.
 - Qualquer pessoa joga. A escolha só entra na pesquisa com cadastro por CPF.
 - Quem jogou vê os cinco primeiros. Só a resposta somada sai do PoliMatch, nunca o dado de uma pessoa.
 - Abre com Política, Famosos e influenciadores, e Futebol.
 - Os jogos de leitura e a parte cívica e de notícias ficam no ar sem trabalho novo.
 - Telas novas minimalistas: fundo neutro, um único verde, foto sem moldura na hora do voto.
 
-Nada disso está liberado para produção por este registro. Continuam sem decisão: fotos (Q3), revisão jurídica (Q5), política de abuso (Q4), prioridade frente ao programa de maturidade (#309) e a Q6. O gate de publicação agregada (#177) e a política de integridade do voto continuam em vigor.
+Nada disso está liberado para produção por este registro. A ordem do trabalho é maturidade primeiro (#309), e as respostas às Q2, Q3, Q4 e Q6 estão na #277; nenhuma delas libera produção. Continuam sem resposta a Q5 (controlador de dados e revisão jurídica), a visibilidade do repositório e a convivência entre o login Google e o CPF. O gate de publicação agregada (#177) e a política de integridade do voto continuam em vigor.
 
 Antes de propor ou alterar tela, regra de voto ou cadastro, ler o registro de decisão: ele lista o que continua valendo e o que deixa de valer para as telas novas.
 
 ## Decisões atuais aprovadas
 
-As decisões desta lista descrevem o que está no ar. As que trazem a marca "Substituída para as telas da pesquisa por foto" não se aplicam à direção nova.
+As decisões desta lista descrevem o que está no ar. A lista completa do que não se aplica à direção nova é a tabela do registro de decisão. A marca "Substituída para as telas da pesquisa por foto" aparece só nas principais, como atalho.
 
 - O frontend anterior foi rejeitado e será substituído, não remendado.
 - A direção de arte `Malaquita 2026 / Digital First` enviada em 13/09/2026 está aprovada e é a referência visual oficial. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.

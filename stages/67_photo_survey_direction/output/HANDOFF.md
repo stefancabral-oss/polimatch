@@ -2,7 +2,8 @@
 
 ## Status
 
-- Estado: pronto para gate humano
+- Estado: aprovado
+- Último commit: o que acompanha este handoff no PR #319
 - Issue: #318, continua aberta
 - Relacionada: #277, com a Q1 respondida em comentário de 12/11/2026
 - Base: `5e52ba8` (#317 já mesclada em main)
@@ -26,9 +27,9 @@
   telas novas.
 - `stages/67_photo_survey_direction/references/prototipo-pesquisa.html`: o
   protótipo navegável aprovado pelo Stefan, com nomes e rostos fictícios.
-  Atualizado em 12/11/2026, a pedido dele, com avisos e indicação de amigos.
-  Esses dois são proposta de tela; as pendências que levantam estão em
-  `references/README.md`.
+  Traz os três acréscimos que ele pediu depois da aprovação: compartilhar,
+  avisos e indicação de amigos. São proposta de tela; as pendências que
+  levantam estão em `references/README.md`.
 
 ## O que este lote não entrega
 
@@ -45,8 +46,10 @@
 - `git diff --name-only origin/main | grep -E '^(app|back|shared)/'`: sem
   resultado. Só documentação mudou.
 - Busca por "Não é pesquisa eleitoral" em `CONTEXT.md`, `README.md`,
-  `AGENTS.md` e `docs/decisions/`: duas ocorrências, as duas como citação
-  histórica.
+  `AGENTS.md` e `docs/decisions/`: duas linhas, nenhuma como definição da
+  direção nova. A frase continua no rodapé do produto no ar
+  (`app/src/presidential-page.js`) e em `docs/security/VOTE_ABUSE_POLICY.md`,
+  e os textos novos dizem que ela segue valendo ali.
 - `npm run test:shared`: 93 passaram, 0 falharam.
 - `npm test --prefix app`: 245 passaram, 0 falharam.
 - Os quatro arquivos apontados por links novos existem.
@@ -59,6 +62,24 @@ Não rodados:
   `back/**`, `shared/**`, `docs/design/**`, `docs/editorial/**` e alguns
   arquivos de estágios antigos). Nenhum dispara para os caminhos deste PR.
 
+## Revisão
+
+Um agente independente revisou o PR em 12/11/2026, a pedido do Stefan. Apontou
+um bloqueio e nove ajustes:
+
+- **Bloqueio.** O texto dizia que "Não é pesquisa eleitoral" deixava de valer e
+  que o repositório não afirmava enquadramento, mas a frase segue no produto no
+  ar. Corrigido: ela continua valendo no que está no ar e deixa de valer só
+  para a direção nova.
+- **Ajustes corrigidos.** Marca de "substituída" passou a remeter à tabela do
+  registro; CPF como identificador "que faz a escolha contar"; três acréscimos
+  do protótipo listados; `AGENTS.md` diz que nada está em produção e que o
+  programa ativo é o de maturidade; detalhes de formato atribuídos ao
+  protótipo; aviso do `README.md`; contagem da busca; redação de "desfazer a
+  escolha"; título completo da seção das Chromas; botão "Copiar".
+- **Levado ao Stefan.** O quanto da decisão deve ficar num repositório público,
+  junto com a pergunta sobre a visibilidade do repositório.
+
 ## Riscos conhecidos
 
 - **Conflito com a [ICM 61] #303**, que reescreve a documentação de entrada e
@@ -66,8 +87,10 @@ Não rodados:
 - **Direção lida como produto no ar.** O registro, o `CONTEXT.md`, o
   `README.md` e o `AGENTS.md` dizem em destaque que nada disso está em
   produção.
-- **Repositório público.** A decisão fica pública. O registro não traz detalhe
-  comercial nem afirma enquadramento jurídico.
+- **Repositório público.** A decisão fica pública. O registro não traz preço
+  nem plano comercial, mas diz que o resultado completo fica com quem
+  encomendou a pesquisa e lista as pendências jurídicas. Não afirma
+  enquadramento jurídico.
 - **Linhas citadas na #318.** A tabela da issue usa os números de linha da base
   `5e52ba8`. Depois deste PR as linhas do `CONTEXT.md` mudam; o registro de
   decisão cita seções, não linhas.
@@ -83,13 +106,16 @@ Não rodados:
 
 ## Próximo passo exato
 
-1. Stefan revisa e, se aceitar, mescla. Nenhum agente aprova o gate, mescla ou
-   publica.
-2. Depois do aceite: decidir a prioridade frente ao programa de maturidade
-   (#309) e só então abrir as etapas de produto.
+1. Merge deste PR e fechamento da #318, executados por agente por instrução do
+   Stefan.
+2. Seguir o programa de maturidade (#309), começando pelos bloqueios. As
+   etapas de produto da pesquisa vêm depois.
 
 ## Human gate
 
-- Decisão: pendente
+- Decisão: aprovado
 - Responsável: Stefan
-- Observação: a issue #318 só fecha no aceite dele.
+- Observação: aprovado por instrução do Stefan em conversa de 12/11/2026
+  ("Pode você fazer"), transcrita no PR. A revisão foi feita por um agente
+  independente e o merge executado por agente, a pedido dele. Produção não é
+  alterada por este PR.

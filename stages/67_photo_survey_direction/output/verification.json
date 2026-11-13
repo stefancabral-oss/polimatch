@@ -2,7 +2,7 @@
   "issue": 318,
   "relatedIssue": 277,
   "icm": 67,
-  "checkedAt": "2026-11-13T01:12:00Z",
+  "checkedAt": "2026-11-13T01:35:52Z",
   "base": "5e52ba8c38929ca9ee552f32feccea18eb8add43",
   "branch": "icm/67-photo-survey-direction",
   "pullRequest": "https://github.com/stefancabral-oss/polimatch/pull/319",
@@ -24,7 +24,11 @@
   },
   "replacedPhrase": {
     "command": "grep -n \"Não é pesquisa eleitoral\" CONTEXT.md README.md AGENTS.md docs/decisions/*.md",
-    "occurrences": 2,
+    "matchingLines": 2,
+    "stillInLiveProduct": [
+      "app/src/presidential-page.js: rodapé \"Jogo pessoal. Não é pesquisa eleitoral.\"",
+      "docs/security/VOTE_ABUSE_POLICY.md: a política não transforma o resultado em pesquisa eleitoral"
+    ],
     "where": [
       "CONTEXT.md, \"Norte do produto\": citação do norte anterior, marcada como histórico",
       "docs/decisions/0001-pesquisa-de-preferencia-por-foto.md: linha da tabela do que é substituído"
@@ -52,8 +56,8 @@
   },
   "prototype": {
     "path": "stages/67_photo_survey_direction/references/prototipo-pesquisa.html",
-    "bytes": 39060,
-    "updatedAt": "2026-11-13T01:20:00Z",
+    "bytes": 39058,
+    "updatedAt": "2026-11-13T01:35:52Z",
     "updateNote": "avisos e indicação de amigos acrescentados a pedido do Stefan; script conferido com node --check e três telas novas vistas em navegador",
     "realPeople": false,
     "sendsOrStoresData": false,
@@ -65,8 +69,17 @@
     "suíte e2e de browser",
     "deploy"
   ],
+  "independentReview": {
+    "by": "agente independente, somente leitura",
+    "when": "2026-11-13",
+    "blockers": 1,
+    "otherFindings": 9,
+    "fixedInThisPr": true,
+    "raisedToOwner": "quanto da decisão deve ficar num repositório público"
+  },
   "humanGate": {
-    "status": "pending",
-    "by": null
+    "status": "approved",
+    "by": "Stefan",
+    "how": "instrução em conversa de 12/11/2026, transcrita no PR; merge executado por agente a pedido dele"
   }
 }

@@ -11,8 +11,8 @@ estão nesta cópia: compartilhar o resultado, avisos e indicação de amigos.
 - Nomes, rostos e camisas são fictícios e desenhados no próprio arquivo. Não
   há foto de pessoa real.
 - Nada é enviado nem guardado. Os campos de CPF e de celular estão desligados,
-  e os botões de compartilhar, avisar e convidar só mostram uma mensagem. O
-  link de indicação é fictício.
+  e os botões de postar, avisar e enviar convite só mostram uma mensagem. O
+  botão "Copiar" copia um link de indicação fictício.
 - As perguntas são exemplos. Nenhuma foi aprovada como pesquisa real.
 - O arquivo não tem `<!doctype>` nem `<html>`, porque foi escrito para uma
   página de pré-visualização que acrescenta essa moldura. O navegador abre
@@ -30,6 +30,8 @@ depois da primeira pesquisa.
 
 Acréscimos pedidos depois da aprovação:
 
+- **Compartilhar.** A pessoa gera uma imagem da própria escolha para postar,
+  ou convida sem mostrar a escolha.
 - **Avisos.** A pessoa escolhe ser avisada quando o resultado de uma pesquisa
   sair e quando chegar pesquisa nova, pelo próprio celular ou por WhatsApp.
 - **Indicação.** Cada pessoa tem um link próprio. Três amigos cadastrados por

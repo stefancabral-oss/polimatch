@@ -49,6 +49,8 @@ Cada Issue deve ter:
 
 Desde 12/11/2026 a direção do produto é a pesquisa de preferência por foto, registrada na issue #318 e em `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md`. Antes de propor ou alterar tela, regra de voto ou cadastro, leia esse registro. Nenhuma etapa de produto da direção nova está aberta: cada uma precisa de Issue própria e de gate humano.
 
+Nada da direção nova está em produção. O programa ativo é o de maturidade (#309), que vem antes de qualquer etapa de produto da pesquisa por foto.
+
 A lista abaixo descreve o programa anterior, a reconstrução do frontend, e vale para o que está no ar. Para as telas novas da pesquisa por foto não valem o tema malaquita, os cards em proporção de TCG, a descrição curta na carta e as Chromas como foco visual.
 
 O programa ICM anterior é a reconstrução do frontend PoliMatch, com foco em:
