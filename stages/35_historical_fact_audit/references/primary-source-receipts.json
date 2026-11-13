@@ -1,0 +1,48 @@
+[
+  {
+    "id": "constituicao",
+    "url": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm",
+    "error": "The read operation timed out",
+    "checkedAt": "2026-10-24",
+    "independentWebReader": {
+      "readSuccessfully": true,
+      "ref": "turn211view0 / turn212view2",
+      "locator": "Art. 144, incisos I–III e parágrafos 1–3",
+      "finding": "Atribuições de polícias federais em segurança pública; inclui texto anterior às emendas."
+    }
+  },
+  {
+    "id": "pronaf-2001",
+    "url": "https://www.bcb.gov.br/htms/CreditoRural/2001/graf521.pdf",
+    "resolvedUrl": "https://www.bcb.gov.br/htms/CreditoRural/2001/graf521.pdf",
+    "httpStatus": 200,
+    "sha256": "f70a54266e659fe3e921f6e13020a2a37ddbe6a1d830e5cdbf7d5271b52625b5",
+    "bytes": 87682,
+    "pages": 4,
+    "checkedAt": "2026-10-24",
+    "locator": "Primeira página do PDF, gráficos 20–24 e texto abaixo; 13.485 contratos de custeio em Rondônia."
+  },
+  {
+    "id": "reservas-2009",
+    "url": "https://www.bcb.gov.br/content/estabilidadefinanceira/relgestaoreservas/RGRI200901-relgestresint062009.pdf",
+    "resolvedUrl": "https://www.bcb.gov.br/content/estabilidadefinanceira/relgestaoreservas/RGRI200901-relgestresint062009.pdf",
+    "httpStatus": 200,
+    "sha256": "b58bcd32c46fa0d69d6e77b957c31e7666a1b5104d1059f26d9044a7b46d81d1",
+    "bytes": 1366747,
+    "pages": 37,
+    "checkedAt": "2026-10-24",
+    "locator": "Página impressa 5, sexta do PDF: janeiro de 2002, US$36,2 bilhões, conceito liquidez."
+  },
+  {
+    "id": "pronaf-1996",
+    "url": "https://www.planalto.gov.br/ccivil_03/decreto/d1946.htm",
+    "error": "The read operation timed out",
+    "checkedAt": "2026-10-24",
+    "independentWebReader": {
+      "readSuccessfully": true,
+      "ref": "turn211view3",
+      "locator": "Data, artigos 1 e 2 e anotação de revogação em 1999",
+      "finding": "Criação nacional em 1996; documento histórico, não norma vigente."
+    }
+  }
+]
