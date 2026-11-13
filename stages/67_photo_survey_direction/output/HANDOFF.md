@@ -116,8 +116,7 @@ decisão que traziam a resposta antiga. Nada além disso mudou.
 
 ## Próximo passo exato
 
-1. Merge deste PR e fechamento da #318, executados por agente por instrução do
-   Stefan.
+1. Feito: PR #319 mesclado e #318 fechada, por instrução do Stefan.
 2. Seguir o programa de maturidade (#309), começando pelos bloqueios. As
    etapas de produto da pesquisa vêm depois.
 

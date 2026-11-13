@@ -74,12 +74,13 @@ Nada abaixo fica liberado por esta decisão. As respostas marcadas como
 "Respondida" foram dadas em 12/11/2026 por delegação do Stefan e estão no
 [comentário da #277](https://github.com/stefancabral-oss/polimatch/issues/277#issuecomment-6841156435).
 
-- **Fotos (Q3 da #277, #284).** Respondida, e revista em 12/11/2026: as fotos de
+- **Fotos (Q3 da #277, #284).** Respondida, e revista pelo Stefan em 12/11/2026: as fotos de
   pessoas públicas ficam enquanto o produto for gratuito. A regularização, com
   retrato oficial ou de licença livre ou com autorização, passa a ser condição
   para vender ou monetizar. O registro de autor, licença e origem por foto
-  continua, para deixar essa regularização pronta. Fotos de agência ou de
-  veículo ficam a confirmar. O compartilhamento da escolha leva a foto para a
+  continua, para deixar essa regularização pronta. As duas fotos de identidade
+  a confirmar continuam saindo já, como na #284. Fotos de agência ou de veículo
+  ficam a confirmar antes de decidir. O compartilhamento da escolha leva a foto para a
   rede social com a marca do PoliMatch, o que pesa nessa regularização.
 - **Jurídico (Q5 da #277, #283).** Sem resposta. Controlador de dados e revisão
   jurídica.
@@ -96,8 +97,9 @@ Nada abaixo fica liberado por esta decisão. As respostas marcadas como
 - **Visibilidade do repositório.** Sem resposta.
 - **Ordem do trabalho (#309).** Respondida: maturidade primeiro. Os bloqueios de
   [ICM 36] a [ICM 44] vêm antes de qualquer etapa de produto da pesquisa, com
-  uma exceção: a regularização das fotos ([ICM 42] #284) é pré-requisito da
-  monetização, não do lançamento gratuito.
+  uma exceção: a troca das fotos de pessoas públicas ([ICM 42] #284) é
+  pré-requisito da monetização, não do lançamento gratuito. O registro por
+  foto da mesma issue segue agora.
 - **Processo (Q6 da #277).** Proposta do agente, a confirmar pelo Stefan,
   porque muda a forma como a aprovação dele vale: aprovação por comentário ou
   por instrução dele transcrita no PR, sem travar o fluxo; e o código do
