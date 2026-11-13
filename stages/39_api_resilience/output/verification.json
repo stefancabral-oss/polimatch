@@ -231,8 +231,24 @@
       "evidence": "passo novo no job back-integration-postgres; passo client-error-report no workflow de interface (Chromium e WebKit)"
     }
   ],
-  "remoteCi": "pending",
-  "humanGate": "not self-approved",
+  "remoteCi": "PR #312: verde em 31/10/2026 no commit ef4f2c3; depois da junção com a main em 13/11/2026, back-unit, back-integration-postgres, shared-data, validate e browser-smoke (chromium) verdes em a7e5a85; browser-smoke (webkit) falhou ali por corrida do teste fact-check.mjs, corrigida em d957521 e 6258623; o merge só acontece com o commit final verde",
+  "mainMergedIn": {
+    "when": "2026-11-13",
+    "includes": ["#311", "#317", "#319", "#320", "#321", "#313", "#310"],
+    "conflicts": ["back/src/server.js", "back/src/topic-store.js", ".github/workflows/back-shared.yml"],
+    "beyondConflicts": [
+      "back/scripts/api-resilience-smoke.mjs usa a guarda de banco descartável do estágio 37",
+      "app/e2e/fact-check.mjs espera load e fontes, com prazo, antes de clicar no rodapé do quiz"
+    ],
+    "localChecks": {
+      "appUnit": { "passed": 265, "failed": 0 },
+      "factCheckWebkitBeforeFix": { "runs": 34, "failed": 4, "failedOnMainWithoutThisPr": "1 em 8" },
+      "factCheckWebkitAfterFix": { "runs": 54, "failed": 0 }
+    },
+    "independentCheck": "agente independente, somente leitura: nenhum defeito de código na junção; correção do teste aprovada, com a sugestão de prazo aplicada",
+    "notRunLocally": "testes do back (dependências não instaladas) e Chromium (versão do navegador diferente)"
+  },
+  "humanGate": "aprovado por instrução do Stefan para este PR em conversa de 13/11/2026, transcrita no PR; merge a cargo do agente com o CI verde; deploy com o Stefan",
   "clientErrorReport": {
     "endpoint": "POST /api/client-errors",
     "transport": "sendBeacon, text/plain, até 2 KB",

@@ -2,7 +2,7 @@
 
 ## Status
 
-- Estado: `pronto para gate`
+- Estado: `aprovado`
 - Issue: #281
 - Branch: `fix/api-resilience` (a partir de main `7c0bb27`; atualizada com a
   `main` em 13/11/2026, ver "Atualização de 13/11/2026")
@@ -335,7 +335,10 @@ smoke de resiliência atende ao teste que a exige.
 
 ## Human gate
 
-- Decisão: `pendente`
+- Decisão: `aprovado`
 - Responsável: Stefan
-- Observação: nenhum agente aprova o próprio gate, faz merge ou publica em
-  produção.
+- Observação: aprovado por instrução direta do Stefan para este PR, em
+  conversa de 13/11/2026 ("Pode mesclar o 312"), transcrita no PR. O merge fica
+  a cargo do agente, a pedido dele, com o CI verde no commit final. A regra 6
+  do `AGENTS.md` não muda. Nenhum agente publica em produção: deploy da API e
+  do app, monitor externo e avisos do Dokploy continuam com o Stefan.
