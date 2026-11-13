@@ -88,6 +88,13 @@ h1 { margin-bottom: 8px; font-size: clamp(2rem, 8vw, 2.8rem); line-height: 1; le
 .home-primary .home-primary-arrow { display: inline-block; margin-left: 10px; font-size: 1rem; transition: transform 160ms ease; }
 .home-primary:hover .home-primary-arrow { transform: translateX(4px); }
 .home-ranking-link { min-height: 44px; padding: 7px 2px; border: 0; border-bottom: 1px solid rgb(227 196 106 / 48%); background: transparent; color: #efe4bf; font-size: .75rem; font-weight: 850; cursor: pointer; }
+.home-notice-slot { margin-top: 20px; }
+.home-notice { display: grid; gap: 8px; justify-items: start; padding: 16px 18px; border: 1px solid rgb(227 196 106 / 38%); border-radius: 18px; background: rgb(1 31 25 / 72%); color: #d7e2dd; font-size: .86rem; line-height: 1.45; }
+.home-notice h2 { margin: 0; color: #fff3cc; font-size: 1.18rem; line-height: 1.15; letter-spacing: -.02em; }
+.home-notice h2:focus { outline: none; }
+.home-notice p { margin: 0; }
+.home-notice small { color: #9eb2aa; font-size: .72rem; }
+.home-notice .primary { margin-top: 4px; }
 .home-trust { display: flex; flex-wrap: wrap; gap: 16px 26px; margin-top: 28px; padding-top: 18px; border-top: 1px solid rgb(255 255 255 / 10%); color: #9eb2aa; font-size: .69rem; }
 .home-trust span { display: flex; align-items: baseline; gap: 6px; }
 .home-trust strong { color: #f3d982; font-family: Georgia, serif; font-size: 1.02rem; }
@@ -484,8 +491,9 @@ button:focus-visible { outline: 3px solid #2a8d70; outline-offset: 3px; }
   .ranking-filters .ranking-search { grid-column: 1 / -1; }
   .profile-taxonomy { grid-template-columns: 1fr; }
   .edition { display: none; }
-  .account-button span { display: none; }
-  .account-button { width: 42px; height: 42px; justify-content: center; padding: 5px; }
+  /* Só o rótulo some; o avatar (símbolo ou foto) continua sendo o ícone do botão. */
+  .account-button [data-account-label] { display: none; }
+  .account-button { width: 44px; height: 44px; justify-content: center; padding: 5px; }
   .sound-toggle { width: 42px; height: 42px; }
   .app-scroll-area { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 16px; }
   .topbar { margin-bottom: 10px; padding-bottom: 9px; }

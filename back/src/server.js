@@ -37,6 +37,9 @@ try {
     guards.shutdown("server_error", 1);
   });
 } catch (error) {
+  // Sem esquema confirmado a API não escuta: o healthcheck falha e nada é
+  // gravado. Vale também para o reset bloqueado do estágio 37, que chega aqui
+  // com o código SCHEMA_RESET_BLOCKED e sai com 1.
   logger.fatal({ event: "boot_failed", err: error });
   await guards.shutdown("boot_failed", 1);
 }

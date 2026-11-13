@@ -21,14 +21,12 @@ import {
   createDatabasePool,
   isTransientDatabaseError,
 } from "../src/database-resilience.js";
+import { requireDisposableDatabase } from "../test-support/disposable-db.js";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) throw new Error("DATABASE_URL é obrigatória para o smoke de resiliência");
-// O smoke encerra conexões e trava tabelas: só roda contra banco local.
-const { hostname } = new URL(connectionString);
-if (!["127.0.0.1", "localhost", "::1", "[::1]"].includes(hostname)) {
-  throw new Error("o smoke de resiliência exige um PostgreSQL local descartável");
-}
+// O smoke encerra conexões e trava tabelas: só roda contra banco local e
+// descartável, pela mesma guarda dos outros smokes (estágio 37). O teste
+// `disposable-db.test.js` exige essa recusa de todo `*-smoke.mjs`.
+const connectionString = requireDisposableDatabase();
 
 const backDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));

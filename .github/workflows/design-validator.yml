@@ -46,3 +46,17 @@ jobs:
         run: npm run build --prefix app
       - name: Build production PWA image from repository-root context
         run: docker build --file app/Dockerfile --tag polimatch-app:pilot-176 .
+      - name: Smoke the nginx image (compression, cache, 404, robots and icons)
+        run: |
+          docker run -d --name polimatch-app-smoke -p 127.0.0.1:8080:80 polimatch-app:pilot-176
+          for i in $(seq 1 30); do
+            if curl -fsS -o /dev/null http://127.0.0.1:8080/; then break; fi
+            if [ "$i" = 30 ]; then docker logs polimatch-app-smoke; exit 1; fi
+            sleep 1
+          done
+          # O build da imagem gera hashes próprios; o smoke lê o dist servido.
+          docker cp polimatch-app-smoke:/usr/share/nginx/html "$RUNNER_TEMP/served-dist"
+          node app/scripts/smoke-nginx.mjs http://127.0.0.1:8080/ --dist "$RUNNER_TEMP/served-dist"
+      - name: Show nginx logs when the smoke fails
+        if: failure()
+        run: docker logs polimatch-app-smoke || true

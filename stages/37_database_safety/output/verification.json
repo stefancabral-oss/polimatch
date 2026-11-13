@@ -1,0 +1,309 @@
+{
+  "checkedAt": "2026-10-31",
+  "base": "7c0bb27d55b756f62cf20398aabcd180b8c54203",
+  "issue": 279,
+  "branch": "fix/database-safety",
+  "environment": {
+    "node": "22.13.0",
+    "postgres": "16.14 local, descartável, banco polimatch_test",
+    "docker": "não instalado; asserção da imagem roda no CI"
+  },
+  "unitTests": {
+    "back": {
+      "passed": 245,
+      "failed": 0,
+      "baselineMain": 232,
+      "new": 13
+    },
+    "app": {
+      "passed": 226,
+      "failed": 0
+    },
+    "shared": {
+      "passed": 93,
+      "failed": 0,
+      "taxonomy": "ok"
+    },
+    "editorialVerify": "ok"
+  },
+  "integration": {
+    "smokes": {
+      "topic-store": "pass",
+      "ordered-choices": "pass",
+      "presidential-duels": "pass",
+      "vote-abuse": "pass",
+      "game-progress": "pass",
+      "civic-schema": "pass",
+      "partial-restore": "pass"
+    },
+    "ciMirror": "pass; ordem do job back-integration-postgres, com pg_dump/pg_restore por pipe no lugar de docker exec",
+    "partialRestoreSmokeAgainstMain": "fail como esperado: a API da main sobe com código 0 e aplica o reset"
+  },
+  "partialRestoreReproduction": {
+    "method": "pg_dump -Fc; pg_restore -L sem TABLE DATA de schema_migrations e daily_answers; boot de back/src/server.js",
+    "main": {
+      "resetApplied": true,
+      "health": 200,
+      "counts": {
+        "anonymous_players": [
+          30,
+          0
+        ],
+        "choice_rounds": [
+          126,
+          0
+        ],
+        "votes": [
+          400,
+          0
+        ],
+        "ranking_stats": [
+          231,
+          160
+        ],
+        "ranking_pools": [
+          8,
+          7
+        ]
+      }
+    },
+    "branch": {
+      "exitCode": 1,
+      "health": null,
+      "code": "SCHEMA_RESET_BLOCKED",
+      "tablesCompared": "26 na execução original; 30 tabelas do schema public na revisão",
+      "tablesChanged": 0
+    },
+    "evidence": "stages/37_database_safety/references/partial-restore-reproduction.md"
+  },
+  "disposableGuard": {
+    "nodeEnvProduction": {
+      "command": "NODE_ENV=production node back/scripts/topic-store-smoke.mjs",
+      "exitCode": 2,
+      "newPostgresConnections": 0
+    },
+    "remoteHost": {
+      "command": "DATABASE_URL=postgresql://u@db.prod.exemplo:5432/polimatch npm run test:integration --prefix back",
+      "exitCode": 2
+    },
+    "databaseWithoutTestSuffix": {
+      "exitCode": 2,
+      "newPostgresConnections": 0
+    },
+    "everySmokeSpawnedAndRefused": 7
+  },
+  "imageExclusion": {
+    "local": "git check-ignore com os padrões do .dockerignore: saem os 7 *-smoke.mjs e os 6 arquivos de back/test-support; os demais 21 scripts ficam",
+    "ci": "verde: back-unit lista scripts na imagem e falha com *-smoke.mjs ou test-support; passou no PR #310 em 31/10/2026 e no commit b641000 em 13/11/2026"
+  },
+  "backupAndDrill": {
+    "backup": {
+      "tables": 44,
+      "totalRows": 7400,
+      "sha256Verified": true,
+      "refusesDumpWithoutSchemaMigrations": true
+    },
+    "drill": {
+      "result": "pass",
+      "restoreExitCode": 0,
+      "restoreMs": 156,
+      "countsMatchManifest": true,
+      "health": 200,
+      "resetApplied": false,
+      "bootChanges": "player_pools 162->210 e player_stats 6082->6930, permitidos (catálogo de produção sobre dados de teste)",
+      "report": "stages/37_database_safety/references/drill-local-2026-10-31.json"
+    },
+    "harnessCases": {
+      "passed": 14,
+      "failed": 0,
+      "covers": [
+        "pg_dump e pg_restore por pipe (caminho docker exec)",
+        "manifesto com contagem adulterada reprova",
+        "sha256 divergente reprova",
+        "dump sem schema_migrations: backup recusa, ensaio reprova com SCHEMA_RESET_BLOCKED",
+        ".sql.gz custom sem manifesto (formato Dokploy)",
+        "SQL puro gzip",
+        "ensaio recusa host remoto, banco sem _test e falta de POLIMATCH_DISPOSABLE_DB",
+        "age, rclone daily/monthly, monitor e retenção local com stubs"
+      ]
+    },
+    "realProductionDump": "pending: Ação do Stefan"
+  },
+  "e2e": {
+    "relevance": "nenhum e2e exercita o backend; app/ e shared/ idênticos à main",
+    "build": "pass",
+    "chromium": {
+      "interaction-smoke": "pass",
+      "ordered-choices": "pass"
+    },
+    "webkit": {
+      "ordered-choices": "pass",
+      "interaction-smoke": "fail no passo de navegação por Tab (WebKit no macOS), sem relação com esta branch"
+    },
+    "browsers": "builds em cache anteriores aos da Playwright 1.55.1, apontados por PLAYWRIGHT_BROWSERS_PATH"
+  },
+  "review": {
+    "by": "revisor independente (outro agente), sem aprovar o gate",
+    "afterCommit": "7fa8b69",
+    "environment": {
+      "node": "22.13.0",
+      "postgres": "16.14 local, descartável, porta própria; banco polimatch_test recriado"
+    },
+    "unitTests": {
+      "back": {
+        "passed": 245,
+        "failed": 0,
+        "baselineMainFullExport": 232
+      },
+      "app": {
+        "passed": 226,
+        "failed": 0
+      },
+      "shared": {
+        "passed": 93,
+        "failed": 0,
+        "taxonomy": "ok"
+      },
+      "editorialVerify": "ok"
+    },
+    "ciMirror": "pass: topic-store, ordered-choices, presidential-duels, vote-abuse, game-progress, civic-schema, backup (44 tabelas, 7400 linhas) + ensaio pass (restore 0, health 200, resetApplied:false), manifesto adulterado reprovado, partial-restore-smoke",
+    "partialRestoreReproduction": {
+      "method": "pg_restore -L sem TABLE DATA de schema_migrations e daily_answers sobre o dump do espelho; boot de server.js com NODE_ENV=production",
+      "branch": {
+        "exit": 1,
+        "code": "SCHEMA_RESET_BLOCKED",
+        "health": null,
+        "tablesCompared": 30,
+        "tablesChanged": 0
+      },
+      "main": {
+        "resetApplied": true,
+        "health": 200,
+        "tablesChanged": 6,
+        "counts": {
+          "anonymous_players": [
+            30,
+            0
+          ],
+          "choice_rounds": [
+            126,
+            0
+          ],
+          "votes": [
+            400,
+            0
+          ],
+          "ranking_stats": [
+            231,
+            160
+          ],
+          "ranking_pools": [
+            8,
+            7
+          ],
+          "schema_migrations": [
+            0,
+            3
+          ]
+        }
+      }
+    },
+    "disposableGuard": {
+      "refusedWithExit2": [
+        "NODE_ENV=production + banco local: topic-store-smoke",
+        "host remoto: npm run test:integration",
+        "banco sem _test: vote-abuse-smoke e drill-local",
+        "sem POLIMATCH_DISPOSABLE_DB=1: partial-restore-smoke"
+      ],
+      "newPostgresConnections": 0
+    },
+    "drillFormats": {
+      "custom+gzip sem manifesto": "pass",
+      "plain+gzip sem manifesto": "pass"
+    },
+    "backupRefusesMissingMigration": true,
+    "fixed": [
+      {
+        "severity": "minor",
+        "issue": "pg_restore/psql do ensaio herdavam PGHOSTADDR/PGSERVICE do shell e podiam restaurar fora do banco conferido pela guarda",
+        "commit": "7fa8b69",
+        "evidence": "antes: com PGHOSTADDR=127.0.0.9 a restauração falhou tentando aquele endereço; depois: mesmo comando pass contra o banco local"
+      },
+      {
+        "severity": "minor",
+        "issue": "runbook de incidente não cobria backup do Dokploy em SQL puro",
+        "commit": "7fa8b69"
+      }
+    ],
+    "e2e": {
+      "build": "pass",
+      "chromium": {
+        "ordered-choices": "pass",
+        "vote-recovery": "pass",
+        "interaction-smoke": "pass",
+        "accessible-profile": "pass"
+      },
+      "webkit": {
+        "ordered-choices": "pass",
+        "vote-recovery": "pass",
+        "interaction-smoke": "fail na navegação por Tab (WebKit do macOS)",
+        "accessible-profile": "fail na navegação por Tab (WebKit do macOS)"
+      },
+      "note": "app/ e shared/ iguais à main; o workflow de UI não dispara nesta PR"
+    }
+  },
+  "acceptance": [
+    {
+      "criterion": "Bucket externo com dump de menos de 26 h e manifesto",
+      "result": "needs-stefan"
+    },
+    {
+      "criterion": "Ensaio registrado: restore exit 0, /api/health 200, resetApplied:false e contagens iguais ao manifesto",
+      "result": "partial: script provado com dados sintéticos local e no CI; dump real pendente com o Stefan"
+    },
+    {
+      "criterion": "Restore parcial sem schema_migrations e sem daily_answers: API aborta e nenhuma contagem muda",
+      "result": "met localmente (pg_restore real e smoke); passo do CI pending"
+    },
+    {
+      "criterion": "docker run --rm --entrypoint ls polimatch-api scripts não lista *-smoke.mjs",
+      "result": "ci-only"
+    },
+    {
+      "criterion": "NODE_ENV=production node back/scripts/topic-store-smoke.mjs aborta antes de abrir conexão",
+      "result": "met"
+    },
+    {
+      "criterion": "createCleanSchema aborta com dados, salvo POLIMATCH_ALLOW_RESET explícito; banco vazio inicializa",
+      "result": "met"
+    },
+    {
+      "criterion": "Todos os smokes exigem POLIMATCH_DISPOSABLE_DB=1, host local e banco _test",
+      "result": "met"
+    },
+    {
+      "criterion": "ROLLBACK.md com piso f99ac18, docs/ops/BACKUP.md e docs/ops/DR.md",
+      "result": "met"
+    },
+    {
+      "criterion": "Painel do provedor da VPS: backup semanal ativo e data do último",
+      "result": "needs-stefan"
+    },
+    {
+      "criterion": "Destino S3 e agendamento no Dokploy (30 diários, 12 mensais)",
+      "result": "needs-stefan"
+    }
+  ],
+  "remoteCi": "verde no commit b641000 em 13/11/2026: back-unit, back-integration-postgres, shared-data e validate",
+  "mainMergedIn": {
+    "when": "2026-11-13",
+    "includes": ["#311", "#317", "#313", "#319", "#320", "#321"],
+    "conflicts": ["CONTEXT.md", "back/src/topic-store.test.js"],
+    "resolution": "os dois lados mantidos; 26 testes no arquivo, 24 de cada lado, nenhum removido ou alterado",
+    "followUp": "b641000: scripts/ops/drill-local.mjs e docs/ops/BACKUP.md aceitam a poda de quota_rejections_daily que o estágio 40 faz no boot",
+    "independentCheck": "agente independente, somente leitura, sem bloqueios",
+    "notRunLocally": "testes do back: dependências não instaladas na máquina da atualização"
+  },
+  "publication": "not deployed",
+  "humanGate": "aprovado por instrução do Stefan para este PR em conversa de 13/11/2026, transcrita no PR; merge a cargo do agente com o CI verde; deploy e ações de infraestrutura com o Stefan"
+}

@@ -4,8 +4,10 @@
 
 - Estado: `pronto para gate`
 - Issue: #281
-- Branch: `fix/api-resilience` (a partir de main `7c0bb27`)
-- PR: não aberta; o agente não faz push nem abre PR
+- Branch: `fix/api-resilience` (a partir de main `7c0bb27`; atualizada com a
+  `main` em 13/11/2026, ver "Atualização de 13/11/2026")
+- PR: https://github.com/stefancabral-oss/polimatch/pull/312, aberta pelo Stefan
+  em 31/10/2026
 - Último commit: o commit deste HANDOFF
 
 ## Entregue
@@ -264,6 +266,38 @@ descartável, Node 22.13.
 3. Merge e deploy da API, depois do app; rollback é voltar a imagem anterior
    de cada serviço, sem mudança de schema.
 4. Executar a lista "Ação do Stefan" e registrar na #281 o tempo do alarme.
+
+## Atualização de 13/11/2026
+
+A branch recebeu a `main` atual, que traz #311, #317, a direção nova (#319 e
+#320), o conserto do CI (#321), o estágio 40 (#313) e o estágio 37 (#310).
+
+Três conflitos, todos com o estágio 37:
+
+- `back/src/server.js`: os dois estágios reescreveram o início da API. Ficou a
+  estrutura deste estágio, com logger e guardas de processo. A garantia do
+  estágio 37 continua: se a inicialização do banco falha, a API não escuta e
+  sai com código 1. O reset bloqueado chega ao mesmo `catch`, e o log
+  `boot_failed` leva o código `SCHEMA_RESET_BLOCKED`.
+- `back/src/topic-store.js`: `createTopicStore` aceita `env`, `logger` e
+  `allowSchemaReset`, e o `init()` aplica os prazos da migração e depois chama
+  `createCleanSchema` com `allowReset`.
+- `.github/workflows/back-shared.yml`: o passo de resiliência vem antes do
+  backup com ensaio e da restauração parcial, que precisa ser o último.
+
+Dois encaixes que o git não acusa:
+
+- `back/scripts/api-resilience-smoke.mjs` passou a usar a guarda de banco
+  descartável do estágio 37. O teste `disposable-db.test.js` roda todo
+  `*-smoke.mjs` e exige essa recusa; sem isso o `back-unit` reprovaria.
+- O log de início deixou de ser a linha `PostgreSQL Eleições 2026
+  inicializado` e passou a ser JSON, com `"event":"database_ready"`. O ensaio e
+  o smoke de restauração parcial já aceitam os dois formatos. O handoff do
+  estágio 37 citava a linha antiga na lista do Stefan e foi corrigido.
+
+Conferido na máquina desta atualização: sintaxe dos arquivos juntados, YAML do
+workflow e ausência de marcadores de conflito. Os testes do back não rodam
+aqui, por falta das dependências instaladas; a prova é o CI do GitHub.
 
 ## Human gate
 
