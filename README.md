@@ -104,6 +104,9 @@ O contrato de `role`, `party`, `primaryArea`, `contextAffiliation` e da proveni�
 | `POST` | `/api/auth/logout` | revoga a sessão própria atual |
 | `POST` | `/api/daily-vote` | confirma o próximo slot diário por `editionId`, `slot`, `winnerId` e `answerId`; a ordem das cartas nunca vem do cliente |
 | `POST` | `/api/round-vote` | confirma uma escolha entre quatro pessoas numa transação; exige `roundId`, `winnerId`, quatro `candidateIds` únicos e `playerVersion` |
+| `GET` | `/api/photo-surveys/:surveyId` | definição pública de uma pesquisa por foto e se ela está aberta; as três rotas de pesquisa respondem 404 `PHOTO_SURVEYS_DISABLED` enquanto `PHOTO_SURVEYS_ENABLED` não for `true` ([ICM 68] #324) |
+| `POST` | `/api/photo-surveys/:surveyId/draw` | emite ou devolve o sorteio de cartas do jogador e a resposta dele, se já houver; exige chave Bearer |
+| `POST` | `/api/photo-surveys/:surveyId/response` | grava uma única vez a resposta, por `answerId`, `pickIds` e `championId`, conferida contra o sorteio; exige chave Bearer |
 
 Exemplo do corpo atual:
 

@@ -2,7 +2,38 @@
   "checkedAt": "2026-11-13",
   "issue": 324,
   "base": "77104a3",
-  "delivery": "68a — registro (documentação, sem código)",
+  "delivery68a": {
+    "delivery": "68a — registro (documentação, sem código)",
+    "codeChanged": false,
+    "changedOutsideStage": [
+      "docs/decisions/0001-pesquisa-de-preferencia-por-foto.md (quatro pontos marcados, nada apagado)",
+      "CONTEXT.md",
+      "README.md",
+      "AGENTS.md"
+    ],
+    "tests": {
+      "app": "286 passed, 0 failed",
+      "shared": "93 passed, 0 failed",
+      "back": "não rodado localmente; o PR não altera back/"
+    },
+    "independentReview": {
+      "mode": "agente separado, somente leitura",
+      "result": "sem bloqueio",
+      "appliedAfterReview": [
+        "tela de entrada acrescentada ao formato e às referências",
+        "desfazer vale até a confirmação; trocar depois fica para outra etapa",
+        "critérios de aceite por entrega, com resposta forjada, sorteio uniforme, tabelas imutáveis, janela e troca de identidade",
+        "página nova fora do sitemap e com noindex; testes que fixam a lista de páginas ajustados na 68c",
+        "troca da entrada do site só na 68e, com critério próprio",
+        "condições de publicação com os bloqueios #284, #283, #279 e #285",
+        "origem das imagens das 20 cartas registrada",
+        "frases da raiz e da decisão 0002 alinhadas"
+      ]
+    },
+    "pr": 325,
+    "humanGate": "68a aprovada por instrução do Stefan para o PR #325 em 13/11/2026 (\"Toca\"), transcrita no PR; merge a cargo do agente com o check verde",
+    "decision": "docs/decisions/0002-ordem-de-construcao-e-cartas-com-moldura.md"
+  },
   "designApproval": {
     "by": "Stefan",
     "when": "2026-11-13",
@@ -15,14 +46,6 @@
     ],
     "entryScreen": "desenhada depois da revisão independente e aprovada com o PR #325 (\"Toca\")"
   },
-  "decision": "docs/decisions/0002-ordem-de-construcao-e-cartas-com-moldura.md",
-  "changedOutsideStage": [
-    "docs/decisions/0001-pesquisa-de-preferencia-por-foto.md (quatro pontos marcados, nada apagado)",
-    "CONTEXT.md",
-    "README.md",
-    "AGENTS.md"
-  ],
-  "codeChanged": false,
   "facts": {
     "politicalCardsWithCommonFrame": 20,
     "source": "app/public/chromas/politicos, arquivos -530.webp e -1060.webp",
@@ -37,32 +60,77 @@
       "source": "shared/presidential-roster.json, campo photo.kind"
     }
   },
-  "tests": {
-    "app": "286 passed, 0 failed",
-    "shared": "93 passed, 0 failed",
-    "back": "não rodado localmente; o PR não altera back/"
-  },
   "acceptance": {
     "delivery68a": "aprovada",
-    "delivery68b": "não iniciada",
+    "delivery68b": "aprovada",
     "delivery68c": "não iniciada",
     "delivery68d": "não iniciada",
     "delivery68e": "não iniciada"
   },
-  "humanGate": "68a aprovada por instrução do Stefan para o PR #325 em 13/11/2026 (\"Toca\"), transcrita no PR; merge a cargo do agente com o check verde",
-  "independentReview": {
-    "mode": "agente separado, somente leitura",
-    "result": "sem bloqueio",
-    "appliedAfterReview": [
-      "tela de entrada acrescentada ao formato e às referências",
-      "desfazer vale até a confirmação; trocar depois fica para outra etapa",
-      "critérios de aceite por entrega, com resposta forjada, sorteio uniforme, tabelas imutáveis, janela e troca de identidade",
-      "página nova fora do sitemap e com noindex; testes que fixam a lista de páginas ajustados na 68c",
-      "troca da entrada do site só na 68e, com critério próprio",
-      "condições de publicação com os bloqueios #284, #283, #279 e #285",
-      "origem das imagens das 20 cartas registrada",
-      "frases da raiz e da decisão 0002 alinhadas"
-    ]
-  },
-  "pr": 325
+  "delivery68b": {
+    "checkedAt": "2026-11-13",
+    "branch": "icm/68b-photo-survey-server",
+    "plan": "stages/68_photo_survey_politics/plans/68b-regras-e-servidor.md",
+    "environment": "PostgreSQL 16.14 local, banco descartável polimatch_test em 127.0.0.1",
+    "redFirst": [
+      "shared/photo-survey.test.js falhou por módulo ausente antes do código",
+      "back/scripts/photo-survey-smoke.mjs falhou por método ausente e depois no caso do login Google sem escolhas no jogo",
+      "back/src/photo-survey-http.test.js falhou em 5 de 6 antes das rotas"
+    ],
+    "tests": {
+      "shared": "104 passed, 0 failed (11 novos)",
+      "backUnit": "293 passed, 0 failed (8 novos)",
+      "app": "286 passed, 0 failed",
+      "smokes": [
+        "integração",
+        "duas escolhas",
+        "duelos",
+        "abuso",
+        "progresso",
+        "cívico",
+        "resiliência",
+        "pesquisa por foto"
+      ],
+      "backupDrill": "47 tabelas, photo_survey_draws e photo_survey_responses no manifesto, sem diferença depois do boot",
+      "partialRestore": "aprovado",
+      "liveApiLocal": "definição 200, sorteio 4 telas de 4, resposta created, repetição alreadyProcessed, outra escolha 409, sem sessão 401"
+    },
+    "acceptance68b": {
+      "mesmo sorteio ao recarregar ou em outra aba": "met (smoke: chamadas repetidas e simultâneas)",
+      "sorteio uniforme": "met (teste com semente, 20.000 sorteios)",
+      "resposta única e idempotente": "met (smoke)",
+      "resposta forjada recusada": "met (smoke e teste de unidade)",
+      "tabelas novas imutáveis": "met (smoke: UPDATE e DELETE recusados)",
+      "ranking_stats, player_stats e votes intactos": "met (smoke: pegada do jogo igual antes e depois)",
+      "fora da janela, recusada": "met (smoke: antes de abrir, depois de fechar e fechando no meio)",
+      "nenhuma rota devolve soma": "met (as três rotas devolvem só definição, sorteio e a resposta do próprio jogador)"
+    },
+    "deviations": [
+      "topic-store.js muda além do registro: combineGoogleHistory liga à conta o anônimo com sorteio de pesquisa (status linked), sem somar nada do jogo",
+      "a trava por jogador é a do findPlayer; não há trava própria da pesquisa"
+    ],
+    "remoteCi": "ci-gate verde no PR #326, no commit f0a2ba9 (servidor, banco, design, navegador em Chromium e em WebKit) e de novo no commit final, que só registra o gate",
+    "humanGate": "68b aprovada por instrução do Stefan para o PR #326 em 13/11/2026 (\"Sim\"), transcrita no PR; merge a cargo do agente com o check verde",
+    "featureFlag": "PHOTO_SURVEYS_ENABLED=true liga as três rotas; sem isso 404 PHOTO_SURVEYS_DISABLED sem chegar ao store (teste de unidade)",
+    "pr": 326,
+    "independentReview": {
+      "mode": "agente separado, somente leitura no repositório, com banco descartável local",
+      "result": "sem bloqueio",
+      "reproducedAndFixed": [
+        "mesmo answerId de duas pessoas em paralelo causava 500 (23505); agora ON CONFLICT (answer_id) DO NOTHING e 400",
+        "anônimo com sorteio e sem resposta não era ligado no login Google e gravava segunda resposta com a chave antiga; agora o vínculo acontece com o sorteio"
+      ],
+      "alsoApplied": [
+        "o vínculo linked não soma nada do jogo nem muda a versão do ranking da conta",
+        "índice photo_survey_draws_player_idx",
+        "teste de uniformidade com pares e com as duas primeiras posições",
+        "smoke: conta com duas respostas (vale a mais antiga) e anônimo que vira o jogador ativo",
+        "política: vale a resposta mais antiga da identidade; contagem futura por identidade"
+      ],
+      "notFixed": [
+        "TRUNCATE não é barrado pelos gatilhos, como nas demais tabelas",
+        "token inválido com corpo inválido responde 400 antes do 401"
+      ]
+    }
+  }
 }
