@@ -24,7 +24,11 @@ on:
 
 jobs:
   browser-smoke:
-    runs-on: ubuntu-latest
+    # Versão fixa de propósito. Em 11/2026 `ubuntu-latest` passou a ser o
+    # 26.04, e o Playwright 1.55.1 não instala navegador nele ("does not
+    # support chromium on ubuntu26.04-x64"). Só voltar a `ubuntu-latest`
+    # junto com uma atualização do Playwright que suporte a versão nova.
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
