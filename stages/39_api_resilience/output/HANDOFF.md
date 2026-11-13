@@ -314,12 +314,20 @@ falhou, por uma falha intermitente que já existia na `main`:
   (`document.styleSheets` vazio no primeiro render). O link do rodapé aparece
   em 4498 px, vai para 1029 px quando o CSS chega e para 1018 px quando a
   fonte troca. O clique do teste nesse intervalo erra o link.
-- Correção, só no teste: esperar `load` e as fontes antes de clicar no link do
-  rodapé da página recém-aberta. Depois dela, 30 rodadas seguidas em WebKit
-  sem falha.
-- Fora do escopo deste estágio: nessas duas páginas o conteúdo sem estilo
-  aparece por um instante no Safari. `index.html` e `duelos-da-corrida.html`
-  não têm o problema. Fica para um estágio de interface.
+- Por que varia: `app/src/quote-quiz.css` começa com um `@import` de
+  `fonts.googleapis.com`. A folha de estilo só fica pronta quando esse pedido
+  externo responde, então o tempo sem estilo depende da rede de terceiros.
+- Correção, só no teste: esperar `load` e as fontes, com prazo, antes de
+  clicar no link do rodapé da página recém-aberta. Depois dela, 54 rodadas em
+  WebKit sem falha: 30 com a primeira versão da espera e 24 com a versão com
+  prazo, que foi sugestão da conferência independente.
+- Fora do escopo deste estágio, para a [ICM 56] #298, que trata de fontes
+  locais: nessas duas páginas o conteúdo sem estilo aparece por um instante no
+  Safari. `index.html` e `duelos-da-corrida.html` não têm o problema.
+- Mesmo padrão, não alterado aqui: `app/e2e/quote-quiz.mjs` (linhas 56, 58 e
+  62) e `app/e2e/quote-quiz-checked.mjs` (linha 81) clicam logo depois de uma
+  navegação para essas páginas. Não falharam, mas estão expostos à mesma
+  corrida.
 
 Um agente independente conferiu a junção, somente leitura: nenhum defeito de
 código na junção, nenhuma linha perdida dos dois lados, e a guarda nova do

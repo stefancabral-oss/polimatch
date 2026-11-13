@@ -12,7 +12,11 @@ if(shots)await mkdir(shots,{recursive:true});
 // e a fonte chegarem: o rodapé desce milhares de pixels e sobe de novo. Um
 // clique nesse intervalo erra o link e a navegação não acontece. Esperar o
 // `load` e as fontes antes de clicar em link do rodapé de uma página recém-aberta.
-const settled=async page=>{await page.waitForLoadState('load');await page.evaluate(()=>document.fonts.ready.then(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done)))));};
+// A folha de estilo importa a fonte de fora (`@import` em quote-quiz.css), então
+// a espera pela fonte tem prazo: se o pedido travar, o passo falha com mensagem
+// clara em vez de ficar pendurado.
+const twoFrames=()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done)));
+const settled=async page=>{await page.waitForLoadState('load');await page.evaluate(twoFrames);await page.waitForFunction(()=>document.fonts.status==='loaded');await page.evaluate(twoFrames);};
 try{
  for(const width of [320,390,440,1440]){
   const page=await browser.newPage({viewport:{width,height:width===440?740:900},serviceWorkers:'block'});
