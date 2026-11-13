@@ -8,6 +8,11 @@ const browser=await ({chromium,webkit}[browserName]).launch();
 const origin=process.env.POLIMATCH_E2E_URL||'http://127.0.0.1:4173/';
 const shots=process.env.POLIMATCH_FACT_SCREENSHOTS;
 if(shots)await mkdir(shots,{recursive:true});
+// No WebKit as páginas de quiz montam o conteúdo antes de as folhas de estilo
+// e a fonte chegarem: o rodapé desce milhares de pixels e sobe de novo. Um
+// clique nesse intervalo erra o link e a navegação não acontece. Esperar o
+// `load` e as fontes antes de clicar em link do rodapé de uma página recém-aberta.
+const settled=async page=>{await page.waitForLoadState('load');await page.evaluate(()=>document.fonts.ready.then(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done)))));};
 try{
  for(const width of [320,390,440,1440]){
   const page=await browser.newPage({viewport:{width,height:width===440?740:900},serviceWorkers:'block'});
@@ -67,7 +72,7 @@ try{
   assert.match(await page.locator('.score-strip').innerText(),/0\s+acertos/);
   assert.equal(await page.evaluate(()=>localStorage.getItem('polimatch.quote-quiz.v1:sentinel')),'preserved');
   assert.equal(JSON.parse(await page.evaluate(key=>localStorage.getItem(key),FACT_STORAGE_KEY)).answers.length,0);
-  await page.getByRole('link',{name:'Jogar Quem disse isso?',exact:true}).click();await page.locator('[data-answer]').first().waitFor();
+  await page.getByRole('link',{name:'Jogar Quem disse isso?',exact:true}).click();await page.locator('[data-answer]').first().waitFor();await settled(page);
   await page.getByRole('link',{name:'Fato ou fake? · edição anterior',exact:true}).click();await page.locator('[data-verdict]').first().waitFor();
   assert.deepEqual(errors,[]);assert.deepEqual(api,[]);
   assert.equal(await page.getByRole('link',{name:'Voltar ao início',exact:true}).getAttribute('href'),'./');

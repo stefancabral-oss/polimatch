@@ -299,6 +299,32 @@ Conferido na máquina desta atualização: sintaxe dos arquivos juntados, YAML d
 workflow e ausência de marcadores de conflito. Os testes do back não rodam
 aqui, por falta das dependências instaladas; a prova é o CI do GitHub.
 
+CI do GitHub no commit `a7e5a85`: `back-unit`, `back-integration-postgres`
+(com resiliência, backup, ensaio e restauração parcial juntos), `shared-data`,
+`validate` e `browser-smoke (chromium)` verdes. `browser-smoke (webkit)`
+falhou, por uma falha intermitente que já existia na `main`:
+
+- O que falhou: `app/e2e/fact-check.mjs` esperou 30 s por `[data-verdict]`
+  depois de voltar do quiz pelo link do rodapé.
+- Reprodução em WebKit nesta máquina: 4 falhas em 34 rodadas, uma delas em 8
+  rodadas na `main` sem este PR. Na falha, a página continuava em
+  `quem-disse-isso.html`: o clique não tinha navegado.
+- Causa: no WebKit, `quem-disse-isso.html` e `fato-ou-fake.html` montam o
+  conteúdo antes de as folhas de estilo estarem aplicadas
+  (`document.styleSheets` vazio no primeiro render). O link do rodapé aparece
+  em 4498 px, vai para 1029 px quando o CSS chega e para 1018 px quando a
+  fonte troca. O clique do teste nesse intervalo erra o link.
+- Correção, só no teste: esperar `load` e as fontes antes de clicar no link do
+  rodapé da página recém-aberta. Depois dela, 30 rodadas seguidas em WebKit
+  sem falha.
+- Fora do escopo deste estágio: nessas duas páginas o conteúdo sem estilo
+  aparece por um instante no Safari. `index.html` e `duelos-da-corrida.html`
+  não têm o problema. Fica para um estágio de interface.
+
+Um agente independente conferiu a junção, somente leitura: nenhum defeito de
+código na junção, nenhuma linha perdida dos dois lados, e a guarda nova do
+smoke de resiliência atende ao teste que a exige.
+
 ## Human gate
 
 - Decisão: `pendente`
