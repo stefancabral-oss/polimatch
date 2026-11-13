@@ -61,6 +61,8 @@ jobs:
               - 'stages/23_chromas_104/output/artwork/**'
               - 'stages/29_political_chromas/output/**'
               - '.dockerignore'
+              # edge-delivery.test.js confere que os ícones do PWA não estão ignorados.
+              - '.gitignore'
               - 'CREDITS.md'
               - 'docs/design/**'
               - 'stages/12_quality_gate_main/evidence/card-art-pilot-176/**'

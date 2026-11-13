@@ -32,9 +32,12 @@ export function releaseBuild(doc, fallback = UNKNOWN_BUILD) {
   return content && content !== UNKNOWN_BUILD ? content : fallback;
 }
 
-// Nome com hash do script de entrada da página ("main-BBiuPtfp"). Muda sempre
-// que o código da página muda, então diz qual versão foi servida quando o build
-// não recebeu o SHA do commit.
+// Nome com hash do script de entrada da página ("main-BBiuPtfp"), para quando o
+// build não recebeu o SHA do commit. Cada página tem o seu, e ele muda quando o
+// JavaScript da página muda; um deploy só de CSS, HTML ou public/ mantém o nome.
+// Cada página construída tem um único script de módulo, o de entrada. No
+// servidor de desenvolvimento o primeiro é o cliente do Vite, e ali o valor não
+// importa.
 export function entryScriptBuild(doc) {
   const src = doc?.querySelector?.('script[type="module"][src]')?.getAttribute("src") || "";
   const name = src.split(/[?#]/)[0].split("/").pop().replace(/\.m?js$/, "");

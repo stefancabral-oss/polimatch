@@ -52,11 +52,11 @@ test("the path filter is pinned to a commit and only consulted for pull requests
   // Dependências cruzadas: os testes do app leem todos os workflows e o ruleset;
   // a API confere os retratos de app/public e usa o .dockerignore da raiz.
   const design = `${block(changes, "\n            design:\n", "\n            ui_smoke:\n")}\n`;
-  for (const path of [".github/workflows/**", "docs/ops/ruleset-main.json", "back/src/**"]) {
+  for (const path of [".github/workflows/**", "docs/ops/ruleset-main.json", "back/src/**", ".dockerignore", ".gitignore"]) {
     assert.ok(design.includes(`- '${path}'\n`), `design: ${path}`);
   }
   const backShared = `${block(changes, "\n            back_shared:\n", "\n            design:\n")}\n`;
-  for (const path of ["app/src/photos.js", "app/public/portraits/**", ".dockerignore", ".github/workflows/ci.yml"]) {
+  for (const path of ["app/src/photos.js", "app/public/portraits/**", ".dockerignore", "scripts/ops/**", ".github/workflows/ci.yml"]) {
     assert.ok(backShared.includes(`- '${path}'\n`), `back_shared: ${path}`);
   }
 });

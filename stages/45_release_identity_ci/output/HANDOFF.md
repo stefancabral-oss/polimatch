@@ -48,6 +48,8 @@
 
 ## Testes executados
 
+Medições de 31/10/2026, sobre a base 7c0bb27, antes da junção com a main. Os números depois da junção estão na "Atualização de 13/11/2026".
+
 - `npm test --prefix app`: 244/244. Eram 226; os 18 novos estão em `release-identity.test.js` (9), `ci-workflows.test.js` (8) e `photos.test.js` (+1).
 - `npm test --prefix back`: 232/232.
 - `npm run test:shared`: 93/93, mais a taxonomia validada.
@@ -105,7 +107,8 @@
   - `ui-interaction-smoke.yml`: o passo do `/version.json` e o da primeira visita do estágio 40. O runner fixo em `ubuntu-24.04` (#321) veio da main.
   - `ci.yml`: `scripts/ops/**` entrou no filtro do back, como a main já tinha no gatilho do `back-shared.yml`.
 - **Choque com o estágio 39 que o git não mostra, corrigido em 71d43bc.** Na main, o relato de erros do navegador usava a meta `polimatch-release` e, sem ela, a constante `__POLIMATCH_ASSET_VERSION__`. Este estágio remove a constante e grava a meta sempre, com `unknown` quando o build não recebe o SHA, que é o caso do deploy de hoje. Juntos, os relatos de produção sairiam com build `unknown`, e o `client-error-report.mjs` falhava num build sem SHA. Agora, sem o SHA, o campo `build` leva o nome com hash do script de entrada da página (por exemplo `main-BBiuPtfp`). Com o SHA nada muda. `docs/ops/MONITORING.md` descreve o campo como ficou.
-- **Testes locais depois da junção:** app 285/285, contrato do piloto 64/64, shared 93 com a taxonomia validada. Builds: com SHA obrigatório, `version.json` e a meta nas quatro páginas trazem o SHA, que não aparece em nenhum JS; sem SHA, saem com `unknown` e o aviso. Em WebKit: `client-error-report.mjs` passa sem SHA e com SHA exigido, `first-visit.mjs` 6 cenários e `photo-recovery.mjs` passam. Os testes do back e o Chromium rodam só no CI do PR.
+- **Testes locais depois da junção:** app 286/286, contrato do piloto 64/64, shared 93 com a taxonomia validada. Builds: com SHA obrigatório, `version.json` e a meta nas quatro páginas trazem o SHA, que não aparece em nenhum JS; sem SHA, saem com `unknown` e o aviso. Em WebKit: `client-error-report.mjs` passa sem SHA e com SHA exigido, `first-visit.mjs` 6 cenários e `photo-recovery.mjs` passam. Os testes do back e o Chromium rodam só no CI do PR.
+- **Revisão independente da junção, somente leitura, em 13/11/2026: sem bloqueio.** Ajustes aplicados depois dela: `.gitignore` entrou no filtro `design` do `ci.yml`, porque `edge-delivery.test.js` (ICM 38) lê esse arquivo; o teste de ordem do smoke do nginx passou a procurar o contêiner do smoke, e não o primeiro `docker run`; um teste confere que cada página tem um único script de módulo; o `CONTEXT.md` do estágio registra a exceção de escopo no relato de erros; e o texto sobre o campo `build` ficou preciso. Notas que ficam: o caminho sem SHA não tem e2e no CI, que sempre constrói com o SHA (rodou aqui em WebKit); `client-error-report.mjs` não cobre `duelos-da-corrida.html`; no servidor de desenvolvimento o `build` do relato sai `client`.
 - **Produção em 13/11/2026.** API e app foram publicados no commit 7a4c9db, sem este estágio. O Dokploy ainda constrói sem `SOURCE_COMMIT`: `/api/health` responde `revision: null`.
 - **O que muda no primeiro deploy depois do merge, sem o SHA no build:** o site passa a servir `/version.json` com `sha: "unknown"`, as URLs dos retratos mudam uma vez para `?v=<hash>` e os relatos de erro levam o nome do script de entrada no campo `build`.
 - **Não muda com o merge:** o ruleset de `main` não é aplicado, e nada é publicado.

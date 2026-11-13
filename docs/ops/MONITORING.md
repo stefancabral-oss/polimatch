@@ -212,5 +212,6 @@ repetir.
 
 - O campo `build` dos relatos do navegador e o `rev` da API só trazem o SHA do
   commit depois que o ICM 45 passar `SOURCE_COMMIT` no build do app e da API.
-  Até lá o `build` traz o nome com hash do script de entrada, que muda quando o
-  código da página muda, e o `rev` fica `null`.
+  Até lá o `rev` fica `null` e o `build` traz o nome com hash do script de
+  entrada. Cada página tem o seu, e ele muda quando o JavaScript da página
+  muda; um deploy só de CSS, HTML ou arquivos de `public/` mantém o nome.

@@ -177,6 +177,15 @@ test("sem o SHA, o build do relato é o nome com hash do script de entrada da p�
   assert.equal(entryScriptBuild(undefined), "unknown");
 });
 
+test("cada página tem um único script de módulo, o de entrada, que dá nome ao build sem SHA", async () => {
+  for (const page of ["index.html", "quem-disse-isso.html", "fato-ou-fake.html", "duelos-da-corrida.html"]) {
+    const html = await readFile(new URL(`../${page}`, import.meta.url), "utf8");
+    const moduleScripts = [...html.matchAll(/<script\b[^>]*\btype="module"[^>]*>/g)].map(([tag]) => tag);
+    assert.equal(moduleScripts.length, 1, page);
+    assert.match(moduleScripts[0], /\bsrc="\.?\/src\/[a-z-]+\.js"/, page);
+  }
+});
+
 test("o instalador do relato não depende da constante de build que o Vite deixou de definir", async () => {
   const source = await readFile(new URL("./install-error-reporter.js", import.meta.url), "utf8");
   assert.doesNotMatch(source, /__POLIMATCH_ASSET_VERSION__/);

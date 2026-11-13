@@ -28,4 +28,9 @@ roda em push. main não tem proteção.
 Workflow de deploy, GHCR e smoke pós-deploy (ICM 50). Cache-Control e
 headers no nginx (ICM 38). Captura de erros no cliente e logs da API (ICM 39).
 Configurar Dokploy, ruleset ou settings do GitHub: só o Stefan.
+Exceção registrada na junção com a main, em 13/11/2026: o campo `build` do
+relato de erros do navegador (ICM 39) lia uma constante que este estágio
+remove. O ajuste desse campo em `app/src/error-reporter.js` e em
+`install-error-reporter.js` entra aqui, e só ele; o resto da captura de erros
+continua fora.
 Nenhum agente aprova o gate, mescla ou publica.

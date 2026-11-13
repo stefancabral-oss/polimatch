@@ -141,7 +141,7 @@
     },
     "unitTests": {
       "app": {
-        "passed": 285,
+        "passed": 286,
         "failed": 0
       },
       "cardArtPilotContract": {
@@ -168,6 +168,24 @@
     },
     "production": "API and app deployed at 7a4c9db on 2026-11-13 without this stage; /api/health revision is null",
     "remoteCi": "see the checks of PR #314 on the final commit",
-    "humanGate": "pending; merge only on Stefan's instruction for this PR"
+    "humanGate": "pending; merge only on Stefan's instruction for this PR",
+    "independentReview": {
+      "mode": "read-only agent, separate from the author of the merge",
+      "result": "no blocker",
+      "appliedAfterReview": [
+        ".gitignore added to the design filter in ci.yml (edge-delivery.test.js reads it)",
+        "edge-delivery.test.js order check now anchors on the smoke container, not on the first docker run",
+        "unit test: each of the four pages has a single module script, the entry",
+        "stage CONTEXT.md records the scope exception for the error report build field",
+        "wording of the build field in MONITORING.md and in the code comment"
+      ],
+      "openNotes": [
+        "the no-SHA path has no e2e in CI, which always builds with the SHA; it ran locally on WebKit",
+        "client-error-report.mjs does not cover duelos-da-corrida.html",
+        "on the dev server the report build is \"client\" (first module script is the Vite client)",
+        "photo-recovery.mjs imports back/src while the ui_smoke filter leaves back/ out (inherited, already in the handoff)"
+      ]
+    },
+    "remoteCiBeforeReviewFixes": "PR #314 on a3859f3: every suite and ci-gate passed"
   }
 }
