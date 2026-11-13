@@ -11,7 +11,8 @@
     "test": "node --test src/*.test.js",
     "test:integration": "node scripts/topic-store-smoke.mjs",
     "test:abuse": "node scripts/vote-abuse-smoke.mjs",
-    "test:resilience": "node scripts/api-resilience-smoke.mjs"
+    "test:resilience": "node scripts/api-resilience-smoke.mjs",
+    "test:photo-survey": "node scripts/photo-survey-smoke.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",

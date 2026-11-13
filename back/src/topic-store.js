@@ -3,6 +3,7 @@ import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { isRoundZebra } from "../../shared/player-feedback.js";
 import { sessionMirror, compareSessionWithCut } from "../../shared/session-mirror.js";
 import { gameProgressStore, installGameSchema } from "./game-progress.js";
+import { installPhotoSurveySchema, photoSurveyResponseCount, photoSurveyStore } from "./photo-survey-store.js";
 import { AGGREGATE_PUBLIC_COPY_POLICY } from "../../shared/aggregate-publication-copy.js";
 import { eloTier, isZebra, ratingDeltas } from "../../shared/elo.js";
 import {
@@ -1171,7 +1172,9 @@ async function combineGoogleHistory(client, { accountPlayerId, anonymousPlayerId
   const rounds = await client.query("SELECT count(*)::integer AS count FROM choice_rounds WHERE player_id=$1", [anonymousPlayerId]);
   if (identity.rowCount || priorLink.rowCount) throw contractError("esta sessão já pertence a outra conta", 409, "HISTORY_SOURCE_CLAIMED");
   const anonymousChoices = Number(rounds.rows[0].count);
-  if (!anonymousChoices) return null;
+  // Sem escolhas no jogo, o anônimo só é incorporado se respondeu a uma
+  // pesquisa por foto: o vínculo impede uma segunda resposta pela conta.
+  if (!anonymousChoices && !(await photoSurveyResponseCount(client, anonymousPlayerId))) return null;
   const priorChoices = await client.query("SELECT count(*)::integer AS count FROM choice_rounds WHERE player_id=$1", [accountPlayerId]);
   const daily = await client.query(`SELECT player_id,count(*)::integer AS count FROM daily_answers a
     JOIN daily_editions e ON e.id=a.edition_id
@@ -1220,7 +1223,8 @@ async function combineGoogleHistory(client, { accountPlayerId, anonymousPlayerId
     (source_player_id,player_id,source_kind,merge_token_hash) VALUES ($1,$2,$3,$4)`,
     [historicalId, activeId, keepAnonymousDaily ? "previous-google-player" : "anonymous-session", accessTokenHash(currentToken)]);
   await client.query("UPDATE anonymous_players SET recovery_hash=$1 WHERE id=$2", [recoveryKeyHash(createRecoveryKey()), anonymousPlayerId]);
-  return { playerId: activeId, status: "combined", anonymousChoices, previousChoices: Number(priorChoices.rows[0].count),
+  // "linked": nada do jogo foi somado, então o app não anuncia escolhas reunidas.
+  return { playerId: activeId, status: anonymousChoices ? "combined" : "linked", anonymousChoices, previousChoices: Number(priorChoices.rows[0].count),
     activeDaily: keepAnonymousDaily ? "anonymous" : "account",
     dailyConflict: (dailyCounts.get(anonymousPlayerId) || 0) > 0 && (dailyCounts.get(accountPlayerId) || 0) > 0 };
 }
@@ -1922,6 +1926,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
   env = process.env,
   logger = createLogger(),
   allowSchemaReset = schemaResetAllowedFromEnvironment(),
+  photoSurveys,
 } = {}) {
   if (!connectionString) throw new Error("DATABASE_URL é obrigatória");
   if (!candidateRegistry?.topicsById || typeof candidateRegistry.candidatesForTopic !== "function") {
@@ -1944,6 +1949,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
           allowReset: allowSchemaReset === true,
         });
         await installGameSchema(client);
+        await installPhotoSurveySchema(client);
         await client.query("COMMIT");
         return migration;
       } catch (error) {
@@ -2893,6 +2899,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
     applyRound: applyFourCardRound, collectionEnabled,
     quotaWindow: () => editionWindow(editorialDateKey(clockInstant(clock))),
   }));
+  Object.assign(store, photoSurveyStore({ pool, findPlayer, clock, surveys: photoSurveys }));
   return store;
 }
 
