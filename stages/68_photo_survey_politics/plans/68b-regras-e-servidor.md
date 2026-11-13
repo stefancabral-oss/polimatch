@@ -30,6 +30,9 @@ sub-store misturado com `Object.assign`. Três rotas novas em
 - A resposta não toca `votes`, `choice_rounds`, `ranking_stats`,
   `player_stats` nem `abuse_quota_counters`.
 - Nenhuma rota nova devolve soma de respostas (gate #177).
+- As rotas nascem desligadas: só `PHOTO_SURVEYS_ENABLED=true` as liga. Sem
+  isso respondem 404 `PHOTO_SURVEYS_DISABLED`. Acrescentado ao fim da
+  entrega, para um deploy da API não abrir a pesquisa antes da publicação.
 - Erros de domínio são `Error` com `.status`, `.code` e `.current` opcional,
   como no resto da API.
 - Todo smoke em `back/scripts/*-smoke.mjs` chama `requireDisposableDatabase()`

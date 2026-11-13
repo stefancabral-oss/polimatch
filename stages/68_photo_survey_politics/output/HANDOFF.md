@@ -27,12 +27,12 @@
 
 O que muda no jogo atual: nada no que a pessoa vê. No servidor, o login Google passa a ligar à conta o jogador anônimo que respondeu a uma pesquisa sem ter jogado; antes ele era descartado. A resposta do login traz `merge.status: "linked"` nesse caso, e o app, que só reage a `combined` e `alreadyCombined`, não mostra aviso.
 
-Nada desta entrega é visível no site: não há tela, e as rotas novas só respondem a quem as chama direto.
+Nada desta entrega é visível no site: não há tela, e as rotas novas nascem desligadas. Só `PHOTO_SURVEYS_ENABLED=true` no ambiente da API as liga; sem isso respondem 404 `PHOTO_SURVEYS_DISABLED`.
 
 ## Não entregue / pendente
 
 - As entregas 68c (tela), 68d (teste por agentes) e 68e (publicação).
-- A pesquisa `politica-2026-01` está sem janela (`opensAt` e `closesAt` nulos), ou seja, aberta assim que a API for publicada. Definir a janela é assunto da 68e.
+- A pesquisa `politica-2026-01` está sem janela (`opensAt` e `closesAt` nulos), ou seja, aberta assim que as rotas forem ligadas. Definir a janela e ligar `PHOTO_SURVEYS_ENABLED` em produção são assunto da 68e.
 - Fechar uma pesquisa exige mudar a definição no código e publicar. Não há painel para isso.
 
 ## Testes executados
@@ -42,7 +42,7 @@ Nada desta entrega é visível no site: não há tela, e as rotas novas só resp
 68b, em 13/11/2026, numa máquina com PostgreSQL 16.14 local e banco descartável:
 
 - `npm run test:shared`: 103/103 (10 novos).
-- `npm test --prefix back`: 292/292 (7 novos: 6 das rotas e a guarda de banco descartável do smoke novo).
+- `npm test --prefix back`: 293/293 (8 novos: 7 das rotas e a guarda de banco descartável do smoke novo).
 - `npm test --prefix app`: 286/286.
 - Smokes na ordem do CI, todos aprovados: integração, duas escolhas, duelos, abuso, progresso, cívico, resiliência e o novo, da pesquisa.
 - Backup com manifesto e ensaio de restauração: 47 tabelas, com as duas novas no manifesto e sem diferença depois do boot. Restauração parcial: aprovada.
@@ -56,7 +56,7 @@ Um agente separado, somente leitura, revisou este PR em 13/11/2026 e não achou 
 ## Riscos conhecidos
 
 - A 68b mexe em `combineGoogleHistory`, a função que junta o histórico no login Google. A mudança é uma condição e um status; os smokes de integração e de identidade continuam aprovados.
-- Publicar a API com a 68b abre a pesquisa para quem chamar as rotas direto, mesmo sem tela. Por isso a publicação fica para a 68e, junto com a janela.
+- Um deploy da API com a 68b não abre a pesquisa: as rotas ficam desligadas até `PHOTO_SURVEYS_ENABLED=true`. As tabelas novas são criadas vazias no boot.
 - A decisão 0002 muda a ordem "maturidade primeiro" da 0001. Os bloqueios de maturidade continuam abertos (#278, #279, #280, #281, #283, #284, #285 e #286) e correm em paralelo.
 - A primeira pesquisa fica sem Lula e Flávio Bolsonaro, porque as cartas deles têm moldura diferente das outras 20.
 - Das 20 cartas, 8 vêm de fotos de veículos ou de sites. Sem refazer essas 8 ou sem a confirmação do Stefan, a publicação (68e) não acontece com elas, e com 12 cartas o formato de 16 não fecha.

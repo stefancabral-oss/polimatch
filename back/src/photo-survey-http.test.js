@@ -6,7 +6,7 @@ const NOW = new Date("2026-11-20T15:00:00.000Z");
 const googleIdentity = { configured: false, verify: async () => ({ subject: "test" }) };
 const SURVEY_VIEW = { id: "politica-2026-01", question: "Quem você prefere?", status: "open" };
 
-function harness(overrides = {}) {
+function harness(overrides = {}, env = { PHOTO_SURVEYS_ENABLED: "true" }) {
   const calls = [];
   const store = {
     health: async () => {},
@@ -15,7 +15,7 @@ function harness(overrides = {}) {
     photoSurveyRespond: async (...args) => { calls.push(["photoSurveyRespond", ...args]); return { status: "created" }; },
     ...overrides,
   };
-  return { calls, app: createHttpApp({ store, googleIdentity, env: {}, clock: () => NOW }) };
+  return { calls, app: createHttpApp({ store, googleIdentity, env, clock: () => NOW }) };
 }
 
 async function withServer(app, run) {
@@ -133,4 +133,23 @@ test("corpo malformado é recusado antes do store", async () => {
     assert.equal((await response.json()).code, "INVALID_JSON");
   });
   assert.deepEqual(calls, []);
+});
+
+test("sem PHOTO_SURVEYS_ENABLED=true as três rotas ficam desligadas e não chegam ao store", async () => {
+  for (const env of [{}, { PHOTO_SURVEYS_ENABLED: "false" }, { PHOTO_SURVEYS_ENABLED: "1" }, { PHOTO_SURVEYS_ENABLED: "TRUE" }]) {
+    const { app, calls } = harness({}, env);
+    await withServer(app, async (base) => {
+      const responses = [
+        await fetch(`${base}/api/photo-surveys/politica-2026-01`),
+        await post(`${base}/api/photo-surveys/politica-2026-01/draw`, {}, BEARER),
+        await post(`${base}/api/photo-surveys/politica-2026-01/response`, {}, BEARER),
+      ];
+      for (const response of responses) {
+        assert.equal(response.status, 404, JSON.stringify(env));
+        assert.equal((await response.json()).code, "PHOTO_SURVEYS_DISABLED");
+        assert.equal(response.headers.get("cache-control"), "no-store");
+      }
+    });
+    assert.deepEqual(calls, [], JSON.stringify(env));
+  }
 });

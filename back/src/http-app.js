@@ -541,7 +541,21 @@ export function createHttpApp({
   // Pesquisa por foto (ICM 68). A definição é pública; o sorteio e a resposta
   // pertencem a um jogador. As cartas mostradas nunca vêm do cliente: a
   // resposta é conferida contra o sorteio gravado no servidor.
+  // O recurso nasce desligado: só PHOTO_SURVEYS_ENABLED=true liga as rotas,
+  // para que um deploy da API não abra a pesquisa antes da publicação.
+  const photoSurveysEnabled = env.PHOTO_SURVEYS_ENABLED === "true";
+  function requirePhotoSurveys(req, res) {
+    if (photoSurveysEnabled) return true;
+    noStore(res).status(404).json({
+      error: "pesquisa por foto indisponível",
+      code: "PHOTO_SURVEYS_DISABLED",
+      requestId: req.requestId,
+    });
+    return false;
+  }
+
   app.get("/api/photo-surveys/:surveyId", async (req, res) => {
+    if (!requirePhotoSurveys(req, res)) return;
     try {
       noStore(res).json(await store.photoSurvey(String(req.params.surveyId), { now: clock() }));
     } catch (error) {
@@ -550,6 +564,7 @@ export function createHttpApp({
   });
 
   app.post("/api/photo-surveys/:surveyId/draw", async (req, res) => {
+    if (!requirePhotoSurveys(req, res)) return;
     try {
       noStore(res).json(await store.photoSurveyDraw(
         requiredRecoveryKey(req),
@@ -562,6 +577,7 @@ export function createHttpApp({
   });
 
   app.post("/api/photo-surveys/:surveyId/response", async (req, res) => {
+    if (!requirePhotoSurveys(req, res)) return;
     const { answerId, pickIds, championId } = req.body || {};
     try {
       noStore(res).json(await store.photoSurveyRespond({

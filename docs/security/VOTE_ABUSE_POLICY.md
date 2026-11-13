@@ -53,6 +53,7 @@ A versão 4 acrescenta a pesquisa por foto ([ICM 68] #324). Ela não muda nenhum
 - Quem apaga os dados do aparelho vira outro jogador e pode responder de novo. O que limita isso é a cota de 3 jogos novos por rede descrita acima. O cadastro por CPF, previsto na decisão 0001, é o que fecha essa porta, e não faz parte desta versão.
 - Um jogador anônimo que respondeu a uma pesquisa e depois entra numa conta Google já existente é ligado à conta mesmo sem ter escolhas no jogo, para a conta não responder de novo. Nesse caso nada do jogo é somado.
 - Nenhuma rota devolve soma de respostas. O [gate de publicação agregada](../legal/AGGREGATE_PUBLICATION_GATE.md) continua valendo.
+- As rotas da pesquisa nascem desligadas. Só `PHOTO_SURVEYS_ENABLED=true` no ambiente da API as liga; sem isso respondem HTTP 404, `PHOTO_SURVEYS_DISABLED`, e nada é gravado.
 
 ## Origem e proxy
 
