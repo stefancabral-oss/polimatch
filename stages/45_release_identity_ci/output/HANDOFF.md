@@ -2,7 +2,7 @@
 
 ## Status
 
-- Estado: `aprovado`
+- Estado: `aprovado` (o aceite do desvio do texto da issue segue pendente)
 - Issue: #287
 - Branch: `chore/release-identity-ci` (base main 7c0bb27; recebeu a main 7a4c9db em 13/11/2026)
 - PR: #314, mesclado em 13/11/2026 no commit `29edba3`
@@ -18,12 +18,12 @@
 - **`ci-gate`.** Sempre roda. Em pull request aceita `success` ou `skipped`. Em push e execução manual exige `success`. `failure` e `cancelled` derrubam o gate. Se o `changes` falhar, o gate também cai.
 - **Filtros com dependências cruzadas conhecidas.** `back_shared` passa a incluir `app/src/photos.js` e as saídas do estágio 17, que os testes do back leem, e `app/public/portraits/**` e `.dockerignore`, porque a API confere o sha256 dos retratos e a imagem da API copia essa pasta. `design` inclui `back/src/**`, as evidências dos estágios 23 e 29, todos os workflows e `docs/ops/ruleset-main.json`, que os testes do app leem.
 - **Release conferido no CI.** O design validator confere `dist/version.json`, `version.json` dentro da imagem do app e a meta contra `GITHUB_SHA`. O smoke confere `/version.json` no preview. O back-shared confere `EMBEDDED_RELEASE_REVISION == GITHUB_SHA` na imagem da API.
-- **Ruleset preparado, não aplicado.** `docs/ops/ruleset-main.json` exige PR, `ci-gate` vindo do app GitHub Actions (id 15368) e conversas resolvidas, e bloqueia force-push e deleção. Não exige segundo revisor e não tem bypass. Os comandos exatos estão em `docs/ops/RELEASE.md`. Um teste confere que o check exigido tem o mesmo nome do job `ci-gate`: se o job for renomeado, o teste falha antes de o ruleset passar a esperar um check que nunca aparece.
+- **Ruleset preparado; aplicado em 13/11/2026, ver "Depois do merge".** `docs/ops/ruleset-main.json` exige PR, `ci-gate` vindo do app GitHub Actions (id 15368) e conversas resolvidas, e bloqueia force-push e deleção. Não exige segundo revisor e não tem bypass. Os comandos exatos estão em `docs/ops/RELEASE.md`. Um teste confere que o check exigido tem o mesmo nome do job `ci-gate`: se o job for renomeado, o teste falha antes de o ruleset passar a esperar um check que nunca aparece.
 - **Documentação.** `docs/ops/RELEASE.md` cobre release, Dokploy, CI e ruleset. O README ganhou o build-arg `SOURCE_COMMIT` do app.
 
 ## Não entregue / pendente
 
-- **Ação do Stefan:**
+- **Ação do Stefan** (situação em 13/11/2026: os itens 1 e 2 e a aplicação do ruleset do item 3 estão feitos, ver "Depois do merge"; seguem abertos `delete_branch_on_merge`, do item 3, e os itens 4 a 8):
   1. Revisar e mesclar o PR desta branch.
   2. Depois do merge, confirmar o primeiro run de push: `gh run list --workflow ci.yml --branch main --event push --limit 1`.
   3. Aplicar o ruleset e a limpeza de branches:
@@ -96,8 +96,8 @@ Medições de 31/10/2026, sobre a base 7c0bb27, antes da junção com a main. Os
 
 ## Próximo passo exato
 
-1. Stefan revisa a branch `chore/release-identity-ci`, abre e mescla o PR. O CI do próprio PR já roda pelo `ci.yml` novo.
-2. Seguir a lista "Ação do Stefan" acima, na ordem.
+1. Feito em 13/11/2026: PR #314 mesclado e ruleset de `main` aplicado (ver "Depois do merge").
+2. Seguir os itens abertos da lista "Ação do Stefan" acima, na ordem.
 
 ## Atualização de 13/11/2026
 
@@ -117,11 +117,11 @@ Medições de 31/10/2026, sobre a base 7c0bb27, antes da junção com a main. Os
 
 - O CI passou inteiro no commit final da branch, `b0201b9`, e o PR foi mesclado em `29edba3`.
 - Primeiro run de push em `main`: todas as suítes e o `ci-gate` passaram no commit `29edba3`.
-- Bateria local em WebKit na `main`, com o SHA no build: 23 de 27; as quatro falhas são as de foco por teclado do WebKit do macOS (`interaction-smoke` nas duas variantes, `accessible-profile` e `civic-navigation`), que não ocorrem no CI em Linux. Em repetições à parte na `main`, `fact-check.mjs` passou 8 de 8 e `quote-quiz-checked.mjs` 5 de 6 (falha na linha 81, intermitência já registrada para o ICM 66).
+- Bateria local em WebKit na `main`, com o SHA no build: 23 de 27; as quatro falhas são as de foco por teclado do WebKit do macOS (`interaction-smoke` nas duas variantes, `accessible-profile` e `civic-navigation`), que não ocorrem no CI em Linux. Em repetições à parte na `main`, `fact-check.mjs` passou 8 de 8 e `quote-quiz-checked.mjs` 5 de 6 (falha na linha 81, a corrida de clique que o handoff do estágio 39 já aponta nessa linha; a causa no produto é assunto da ICM 56, #298).
 - Antes do merge, a mesma bateria num build sem SHA, como o Dokploy constrói hoje: 22 de 27; as cinco falhas são as quatro de foco por teclado do WebKit do macOS, que se repetem na `main`, e uma intermitente do `fact-check.mjs` (linha 50), que passou em 13 repetições.
 - **Ruleset de `main` aplicado em 13/11/2026**, por instrução do Stefan em conversa ("Sim, aplica"), depois do primeiro CI de push verde. Id 27227559, `enforcement: active`, com as regras `deletion`, `non_fast_forward`, `pull_request` e `required_status_checks` (`ci-gate`). `delete_branch_on_merge` não foi alterado, e o bloqueio ainda não foi provado com um PR de teste.
 - Produção não mudou com o merge: segue em `7a4c9db`, sem `/version.json` e com `revision: null`.
-- Continuam com o Stefan: provar o bloqueio, `delete_branch_on_merge`, a chegada do SHA ao build do Dokploy e a conferência depois do primeiro deploy com o SHA. A issue #287 segue aberta.
+- Continuam com o Stefan: provar o bloqueio, `delete_branch_on_merge`, atualizar com a `main` os PRs #252, #257 e #276, abertos antes do `ci.yml`, para que recebam o `ci-gate`, o aceite do desvio do texto da issue, a chegada do SHA ao build do Dokploy e a conferência depois do primeiro deploy com o SHA. A issue #287 segue aberta.
 
 ## Human gate
 

@@ -117,12 +117,13 @@
   "humanGate": "aprovado por instrução do Stefan para este PR em conversa de 12/11/2026, transcrita no PR; merge a cargo do agente depois do CI verde; deploy com o Stefan",
   "production20261113": {
     "authorizedBy": "Stefan, in conversation (\"Sim, publica\", \"Sim, confere\", \"Sim, mede\", \"Sim, fecha\")",
+    "executedBy": "the agent, clicking Deploy in the panel at Stefan's request; a one-off exception to \"no agent publishes to production\", which stays the rule",
     "deployedCommit": "7a4c9dba4b16a3cf6f9d9ad84340ab8348576f88",
     "cleanBrowser": "Playwright WebKit, fresh context per page, no clicks, every non-GET request to the API blocked: home made three GET calls, the other three pages none; no write attempt, no localStorage key, no browser error; no POST and no /api/player in the API log",
     "mobileLcpHome": {
-      "repoScriptSimulatedApi4s": "2.10 s (median of 3), h1, first API response at 5.9 s",
+      "repoScriptSimulatedApi4s": "2.10 s (median of 3), h1, first API response at 5.9 s; run from a copy of the script with channel chrome, because the installed Playwright Chromium is a different build",
       "lighthouse12.8.2DevtoolsThrottlingRealApi": "2.10 s (median of 3), score 97, first API response at 2.64 s",
-      "lighthouse12.8.2DefaultSimulate": "5.41 s, 5.42 s and 2.84 s; estimate, cause of the variation not investigated",
+      "lighthouse12.8.2DefaultSimulate": "5.41 s, 5.42 s and 2.84 s (median 5.41 s, score 80), an estimate equal to the audit baseline; default Lighthouse or PageSpeed may still show about 5.4 s; cause of the variation not investigated",
       "auditBaseline20261030": "5.4 s"
     },
     "notChecked": "the exhausted-quota notice in production",

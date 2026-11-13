@@ -248,9 +248,9 @@ commit `7fa8b69`:
 
 ## Publicação em produção — 13/11/2026
 
-Por instrução do Stefan em conversa ("Sim, cópia e API"), com ele logado no painel, a API com este estágio foi publicada no commit `7a4c9db`.
+Por instrução do Stefan em conversa ("Sim, cópia e API"), com ele logado no painel, a API com este estágio foi publicada no commit `7a4c9db`. Quem executou o deploy foi o agente, clicando em Deploy no painel, a pedido dele. É uma exceção pontual, autorizada por ele naquela conversa, à frase "nenhum agente publica em produção" do gate abaixo; a regra não muda.
 
-- Antes do deploy foi feita uma cópia manual do banco com `pg_dump` (formato custom, 26 tabelas, comando sem erro). Ela fica dentro do contêiner do banco e é provisória: não substitui o backup externo.
+- Antes do deploy foi feita uma cópia manual do banco com `pg_dump` (formato custom, 26 tabelas, comando sem erro). Ela fica dentro do contêiner do banco e é provisória: não substitui o backup externo. Como todo dump, contém dados pessoais (`docs/ops/BACKUP.md`). Fica sob responsabilidade do Stefan e deve ser apagada quando o primeiro backup externo for conferido, ou antes, se ele decidir; não há prazo definido.
 - O banco tinha a linha `20260913_eleicoes_2026_clean_start` em `schema_migrations`. O log de início trouxe `"event":"database_ready"` com `"resetApplied":false`.
 - Contagem de linhas por tabela antes e depois: 25 tabelas iguais. O boot podou `abuse_quota_counters` e criou `quota_rejections_daily` vazia, como previsto.
 - No painel não havia destino de backup configurado. Continuam com o Stefan: bucket externo, destino e agendamentos no Dokploy, cofre de senhas, ensaio com dump real e a conferência do backup da VPS. A issue #279 segue aberta.

@@ -177,8 +177,8 @@
     },
     {
       "criterion": "Respostas sem x-powered-by",
-      "result": "met localmente; produção depende de deploy",
-      "evidence": "teste unitário e smoke; conferência em produção na lista do Stefan"
+      "result": "met localmente; conferido em produção em 13/11/2026 (production20261113)",
+      "evidence": "teste unitário e smoke; em produção, GET em /api/health sem o cabeçalho"
     },
     {
       "criterion": "Pool com ouvinte de erro, prazos de conexão, consulta, trava e transação parada, sem quebrar a migração de boot",
@@ -303,6 +303,7 @@
   },
   "production20261113": {
     "authorizedBy": "Stefan, in conversation (\"Sim, cópia e API\", then \"Sim, publica\"), logged in to the panel himself",
+    "executedBy": "the agent, clicking Deploy in the panel at Stefan's request; a one-off exception to \"no agent publishes to production\", which stays the rule",
     "deployedCommit": "7a4c9dba4b16a3cf6f9d9ad84340ab8348576f88",
     "api": "deploy done in 52 s; external GETs every 5 s during the switch answered 200; /api/health without x-powered-by and with x-request-id; log lines database_ready, listening and http_request",
     "app": "deploy done in 42 s; four pages and their referenced files answer 200; the build carries the error reporter",

@@ -244,14 +244,15 @@ números acima:
 
 ## Publicação em produção — 13/11/2026
 
-Por instrução do Stefan em conversa ("Sim, publica"), com ele logado no painel, o app com este estágio foi publicado no commit `7a4c9db`, depois da API.
+Por instrução do Stefan em conversa ("Sim, publica"), com ele logado no painel, o app com este estágio foi publicado no commit `7a4c9db`, depois da API. Quem executou o deploy foi o agente, clicando em Deploy no painel, a pedido dele. É uma exceção pontual, autorizada por ele naquela conversa, à frase "nenhum agente publica em produção" do gate abaixo; a regra não muda.
 
 - Por GET: as quatro páginas e os arquivos que elas referenciam respondem 200, e o build de produção traz o client id do Google.
 - Em navegador limpo, autorizado por ele ("Sim, confere"): WebKit do Playwright, um contexto novo por página, sem clique, com toda requisição que não fosse GET para a API bloqueada. A capa fez três chamadas GET à API; as outras três páginas, nenhuma. Não houve tentativa de gravação, chave no `localStorage` nem erro. No log da API não apareceu `POST` nem `/api/player`.
 - LCP móvel da capa, autorizado por ele ("Sim, mede"), mediana de 3: 2,10 s com `app/scripts/measure-home-lcp.mjs` (API simulada com 4 s) e 2,10 s no Lighthouse 12.8.2 com `--throttling-method=devtools` e a API real (nota 97; primeira resposta da API em 2,64 s). A auditoria de 30/10 registrava 5,4 s.
-- No modo padrão o Lighthouse estima por simulação e deu 5,41 s, 5,42 s e 2,84 s. A causa da variação não foi investigada.
+- No modo padrão o Lighthouse estima por simulação e deu 5,41 s, 5,42 s e 2,84 s (nota 80 na mediana). A mediana, 5,41 s, é igual à base da auditoria: quem rodar o Lighthouse padrão ou o PageSpeed pode continuar vendo perto de 5,4 s. A causa da variação não foi investigada.
+- O script do repositório rodou a partir de uma cópia com `channel: "chrome"`, porque o Chromium do Playwright instalado na máquina é de outra versão.
 - Não conferido em produção: o aviso de cota esgotada.
-- Achado fora deste estágio: `GET /api/candidates` responde 86 KB sem compressão.
+- Já registrado no handoff do estágio 38 e confirmado em produção: `GET /api/candidates` responde 86 KB sem compressão.
 - A issue #282 foi fechada em 13/11/2026 por instrução do Stefan ("Sim, fecha"), transcrita na issue.
 
 ## Human gate
