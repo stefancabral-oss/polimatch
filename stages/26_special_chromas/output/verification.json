@@ -1,0 +1,26 @@
+[
+  {
+    "file": "stages/26_special_chromas/output/artwork/flavio-bolsonaro-22-special-v01.png",
+    "size": [
+      1060,
+      1484
+    ],
+    "bytes": 3117363,
+    "sha256": "635f252aabb5400e3b2aa8a53198840a3738b6b921ba809fd3283043b7d14e18",
+    "status": "awaiting-user-visual-review",
+    "generator": "built-in image_gen",
+    "runtimePublished": false
+  },
+  {
+    "file": "stages/26_special_chromas/output/artwork/lula-13-special-v01.png",
+    "size": [
+      1060,
+      1484
+    ],
+    "bytes": 3368940,
+    "sha256": "607a1b23c17fd05cfbf778d15b244cf746238af7167239ef2518c5284bc9a9a8",
+    "status": "awaiting-user-visual-review",
+    "generator": "built-in image_gen",
+    "runtimePublished": false
+  }
+]
