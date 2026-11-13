@@ -121,8 +121,8 @@
       "test that the ruleset requires the exact ci-gate check name from GitHub Actions"
     ]
   },
-  "remoteCi": "pending",
-  "humanGate": "not self-approved",
+  "remoteCi": "PR #314 on b0201b9: every suite and ci-gate passed; first push run on main at 29edba3: every suite and ci-gate passed",
+  "humanGate": "approved by Stefan for this PR on 2026-11-13 (\"Sim, mescla\"), transcribed in the PR; merged by the agent at his request as 29edba3",
   "mergeWithMain20261113": {
     "checkedAt": "2026-11-13",
     "mainHead": "7a4c9dba4b16a3cf6f9d9ad84340ab8348576f88",
@@ -187,5 +187,13 @@
       ]
     },
     "remoteCiBeforeReviewFixes": "PR #314 on a3859f3: every suite and ci-gate passed"
+  },
+  "afterMerge20261113": {
+    "mergeCommit": "29edba3",
+    "localWebkitOnMainWithSha": "23 de 27; as quatro falhas são as de foco por teclado do WebKit do macOS (`interaction-smoke` nas duas variantes, `accessible-profile` e `civic-navigation`), que não ocorrem no CI em Linux.",
+    "localWebkitNoShaBeforeMerge": "22 of 27; four macOS WebKit keyboard-focus failures also present on main, one intermittent fact-check.mjs:50 failure that passed 13 reruns",
+    "ruleset": "applied on Stefan's instruction (\"Sim, aplica\"), id 27227559, enforcement active; delete_branch_on_merge unchanged; block not yet proven with a test PR",
+    "production": "unchanged by the merge: 7a4c9db, no /version.json, revision null",
+    "deviationAcceptance": "pending: the opt-in failure without SHA was not presented to Stefan separately"
   }
 }

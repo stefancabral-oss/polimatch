@@ -2,11 +2,11 @@
 
 ## Status
 
-- Estado: `pronto para gate`
+- Estado: `aprovado`
 - Issue: #287
 - Branch: `chore/release-identity-ci` (base main 7c0bb27; recebeu a main 7a4c9db em 13/11/2026)
-- PR: #314
-- Último commit: ver `git log` da branch
+- PR: #314, mesclado em 13/11/2026 no commit `29edba3`
+- Último commit da branch antes do merge: `b0201b9`
 
 ## Entregue
 
@@ -113,8 +113,18 @@ Medições de 31/10/2026, sobre a base 7c0bb27, antes da junção com a main. Os
 - **O que muda no primeiro deploy depois do merge, sem o SHA no build:** o site passa a servir `/version.json` com `sha: "unknown"`, as URLs dos retratos mudam uma vez para `?v=<hash>` e os relatos de erro levam o nome do script de entrada no campo `build`.
 - **Não muda com o merge:** o ruleset de `main` não é aplicado, e nada é publicado.
 
+## Depois do merge — 13/11/2026
+
+- O CI passou inteiro no commit final da branch, `b0201b9`, e o PR foi mesclado em `29edba3`.
+- Primeiro run de push em `main`: todas as suítes e o `ci-gate` passaram no commit `29edba3`.
+- Bateria local em WebKit na `main`, com o SHA no build: 23 de 27; as quatro falhas são as de foco por teclado do WebKit do macOS (`interaction-smoke` nas duas variantes, `accessible-profile` e `civic-navigation`), que não ocorrem no CI em Linux. Em repetições à parte na `main`, `fact-check.mjs` passou 8 de 8 e `quote-quiz-checked.mjs` 5 de 6 (falha na linha 81, intermitência já registrada para o ICM 66).
+- Antes do merge, a mesma bateria num build sem SHA, como o Dokploy constrói hoje: 22 de 27; as cinco falhas são as quatro de foco por teclado do WebKit do macOS, que se repetem na `main`, e uma intermitente do `fact-check.mjs` (linha 50), que passou em 13 repetições.
+- **Ruleset de `main` aplicado em 13/11/2026**, por instrução do Stefan em conversa ("Sim, aplica"), depois do primeiro CI de push verde. Id 27227559, `enforcement: active`, com as regras `deletion`, `non_fast_forward`, `pull_request` e `required_status_checks` (`ci-gate`). `delete_branch_on_merge` não foi alterado, e o bloqueio ainda não foi provado com um PR de teste.
+- Produção não mudou com o merge: segue em `7a4c9db`, sem `/version.json` e com `revision: null`.
+- Continuam com o Stefan: provar o bloqueio, `delete_branch_on_merge`, a chegada do SHA ao build do Dokploy e a conferência depois do primeiro deploy com o SHA. A issue #287 segue aberta.
+
 ## Human gate
 
-- Decisão: `pendente`
+- Decisão: `aprovado`
 - Responsável: Stefan
-- Observação: o merge só acontece com instrução do Stefan para este PR, transcrita no PR, e com o CI verde no commit final. A regra 6 do `AGENTS.md` não muda. Ruleset, `delete_branch_on_merge` e a chegada do SHA ao build do Dokploy ficam com o Stefan.
+- Observação: aprovado por instrução direta do Stefan para este PR, em conversa de 13/11/2026 ("Sim, mescla"), transcrita no PR. O merge ficou a cargo do agente, a pedido dele, com o CI verde no commit final. O desvio do texto da issue (falha do build por falta do SHA é opcional) não foi apresentado a ele em separado; o aceite específico segue pendente. A regra 6 do `AGENTS.md` não muda.

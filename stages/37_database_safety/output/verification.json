@@ -305,5 +305,13 @@
     "notRunLocally": "testes do back: dependências não instaladas na máquina da atualização"
   },
   "publication": "not deployed",
-  "humanGate": "aprovado por instrução do Stefan para este PR em conversa de 13/11/2026, transcrita no PR; merge a cargo do agente com o CI verde; deploy e ações de infraestrutura com o Stefan"
+  "humanGate": "aprovado por instrução do Stefan para este PR em conversa de 13/11/2026, transcrita no PR; merge a cargo do agente com o CI verde; deploy e ações de infraestrutura com o Stefan",
+  "production20261113": {
+    "authorizedBy": "Stefan, in conversation (\"Sim, cópia e API\"), logged in to the panel himself",
+    "deployedCommit": "7a4c9dba4b16a3cf6f9d9ad84340ab8348576f88",
+    "preDeployDump": "manual pg_dump -Fc inside the database container, 26 tables, exit 0; temporary, not the external backup",
+    "bootLog": "event database_ready, resetApplied false",
+    "rowCounts": "25 tables identical before and after; abuse_quota_counters pruned by boot; quota_rejections_daily created empty",
+    "stillOpen": "external backup: bucket, Dokploy destination and schedules, vault, drill with a real dump (issue #279)"
+  }
 }

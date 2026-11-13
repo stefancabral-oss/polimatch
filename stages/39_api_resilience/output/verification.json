@@ -300,5 +300,13 @@
       "requestId na linha client_error",
       "verificação refeita do zero"
     ]
+  },
+  "production20261113": {
+    "authorizedBy": "Stefan, in conversation (\"Sim, cópia e API\", then \"Sim, publica\"), logged in to the panel himself",
+    "deployedCommit": "7a4c9dba4b16a3cf6f9d9ad84340ab8348576f88",
+    "api": "deploy done in 52 s; external GETs every 5 s during the switch answered 200; /api/health without x-powered-by and with x-request-id; log lines database_ready, listening and http_request",
+    "app": "deploy done in 42 s; four pages and their referenced files answer 200; the build carries the error reporter",
+    "notChecked": "a forced browser error arriving as client_error",
+    "stillOpen": "external monitor, alarm test, Dokploy notifications, logger decision (issue #281); rev and revision stay null until the SHA reaches the Dokploy build (issue #287)"
   }
 }
