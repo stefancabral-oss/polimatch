@@ -29,7 +29,10 @@ const BOOT_MAY_GROW = new Set([
   "public.player_pools",
   "public.player_stats",
 ]);
-const BOOT_MAY_PRUNE = new Set(["public.abuse_quota_counters"]);
+// O estágio 40 (#313) passou a podar no boot também o agregado de recusas de
+// cota, depois de QUOTA_REJECTION_RETENTION_DAYS. Sem ele aqui, um dump com
+// recusas mais antigas que a retenção seria acusado de perda.
+const BOOT_MAY_PRUNE = new Set(["public.abuse_quota_counters", "public.quota_rejections_daily"]);
 
 const USAGE = `Uso:
   POLIMATCH_DISPOSABLE_DB=1 \\

@@ -223,10 +223,13 @@ commit `7fa8b69`:
   tudo: no `CONTEXT.md` da raiz ficaram as seções deste estágio e do estágio
   40; em `back/src/topic-store.test.js` ficaram os imports e os testes dos
   dois estágios. Nenhum teste foi removido ou alterado.
-- O estágio 40 criou a tabela `quota_rejections_daily`, que é podada no boot.
-  O smoke de restauração parcial e o ensaio deste estágio comparam contagens
-  antes e depois do boot, então o CI desta junção é a prova de que as duas
-  mudanças convivem.
+- O estágio 40 criou a tabela `quota_rejections_daily`, que é podada no boot
+  depois de mais de 400 dias. O ensaio deste estágio só aceitava poda em
+  `abuse_quota_counters` e acusaria perda num dump com recusas mais antigas
+  que a retenção. `scripts/ops/drill-local.mjs` e `docs/ops/BACKUP.md`
+  passaram a aceitar essa segunda poda. É a única mudança de código além dos
+  conflitos, e nenhum teste a exercita: o CI roda o ensaio com dados recentes,
+  onde nada é podado.
 - Os testes do back não rodam na máquina desta atualização, por falta das
   dependências instaladas. Conferidos aqui: sintaxe dos arquivos juntados e os
   cinco nomes importados no teste. O resto fica com o CI do GitHub.

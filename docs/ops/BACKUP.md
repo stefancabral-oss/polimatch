@@ -121,7 +121,8 @@ qualquer outro alvo.
    `/api/health` 200 e registra `resetApplied: false`; e o boot não muda
    nenhuma tabela além de completar catálogo e estatísticas
    (`ranking_pools`, `ranking_stats`, `player_pools`, `player_stats`,
-   `schema_migrations`) e podar cotas vencidas (`abuse_quota_counters`).
+   `schema_migrations`) e podar cotas vencidas (`abuse_quota_counters`) e
+   recusas de cota mais antigas que a retenção (`quota_rejections_daily`).
 6. Registrar na tabela abaixo: data, arquivo, resultado, tabelas, linhas e
    duração da restauração. Não copiar dados pessoais para o registro.
 7. Apagar o dump baixado. O banco do ensaio é apagado pelo script, exceto com
