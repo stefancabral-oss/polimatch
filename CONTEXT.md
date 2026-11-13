@@ -201,3 +201,10 @@ navegação e quizzes abrem sem escrita no servidor; o jogador anônimo nasce na
 primeira jogada. A recusa da cota de jogos novos por rede tem aviso próprio,
 com login Google e horário de liberação, e a janela passa ao dia editorial.
 O limite de 3 por rede continua até a decisão Q4 da #277.
+
+## Saber qual commit está no ar e CI em main — issue #287
+Auditoria de maturidade de 30/10/2026. Estágio 45: o build do app grava o SHA
+do commit em `/version.json` e na meta `polimatch-release`, os retratos usam o
+hash do conteúdo como versão e o `ci.yml` roda em todo PR e em todo push para
+`main`, com o check único `ci-gate`. O ruleset de `main` e a chegada do SHA ao
+build do Dokploy ficam com Stefan (docs/ops/RELEASE.md).

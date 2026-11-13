@@ -4,8 +4,8 @@
 
 - Estado: `pronto para gate`
 - Issue: #287
-- Branch: `chore/release-identity-ci` (base main 7c0bb27)
-- PR: não aberto por este agente
+- Branch: `chore/release-identity-ci` (base main 7c0bb27; recebeu a main 7a4c9db em 13/11/2026)
+- PR: #314
 - Último commit: ver `git log` da branch
 
 ## Entregue
@@ -42,8 +42,8 @@
   8. Opcional: ligar `strict_required_status_checks_policy` no JSON, se quiser exigir branch atualizada antes do merge. A troca é revalidar o CI a cada merge.
 - O aceite "revision e sha iguais a origin/main no próximo deploy" depende do passo 6. Sem ele, a produção continua com `null`/`unknown`, agora sem quebrar o build.
 - O comportamento real do `ci-gate`, do filtro e do primeiro push em main só aparece no GitHub Actions depois do push da branch.
-- A seção desta issue no `CONTEXT.md` da raiz não foi escrita, para evitar conflito com os estágios paralelos. Registrar ao mesclar.
-- `/version.json` sai sem `Cache-Control` (só ETag/Last-Modified). Headers do nginx são escopo do ICM 38; o arquivo deve receber `no-cache` lá.
+- A seção desta issue no `CONTEXT.md` da raiz foi escrita em 13/11/2026, na junção com a main.
+- `/version.json` sai com `Cache-Control: no-cache` desde o ICM 38 (#311), que já trouxe a regra no `nginx.conf` e o teste em `edge-delivery.test.js`.
 - O smoke `photo-recovery.mjs` importa `back/src`, mas o filtro `ui_smoke` continua sem `back/**`, por decisão registrada no próprio workflow. O push em main cobre isso depois do merge. Remover a importação é escopo do ICM 66.
 
 ## Testes executados
@@ -97,8 +97,21 @@
 1. Stefan revisa a branch `chore/release-identity-ci`, abre e mescla o PR. O CI do próprio PR já roda pelo `ci.yml` novo.
 2. Seguir a lista "Ação do Stefan" acima, na ordem.
 
+## Atualização de 13/11/2026
+
+- **A branch recebeu a main atual (7a4c9db).** Entraram os estágios 37 (#310), 38 (#311), 39 (#312) e 40 (#313), o ICM 58 (#317), o ICM 67 (#319, #320) e o hotfix do CI (#321). Três workflows conflitavam; a junção está em 36096e8.
+  - `back-shared.yml`: continua chamado pelo `ci.yml`. Ficam a conferência do SHA na imagem da API e, depois dela, o passo do estágio 37 que confere a imagem sem smokes.
+  - `design-validator.yml`: build e imagem com o SHA obrigatório, seguidos do smoke do nginx do estágio 38.
+  - `ui-interaction-smoke.yml`: o passo do `/version.json` e o da primeira visita do estágio 40. O runner fixo em `ubuntu-24.04` (#321) veio da main.
+  - `ci.yml`: `scripts/ops/**` entrou no filtro do back, como a main já tinha no gatilho do `back-shared.yml`.
+- **Choque com o estágio 39 que o git não mostra, corrigido em 71d43bc.** Na main, o relato de erros do navegador usava a meta `polimatch-release` e, sem ela, a constante `__POLIMATCH_ASSET_VERSION__`. Este estágio remove a constante e grava a meta sempre, com `unknown` quando o build não recebe o SHA, que é o caso do deploy de hoje. Juntos, os relatos de produção sairiam com build `unknown`, e o `client-error-report.mjs` falhava num build sem SHA. Agora, sem o SHA, o campo `build` leva o nome com hash do script de entrada da página (por exemplo `main-BBiuPtfp`). Com o SHA nada muda. `docs/ops/MONITORING.md` descreve o campo como ficou.
+- **Testes locais depois da junção:** app 285/285, contrato do piloto 64/64, shared 93 com a taxonomia validada. Builds: com SHA obrigatório, `version.json` e a meta nas quatro páginas trazem o SHA, que não aparece em nenhum JS; sem SHA, saem com `unknown` e o aviso. Em WebKit: `client-error-report.mjs` passa sem SHA e com SHA exigido, `first-visit.mjs` 6 cenários e `photo-recovery.mjs` passam. Os testes do back e o Chromium rodam só no CI do PR.
+- **Produção em 13/11/2026.** API e app foram publicados no commit 7a4c9db, sem este estágio. O Dokploy ainda constrói sem `SOURCE_COMMIT`: `/api/health` responde `revision: null`.
+- **O que muda no primeiro deploy depois do merge, sem o SHA no build:** o site passa a servir `/version.json` com `sha: "unknown"`, as URLs dos retratos mudam uma vez para `?v=<hash>` e os relatos de erro levam o nome do script de entrada no campo `build`.
+- **Não muda com o merge:** o ruleset de `main` não é aplicado, e nada é publicado.
+
 ## Human gate
 
 - Decisão: `pendente`
 - Responsável: Stefan
-- Observação: nenhum agente aprova este gate, mescla ou publica. Ruleset, `delete_branch_on_merge` e Dokploy ficam com o Stefan.
+- Observação: o merge só acontece com instrução do Stefan para este PR, transcrita no PR, e com o CI verde no commit final. A regra 6 do `AGENTS.md` não muda. Ruleset, `delete_branch_on_merge` e a chegada do SHA ao build do Dokploy ficam com o Stefan.

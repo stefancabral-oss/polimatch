@@ -122,5 +122,52 @@
     ]
   },
   "remoteCi": "pending",
-  "humanGate": "not self-approved"
+  "humanGate": "not self-approved",
+  "mergeWithMain20261113": {
+    "checkedAt": "2026-11-13",
+    "mainHead": "7a4c9dba4b16a3cf6f9d9ad84340ab8348576f88",
+    "mergeCommit": "36096e8",
+    "conflicts": [
+      ".github/workflows/back-shared.yml",
+      ".github/workflows/design-validator.yml",
+      ".github/workflows/ui-interaction-smoke.yml"
+    ],
+    "ciFilter": "scripts/ops/** added to back_shared, as main had it on the back-shared.yml trigger",
+    "seamFix": {
+      "commit": "71d43bc",
+      "problem": "stage 39 reporter fell back to __POLIMATCH_ASSET_VERSION__, which stage 45 removes; with the always-present meta, a build without the SHA would report build \"unknown\"",
+      "fix": "releaseBuild treats \"unknown\" as no SHA; entryScriptBuild falls back to the hashed entry script name",
+      "redFirst": "client-error-report.mjs failed on a build without SHA before the fix (report.build === \"unknown\")"
+    },
+    "unitTests": {
+      "app": {
+        "passed": 285,
+        "failed": 0
+      },
+      "cardArtPilotContract": {
+        "passed": 64,
+        "failed": 0
+      },
+      "shared": {
+        "passed": 93,
+        "failed": 0,
+        "taxonomy": "validated"
+      },
+      "back": "not run locally (no back/node_modules); runs in the PR CI"
+    },
+    "build": {
+      "requiredWithSha": "version.json and the meta on the four pages carry the SHA; the SHA is in no JS file",
+      "withoutSha": "rc 0, warning, sha unknown"
+    },
+    "e2eWebkit": {
+      "client-error-report without SHA": "passed",
+      "client-error-report with POLIMATCH_E2E_EXPECT_BUILD": "passed",
+      "first-visit": "6 scenarios passed",
+      "photo-recovery": "passed",
+      "chromium": "not run locally (installed build mismatch); runs in the PR CI"
+    },
+    "production": "API and app deployed at 7a4c9db on 2026-11-13 without this stage; /api/health revision is null",
+    "remoteCi": "see the checks of PR #314 on the final commit",
+    "humanGate": "pending; merge only on Stefan's instruction for this PR"
+  }
 }
