@@ -62,7 +62,7 @@
   },
   "acceptance": {
     "delivery68a": "aprovada",
-    "delivery68b": "pronta para gate",
+    "delivery68b": "aprovada",
     "delivery68c": "não iniciada",
     "delivery68d": "não iniciada",
     "delivery68e": "não iniciada"
@@ -109,8 +109,8 @@
       "topic-store.js muda além do registro: combineGoogleHistory liga à conta o anônimo com sorteio de pesquisa (status linked), sem somar nada do jogo",
       "a trava por jogador é a do findPlayer; não há trava própria da pesquisa"
     ],
-    "remoteCi": "ver os checks do PR da 68b",
-    "humanGate": "pendente",
+    "remoteCi": "ci-gate verde no PR #326, no commit f0a2ba9 (servidor, banco, design, navegador em Chromium e em WebKit) e de novo no commit final, que só registra o gate",
+    "humanGate": "68b aprovada por instrução do Stefan para o PR #326 em 13/11/2026 (\"Sim\"), transcrita no PR; merge a cargo do agente com o check verde",
     "featureFlag": "PHOTO_SURVEYS_ENABLED=true liga as três rotas; sem isso 404 PHOTO_SURVEYS_DISABLED sem chegar ao store (teste de unidade)",
     "pr": 326,
     "independentReview": {

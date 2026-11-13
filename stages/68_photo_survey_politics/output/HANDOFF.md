@@ -2,10 +2,10 @@
 
 ## Status
 
-- Estado: `em andamento`. A entrega 68a (registro) foi aprovada. A 68b (regras e servidor) está pronta para gate. Faltam a 68c, a 68d e a 68e.
+- Estado: `em andamento`. As entregas 68a (registro) e 68b (regras e servidor) foram aprovadas. Faltam a 68c, a 68d e a 68e.
 - Issue: #324
 - 68a: PR #325, mesclado em `3a59344`.
-- 68b: branch `icm/68b-photo-survey-server` (base main `3a59344`); o PR está na issue #324.
+- 68b: PR #326, branch `icm/68b-photo-survey-server` (base main `3a59344`).
 
 ## Entregue (68a — registro)
 
@@ -83,7 +83,7 @@ Decididas pelo Stefan em 13/11/2026:
 - Ninguém de fora é chamado antes de o aplicativo estar testado por agentes.
 - O desenho da etapa 1: 16 cartas em 4 telas de 4, final, confirmação; página nova ao lado do jogo atual; sem CPF, sem top 5 público, sem compartilhar, avisos e indicação nesta etapa.
 
-Escolhas de desenho do agente, dentro do que ele aprovou, a confirmar neste gate:
+Escolhas de desenho do agente, dentro do que ele aprovou. Estão implementadas na 68b; ele delegou esse tipo de escolha e pode mudar qualquer uma até a publicação:
 
 - Cada pessoa recebe 16 das 20 cartas por sorteio, em vez de uma lista fixa de 16. Evita excluir quatro nomes por escolha editorial.
 - O sorteio é emitido pelo servidor quando a pessoa começa, e as escolhas parciais ficam só no aparelho até a confirmação.
@@ -92,12 +92,11 @@ Escolhas de desenho do agente, dentro do que ele aprovou, a confirmar neste gate
 
 ## Próximo passo exato
 
-1. Gate do Stefan no PR da 68b.
-2. Plano e implementação da 68c, a tela.
+1. Plano e implementação da 68c, a tela, em PR próprio e com gate próprio.
+2. Depois dela, a 68d (teste por agentes) e a 68e (publicação).
 
 ## Ação do Stefan
 
-- Decidir o merge do PR da 68b. Ele não publica nada.
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
 - Confirmar as condições de publicação propostas no contexto do estágio.
 - Dizer se quer cartas de Lula e Flávio Bolsonaro no padrão comum, para entrarem numa próxima pesquisa.
@@ -107,3 +106,6 @@ Escolhas de desenho do agente, dentro do que ele aprovou, a confirmar neste gate
 - Decisão da entrega 68a: `aprovado`
 - Responsável: Stefan
 - Observação: aprovado por instrução direta do Stefan para este PR, em conversa de 13/11/2026. À pergunta "Mesclo o PR 325, com a tela de entrada incluída, ou quer mudar alguma coisa?", ele respondeu: "Toca". O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. As entregas 68b a 68e têm gate próprio. A regra 6 do `AGENTS.md` não muda.
+- Decisão da entrega 68b: `aprovado`
+- Responsável: Stefan
+- Observação: aprovado por instrução direta do Stefan para este PR, em conversa de 13/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 326, sim ou não?", ele respondeu: "Sim". O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada: as rotas seguem desligadas, e ligar `PHOTO_SURVEYS_ENABLED` em produção é assunto da 68e, com um sim próprio. As escolhas de desenho do agente listadas acima não foram discutidas uma a uma: seguem por delegação dele e podem ser mudadas até a publicação. As entregas 68c a 68e têm gate próprio.
