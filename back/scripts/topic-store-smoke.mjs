@@ -4,9 +4,9 @@ import pg from "pg";
 import CATALOG from "../../shared/elections-2026.json" with { type: "json" };
 import { createTopicStore, recoveryKeyHash } from "../src/topic-store.js";
 import { createApprovedTestRegistry } from "../test-support/editorial-fixtures.js";
+import { requireDisposableDatabase } from "../test-support/disposable-db.js";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) throw new Error("DATABASE_URL é obrigatória para o smoke de integração");
+const connectionString = requireDisposableDatabase();
 const candidateRegistry = createApprovedTestRegistry();
 
 const seed = new pg.Pool({ connectionString });
@@ -20,7 +20,28 @@ await seed.query(`
 `);
 await seed.end();
 
-const firstStore = createTopicStore(connectionString, { candidateRegistry });
+// O legado tem linhas: sem autorização explícita a inicialização recusa o reset
+// e desfaz a transação, preservando tabelas e linhas antigas.
+const blockedStore = createTopicStore(connectionString, { candidateRegistry, allowSchemaReset: false });
+await assert.rejects(blockedStore.init(), (error) => {
+  assert.equal(error.code, "SCHEMA_RESET_BLOCKED");
+  assert.deepEqual(error.populatedTables, ["public.ranking_pools", "public.votes"]);
+  return true;
+});
+await blockedStore.close();
+const legacyAudit = new pg.Pool({ connectionString });
+assert.deepEqual(
+  (await legacyAudit.query("SELECT mode, duels::int FROM ranking_pools")).rows,
+  [{ mode: "presidentes", duels: 37 }],
+);
+assert.deepEqual(
+  (await legacyAudit.query("SELECT winner_id, loser_id FROM votes")).rows,
+  [{ winner_id: "legacy-a", loser_id: "legacy-b" }],
+);
+assert.equal((await legacyAudit.query("SELECT to_regclass('public.schema_migrations') AS name")).rows[0].name, null);
+await legacyAudit.end();
+
+const firstStore = createTopicStore(connectionString, { candidateRegistry, allowSchemaReset: true });
 const firstMigration = await firstStore.init();
 assert.equal(firstMigration.resetApplied, true);
 

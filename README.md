@@ -155,6 +155,8 @@ O contrato de voto V2 é incompatível com frontend/backend antigos em rolling m
 
 O domínio público `polimatch.com.br` aponta para o app; `api.polimatch.com.br`, para a API. HTTPS é obrigatório para o PWA. A publicação só deve ocorrer depois do gate visual e fotográfico.
 
+Backup externo do PostgreSQL, ensaio de restauração e reconstrução do ambiente: [docs/ops/BACKUP.md](docs/ops/BACKUP.md) e [docs/ops/DR.md](docs/ops/DR.md). O piso de rollback da API está no [ROLLBACK.md](stages/08_release_deploy_observabilidade/output/ROLLBACK.md).
+
 ## Fonte de verdade
 
 Decisões e estado da reconstrução:
