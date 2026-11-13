@@ -2,6 +2,8 @@
 
 PoliMatch é um jogo web casual de comparação entre personalidades públicas. A pessoa escolhe sua preferida entre quatro cartas, recebe uma nova rodada imediatamente e acompanha seu ranking pessoal. Superfícies agregadas permanecem retidas por padrão enquanto a decisão humana da issue #177 estiver pendente.
 
+**Direção desde 12/11/2026:** o PoliMatch caminha para ser uma pesquisa de preferência por foto (issue #318, [registro de decisão](docs/decisions/0001-pesquisa-de-preferencia-por-foto.md)). Nada dessa direção está no ar. Cadastro por CPF, exibição dos cinco primeiros e entrega de resultado somado dependem de etapas e decisões ainda abertas. A seção abaixo descreve o produto anterior, que é o que está no ar; a correção dos números dela é da [ICM 61] #303.
+
 ## Produto atual
 
 - Interface reconstruída na direção `Malaquita 2026 / Digital First`.
@@ -158,6 +160,8 @@ O domínio público `polimatch.com.br` aponta para o app; `api.polimatch.com.br`
 Decisões e estado da reconstrução:
 
 - `CONTEXT.md`
+- `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md`
+- `stages/67_photo_survey_direction/CONTEXT.md`
 - `stages/10_rebuild_eleicoes_2026/CONTEXT.md`
 - `stages/10_rebuild_eleicoes_2026/output/HANDOFF.md`
 - `stages/10_rebuild_eleicoes_2026/output/verification.json`

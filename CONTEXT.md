@@ -26,12 +26,33 @@ Conteúdo sem aprovação externa e agregados sem autoridade continuam retidos.
 
 ## Norte do produto
 
-PoliMatch é um jogo casual de comparação entre personalidades públicas. Não é pesquisa eleitoral. O produto deve ser simples de jogar, visualmente próprio, colecionável e agradável no celular.
+Desde 12/11/2026, por decisão do Stefan, a direção do PoliMatch é ser uma pesquisa de preferência por foto: a pessoa se diverte escolhendo fotos e disso sai a preferência do público. O registro completo está em `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md`.
+
+Essa direção ainda não está no ar. O que está em produção continua sendo o jogo casual de comparação descrito nesta página, e as decisões abaixo seguem valendo para ele até que cada etapa da direção nova passe pelo gate humano.
+
+Norte anterior, mantido como histórico: "PoliMatch é um jogo casual de comparação entre personalidades públicas. Não é pesquisa eleitoral. O produto deve ser simples de jogar, visualmente próprio, colecionável e agradável no celular." A frase "Não é pesquisa eleitoral" continua valendo, e exibida, no que está no ar. Ela deixa de valer para a direção nova: o texto que a substitui ali depende da revisão jurídica (Q5 da #277), e até lá o repositório não afirma nenhum enquadramento para a pesquisa por foto.
+
+## Direção nova: pesquisa de preferência por foto — issue #318
+
+Em 12/11/2026 Stefan respondeu à Q1 da #277 com um caminho fora das três opções. Estágio `stages/67_photo_survey_direction/CONTEXT.md`. Resumo da decisão:
+
+- Cada pesquisa é um conjunto de fotos e uma pergunta curta, com começo e fim. Só foto e nome, sem texto para ler.
+- Qualquer pessoa joga. A escolha só entra na pesquisa com cadastro por CPF.
+- Quem jogou vê os cinco primeiros. Só a resposta somada sai do PoliMatch, nunca o dado de uma pessoa.
+- Abre com Política, Famosos e influenciadores, e Futebol.
+- Os jogos de leitura e a parte cívica e de notícias ficam no ar sem trabalho novo.
+- Telas novas minimalistas: fundo neutro, um único verde, foto sem moldura na hora do voto.
+
+Nada disso está liberado para produção por este registro. A ordem do trabalho é maturidade primeiro (#309), e as respostas às Q2, Q3 e Q4, com a proposta para a Q6, estão na #277; nenhuma delas libera produção. Continuam sem resposta a Q5 (controlador de dados e revisão jurídica), a visibilidade do repositório e a convivência entre o login Google e o CPF. O gate de publicação agregada (#177) e a política de integridade do voto continuam em vigor.
+
+Antes de propor ou alterar tela, regra de voto ou cadastro, ler o registro de decisão: ele lista o que continua valendo e o que deixa de valer para as telas novas.
 
 ## Decisões atuais aprovadas
 
+As decisões desta lista descrevem o que está no ar. A referência para o que não se aplica à direção nova é a tabela do registro de decisão. A marca "Substituída para as telas da pesquisa por foto" aparece só nas principais, como atalho.
+
 - O frontend anterior foi rejeitado e será substituído, não remendado.
-- A direção de arte `Malaquita 2026 / Digital First` enviada em 13/09/2026 está aprovada e é a referência visual oficial.
+- A direção de arte `Malaquita 2026 / Digital First` enviada em 13/09/2026 está aprovada e é a referência visual oficial. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.
 - O shell usa malaquita escura; porcelana aparece em placas de nome e superfícies editoriais; ouro indica progresso e raridade.
 - Cards têm moldura facetada, fotografia dominante, marca pequena, raridade no canto e placa inferior clara.
 - Chromas ampliam luz, cor e materialidade progressivamente; o efeito prismático máximo é reservado à Chroma comemorativa.
@@ -41,8 +62,8 @@ PoliMatch é um jogo casual de comparação entre personalidades públicas. Não
 - O menu de assuntos nasce pronto para expansão, mas somente `Eleições 2026` estará ativo na primeira edição; ela reúne todos os perfis com fotografia aprovada.
 - `Influenciadores` poderá ser uma edição independente futura, sem retirar essas personalidades da edição principal atual.
 - Escândalos e acontecimentos serão curadorias independentes, começando posteriormente por casos como Banco Master, Mensalão, INSS e 8 de Janeiro.
-- Cada pessoa terá perfil educativo, fontes e contexto suficientes para uma escolha informada.
-- Existirão ranking da edição e ranking pessoal. Ranking geral entre assuntos só será exibido quando houver mais de um assunto ativo.
+- Cada pessoa terá perfil educativo, fontes e contexto suficientes para uma escolha informada. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.
+- Existirão ranking da edição e ranking pessoal. Ranking geral entre assuntos só será exibido quando houver mais de um assunto ativo. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.
 - Cards e Chromas são colecionáveis; Chromas são obtidas por sorte e não determinam o ranking.
 - Duelos usam carta padrão por default. Apenas o próprio jogador pode aplicar uma Chroma possuída àquela pessoa.
 - Novos debates e discussões podem lançar novas Chromas versionadas sem alterar votos ou rankings anteriores.
@@ -51,7 +72,7 @@ PoliMatch é um jogo casual de comparação entre personalidades públicas. Não
 - A aprovação visual dos retratos começa por um lote de dez pessoas antes da escala fotográfica completa.
 - O app continua online-only: nenhuma escolha é confirmada antes do servidor.
 - A identidade sonora usa impactos graves, atrito curto e brilho metálico discreto, sintetizados localmente após interação do usuário; nunca varia por pessoa e oferece controle persistente para desligar.
-- O resultado da rodada permanece por um instante nas quatro cartas: a escolhida sobe e acende, as outras três descem e perdem saturação, sempre com os deltas reais de Elo e sem cobrir os rostos.
+- O resultado da rodada permanece por um instante nas quatro cartas: a escolhida sobe e acende, as outras três descem e perdem saturação, sempre com os deltas reais de Elo e sem cobrir os rostos. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.
 - Faixas de Elo e eventos de ultrapassagem, subida, queda e baixa pontuação recebem respostas visuais, sonoras e hápticas próprias. O texto pode provocar com humor leve, mas nunca julga ideologia ou dignidade da pessoa.
 - Por decisão do usuário em 15/09/2026, o acesso com Google entra como opção simples para salvar e recuperar progresso; jogar anonimamente continua permitido. Publicação automática permanece fora do primeiro corte e compartilhamento será iniciado pelo usuário.
 
@@ -100,7 +121,7 @@ O programa só é considerado concluído quando:
 8. Testes críticos, build, deploy e QA pós-deploy são confirmados.
 
 ## Duas escolhas ordenadas — issue #239
-A decisão posterior de Stefan substitui a escolha única no núcleo de quatro cartas: primeira preferência recebe mais pontos que segunda; as duas restantes recebem a mesma penalização. O estágio ativo é stages/19_ordered_two_choices/CONTEXT.md. Histórico e modos binários permanecem compatíveis.
+A decisão posterior de Stefan substitui a escolha única no núcleo de quatro cartas: primeira preferência recebe mais pontos que segunda; as duas restantes recebem a mesma penalização. O estágio ativo é stages/19_ordered_two_choices/CONTEXT.md. Histórico e modos binários permanecem compatíveis. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.
 
 ## Quem disse isso? — issue #244
 Novo modo de conhecimento aprovado por Stefan, independente do ranking político. Estágio stages/20_quote_quiz/CONTEXT.md. Layout: duas cartas clicáveis, nome uma vez, frase real e revelação com fonte.
@@ -130,6 +151,8 @@ Duelo, Coleção e Ranking, preservando navegação cívica e controles existent
 Em 23/10/2026 Stefan pediu Flávio, Lula, Nikolas e Janja na capa principal.
 Estágio 28 usa as artes especiais existentes Flávio azul/22 e Lula vermelha/13
 somente na capa, preservando jogos, inventário e as Malaquitas de Nikolas/Janja.
+Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue
+valendo para o que está no ar.
 
 ## Vinte Chromas Políticos — issue #263
 Em 23/10/2026 Stefan solicitou refinar todas as Chromas da seção política.
@@ -142,6 +165,8 @@ pediu reduzir a escala no iPhone 17 Pro Max. Estágio 30 aplica as edições
 existentes aos slots persistentes diários/livres/pares, mantendo a foto documental
 como reserva. A grade móvel usa o espaço restante real do shell. Sem mudar
 sessão diária, escolhas, ranking ou propriedade de itens da Coleção.
+Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue
+valendo para o que está no ar.
 
 ## Fato ou fake — issue #267
 Em 24/10/2026 Stefan solicitou jogo com falas pragmáticas do debate da Globo
