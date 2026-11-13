@@ -14,10 +14,12 @@ const SURVEY = PHOTO_SURVEYS[0];
 const WINDOWED = Object.freeze({
   ...SURVEY,
   id: "smoke-janela",
-  opensAt: "2032-09-17T03:00:00.000Z",
-  closesAt: "2032-09-18T03:00:00.000Z",
+  opensAt: "2034-05-10T03:00:00.000Z",
+  closesAt: "2034-05-11T03:00:00.000Z",
 });
-const OPEN_INSTANT = new Date("2032-09-17T15:00:00.000Z");
+// Um dia que nenhum outro smoke usa: a rodada diária dele ainda está aberta
+// mesmo quando este script roda depois dos outros no mesmo banco.
+const OPEN_INSTANT = new Date("2034-05-10T15:00:00.000Z");
 let now = OPEN_INSTANT;
 const options = {
   candidateRegistry: createApprovedTestRegistry(CATALOG.map((person) => person.id)),
@@ -65,6 +67,7 @@ try {
 
   // --- Sorteio: emitido uma vez por jogador, igual em chamadas repetidas e simultâneas ---
   const alice = await newPlayer();
+  const drawsBefore = await count("photo_survey_draws");
   const [first, parallel] = await Promise.all([
     store.photoSurveyDraw(alice.recoveryKey, SURVEY.id),
     store.photoSurveyDraw(alice.recoveryKey, SURVEY.id),
@@ -77,7 +80,7 @@ try {
   const shown = first.draw.groups.flat();
   assert.equal(new Set(shown).size, 16);
   assert.ok(shown.every((id) => SURVEY.cardIds.includes(id)));
-  assert.equal(await count("photo_survey_draws", `WHERE survey_id = '${SURVEY.id}' AND player_id = (SELECT player_id FROM photo_survey_draws ORDER BY issued_at DESC LIMIT 1)`), 1);
+  assert.equal(await count("photo_survey_draws"), drawsBefore + 1, "três chamadas, um sorteio gravado");
   await rejectsWith(store.photoSurveyDraw("pm2_chave-que-nao-existe", SURVEY.id), 401, undefined);
   await rejectsWith(store.photoSurveyDraw(alice.recoveryKey, "nao-existe"), 404, "PHOTO_SURVEY_NOT_FOUND");
 
@@ -156,6 +159,23 @@ try {
   assert.equal((await store.photoSurveyDraw(carla.recoveryKey, SURVEY.id)).response, null);
   assert.equal((await respond(carla, { pickIds: valid, championId: valid[2] })).status, "created");
 
+  // --- Duas pessoas mandam o mesmo recibo ao mesmo tempo: uma grava, a outra recebe 400, nunca 500 ---
+  for (let round = 0; round < 6; round += 1) {
+    const pair = [await newPlayer(), await newPlayer()];
+    const draws = await Promise.all(pair.map((player) => store.photoSurveyDraw(player.recoveryKey, SURVEY.id)));
+    const sharedReceipt = randomUUID();
+    const settled = await Promise.allSettled(pair.map((player, index) => {
+      const picks = picksOf(draws[index].draw, round);
+      return store.photoSurveyRespond({
+        recoveryKey: player.recoveryKey, surveyId: SURVEY.id, answerId: sharedReceipt, pickIds: picks, championId: picks[0],
+      });
+    }));
+    assert.deepEqual(settled.map((result) => result.status).sort(), ["fulfilled", "rejected"], `recibo disputado, rodada ${round}`);
+    const refused = settled.find((result) => result.status === "rejected").reason;
+    assert.equal(refused.code, "PHOTO_SURVEY_RESPONSE_INVALID", refused.message);
+    assert.equal(refused.status, 400);
+  }
+
   // --- Sem sorteio, sem pesquisa, sem sessão ---
   const dora = await newPlayer();
   await rejectsWith(respond(dora, { pickIds: valid, championId: valid[0] }), 409, "PHOTO_SURVEY_DRAW_REQUIRED");
@@ -166,7 +186,7 @@ try {
 
   // --- Janela: antes de abrir, aberta, e fechando entre o sorteio e a resposta ---
   const elis = await newPlayer();
-  now = new Date("2032-09-17T02:59:59.999Z");
+  now = new Date("2034-05-10T02:59:59.999Z");
   assert.equal((await store.photoSurvey(WINDOWED.id)).status, "scheduled");
   await rejectsWith(store.photoSurveyDraw(elis.recoveryKey, WINDOWED.id), 409, "PHOTO_SURVEY_CLOSED");
   now = OPEN_INSTANT;
@@ -199,6 +219,7 @@ try {
   const account = await store.signInWithGoogle({
     identity: { subject, displayName: "Teste" }, currentToken: accountSeed.recoveryKey, topicId: "eleicoes-2026",
   });
+  const accountVersion = (await store.playerRanking(account.sessionToken, "eleicoes-2026")).version;
   const fabio = await newPlayer();
   const fabioDraw = await store.photoSurveyDraw(fabio.recoveryKey, SURVEY.id);
   const fabioPicks = picksOf(fabioDraw.draw, 1);
@@ -219,13 +240,89 @@ try {
     }), 409, "PHOTO_SURVEY_ALREADY_ANSWERED");
   }
 
-  // Anônimo sem jogo e sem resposta continua não sendo incorporado, como antes.
+  assert.equal(
+    (await store.playerRanking(account.sessionToken, "eleicoes-2026")).version,
+    accountVersion,
+    "o vínculo da pesquisa não soma nada do jogo nem muda a versão do ranking da conta",
+  );
+
+  // Anônimo com sorteio e sem resposta também é ligado: a chave antiga deixa de
+  // valer, e uma aba aberta com ela não grava uma segunda resposta.
+  const subjectTwo = `photo-survey-smoke-${randomUUID()}`;
+  const seedTwo = await newPlayer();
+  const accountTwo = await store.signInWithGoogle({
+    identity: { subject: subjectTwo, displayName: "Teste" }, currentToken: seedTwo.recoveryKey, topicId: "eleicoes-2026",
+  });
   const gil = await newPlayer();
-  await store.photoSurveyDraw(gil.recoveryKey, WINDOWED.id);
+  const gilDraw = await store.photoSurveyDraw(gil.recoveryKey, SURVEY.id);
+  const gilPicks = picksOf(gilDraw.draw, 0);
+  const gilLogin = await store.signInWithGoogle({
+    identity: { subject: subjectTwo, displayName: "Teste" }, currentToken: gil.recoveryKey, topicId: "eleicoes-2026",
+  });
+  assert.equal(gilLogin.merge.status, "linked");
+  await rejectsWith(respond(gil, { pickIds: gilPicks, championId: gilPicks[0] }), 401, undefined);
+  const accountTwoDraw = await store.photoSurveyDraw(gilLogin.sessionToken, SURVEY.id);
+  assert.equal(accountTwoDraw.response, null, "a conta recomeça com o sorteio dela");
+  const accountTwoPicks = picksOf(accountTwoDraw.draw, 1);
+  const accountTwoResponse = await store.photoSurveyRespond({
+    recoveryKey: accountTwo.sessionToken, surveyId: SURVEY.id, answerId: randomUUID(), pickIds: accountTwoPicks, championId: accountTwoPicks[1],
+  });
+  assert.equal(accountTwoResponse.status, "created");
+
+  // Anônimo sem jogo e sem pesquisa continua não sendo incorporado, como antes.
+  const hugo = await newPlayer();
   const untouched = await store.signInWithGoogle({
-    identity: { subject, displayName: "Teste" }, currentToken: gil.recoveryKey, topicId: "eleicoes-2026",
+    identity: { subject: subjectTwo, displayName: "Teste" }, currentToken: hugo.recoveryKey, topicId: "eleicoes-2026",
   });
   assert.equal(untouched.merge, null);
+
+  // Conta que acaba com duas respostas (uma dela, outra de um anônimo ligado
+  // depois): vale a mais antiga, sempre a mesma.
+  const iris = await newPlayer();
+  const irisDraw = await store.photoSurveyDraw(iris.recoveryKey, SURVEY.id);
+  const irisPicks = picksOf(irisDraw.draw, 2);
+  now = new Date(OPEN_INSTANT.getTime() + 60_000);
+  await respond(iris, { pickIds: irisPicks, championId: irisPicks[3] });
+  now = OPEN_INSTANT;
+  const irisLogin = await store.signInWithGoogle({
+    identity: { subject: subjectTwo, displayName: "Teste" }, currentToken: iris.recoveryKey, topicId: "eleicoes-2026",
+  });
+  assert.equal(irisLogin.merge.status, "linked");
+  for (const token of [irisLogin.sessionToken, accountTwo.sessionToken]) {
+    assert.deepEqual((await store.photoSurveyDraw(token, SURVEY.id)).response, accountTwoResponse.response, "vale a resposta mais antiga da identidade");
+  }
+
+  // Quando o anônimo já jogou a rodada de hoje, ele vira o jogador ativo da
+  // conta. A resposta que a conta já tinha continua valendo para ele.
+  const subjectThree = `photo-survey-smoke-${randomUUID()}`;
+  const seedThree = await newPlayer();
+  const accountThree = await store.signInWithGoogle({
+    identity: { subject: subjectThree, displayName: "Teste" }, currentToken: seedThree.recoveryKey, topicId: "eleicoes-2026",
+  });
+  const accountThreeDraw = await store.photoSurveyDraw(accountThree.sessionToken, SURVEY.id);
+  const accountThreePicks = picksOf(accountThreeDraw.draw, 3);
+  const accountThreeResponse = (await store.photoSurveyRespond({
+    recoveryKey: accountThree.sessionToken, surveyId: SURVEY.id, answerId: randomUUID(), pickIds: accountThreePicks, championId: accountThreePicks[2],
+  })).response;
+  const joana = await newPlayer();
+  const daily = await store.dailySession(joana.recoveryKey, "eleicoes-2026");
+  await store.dailyVote({
+    topicId: "eleicoes-2026", editionId: daily.edition.id, slot: 1, winnerId: daily.round.candidateIds[1],
+    answerId: randomUUID(), recoveryKey: joana.recoveryKey, playerVersion: 0,
+  });
+  const joanaLogin = await store.signInWithGoogle({
+    identity: { subject: subjectThree, displayName: "Teste" }, currentToken: joana.recoveryKey, topicId: "eleicoes-2026",
+  });
+  assert.equal(joanaLogin.merge.status, "combined");
+  assert.equal(joanaLogin.merge.activeDaily, "anonymous");
+  for (const token of [joanaLogin.sessionToken, accountThree.sessionToken]) {
+    const seen = await store.photoSurveyDraw(token, SURVEY.id);
+    assert.deepEqual(seen.response, accountThreeResponse, "a resposta da conta vale para o jogador que passou a ser o ativo");
+    const again = picksOf(seen.draw, 0);
+    await rejectsWith(store.photoSurveyRespond({
+      recoveryKey: token, surveyId: SURVEY.id, answerId: randomUUID(), pickIds: again, championId: again[1],
+    }), 409, "PHOTO_SURVEY_ALREADY_ANSWERED");
+  }
 
   // --- Um segundo boot no mesmo banco não falha nem perde linhas ---
   const rowsBefore = [await count("photo_survey_draws"), await count("photo_survey_responses")];

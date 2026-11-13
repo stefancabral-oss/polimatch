@@ -3,7 +3,7 @@ import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { isRoundZebra } from "../../shared/player-feedback.js";
 import { sessionMirror, compareSessionWithCut } from "../../shared/session-mirror.js";
 import { gameProgressStore, installGameSchema } from "./game-progress.js";
-import { installPhotoSurveySchema, photoSurveyResponseCount, photoSurveyStore } from "./photo-survey-store.js";
+import { installPhotoSurveySchema, photoSurveyParticipation, photoSurveyStore } from "./photo-survey-store.js";
 import { AGGREGATE_PUBLIC_COPY_POLICY } from "../../shared/aggregate-publication-copy.js";
 import { eloTier, isZebra, ratingDeltas } from "../../shared/elo.js";
 import {
@@ -1172,9 +1172,9 @@ async function combineGoogleHistory(client, { accountPlayerId, anonymousPlayerId
   const rounds = await client.query("SELECT count(*)::integer AS count FROM choice_rounds WHERE player_id=$1", [anonymousPlayerId]);
   if (identity.rowCount || priorLink.rowCount) throw contractError("esta sessão já pertence a outra conta", 409, "HISTORY_SOURCE_CLAIMED");
   const anonymousChoices = Number(rounds.rows[0].count);
-  // Sem escolhas no jogo, o anônimo só é incorporado se respondeu a uma
-  // pesquisa por foto: o vínculo impede uma segunda resposta pela conta.
-  if (!anonymousChoices && !(await photoSurveyResponseCount(client, anonymousPlayerId))) return null;
+  // Sem escolhas no jogo, o anônimo só é incorporado se participou de uma
+  // pesquisa por foto: o vínculo impede uma segunda resposta da mesma pessoa.
+  if (!anonymousChoices && !(await photoSurveyParticipation(client, anonymousPlayerId))) return null;
   const priorChoices = await client.query("SELECT count(*)::integer AS count FROM choice_rounds WHERE player_id=$1", [accountPlayerId]);
   const daily = await client.query(`SELECT player_id,count(*)::integer AS count FROM daily_answers a
     JOIN daily_editions e ON e.id=a.edition_id
@@ -1186,29 +1186,33 @@ async function combineGoogleHistory(client, { accountPlayerId, anonymousPlayerId
   const keepAnonymousDaily = (dailyCounts.get(anonymousPlayerId) || 0) > 0;
   const activeId = keepAnonymousDaily ? anonymousPlayerId : accountPlayerId;
   const historicalId = keepAnonymousDaily ? accountPlayerId : anonymousPlayerId;
-  await client.query(`INSERT INTO player_pools (player_id,topic_id,version,duels)
-    SELECT $1,topic_id,version+1,duels FROM player_pools WHERE player_id=$2
-    ON CONFLICT (player_id,topic_id) DO UPDATE SET
-      version=player_pools.version+EXCLUDED.version,
-      duels=player_pools.duels+EXCLUDED.duels`, [activeId, historicalId]);
-  await client.query(`INSERT INTO player_stats (player_id,topic_id,candidate_id,rating,wins,losses)
-    SELECT $1,topic_id,candidate_id,rating,wins,losses FROM player_stats WHERE player_id=$2
-    ON CONFLICT (player_id,topic_id,candidate_id) DO UPDATE SET
-      rating=player_stats.rating+EXCLUDED.rating-1000,
-      wins=player_stats.wins+EXCLUDED.wins,
-      losses=player_stats.losses+EXCLUDED.losses`, [activeId, historicalId]);
-  // A cota pertence à origem que efetuou cada escolha. Os contadores antigos
-  // seguem auditáveis nessa origem; somá-los ao dono da sessão diária ativa
-  // impediria completar seus dez slots quando as duas partidas jogaram hoje.
-  await client.query(`INSERT INTO player_chromas (player_id,chroma_id,quantity,first_acquired_at,last_acquired_at)
-    SELECT $1,chroma_id,quantity,first_acquired_at,last_acquired_at FROM player_chromas WHERE player_id=$2
-    ON CONFLICT (player_id,chroma_id) DO UPDATE SET
-      quantity=player_chromas.quantity+EXCLUDED.quantity,
-      first_acquired_at=LEAST(player_chromas.first_acquired_at,EXCLUDED.first_acquired_at),
-      last_acquired_at=GREATEST(player_chromas.last_acquired_at,EXCLUDED.last_acquired_at)`, [activeId, historicalId]);
-  await client.query(`INSERT INTO equipped_chromas (player_id,topic_id,candidate_id,chroma_id,equipped_at)
-    SELECT $1,topic_id,candidate_id,chroma_id,equipped_at FROM equipped_chromas WHERE player_id=$2
-    ON CONFLICT (player_id,topic_id,candidate_id) DO NOTHING`, [activeId, historicalId]);
+  // Só há o que somar quando o anônimo jogou. No vínculo feito por causa de
+  // uma pesquisa por foto, o ranking, a versão e as Chromas da conta não mudam.
+  if (anonymousChoices) {
+    await client.query(`INSERT INTO player_pools (player_id,topic_id,version,duels)
+      SELECT $1,topic_id,version+1,duels FROM player_pools WHERE player_id=$2
+      ON CONFLICT (player_id,topic_id) DO UPDATE SET
+        version=player_pools.version+EXCLUDED.version,
+        duels=player_pools.duels+EXCLUDED.duels`, [activeId, historicalId]);
+    await client.query(`INSERT INTO player_stats (player_id,topic_id,candidate_id,rating,wins,losses)
+      SELECT $1,topic_id,candidate_id,rating,wins,losses FROM player_stats WHERE player_id=$2
+      ON CONFLICT (player_id,topic_id,candidate_id) DO UPDATE SET
+        rating=player_stats.rating+EXCLUDED.rating-1000,
+        wins=player_stats.wins+EXCLUDED.wins,
+        losses=player_stats.losses+EXCLUDED.losses`, [activeId, historicalId]);
+    // A cota pertence à origem que efetuou cada escolha. Os contadores antigos
+    // seguem auditáveis nessa origem; somá-los ao dono da sessão diária ativa
+    // impediria completar seus dez slots quando as duas partidas jogaram hoje.
+    await client.query(`INSERT INTO player_chromas (player_id,chroma_id,quantity,first_acquired_at,last_acquired_at)
+      SELECT $1,chroma_id,quantity,first_acquired_at,last_acquired_at FROM player_chromas WHERE player_id=$2
+      ON CONFLICT (player_id,chroma_id) DO UPDATE SET
+        quantity=player_chromas.quantity+EXCLUDED.quantity,
+        first_acquired_at=LEAST(player_chromas.first_acquired_at,EXCLUDED.first_acquired_at),
+        last_acquired_at=GREATEST(player_chromas.last_acquired_at,EXCLUDED.last_acquired_at)`, [activeId, historicalId]);
+    await client.query(`INSERT INTO equipped_chromas (player_id,topic_id,candidate_id,chroma_id,equipped_at)
+      SELECT $1,topic_id,candidate_id,chroma_id,equipped_at FROM equipped_chromas WHERE player_id=$2
+      ON CONFLICT (player_id,topic_id,candidate_id) DO NOTHING`, [activeId, historicalId]);
+  }
   // Elimina só as sessões da origem anônima antes de mover as sessões Google
   // para o jogador que continua a rodada diária.
   await client.query("DELETE FROM player_sessions WHERE player_id=$1", [anonymousPlayerId]);

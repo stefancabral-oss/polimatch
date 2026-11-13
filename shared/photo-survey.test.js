@@ -76,6 +76,35 @@ test("o sorteio é uniforme: cada carta entra e ocupa cada posição com a mesma
   }
 });
 
+// As frequências por carta e por posição, sozinhas, aceitariam um sorteio com
+// padrão fixo (rodar o conjunto ordenado, por exemplo). Pares e vizinhos não.
+test("o sorteio não tem padrão fixo: pares de cartas e as duas primeiras posições variam", () => {
+  const randomInt = seededRandomInt(424242);
+  const rounds = 20000;
+  const together = new Map();
+  const firstTwo = new Map();
+  const bump = (map, key) => map.set(key, (map.get(key) || 0) + 1);
+  for (let round = 0; round < rounds; round += 1) {
+    const shown = drawCards(SURVEY, randomInt);
+    bump(firstTwo, `${shown[0]}>${shown[1]}`);
+    const sorted = [...shown].sort();
+    for (let left = 0; left < sorted.length; left += 1) {
+      for (let right = left + 1; right < sorted.length; right += 1) bump(together, `${sorted[left]}|${sorted[right]}`);
+    }
+  }
+  // Duas cartas quaisquer saem juntas com probabilidade (16·15)/(20·19) ≈ 0,632.
+  assert.equal(together.size, 190, "todos os pares de cartas aparecem juntos");
+  for (const [pair, count] of together) {
+    const share = count / rounds;
+    assert.ok(share > 0.6 && share < 0.665, `${pair} juntas em ${share}`);
+  }
+  // As 380 ordens possíveis para as duas primeiras posições aparecem, cada uma perto de 1/380.
+  assert.equal(firstTwo.size, 380, "todas as ordens das duas primeiras posições aparecem");
+  for (const [order, count] of firstTwo) {
+    assert.ok(count > 20 && count < 95, `${order} apareceu ${count} vezes`);
+  }
+});
+
 test("o sorteio recusa gerador que devolve valor fora do intervalo", () => {
   assert.throws(() => drawCards(SURVEY, () => 99), RangeError);
   assert.throws(() => drawCards(SURVEY, () => -1), RangeError);

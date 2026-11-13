@@ -23,8 +23,8 @@ sub-store misturado com `Object.assign`. Três rotas novas em
   `init()`, um `Object.assign` e a opção `photoSurveys` para testes) e em um
   ponto do login Google, descoberto na Tarefa 2: `combineGoogleHistory`
   devolvia `null` para o anônimo sem escolhas no jogo, o que deixava solta a
-  resposta de pesquisa dele. Ele passa a ser ligado à conta, com status
-  `linked`, quando tem resposta de pesquisa.
+  participação dele na pesquisa. Ele passa a ser ligado à conta, com status
+  `linked`, quando tem sorteio emitido, e nesse caso nada do jogo é somado.
 - Tabelas novas são aditivas (`CREATE TABLE IF NOT EXISTS`) e imutáveis, com o
   gatilho `reject_vote_mutation()` que o jogo já usa.
 - A resposta não toca `votes`, `choice_rounds`, `ranking_stats`,
@@ -155,9 +155,10 @@ As duas recebem o gatilho `…_are_immutable` com `reject_vote_mutation()`.
   sorteio dela. Senão, devolve o sorteio do jogador; se não existe, cria,
   desde que a pesquisa esteja `open` (senão 409 `PHOTO_SURVEY_CLOSED`).
 - `photoSurveyRespond`: `answerId` tem de ser UUID (400
-  `PHOTO_SURVEY_RESPONSE_INVALID`). Se a identidade já respondeu: mesmo
-  `answerId`, ou mesmas escolhas, devolve `alreadyProcessed`; senão 409
-  `PHOTO_SURVEY_ALREADY_ANSWERED` com `current`. Sem resposta: exige sorteio
+  `PHOTO_SURVEY_RESPONSE_INVALID`). Se a identidade já respondeu: as mesmas
+  escolhas devolvem `alreadyProcessed`, com qualquer `answerId`; outra
+  escolha dá 409 `PHOTO_SURVEY_ALREADY_ANSWERED` com `current`, mesmo com o
+  mesmo `answerId`. Sem resposta: exige sorteio
   do jogador (409 `PHOTO_SURVEY_DRAW_REQUIRED`), pesquisa `open` (409
   `PHOTO_SURVEY_CLOSED`) e chave válida (400
   `PHOTO_SURVEY_RESPONSE_INVALID`); grava com o relógio do servidor.
@@ -246,3 +247,19 @@ resposta é imutável.
   descartável, e `npm test --prefix app`.
 - [x] **Passo 4:** atualizar o handoff e a verificação com os números.
 - [x] **Passo 5:** commit, PR e revisão independente do ramo inteiro.
+
+## Depois da revisão independente
+
+A revisão do ramo inteiro, somente leitura, não achou bloqueio e reproduziu
+dois problemas, corrigidos com teste antes do código:
+
+- Recibo disputado: duas pessoas com o mesmo `answerId` ao mesmo tempo davam
+  erro 500 por violação de unicidade. A gravação passou a usar
+  `ON CONFLICT (answer_id) DO NOTHING` e responde 400.
+- Anônimo com sorteio e sem resposta: não era ligado à conta no login, a chave
+  dele continuava valendo e uma aba aberta gravava uma segunda resposta. O
+  vínculo passou a acontecer com o sorteio, e não soma nada do jogo.
+
+Também entraram: índice por jogador em `photo_survey_draws`, teste de
+uniformidade com pares e vizinhos, e no smoke os casos de conta com duas
+respostas e de anônimo que vira o jogador ativo da conta.

@@ -2,7 +2,38 @@
   "checkedAt": "2026-11-13",
   "issue": 324,
   "base": "77104a3",
-  "delivery": "68a — registro (documentação, sem código)",
+  "delivery68a": {
+    "delivery": "68a — registro (documentação, sem código)",
+    "codeChanged": false,
+    "changedOutsideStage": [
+      "docs/decisions/0001-pesquisa-de-preferencia-por-foto.md (quatro pontos marcados, nada apagado)",
+      "CONTEXT.md",
+      "README.md",
+      "AGENTS.md"
+    ],
+    "tests": {
+      "app": "286 passed, 0 failed",
+      "shared": "93 passed, 0 failed",
+      "back": "não rodado localmente; o PR não altera back/"
+    },
+    "independentReview": {
+      "mode": "agente separado, somente leitura",
+      "result": "sem bloqueio",
+      "appliedAfterReview": [
+        "tela de entrada acrescentada ao formato e às referências",
+        "desfazer vale até a confirmação; trocar depois fica para outra etapa",
+        "critérios de aceite por entrega, com resposta forjada, sorteio uniforme, tabelas imutáveis, janela e troca de identidade",
+        "página nova fora do sitemap e com noindex; testes que fixam a lista de páginas ajustados na 68c",
+        "troca da entrada do site só na 68e, com critério próprio",
+        "condições de publicação com os bloqueios #284, #283, #279 e #285",
+        "origem das imagens das 20 cartas registrada",
+        "frases da raiz e da decisão 0002 alinhadas"
+      ]
+    },
+    "pr": 325,
+    "humanGate": "68a aprovada por instrução do Stefan para o PR #325 em 13/11/2026 (\"Toca\"), transcrita no PR; merge a cargo do agente com o check verde",
+    "decision": "docs/decisions/0002-ordem-de-construcao-e-cartas-com-moldura.md"
+  },
   "designApproval": {
     "by": "Stefan",
     "when": "2026-11-13",
@@ -15,14 +46,6 @@
     ],
     "entryScreen": "desenhada depois da revisão independente e aprovada com o PR #325 (\"Toca\")"
   },
-  "decision": "docs/decisions/0002-ordem-de-construcao-e-cartas-com-moldura.md",
-  "changedOutsideStage": [
-    "docs/decisions/0001-pesquisa-de-preferencia-por-foto.md (quatro pontos marcados, nada apagado)",
-    "CONTEXT.md",
-    "README.md",
-    "AGENTS.md"
-  ],
-  "codeChanged": false,
   "facts": {
     "politicalCardsWithCommonFrame": 20,
     "source": "app/public/chromas/politicos, arquivos -530.webp e -1060.webp",
@@ -37,11 +60,6 @@
       "source": "shared/presidential-roster.json, campo photo.kind"
     }
   },
-  "tests": {
-    "app": "286 passed, 0 failed",
-    "shared": "93 passed, 0 failed",
-    "back": "não rodado localmente; o PR não altera back/"
-  },
   "acceptance": {
     "delivery68a": "aprovada",
     "delivery68b": "pronta para gate",
@@ -49,22 +67,6 @@
     "delivery68d": "não iniciada",
     "delivery68e": "não iniciada"
   },
-  "humanGate": "68a aprovada por instrução do Stefan para o PR #325 em 13/11/2026 (\"Toca\"), transcrita no PR; merge a cargo do agente com o check verde",
-  "independentReview": {
-    "mode": "agente separado, somente leitura",
-    "result": "sem bloqueio",
-    "appliedAfterReview": [
-      "tela de entrada acrescentada ao formato e às referências",
-      "desfazer vale até a confirmação; trocar depois fica para outra etapa",
-      "critérios de aceite por entrega, com resposta forjada, sorteio uniforme, tabelas imutáveis, janela e troca de identidade",
-      "página nova fora do sitemap e com noindex; testes que fixam a lista de páginas ajustados na 68c",
-      "troca da entrada do site só na 68e, com critério próprio",
-      "condições de publicação com os bloqueios #284, #283, #279 e #285",
-      "origem das imagens das 20 cartas registrada",
-      "frases da raiz e da decisão 0002 alinhadas"
-    ]
-  },
-  "pr": 325,
   "delivery68b": {
     "checkedAt": "2026-11-13",
     "branch": "icm/68b-photo-survey-server",
@@ -76,7 +78,7 @@
       "back/src/photo-survey-http.test.js falhou em 5 de 6 antes das rotas"
     ],
     "tests": {
-      "shared": "103 passed, 0 failed (10 novos)",
+      "shared": "104 passed, 0 failed (11 novos)",
       "backUnit": "293 passed, 0 failed (8 novos)",
       "app": "286 passed, 0 failed",
       "smokes": [
@@ -104,11 +106,31 @@
       "nenhuma rota devolve soma": "met (as três rotas devolvem só definição, sorteio e a resposta do próprio jogador)"
     },
     "deviations": [
-      "topic-store.js muda além do registro: combineGoogleHistory liga à conta o anônimo que só respondeu pesquisa (status linked)",
+      "topic-store.js muda além do registro: combineGoogleHistory liga à conta o anônimo com sorteio de pesquisa (status linked), sem somar nada do jogo",
       "a trava por jogador é a do findPlayer; não há trava própria da pesquisa"
     ],
     "remoteCi": "ver os checks do PR da 68b",
     "humanGate": "pendente",
-    "featureFlag": "PHOTO_SURVEYS_ENABLED=true liga as três rotas; sem isso 404 PHOTO_SURVEYS_DISABLED sem chegar ao store (teste de unidade)"
+    "featureFlag": "PHOTO_SURVEYS_ENABLED=true liga as três rotas; sem isso 404 PHOTO_SURVEYS_DISABLED sem chegar ao store (teste de unidade)",
+    "pr": 326,
+    "independentReview": {
+      "mode": "agente separado, somente leitura no repositório, com banco descartável local",
+      "result": "sem bloqueio",
+      "reproducedAndFixed": [
+        "mesmo answerId de duas pessoas em paralelo causava 500 (23505); agora ON CONFLICT (answer_id) DO NOTHING e 400",
+        "anônimo com sorteio e sem resposta não era ligado no login Google e gravava segunda resposta com a chave antiga; agora o vínculo acontece com o sorteio"
+      ],
+      "alsoApplied": [
+        "o vínculo linked não soma nada do jogo nem muda a versão do ranking da conta",
+        "índice photo_survey_draws_player_idx",
+        "teste de uniformidade com pares e com as duas primeiras posições",
+        "smoke: conta com duas respostas (vale a mais antiga) e anônimo que vira o jogador ativo",
+        "política: vale a resposta mais antiga da identidade; contagem futura por identidade"
+      ],
+      "notFixed": [
+        "TRUNCATE não é barrado pelos gatilhos, como nas demais tabelas",
+        "token inválido com corpo inválido responde 400 antes do 401"
+      ]
+    }
   }
 }

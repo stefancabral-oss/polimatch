@@ -60,15 +60,21 @@ export async function installPhotoSurveySchema(client) {
       BEFORE UPDATE OR DELETE ON photo_survey_responses
       FOR EACH ROW EXECUTE FUNCTION reject_vote_mutation();
 
+    -- O login Google pergunta, por jogador, se ele participou de alguma pesquisa.
+    CREATE INDEX IF NOT EXISTS photo_survey_draws_player_idx ON photo_survey_draws (player_id);
+
     INSERT INTO schema_migrations(id) VALUES ('2026-11-13-photo-survey-v1') ON CONFLICT DO NOTHING;
   `);
 }
 
-// Usado pelo login Google: um anônimo que só respondeu a pesquisas, sem jogar,
-// também precisa ser ligado à conta, senão a conta responderia de novo.
-export async function photoSurveyResponseCount(client, playerId) {
+// Usado pelo login Google: um anônimo que participou de uma pesquisa, mesmo
+// sem jogar, precisa ser ligado à conta. Basta o sorteio: se a chave anônima
+// continuasse valendo, uma aba aberta com ela gravaria uma segunda resposta
+// da mesma pessoa. Toda resposta tem sorteio, então contar sorteios cobre os
+// dois casos.
+export async function photoSurveyParticipation(client, playerId) {
   const result = await client.query(
-    "SELECT count(*)::integer AS count FROM photo_survey_responses WHERE player_id = $1",
+    "SELECT count(*)::integer AS count FROM photo_survey_draws WHERE player_id = $1",
     [playerId],
   );
   return Number(result.rows[0].count);
@@ -188,14 +194,15 @@ export function photoSurveyStore({
         if (view.status !== "open") throw closedError(view.status);
         const bracket = validateBracket(survey, shownIds, { pickIds, championId });
         if (!bracket.ok) throw invalidResponse(bracket.reason);
-        // O recibo é único entre todas as respostas: o de outra pessoa não serve.
-        const taken = await client.query("SELECT 1 FROM photo_survey_responses WHERE answer_id = $1", [receipt]);
-        if (taken.rowCount) throw invalidResponse("answer-id");
+        // O recibo é único entre todas as respostas. Se outra pessoa já o
+        // usou, mesmo numa requisição simultânea, nada é gravado aqui.
         const inserted = await client.query(`INSERT INTO photo_survey_responses
             (survey_id, player_id, answer_id, shown_ids, pick_ids, champion_id, responded_at)
           VALUES ($1, $2, $3, $4, $5, $6, $7)
+          ON CONFLICT (answer_id) DO NOTHING
           RETURNING answer_id, shown_ids, pick_ids, champion_id, responded_at`,
         [survey.id, player.id, receipt, shownIds, bracket.pickIds, bracket.championId, at]);
+        if (!inserted.rowCount) throw invalidResponse("answer-id");
         return {
           status: "created",
           survey: view,

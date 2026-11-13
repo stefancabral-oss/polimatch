@@ -25,7 +25,7 @@
 - `README.md`: as três rotas na tabela da API.
 - `stages/68_photo_survey_politics/plans/68b-regras-e-servidor.md`: o plano seguido.
 
-O que muda no jogo atual: nada no que a pessoa vê. No servidor, o login Google passa a ligar à conta o jogador anônimo que respondeu a uma pesquisa sem ter jogado; antes ele era descartado. A resposta do login traz `merge.status: "linked"` nesse caso, e o app, que só reage a `combined` e `alreadyCombined`, não mostra aviso.
+O que muda no jogo atual: nada no que a pessoa vê. No servidor, o login Google passa a ligar à conta o jogador anônimo que recebeu o sorteio de uma pesquisa sem ter jogado; antes ele era descartado. A resposta do login traz `merge.status: "linked"` nesse caso, nada do jogo é somado, e o app, que só reage a `combined` e `alreadyCombined`, não mostra aviso. Se a pessoa repetir o login com a chave antiga, o app mostra o aviso que já existe para acesso recuperado.
 
 Nada desta entrega é visível no site: não há tela, e as rotas novas nascem desligadas. Só `PHOTO_SURVEYS_ENABLED=true` no ambiente da API as liga; sem isso respondem 404 `PHOTO_SURVEYS_DISABLED`.
 
@@ -41,7 +41,7 @@ Nada desta entrega é visível no site: não há tela, e as rotas novas nascem d
 
 68b, em 13/11/2026, numa máquina com PostgreSQL 16.14 local e banco descartável:
 
-- `npm run test:shared`: 103/103 (10 novos).
+- `npm run test:shared`: 104/104 (11 novos).
 - `npm test --prefix back`: 293/293 (8 novos: 7 das rotas e a guarda de banco descartável do smoke novo).
 - `npm test --prefix app`: 286/286.
 - Smokes na ordem do CI, todos aprovados: integração, duas escolhas, duelos, abuso, progresso, cívico, resiliência e o novo, da pesquisa.
@@ -51,7 +51,18 @@ Nada desta entrega é visível no site: não há tela, e as rotas novas nascem d
 
 ## Revisão independente
 
-Um agente separado, somente leitura, revisou este PR em 13/11/2026 e não achou bloqueio. Correções aplicadas depois dela: a tela de entrada, que faltava no formato; a regra do desfazer, que vale até a confirmação; critérios de aceite por entrega, com os que faltavam (resposta forjada, sorteio uniforme, tabelas imutáveis, janela, troca de identidade); a página nova fora do sitemap e os testes que fixam a lista de páginas; a troca da entrada do site só na 68e; e as condições de publicação, com os bloqueios de maturidade que pesam nesta etapa.
+**68a.** Um agente separado, somente leitura, revisou o PR #325 em 13/11/2026 e não achou bloqueio. Correções aplicadas depois dela: a tela de entrada, que faltava no formato; a regra do desfazer, que vale até a confirmação; critérios de aceite por entrega, com os que faltavam (resposta forjada, sorteio uniforme, tabelas imutáveis, janela, troca de identidade); a página nova fora do sitemap e os testes que fixam a lista de páginas; a troca da entrada do site só na 68e; e as condições de publicação, com os bloqueios de maturidade que pesam nesta etapa.
+
+**68b.** Outro agente separado, somente leitura no repositório e com banco descartável, revisou o PR #326 em 13/11/2026. Não achou bloqueio e reproduziu dois problemas, corrigidos com teste antes do código:
+
+- Duas pessoas mandando o mesmo recibo (`answerId`) ao mesmo tempo causavam erro 500. Agora uma grava e a outra recebe 400.
+- O anônimo que tinha sorteio, mas ainda não tinha respondido, não era ligado à conta no login Google. A chave dele continuava valendo, e uma aba aberta com ela gravava uma segunda resposta da mesma pessoa. Agora o vínculo acontece com o sorteio, e a chave antiga deixa de valer.
+
+Também saíram da revisão: o vínculo da pesquisa deixou de mexer na versão do ranking da conta; o teste de uniformidade passou a medir pares e vizinhos; o smoke ganhou a conta com duas respostas e o anônimo que vira o jogador ativo; e a política passou a dizer que, depois de vínculos, vale a resposta mais antiga da identidade.
+
+Notas que ficam para a 68c: quando o anônimo vira o jogador ativo da conta, outro aparelho da conta passa a receber o sorteio dele, e uma resposta montada com o sorteio antigo é recusada com 400. A tela precisa buscar o sorteio de novo quando isso acontecer, e também quando a chave anônima deixar de valer no meio da pesquisa.
+
+Não corrigido, por ser igual ao resto do banco: `TRUNCATE` não é barrado pelos gatilhos de imutabilidade, nas tabelas novas nem nas antigas.
 
 ## Riscos conhecidos
 
