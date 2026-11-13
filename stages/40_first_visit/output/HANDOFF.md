@@ -2,10 +2,11 @@
 
 ## Status
 
-- Estado: `pronto para gate`
+- Estado: `aprovado`
 - Issue: #282
 - Branch: `fix/first-visit` (a partir de `main` em 7c0bb27)
-- PR: não aberta nesta rodada (ver "Ação do Stefan")
+- PR: https://github.com/stefancabral-oss/polimatch/pull/313, aberta pelo Stefan
+  em 31/10/2026
 - Último commit: ver `git log fix/first-visit`; os commits de código são
   873da23, 1d85cff, f2d65c7, e38945d e 98b8967 (correção da revisão
   independente), e os registros do estágio vêm por último.
@@ -225,9 +226,27 @@ números acima:
   administração e só leitura:
   `SELECT day, scope, code, count FROM quota_rejections_daily ORDER BY day DESC LIMIT 30;`
 
+## Atualização de 12/11/2026
+
+- A branch recebeu a `main` atual (#311, #317, #319 e #320). A junção foi
+  automática; só o `CONTEXT.md` da raiz foi tocado dos dois lados.
+- Antes do envio, na junção local: `npm test --prefix app` com 255 testes e
+  nenhuma falha, `npm run test:shared` com 93 e nenhuma falha, e
+  `npm run build --prefix app` concluído. Os testes do back e os e2e rodam no
+  CI do GitHub depois do envio.
+- A Q4 da #277 foi respondida em 12/11/2026: o jogador nasce só no primeiro
+  voto, que é o que este estágio entrega, e o limite por rede sobe. O número
+  novo sai numa decisão versionada da política, com o dado de recusas que a
+  tabela `quota_rejections_daily` passa a guardar. Este PR não muda o número.
+- Continuam com o Stefan, depois do merge: o deploy, conferir que o build de
+  produção tem `VITE_GOOGLE_CLIENT_ID`, medir o LCP da capa em produção e
+  acompanhar as recusas pela consulta da seção "Ação do Stefan".
+
 ## Human gate
 
-- Decisão: `pendente`
+- Decisão: `aprovado`
 - Responsável: Stefan
-- Observação: nenhum agente aprova o próprio gate, faz merge ou publica em
-  produção.
+- Observação: aprovado por instrução direta do Stefan para este PR, em
+  conversa de 12/11/2026 ("Pode mesclar o 313"), transcrita no PR. O merge fica
+  a cargo do agente, a pedido dele, depois do CI verde. A regra 6 do
+  `AGENTS.md` não muda. Nenhum agente publica em produção.

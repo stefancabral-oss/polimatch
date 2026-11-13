@@ -87,7 +87,7 @@
     { "criterion": "Login Google de subject novo sem token não consome a cota de rede", "result": "met", "evidence": "vote-abuse-smoke.mjs e http-app.test.js" },
     { "criterion": "Janela da cota de rede no dia editorial de São Paulo", "result": "met", "evidence": "topic-store.test.js (23h30 → 2026-10-25T03:00Z) e vote-abuse-smoke.mjs" },
     { "criterion": "LCP móvel ≤ 2,5 s com throttling e API simulada, pintado antes de qualquer resposta de /api/", "result": "partial", "evidence": "1,98 s com throttling equivalente no Chromium, antes da primeira resposta da API; Lighthouse real e produção pendentes" },
-    { "criterion": "CI remoto (UI Interaction Smoke e Backend and Shared)", "result": "pending", "evidence": "branch local, sem push" }
+    { "criterion": "CI remoto (UI Interaction Smoke e Backend and Shared)", "result": "met", "evidence": "PR #313: verde no commit 5374579 em 31/10/2026; nova rodada disparada em 12/11/2026 pela junção com a main, conferida antes do merge" }
   ],
   "independentReview": {
     "checkedAt": "2026-10-31",
@@ -108,6 +108,11 @@
     },
     "lcp": { "server": "vite preview", "runs": 3, "baseMedianMs": 9980, "branchMedianMs": 1980, "branchFirstApiResponseMs": 5853, "paintedBeforeAnyApiResponse": true }
   },
-  "remoteCi": "pending",
-  "humanGate": "not self-approved"
+  "remoteCi": "verde no commit 5374579 em 31/10/2026; nova rodada em 12/11/2026 depois da junção com a main",
+  "mainMergedIn": {
+    "when": "2026-11-13",
+    "includes": ["#311", "#317", "#319", "#320"],
+    "localChecks": { "appUnit": { "passed": 255, "failed": 0 }, "shared": { "passed": 93, "failed": 0 }, "appBuild": "ok" }
+  },
+  "humanGate": "aprovado por instrução do Stefan para este PR em conversa de 12/11/2026, transcrita no PR; merge a cargo do agente depois do CI verde; deploy com o Stefan"
 }
