@@ -2,7 +2,7 @@
 
 ## Status
 
-- Estado: `em andamento`. A entrega 68a (registro) está pronta para gate.
+- Estado: `em andamento`. A entrega 68a (registro) foi aprovada; faltam as entregas 68b a 68e.
 - Issue: #324
 - Branch desta entrega: `icm/68-photo-survey-politics` (base main `77104a3`)
 - PR: #325
@@ -11,7 +11,7 @@
 
 - `docs/decisions/0002-ordem-de-construcao-e-cartas-com-moldura.md`: a decisão do Stefan de 13/11/2026 sobre a ordem de construção e as cartas com moldura no voto, com o que ela altera na decisão 0001.
 - `stages/68_photo_survey_politics/CONTEXT.md`: formato, regras, entregas, fora de escopo e critérios de aceite da etapa 1.
-- `stages/68_photo_survey_politics/references/`: as três telas aprovadas e a de entrada, desenhada depois e ainda a aprovar.
+- `stages/68_photo_survey_politics/references/`: as quatro telas aprovadas. A de entrada foi desenhada depois das outras três e aprovada com este PR.
 - `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md`: marca nos quatro pontos alterados. Nada foi apagado.
 - `CONTEXT.md`, `README.md` e `AGENTS.md` da raiz: apontam para a decisão 0002 e para esta etapa.
 
@@ -55,19 +55,16 @@ Escolhas de desenho do agente, dentro do que ele aprovou, a confirmar neste gate
 
 ## Próximo passo exato
 
-1. Gate do Stefan nesta entrega (68a).
-2. Plano de implementação da 68b e, com o sim dele, o primeiro PR de código.
+1. Plano de implementação da 68b e o primeiro PR de código, que pede o gate dele antes do merge.
 
 ## Ação do Stefan
 
-- Revisar e decidir o merge do PR da 68a.
-- Aprovar a tela de entrada, que não estava entre as três que ele viu.
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
 - Confirmar as condições de publicação propostas no contexto do estágio.
 - Dizer se quer cartas de Lula e Flávio Bolsonaro no padrão comum, para entrarem numa próxima pesquisa.
 
 ## Human gate
 
-- Decisão: `pendente`
+- Decisão da entrega 68a: `aprovado`
 - Responsável: Stefan
-- Observação: o desenho da etapa foi aprovado por ele em conversa de 13/11/2026 ("Aprovado"). O merge deste PR depende de instrução dele para este PR, transcrita no PR. A regra 6 do `AGENTS.md` não muda.
+- Observação: aprovado por instrução direta do Stefan para este PR, em conversa de 13/11/2026. À pergunta "Mesclo o PR 325, com a tela de entrada incluída, ou quer mudar alguma coisa?", ele respondeu: "Toca". O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. As entregas 68b a 68e têm gate próprio. A regra 6 do `AGENTS.md` não muda.

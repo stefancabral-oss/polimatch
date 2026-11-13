@@ -7,8 +7,8 @@ As telas da etapa 1 da pesquisa por foto. Três foram aprovadas pelo Stefan em
 - `etapa1-2-final.jpg`: a final, com as quatro cartas escolhidas.
 - `etapa1-3-confirmacao.jpg`: a confirmação, antes de gravar.
 
-Uma foi desenhada depois, a pedido da revisão independente, e ainda não foi
-aprovada por ele:
+Uma foi desenhada depois, a pedido da revisão independente, e aprovada por ele
+no mesmo dia, junto com o PR #325 ("Toca"):
 
 - `etapa1-0-entrada.jpg`: a entrada, com o botão "Começar". No produto, as
   cartas que a ilustram são sorteadas a cada visita.

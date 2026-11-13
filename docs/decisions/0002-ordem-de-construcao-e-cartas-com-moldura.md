@@ -90,5 +90,5 @@ pesquisa têm a mesma moldura.
 
 - `stages/68_photo_survey_politics/`: contexto, handoff e verificação da
   etapa 1.
-- `stages/68_photo_survey_politics/references/`: as três telas que o Stefan
-  aprovou em 13/11/2026 e a tela de entrada, desenhada depois.
+- `stages/68_photo_survey_politics/references/`: as quatro telas que o Stefan
+  aprovou em 13/11/2026.

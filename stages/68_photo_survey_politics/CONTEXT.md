@@ -15,8 +15,8 @@ etapa estar testada e o Stefan autorizar a publicação.
 ## Entradas
 
 - Issue #324 e as decisões 0001 e 0002.
-- As telas em `references/`: três aprovadas pelo Stefan em 13/11/2026 (voto,
-  final e confirmação) e a de entrada, desenhada depois e ainda a aprovar.
+- As quatro telas em `references/`, aprovadas pelo Stefan em 13/11/2026:
+  entrada, voto, final e confirmação.
 - As 20 cartas "Políticos 2026" de `app/public/chromas/politicos`, em 530 e
   1060 pixels de largura. São imagens completas, com moldura e nome.
 - O protótipo de 12/11/2026, em
