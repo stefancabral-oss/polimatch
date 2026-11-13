@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-11-13",
+  "issue": 324,
+  "base": "77104a3",
+  "delivery": "68a — registro (documentação, sem código)",
+  "designApproval": {
+    "by": "Stefan",
+    "when": "2026-11-13",
+    "how": "em conversa, depois de ver as três telas e o resumo do desenho: \"Aprovado\"",
+    "screens": [
+      "references/etapa1-1-voto.jpg",
+      "references/etapa1-2-final.jpg",
+      "references/etapa1-3-confirmacao.jpg"
+    ]
+  },
+  "decision": "docs/decisions/0002-ordem-de-construcao-e-cartas-com-moldura.md",
+  "changedOutsideStage": [
+    "docs/decisions/0001-pesquisa-de-preferencia-por-foto.md (quatro pontos marcados, nada apagado)",
+    "CONTEXT.md",
+    "README.md",
+    "AGENTS.md"
+  ],
+  "codeChanged": false,
+  "facts": {
+    "politicalCardsWithCommonFrame": 20,
+    "source": "app/public/chromas/politicos, arquivos -530.webp e -1060.webp",
+    "specialFrameCards": ["lula", "flavio-bolsonaro"],
+    "currentGame": "10 telas de 4 cartas por dia, duas escolhas em ordem, sem voltar, gravação imutável por tela (back/src/daily-session.js, back/src/topic-store.js)"
+  },
+  "tests": {
+    "app": "286 passed, 0 failed",
+    "shared": "93 passed, 0 failed",
+    "back": "não rodado localmente; o PR não altera back/"
+  },
+  "acceptance": {
+    "delivery68a": "pronta para gate",
+    "delivery68b": "não iniciada",
+    "delivery68c": "não iniciada",
+    "delivery68d": "não iniciada",
+    "delivery68e": "não iniciada"
+  },
+  "humanGate": "pendente; merge só por instrução do Stefan para este PR"
+}

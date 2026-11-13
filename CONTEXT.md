@@ -41,9 +41,9 @@ Em 12/11/2026 Stefan respondeu à Q1 da #277 com um caminho fora das três opç�
 - Quem jogou vê os cinco primeiros. Só a resposta somada sai do PoliMatch, nunca o dado de uma pessoa.
 - Abre com Política, Famosos e influenciadores, e Futebol.
 - Os jogos de leitura e a parte cívica e de notícias ficam no ar sem trabalho novo.
-- Telas novas minimalistas: fundo neutro, um único verde, foto sem moldura na hora do voto.
+- Telas novas minimalistas: fundo neutro e um único verde. Na hora do voto vale a carta com moldura, no mesmo padrão para todas as cartas da pesquisa (decisão 0002, de 13/11/2026, que alterou o "foto sem moldura" da 0001).
 
-Nada disso está liberado para produção por este registro. A ordem do trabalho é maturidade primeiro (#309), e as respostas às Q2, Q3 e Q4, com a proposta para a Q6, estão na #277; nenhuma delas libera produção. Continuam sem resposta a Q5 (controlador de dados e revisão jurídica), a visibilidade do repositório e a convivência entre o login Google e o CPF. O gate de publicação agregada (#177) e a política de integridade do voto continuam em vigor.
+Nada disso está liberado para produção por este registro. A ordem do trabalho era maturidade primeiro (#309); desde a decisão 0002 a etapa 1 da pesquisa ([ICM 68] #324) corre em paralelo, sem dispensar nenhum bloqueio de maturidade. As respostas às Q2, Q3 e Q4, com a proposta para a Q6, estão na #277; nenhuma delas libera produção. Continuam sem resposta a Q5 (controlador de dados e revisão jurídica), a visibilidade do repositório e a convivência entre o login Google e o CPF. O gate de publicação agregada (#177) e a política de integridade do voto continuam em vigor.
 
 Antes de propor ou alterar tela, regra de voto ou cadastro, ler o registro de decisão: ele lista o que continua valendo e o que deixa de valer para as telas novas.
 
@@ -209,3 +209,12 @@ hash do conteúdo como versão e o `ci.yml` roda em todo PR e em todo push para
 `main`, com o check único `ci-gate`. O ruleset de `main` foi aplicado em
 13/11/2026. A chegada do SHA ao build do Dokploy fica com Stefan
 (docs/ops/RELEASE.md).
+
+## Pesquisa por foto, etapa 1 — issue #324
+Decisão 0002, de 13/11/2026: a construção começa pela política que já funciona,
+no formato novo e com as cartas de moldura que já existem; depois celebridades
+e influenciadores; depois roupas com imagens próprias. Estágio
+`stages/68_photo_survey_politics/CONTEXT.md`: 16 cartas em 4 telas de 4, final
+e confirmação, em página própria ao lado do jogo atual. Sem CPF, sem resultado
+público e sem mudança no jogo que está no ar. Ninguém de fora é chamado antes
+de o aplicativo estar testado.
