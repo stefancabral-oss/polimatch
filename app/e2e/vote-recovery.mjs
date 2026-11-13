@@ -218,8 +218,8 @@ async function instalarServidor(page, servidor) {
   });
 }
 
-async function abrirDuelo(page) {
-  await page.goto(appUrl, { waitUntil: "networkidle" });
+async function abrirDuelo(page, { navegar = true } = {}) {
+  if (navegar) await page.goto(appUrl, { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "Duelo" }).click();
   await page.getByRole("button", { name: "Continuar no modo livre" }).click();
   await page.getByRole("heading", { name: "Quem você prefere?" }).waitFor();
@@ -350,11 +350,17 @@ try {
     await page.reload({ waitUntil: "networkidle" });
     await page.waitForTimeout(800);
 
+    // Desde a #282 o jogador novo só nasce na próxima jogada: o 401 descarta a
+    // chave na abertura, e abrir o duelo (na mesma página, sem o initScript
+    // regravar a chave antiga) cria a credencial substituta.
+    if (await chaveGuardada(page) === RECOVERY_KEY) {
+      throw new Error("um 401 real deveria descartar a chave inválida");
+    }
+    await abrirDuelo(page, { navegar: false });
     const depois = await chaveGuardada(page);
     if (!depois || depois === RECOVERY_KEY) {
       throw new Error("um 401 real deveria descartar a chave e criar um jogador novo");
     }
-    await abrirDuelo(page);
     if (await page.locator(".candidate-card").count() !== 4) {
       throw new Error("o app não voltou a ficar utilizável depois do 401");
     }

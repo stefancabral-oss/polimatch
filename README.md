@@ -2,6 +2,8 @@
 
 PoliMatch é um jogo web casual de comparação entre personalidades públicas. A pessoa escolhe sua preferida entre quatro cartas, recebe uma nova rodada imediatamente e acompanha seu ranking pessoal. Superfícies agregadas permanecem retidas por padrão enquanto a decisão humana da issue #177 estiver pendente.
 
+**Direção desde 12/11/2026:** o PoliMatch caminha para ser uma pesquisa de preferência por foto (issue #318, [registro de decisão](docs/decisions/0001-pesquisa-de-preferencia-por-foto.md)). Nada dessa direção está no ar. Cadastro por CPF, exibição dos cinco primeiros e entrega de resultado somado dependem de etapas e decisões ainda abertas. A seção abaixo descreve o produto anterior, que é o que está no ar; a correção dos números dela é da [ICM 61] #303.
+
 ## Produto atual
 
 - Interface reconstruída na direção `Malaquita 2026 / Digital First`.
@@ -136,6 +138,7 @@ API:
 - antes de publicar qualquer decisão editorial, injetar `EDITORIAL_AUTHORITY_PUBLIC_JWK`, `EDITORIAL_AUTHORITY_ISSUER`, `EDITORIAL_AUTHORITY_KEY_ID` e `EDITORIAL_AUTHORITY_RECEIPTS`; recibos inválidos ou ausentes mantêm default-deny;
 - origem padrão de produção: somente `https://polimatch.com.br`; ambientes adicionais exigem `APP_ORIGINS=https://polimatch.com.br,https://staging.exemplo`;
 - healthcheck: `GET /api/health`.
+- logs: uma linha JSON por requisição no stdout, sem IP nem token, e uma linha `client_error` para cada erro relatado pelo navegador em `POST /api/client-errors`; prazos do banco ajustáveis por `PG_*_TIMEOUT_MS`. Campos, consultas e o alarme externo estão em [Monitoramento e alertas](docs/ops/MONITORING.md);
 - revisão do release: construa a imagem da API com `--build-arg SOURCE_COMMIT=<SHA completo do checkout>`; o Dockerfile grava a revisão no artefato e a receipt deve conter o mesmo `releaseRevision`;
 - publicação agregada: `AGGREGATE_AUTHORITY_RECEIPTS=<array JSON>` é a única entrada operacional. JWK, emissor e `keyId` precisam estar previamente pinados no artefato versionado; enquanto o keyring estiver vazio ou qualquer vínculo falhar, todos os escopos permanecem bloqueados.
 
@@ -154,11 +157,15 @@ O contrato de voto V2 é incompatível com frontend/backend antigos em rolling m
 
 O domínio público `polimatch.com.br` aponta para o app; `api.polimatch.com.br`, para a API. HTTPS é obrigatório para o PWA. A publicação só deve ocorrer depois do gate visual e fotográfico.
 
+Backup externo do PostgreSQL, ensaio de restauração e reconstrução do ambiente: [docs/ops/BACKUP.md](docs/ops/BACKUP.md) e [docs/ops/DR.md](docs/ops/DR.md). O piso de rollback da API está no [ROLLBACK.md](stages/08_release_deploy_observabilidade/output/ROLLBACK.md).
+
 ## Fonte de verdade
 
 Decisões e estado da reconstrução:
 
 - `CONTEXT.md`
+- `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md`
+- `stages/67_photo_survey_direction/CONTEXT.md`
 - `stages/10_rebuild_eleicoes_2026/CONTEXT.md`
 - `stages/10_rebuild_eleicoes_2026/output/HANDOFF.md`
 - `stages/10_rebuild_eleicoes_2026/output/verification.json`

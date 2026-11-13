@@ -49,6 +49,8 @@ jobs:
               - 'stages/10_rebuild_eleicoes_2026/input/polimatch-taxonomia-125.json'
               - 'docs/editorial/**'
               - 'package.json'
+              # O backup e o ensaio de restauração rodam na suíte de PostgreSQL.
+              - 'scripts/ops/**'
               - '.github/workflows/back-shared.yml'
               - '.github/workflows/ci.yml'
             design:

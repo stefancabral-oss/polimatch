@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run editorial-assets:check && npm run portraits:check && npm run presidential-assets:check && vite build && node scripts/verify-card-art-pilot-excluded.mjs",
+    "build": "npm run editorial-assets:check && npm run portraits:check && npm run presidential-assets:check && vite build && node scripts/verify-card-art-pilot-excluded.mjs && node scripts/verify-share-preview.mjs && node scripts/verify-public-refs.mjs",
     "editorial-assets:check": "node scripts/validate-editorial-assets.mjs",
     "card-art-pilot:validate-participants": "node scripts/validate-card-art-pilot-participants.mjs",
     "card-art-pilot:validate-results": "node scripts/validate-card-art-pilot-results.mjs",
