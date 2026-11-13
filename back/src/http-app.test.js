@@ -617,3 +617,28 @@ test("quota responses expose a retry contract", async () => {
     assert.equal(body.retryAfterSeconds, 86400);
   });
 });
+
+test("login Google sem token não passa pela emissão anônima limitada por rede", async () => {
+  let issued = 0;
+  let received = null;
+  const app = createHttpApp({
+    store: fakeStore({
+      createPlayer: async () => { issued += 1; throw new Error("a emissão anônima não deveria ser chamada"); },
+      signInWithGoogle: async (value) => { received = value; return { sessionToken: "pms_test", account: {}, player: {}, merge: null }; },
+    }),
+    googleIdentity: { configured: true, verify: async () => ({ subject: "google-subject-novo", displayName: "Pessoa", avatarUrl: "" }) },
+    env: {},
+  });
+  await withServer(app, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/auth/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential: "credencial-de-teste", topicId: "eleicoes-2026" }),
+    });
+    assert.equal(response.status, 200);
+  });
+  assert.equal(issued, 0);
+  assert.equal(received.currentToken, "");
+  assert.equal(received.identity.subject, "google-subject-novo");
+  assert.equal(Object.hasOwn(received, "networkHash"), false);
+});

@@ -1,6 +1,6 @@
 # Política de integridade do voto público
 
-Status: política normativa da API do PoliMatch, versão 2, vinculada às issues #170 e #179.
+Status: política normativa da API do PoliMatch, versão 3, vinculada às issues #170, #179 e #282.
 
 Esta política existe para que o placar público seja um painel de preferências declaradas com limites conhecidos. Ela não transforma o resultado em pesquisa eleitoral nem prova que cada jogador corresponde a uma pessoa única.
 
@@ -22,7 +22,7 @@ Somente escolhas novas consomem cota. Repetir o mesmo `roundId` livre ou `answer
 | jogador, total | 30 escolhas | dia editorial de São Paulo | HTTP 429, `VOTE_DAILY_LIMIT` |
 | jogador, rodada do dia | 10 escolhas | janela persistida da edição diária | HTTP 429, `DAILY_CHOICE_LIMIT` |
 | jogador, conjunto não diário: livre, aquecimento e desempate | 20 escolhas compartilhadas | dia editorial de São Paulo | HTTP 429, `FREE_CHOICE_LIMIT` |
-| pseudônimo de rede | 3 novos jogadores anônimos | dia UTC | HTTP 429, `PLAYER_ISSUANCE_LIMIT` |
+| pseudônimo de rede | 3 novos jogadores anônimos | dia editorial de São Paulo | HTTP 429, `PLAYER_ISSUANCE_LIMIT` |
 
 Uma escolha entre quatro gera três comparações Elo, mas consome uma unidade; uma escolha entre duas também consome uma unidade. Na consolidação #182 de 17/09/2026, aquecimento e desempate usam o mesmo conjunto não diário do modo livre: três votos no aquecimento deixam dezessete escolhas para livre/desempate nessa data editorial. Esgotar esse conjunto impede novos votos nos três modos até a próxima data, mas preserva as dez escolhas diárias. Os nomes históricos `freeChoices` e `FREE_CHOICE_LIMIT` identificam esse conjunto compartilhado na API; não prometem vinte escolhas adicionais em quatro cartas. Os limites numéricos e snapshots anteriores permanecem inalterados.
 
@@ -30,9 +30,15 @@ A cota total é 30. A edição diária usa exatamente seus `opensAt` e `closesAt
 
 Na migração da cota antiga por dia UTC, os buckets legados que se sobrepõem ao dia editorial são somados conservadoramente ao contador total v2, limitado a 30. A aproximação pode bloquear cedo, mas nunca concede uma segunda franquia de 30 escolhas durante o deploy.
 
+A cota de jogos novos por rede usa a mesma janela das cotas por jogador: começa à meia-noite de São Paulo e o `Retry-After` da recusa conta os segundos até a próxima meia-noite, não 24 horas fixas. Na troca da janela antiga por dia UTC, o contador legado que se sobrepõe ao dia editorial é herdado, limitado a 3, para o dia do deploy não abrir uma segunda franquia para a mesma rede.
+
+O login Google não consome a cota de jogos novos por rede, de propósito: ele é a saída para quem compartilha a rede com muita gente (CGNAT de operadora, Wi-Fi de escola ou escritório) e encontrou o limite anônimo esgotado. A identidade Google continua ligada a um único jogador por `provider + subject`, e as cotas por jogador valem igualmente para essa sessão. O smoke `back/scripts/vote-abuse-smoke.mjs` prova que um subject novo sem token entra mesmo com a rede esgotada, sem criar nem alterar contador de rede. Fechar essa saída, ou dar a ela uma cota própria, exige nova decisão versionada.
+
+As recusas de criação de jogador são contadas na tabela agregada `quota_rejections_daily` (`day`, `scope`, `code`, `count`), fora da transação revertida. Ela não guarda IP, pseudônimo de rede, jogador nem token, e é retida por 400 dias para comparar períodos; os contadores por rede continuam sendo apagados depois de 8 dias.
+
 O pseudônimo de rede é `HMAC-SHA-256(identidade de rede normalizada, VOTER_NETWORK_SECRET)`. IPv4 usa o endereço canônico; IPv6 usa o prefixo `/64`, para que endereços temporários da mesma rede não multipliquem cotas. Entradas de proxy que não sejam IP válidos caem numa identidade comum e não podem fabricar pseudônimos arbitrários. A cota de emissão por rede não é usada sozinha: ela limita a multiplicação de tokens, enquanto as cotas persistentes por jogador limitam a escrita. O segredo deve ser próprio do ambiente de produção e não pode ser versionado.
 
-Alterar qualquer número exige nova decisão versionada, teste e registro no handoff; não é ajuste operacional silencioso.
+Alterar qualquer número exige nova decisão versionada, teste e registro no handoff; não é ajuste operacional silencioso. A revisão do limite de 3 jogos novos por rede é a decisão Q4 da issue #277 e continua pendente; a versão 3 muda só a janela e a contagem das recusas.
 
 ## Origem e proxy
 
@@ -51,6 +57,9 @@ Alterar qualquer número exige nova decisão versionada, teste e registro no han
 - Contadores de cota ficam no PostgreSQL, portanto reinício da API e múltiplas réplicas não reiniciam nem dividem o limite.
 
 ## Contrato de confirmação no aplicativo
+
+- Abrir a capa, navegar e entrar nos quizzes não escreve nada na API. O jogador anônimo só é criado na primeira ação que precisa de identidade (jogar a rodada, entrar no duelo ou na arena da corrida); uma chave já salva é apenas lida.
+- HTTP 429 com `PLAYER_ISSUANCE_LIMIT` na criação do jogador mostra mensagem própria na capa, com `Entrar com Google` e o horário de liberação, sem o texto de falha de conexão.
 
 - `ready`: as quatro cartas estão ativas e nenhuma tentativa está pendente.
 - `sending`: rodada, vencedor e quatro IDs ficam congelados; cartas e troca são bloqueadas, sem avanço de contador.

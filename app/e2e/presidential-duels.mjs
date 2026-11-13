@@ -23,7 +23,8 @@ try {
       requests = [],
       pools = new Map(),
       receipts = new Map();
-    let dropFirst = true;
+    let dropFirst = true,
+      playerPosts = 0;
     page.on("pageerror", (e) => errors.push(e.message));
     const poolFor = (topic) => {
       if (!pools.has(topic))
@@ -72,8 +73,10 @@ try {
       const url = new URL(route.request().url()),
         path = url.pathname;
       const send = (json, status = 200) => route.fulfill({ status, json });
-      if (path === "/api/player")
+      if (path === "/api/player") {
+        playerPosts++;
         return send({ recoveryKey: "pm2_" + "a".repeat(43) }, 201);
+      }
       if (path === "/api/player/state")
         return send(snapshot(url.searchParams.get("topic")));
       if (path !== "/api/round-vote")
@@ -143,12 +146,12 @@ try {
       }
       return send(payload);
     });
-    await page.goto(new URL("duelos-da-corrida.html", base).href);
-    await page.waitForFunction(
-      () =>
-        document.querySelectorAll('[data-card][aria-disabled="false"]')
-          .length === 4,
-    );
+    await page.goto(new URL("duelos-da-corrida.html", base).href, {
+      waitUntil: "networkidle",
+    });
+    // Desde a #282 a capa da arena abre sem criar jogador; a identidade nasce
+    // ao entrar na arena, logo abaixo.
+    assert.equal(playerPosts, 0);
     if (screenshots)
       await page.screenshot({
         path: `${screenshots}/${kind}-${viewport.width}-inicio.png`,
@@ -164,6 +167,12 @@ try {
     );
     await page.locator("#race-sound").click();
     await page.locator("#race-start").click();
+    await page.waitForFunction(
+      () =>
+        document.querySelectorAll('[data-card][aria-disabled="false"]')
+          .length === 4,
+    );
+    assert.equal(playerPosts, 1);
     const cards = page.locator("#race-table [data-card]");
     assert.equal(await cards.count(), 4);
     const profile = page.locator("[data-profile]").first();

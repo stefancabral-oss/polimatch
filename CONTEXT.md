@@ -188,3 +188,10 @@ Stefan autorizou validar a pauta do Mentiras do Lula contra documentos e dados
 originais e incorporar as conclusões sustentadas. Estágio 34 registra 13 itens
 do debate e oito anteriores; edição 4 preserva versões/progresso e restringe
 o selo aos recortes verificáveis. Sem transformar ausência de prova em falso.
+
+## Primeira visita sem jogador — issue #282
+Auditoria de maturidade de 30/10/2026, bloqueio B4. Estágio 40: capa,
+navegação e quizzes abrem sem escrita no servidor; o jogador anônimo nasce na
+primeira jogada. A recusa da cota de jogos novos por rede tem aviso próprio,
+com login Google e horário de liberação, e a janela passa ao dia editorial.
+O limite de 3 por rede continua até a decisão Q4 da #277.

@@ -50,6 +50,7 @@ const page = await context.newPage();
 const pageErrors = [];
 let playerSequence = 0;
 let resultRequests = 0;
+const resultAuthorizations = [];
 let holdNextResults = false;
 let releaseHeldResults = null;
 page.on("pageerror", (error) => pageErrors.push(error.message));
@@ -84,6 +85,7 @@ await page.route((url) => url.pathname.startsWith("/api/"), async (route) => {
   if (pathname === "/api/auth/logout" && request.method() === "POST") return route.fulfill({ status: 204 });
   if (pathname === "/api/daily-prediction-results") {
     resultRequests += 1;
+    resultAuthorizations.push(request.headers().authorization || "");
     if (holdNextResults) {
       holdNextResults = false;
       await new Promise((resolve) => { releaseHeldResults = resolve; });
@@ -106,6 +108,14 @@ async function waitForResultRequest(expected) {
 
 try {
   await page.goto(appUrl, { waitUntil: "networkidle" });
+
+  // Desde a #282 o jogador anônimo só nasce na primeira jogada. Jogar a rodada
+  // do dia cria a credencial anônima que este teste precisa trocar no meio do load.
+  assert.equal(playerSequence, 0, "a capa criou jogador sem interação");
+  await page.getByRole("button", { name: "Jogar rodada do dia" }).first().click();
+  await page.getByRole("heading", { name: "Você fechou a rodada." }).waitFor();
+  assert.equal(playerSequence, 1);
+  await page.locator('[data-screen="topics"]').click();
 
   // Login enquanto a credencial anônima ainda aguarda o placar antigo.
   holdNextResults = true;
@@ -135,10 +145,23 @@ try {
   await page.getByRole("button", { name: "Entrar com Google" }).waitFor();
   releaseHeldResults();
   await page.getByRole("heading", { name: "Ainda não há recorte fechado." }).waitFor();
+  // Fora do duelo, sair não cria outro jogador anônimo: sem identidade, o
+  // placar abre vazio e não envia a sessão revogada.
+  assert.equal(playerSequence, 1, "o logout fora do duelo criou jogador anônimo");
+  await page.locator('[data-screen="topics"]').click();
+  await page.getByRole("button", { name: "Meu placar de apostas" }).click();
+  await page.getByRole("heading", { name: "Ainda não há recorte fechado." }).waitFor();
+  assert.equal(resultRequests, 3, "o placar sem identidade consultou o servidor");
+  // A sessão anônima seguinte nasce na próxima jogada e abre o próprio placar.
+  await page.locator('[data-screen="topics"]').click();
+  await page.getByRole("button", { name: "Jogar rodada do dia" }).first().click();
+  await page.getByRole("heading", { name: "Você fechou a rodada." }).waitFor();
+  assert.equal(playerSequence, 2);
   await page.locator('[data-screen="topics"]').click();
   await page.getByRole("button", { name: "Meu placar de apostas" }).click();
   await waitForResultRequest(4);
   await page.getByRole("heading", { name: "Ainda não há recorte fechado." }).waitFor();
+  assert.equal(resultAuthorizations.at(-1), "Bearer pm2_identity_2", "o placar da sessão seguinte usou outra credencial");
 
   assert.deepEqual(pageErrors, []);
   console.log(`${browserName}: login/logout durante load não prendem o placar da identidade seguinte`);
