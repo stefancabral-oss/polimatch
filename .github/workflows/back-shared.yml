@@ -1,19 +1,9 @@
 name: Backend and Shared
 
+# Chamado por ci.yml (pull_request filtrado por caminho, push para main sem filtro);
+# workflow_dispatch continua disponível para execução manual.
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'back/**'
-      - 'shared/**'
-      - 'stages/10_rebuild_eleicoes_2026/input/polimatch-catalogo-125.json'
-      - 'stages/10_rebuild_eleicoes_2026/input/polimatch-perfis-editoriais-125.json'
-      - 'stages/10_rebuild_eleicoes_2026/input/polimatch-taxonomia-125.json'
-      - 'docs/editorial/**'
-      - 'package.json'
-      - '.dockerignore'
-      - 'scripts/ops/**'
-      - '.github/workflows/back-shared.yml'
+  workflow_call:
   workflow_dispatch:
 
 permissions:
@@ -51,7 +41,7 @@ jobs:
       - name: Build API image and verify recovered photographs are packaged
         run: |
           docker build --file back/Dockerfile --build-arg SOURCE_COMMIT="$GITHUB_SHA" --tag polimatch-api:recovery .
-          docker run --rm --entrypoint node polimatch-api:recovery --input-type=module -e 'import assert from "node:assert/strict"; import {PRODUCTION_CANDIDATE_REGISTRY as registry} from "./src/candidates.js"; import {EMBEDDED_RELEASE_REVISION} from "./src/release-identity.js"; assert.equal(registry.candidatesForTopic("eleicoes-2026").length,54); assert.match(EMBEDDED_RELEASE_REVISION,/^[a-f0-9]{40}$/); console.log("54 verified photographs and release identity packaged");'
+          docker run --rm --env EXPECTED_RELEASE="$GITHUB_SHA" --entrypoint node polimatch-api:recovery --input-type=module -e 'import assert from "node:assert/strict"; import {PRODUCTION_CANDIDATE_REGISTRY as registry} from "./src/candidates.js"; import {EMBEDDED_RELEASE_REVISION} from "./src/release-identity.js"; assert.equal(registry.candidatesForTopic("eleicoes-2026").length,54); assert.match(EMBEDDED_RELEASE_REVISION,/^[a-f0-9]{40}$/); assert.equal(EMBEDDED_RELEASE_REVISION,process.env.EXPECTED_RELEASE); console.log("54 verified photographs and release identity packaged");'
       - name: Verify API image excludes integration smokes and test support
         run: |
           docker run --rm --entrypoint ls polimatch-api:recovery scripts | tee "$RUNNER_TEMP/image-scripts.txt"

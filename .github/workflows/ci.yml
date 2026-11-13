@@ -1,0 +1,154 @@
+name: CI
+
+# Ponto único de entrada do CI. Em pull_request, o job `changes` decide quais
+# suítes rodar; em push para main e em execução manual, todas rodam, sem filtro
+# de caminho. O `ci-gate` sempre roda e é o único check que o ruleset de main
+# precisa exigir (docs/ops/RELEASE.md).
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    name: changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      back_shared: ${{ steps.filter.outputs.back_shared }}
+      design: ${{ steps.filter.outputs.design }}
+      ui_smoke: ${{ steps.filter.outputs.ui_smoke }}
+      planning: ${{ steps.filter.outputs.planning }}
+    steps:
+      - name: Detect changed areas in the pull request
+        id: filter
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          filters: |
+            back_shared:
+              - 'back/**'
+              - 'shared/**'
+              # Testes do back importam o módulo de retratos do app e leem o B02 do estágio 17.
+              - 'app/src/photos.js'
+              - 'stages/17_candidate_news/output/**'
+              # A API confere o sha256 dos retratos e a imagem copia a pasta; o
+              # .dockerignore define o contexto do docker build da API.
+              - 'app/public/portraits/**'
+              - '.dockerignore'
+              - 'stages/10_rebuild_eleicoes_2026/input/polimatch-catalogo-125.json'
+              - 'stages/10_rebuild_eleicoes_2026/input/polimatch-perfis-editoriais-125.json'
+              - 'stages/10_rebuild_eleicoes_2026/input/polimatch-taxonomia-125.json'
+              - 'docs/editorial/**'
+              - 'package.json'
+              # O backup e o ensaio de restauração rodam na suíte de PostgreSQL.
+              - 'scripts/ops/**'
+              - '.github/workflows/back-shared.yml'
+              - '.github/workflows/ci.yml'
+            design:
+              - 'app/**'
+              - 'shared/**'
+              # Testes do app leem fontes do back e evidências dos estágios 23 e 29.
+              - 'back/src/**'
+              - 'stages/23_chromas_104/output/artwork/**'
+              - 'stages/29_political_chromas/output/**'
+              - '.dockerignore'
+              # edge-delivery.test.js confere que os ícones do PWA não estão ignorados.
+              - '.gitignore'
+              - 'CREDITS.md'
+              - 'docs/design/**'
+              - 'stages/12_quality_gate_main/evidence/card-art-pilot-176/**'
+              - 'stages/12_quality_gate_main/output/card-art-pilot-176*'
+              - 'stages/12_quality_gate_main/output/card-art-pilot-results.json'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-176.*'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-generation-contract.schema.json'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-participant-response.schema.json'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-receipt-registry.schema.json'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-recognition-rules.schema.json'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-response-bundle.schema.json'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-results.schema.json'
+              # ci-workflows.test.js lê todos os workflows e o ruleset de main.
+              - '.github/workflows/**'
+              - 'docs/ops/ruleset-main.json'
+            ui_smoke:
+              - 'app/**'
+              # `shared/` entra no bundle do app (domain.js importa elo.js), então
+              # mudanças ali mudam o que este smoke exercita. `back/` fica de fora de
+              # propósito: o servidor aqui é simulado, e incluí-lo daria a impressão de
+              # uma cobertura de back que estes testes não têm.
+              - 'shared/**'
+              - 'docs/design/CARD_ART_NEUTRALITY_GUIDE.md'
+              - 'stages/12_quality_gate_main/evidence/card-art-pilot-176/**'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-176.*'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-generation-contract.schema.json'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-participant-response.schema.json'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-receipt-registry.schema.json'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-recognition-rules.schema.json'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-response-bundle.schema.json'
+              - 'stages/12_quality_gate_main/references/card-art-pilot-results.schema.json'
+              - '.github/workflows/ui-interaction-smoke.yml'
+              - '.github/workflows/ci.yml'
+            planning:
+              - 'stages/17_candidate_news/**'
+              - '.github/workflows/civic-planning.yml'
+              - '.github/workflows/ci.yml'
+
+  back-shared:
+    name: back-shared
+    needs: changes
+    if: github.event_name != 'pull_request' || needs.changes.outputs.back_shared == 'true'
+    uses: ./.github/workflows/back-shared.yml
+    secrets: inherit
+
+  design-validator:
+    name: design-validator
+    needs: changes
+    if: github.event_name != 'pull_request' || needs.changes.outputs.design == 'true'
+    uses: ./.github/workflows/design-validator.yml
+
+  ui-interaction-smoke:
+    name: ui-interaction-smoke
+    needs: changes
+    if: github.event_name != 'pull_request' || needs.changes.outputs.ui_smoke == 'true'
+    uses: ./.github/workflows/ui-interaction-smoke.yml
+
+  civic-planning:
+    name: civic-planning
+    needs: changes
+    if: github.event_name != 'pull_request' || needs.changes.outputs.planning == 'true'
+    uses: ./.github/workflows/civic-planning.yml
+
+  ci-gate:
+    name: ci-gate
+    if: always()
+    needs: [changes, back-shared, design-validator, ui-interaction-smoke, civic-planning]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every job to pass or be skipped by the path filter
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          # ci-gate:begin
+          set -euo pipefail
+          # Em pull_request, "skipped" quer dizer que o filtro de caminho dispensou
+          # a suíte. Em push e em execução manual tudo precisa rodar e passar.
+          allowed='["success"]'
+          if [ "$EVENT_NAME" = "pull_request" ]; then allowed='["success","skipped"]'; fi
+          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
+          blocked="$(echo "$NEEDS" | jq -r --argjson allowed "$allowed" '[to_entries[] | select(.value.result | IN($allowed[]) | not) | .key] | join(", ")')"
+          if [ -n "$blocked" ]; then
+            echo "::error::ci-gate bloqueado por: $blocked"
+            exit 1
+          fi
+          echo "ci-gate: todos os jobs necessários passaram ou foram dispensados pelo filtro de caminho."
+          # ci-gate:end

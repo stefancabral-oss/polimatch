@@ -7,6 +7,7 @@ import {
   MAX_REPORTS_PER_PAGE,
   beaconSender,
   buildClientErrorReport,
+  entryScriptBuild,
   installErrorReporter,
   releaseBuild,
   scrubText,
@@ -146,15 +147,47 @@ test("every page entry installs the reporter before any other module", async () 
   }
 });
 
-test("build do relato vem da meta do release e, sem ela, da versão de assets", () => {
-  const withMeta = {
-    querySelector: (selector) => (selector === 'meta[name="polimatch-release"]'
-      ? { getAttribute: (name) => (name === "content" ? SHA : null) }
-      : null),
+function fakeDocument({ release = null, entry = null } = {}) {
+  const element = (attribute, value) => (value === null ? null : { getAttribute: (name) => (name === attribute ? value : null) });
+  return {
+    querySelector: (selector) => {
+      if (selector === 'meta[name="polimatch-release"]') return element("content", release);
+      if (selector === 'script[type="module"][src]') return element("src", entry);
+      return null;
+    },
   };
-  assert.equal(releaseBuild(withMeta, "lq2x0abc"), SHA);
-  assert.equal(releaseBuild({ querySelector: () => null }, "lq2x0abc"), "lq2x0abc");
-  const emptyMeta = { querySelector: () => ({ getAttribute: () => "" }) };
-  assert.equal(releaseBuild(emptyMeta, "lq2x0abc"), "lq2x0abc");
+}
+
+test("build do relato vem da meta do release e, sem o SHA, do fallback", () => {
+  assert.equal(releaseBuild(fakeDocument({ release: SHA }), "main-BBiuPtfp"), SHA);
+  assert.equal(releaseBuild(fakeDocument(), "main-BBiuPtfp"), "main-BBiuPtfp");
+  assert.equal(releaseBuild(fakeDocument({ release: "" }), "main-BBiuPtfp"), "main-BBiuPtfp");
+  // O build que não recebe SOURCE_COMMIT grava "unknown" na meta (ICM 45).
+  assert.equal(releaseBuild(fakeDocument({ release: "unknown" }), "main-BBiuPtfp"), "main-BBiuPtfp");
   assert.equal(releaseBuild(undefined), "unknown");
+});
+
+test("sem o SHA, o build do relato é o nome com hash do script de entrada da página", () => {
+  assert.equal(entryScriptBuild(fakeDocument({ entry: "./assets/main-BBiuPtfp.js" })), "main-BBiuPtfp");
+  assert.equal(entryScriptBuild(fakeDocument({ entry: "https://polimatch.com.br/assets/quoteQuiz-Bm3wRaBp.js?v=1#x" })), "quoteQuiz-Bm3wRaBp");
+  assert.equal(entryScriptBuild(fakeDocument({ entry: "/src/main.js" })), "main");
+  assert.equal(entryScriptBuild(fakeDocument({ entry: "./assets/nome com espaço.js" })), "unknown");
+  assert.equal(entryScriptBuild(fakeDocument({ entry: `./assets/${"a".repeat(65)}.js` })), "unknown");
+  assert.equal(entryScriptBuild(fakeDocument()), "unknown");
+  assert.equal(entryScriptBuild(undefined), "unknown");
+});
+
+test("cada página tem um único script de módulo, o de entrada, que dá nome ao build sem SHA", async () => {
+  for (const page of ["index.html", "quem-disse-isso.html", "fato-ou-fake.html", "duelos-da-corrida.html"]) {
+    const html = await readFile(new URL(`../${page}`, import.meta.url), "utf8");
+    const moduleScripts = [...html.matchAll(/<script\b[^>]*\btype="module"[^>]*>/g)].map(([tag]) => tag);
+    assert.equal(moduleScripts.length, 1, page);
+    assert.match(moduleScripts[0], /\bsrc="\.?\/src\/[a-z-]+\.js"/, page);
+  }
+});
+
+test("o instalador do relato não depende da constante de build que o Vite deixou de definir", async () => {
+  const source = await readFile(new URL("./install-error-reporter.js", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /__POLIMATCH_ASSET_VERSION__/);
+  assert.match(source, /releaseBuild\(window\.document, entryScriptBuild\(window\.document\)\)/);
 });

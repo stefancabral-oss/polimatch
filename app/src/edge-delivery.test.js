@@ -166,7 +166,8 @@ test("the build verifies public references and CI smokes the real nginx image", 
   assert.match(packageJson.scripts.build, /vite build && .*node scripts\/verify-public-refs\.mjs$/);
   // O ICM 45 (#287) acrescenta build-args do release entre o Dockerfile e a tag.
   const build = workflow.search(/docker build --file app\/Dockerfile (?:.* )?--tag polimatch-app:pilot-176 \./);
-  const run = workflow.indexOf("docker run");
+  // O contêiner do smoke, e não o `docker run ... cat` que confere o release.
+  const run = workflow.indexOf("docker run -d --name polimatch-app-smoke");
   const copy = workflow.indexOf("docker cp");
   const smoke = workflow.indexOf("node app/scripts/smoke-nginx.mjs");
   assert.ok(build !== -1 && build < run && run < copy && copy < smoke, "CI must build, run, copy the served dist and then smoke the container");

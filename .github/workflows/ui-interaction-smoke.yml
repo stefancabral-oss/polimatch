@@ -1,25 +1,9 @@
 name: UI Interaction Smoke
 
+# Chamado por ci.yml (pull_request filtrado por caminho, push para main sem filtro);
+# workflow_dispatch continua disponível para execução manual.
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'app/**'
-      # `shared/` entra no bundle do app (domain.js importa elo.js), então
-      # mudanças ali mudam o que este smoke exercita. `back/` fica de fora de
-      # propósito: o servidor aqui é simulado, e incluí-lo daria a impressão de
-      # uma cobertura de back que estes testes não têm.
-      - 'shared/**'
-      - 'docs/design/CARD_ART_NEUTRALITY_GUIDE.md'
-      - 'stages/12_quality_gate_main/evidence/card-art-pilot-176/**'
-      - 'stages/12_quality_gate_main/references/card-art-pilot-176.*'
-      - 'stages/12_quality_gate_main/references/card-art-pilot-generation-contract.schema.json'
-      - 'stages/12_quality_gate_main/references/card-art-pilot-participant-response.schema.json'
-      - 'stages/12_quality_gate_main/references/card-art-pilot-receipt-registry.schema.json'
-      - 'stages/12_quality_gate_main/references/card-art-pilot-recognition-rules.schema.json'
-      - 'stages/12_quality_gate_main/references/card-art-pilot-response-bundle.schema.json'
-      - 'stages/12_quality_gate_main/references/card-art-pilot-results.schema.json'
-      - '.github/workflows/ui-interaction-smoke.yml'
+  workflow_call:
   workflow_dispatch:
 
 jobs:
@@ -53,6 +37,7 @@ jobs:
       - name: Build app and verify pilot evidence isolation
         env:
           VITE_GOOGLE_CLIENT_ID: e2e-client.apps.googleusercontent.com
+          POLIMATCH_REQUIRE_RELEASE: '1'
         run: npm run build --prefix app
 
       - name: Start preview
@@ -68,6 +53,9 @@ jobs:
           done
           cat /tmp/polimatch-vite.log
           exit 1
+
+      - name: Verify release identity served at /version.json
+        run: curl -fsS http://127.0.0.1:4173/version.json | jq -e --arg sha "$GITHUB_SHA" '.sha == $sha'
 
       - name: Validate first visit without player creation and network quota exit
         env:

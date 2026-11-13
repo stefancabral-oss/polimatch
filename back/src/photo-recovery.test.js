@@ -14,7 +14,7 @@ test("all 54 recovered portraits survive the daily snapshot and render as local 
   for (const candidate of snapshot.candidates) {
     const authorized = manifest.photos.find(({ id }) => id === candidate.id);
     assert.equal(candidate.name, authorized.name);
-    assert.equal(candidateCardArt(candidate), `${authorized.image}?v=test`);
+    assert.equal(candidateCardArt(candidate), authorized.image);
     assert.equal(candidate.publication.content.status, "pending");
     assert.equal(candidate.reviewedAt, "");
     assert.equal(candidate.bio, RECOVERY_NOTICE);

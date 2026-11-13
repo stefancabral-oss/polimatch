@@ -5,8 +5,12 @@ export const CLIENT_ERROR_PATH = "/api/client-errors";
 export const MAX_REPORT_BYTES = 2048;
 export const MAX_REPORTS_PER_PAGE = 5;
 // O ICM 45 (#287) grava o SHA do release nesta meta de cada página, e não no
-// JS, para os assets com hash não mudarem a cada commit.
+// JS, para os assets com hash não mudarem a cada commit. O build que não
+// recebe o SHA grava "unknown".
 export const RELEASE_META_NAME = "polimatch-release";
+const UNKNOWN_BUILD = "unknown";
+// Mesmo formato que a API aceita no campo build.
+const BUILD_PATTERN = /^[A-Za-z0-9._-]{1,64}$/;
 
 const LIMITS = Object.freeze({ build: 64, page: 120, message: 300, source: 200, stack: 1200 });
 const TOKEN_PATTERN = /\bpm[2s]_[A-Za-z0-9_-]{16,}/g;
@@ -23,9 +27,21 @@ function withoutQuery(token) {
   return token.slice(0, cut) + suffix;
 }
 
-export function releaseBuild(doc, fallback = "unknown") {
+export function releaseBuild(doc, fallback = UNKNOWN_BUILD) {
   const content = doc?.querySelector?.(`meta[name="${RELEASE_META_NAME}"]`)?.getAttribute("content");
-  return content || fallback;
+  return content && content !== UNKNOWN_BUILD ? content : fallback;
+}
+
+// Nome com hash do script de entrada da página ("main-BBiuPtfp"), para quando o
+// build não recebeu o SHA do commit. Cada página tem o seu, e ele muda quando o
+// JavaScript da página muda; um deploy só de CSS, HTML ou public/ mantém o nome.
+// Cada página construída tem um único script de módulo, o de entrada. No
+// servidor de desenvolvimento o primeiro é o cliente do Vite, e ali o valor não
+// importa.
+export function entryScriptBuild(doc) {
+  const src = doc?.querySelector?.('script[type="module"][src]')?.getAttribute("src") || "";
+  const name = src.split(/[?#]/)[0].split("/").pop().replace(/\.m?js$/, "");
+  return BUILD_PATTERN.test(name) ? name : UNKNOWN_BUILD;
 }
 
 export function scrubText(value, limit) {

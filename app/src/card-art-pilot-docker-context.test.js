@@ -7,14 +7,16 @@ const dockerignoreUrl = new URL("../../.dockerignore", import.meta.url);
 const manifestUrl = new URL("../../stages/12_quality_gate_main/evidence/card-art-pilot-176/manifest.json", import.meta.url);
 const verifierUrl = new URL("../scripts/verify-card-art-pilot-excluded.mjs", import.meta.url);
 const workflowUrl = new URL("../../.github/workflows/design-validator.yml", import.meta.url);
+const ciWorkflowUrl = new URL("../../.github/workflows/ci.yml", import.meta.url);
 const manifestPath = "stages/12_quality_gate_main/evidence/card-art-pilot-176/manifest.json";
 
 test("the root Docker context explicitly supplies the isolation manifest before the app build", async () => {
-  const [dockerfile, dockerignore, verifier, workflow] = await Promise.all([
+  const [dockerfile, dockerignore, verifier, workflow, ciWorkflow] = await Promise.all([
     readFile(dockerfileUrl, "utf8"),
     readFile(dockerignoreUrl, "utf8"),
     readFile(verifierUrl, "utf8"),
-    readFile(workflowUrl, "utf8")
+    readFile(workflowUrl, "utf8"),
+    readFile(ciWorkflowUrl, "utf8")
   ]);
   await access(manifestUrl);
 
@@ -37,8 +39,16 @@ test("the root Docker context explicitly supplies the isolation manifest before 
   assert.equal(finalStage.includes(manifestPath), false, "the evidence manifest must not enter the nginx image");
   assert.match(finalStage, /COPY --from=build \/repo\/app\/dist \/usr\/share\/nginx\/html/);
 
-  assert.match(workflow, /docker build --file app\/Dockerfile --tag polimatch-app:pilot-176 \./);
+  // O build da imagem passa a receber o SHA do commit (estágio 45); o contexto continua a raiz.
+  assert.match(workflow, /docker build --file app\/Dockerfile (?:--build-arg \S+ )*--tag polimatch-app:pilot-176 \./);
+  assert.match(workflow, /--build-arg SOURCE_COMMIT="\$GITHUB_SHA"/);
   assert.match(workflow, /fetch-depth:\s*0/, "provenance tests require the complete Git history");
+  // Os filtros de caminho saíram do design-validator.yml para o job `changes` de ci.yml.
+  const designStart = ciWorkflow.indexOf("\n            design:\n");
+  const designEnd = ciWorkflow.indexOf("\n            ui_smoke:\n");
+  assert.ok(designStart > -1 && designEnd > designStart, "ci.yml must declare the design path filter");
+  const designFilter = ciWorkflow.slice(designStart, designEnd);
+  assert.match(ciWorkflow, /uses: \.\/\.github\/workflows\/design-validator\.yml/);
   for (const trigger of [
     "'app/**'",
     "'shared/**'",
@@ -53,6 +63,6 @@ test("the root Docker context explicitly supplies the isolation manifest before 
     "'stages/12_quality_gate_main/references/card-art-pilot-response-bundle.schema.json'",
     "'stages/12_quality_gate_main/references/card-art-pilot-results.schema.json'"
   ]) {
-    assert.ok(workflow.includes(trigger), `remote Docker gate must run when ${trigger} changes`);
+    assert.ok(designFilter.includes(`- ${trigger}\n`), `remote Docker gate must run when ${trigger} changes`);
   }
 });
