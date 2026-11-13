@@ -305,5 +305,5 @@
     "notRunLocally": "testes do back: dependências não instaladas na máquina da atualização"
   },
   "publication": "not deployed",
-  "humanGate": "not self-approved"
+  "humanGate": "aprovado por instrução do Stefan para este PR em conversa de 13/11/2026, transcrita no PR; merge a cargo do agente com o CI verde; deploy e ações de infraestrutura com o Stefan"
 }

@@ -2,7 +2,7 @@
 
 ## Status
 
-- Estado: `pronto para gate`
+- Estado: `aprovado`
 - Issue: #279
 - Branch: `fix/database-safety` (base main `7c0bb27`; atualizada com a `main`
   em 13/11/2026, ver "Atualização de 13/11/2026")
@@ -246,6 +246,10 @@ commit `7fa8b69`:
 
 ## Human gate
 
-- Decisão: `pendente`
+- Decisão: `aprovado`
 - Responsável: Stefan
-- Observação: nenhum agente aprovou este gate, fez push, merge ou publicou.
+- Observação: aprovado por instrução direta do Stefan para este PR, em
+  conversa de 13/11/2026 ("Pode mesclar o 310"), transcrita no PR. O merge fica
+  a cargo do agente, a pedido dele, com o CI verde. A regra 6 do `AGENTS.md`
+  não muda. Nenhum agente publica em produção: deploy, bucket, agendamento do
+  backup, cofre e ensaio com dump real continuam com o Stefan.
