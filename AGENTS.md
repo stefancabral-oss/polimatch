@@ -47,11 +47,11 @@ Cada Issue deve ter:
 
 ## Estado atual
 
-Desde 12/11/2026 a direção do produto é a pesquisa de preferência por foto, registrada na issue #318 e em `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md`. Antes de propor ou alterar tela, regra de voto ou cadastro, leia esse registro. Nenhuma etapa de produto da direção nova está aberta: cada uma precisa de Issue própria e de gate humano.
+Desde 12/11/2026 a direção do produto é a pesquisa de preferência por foto, registrada na issue #318 e em `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md`. Antes de propor ou alterar tela, regra de voto ou cadastro, leia esse registro e a decisão 0002 (`docs/decisions/0002-ordem-de-construcao-e-cartas-com-moldura.md`), de 13/11/2026, que alterou quatro pontos dele. A primeira etapa de produto da direção nova está aberta: [ICM 68] #324, em `stages/68_photo_survey_politics/`. Cada etapa precisa de Issue própria e de gate humano.
 
-Nada da direção nova está em produção. O programa ativo é o de maturidade (#309), que vem antes de qualquer etapa de produto da pesquisa por foto.
+Nada da direção nova está em produção. O programa de maturidade (#309) continua ativo e corre em paralelo à etapa 1 da pesquisa por foto; nenhum bloqueio dele foi dispensado. Ninguém de fora é chamado antes de o aplicativo estar testado.
 
-A lista abaixo descreve o programa anterior, a reconstrução do frontend, e vale para o que está no ar. Para as telas novas da pesquisa por foto não valem o tema malaquita, os cards em proporção de TCG, a descrição curta na carta e as Chromas como foco visual.
+A lista abaixo descreve o programa anterior, a reconstrução do frontend, e vale para o que está no ar. Para as telas novas da pesquisa por foto não valem o tema malaquita na interface nem a descrição curta na carta. As cartas com moldura valem na tela de voto, desde que todas as cartas de uma pesquisa usem o mesmo padrão (decisão 0002).
 
 O programa ICM anterior é a reconstrução do frontend PoliMatch, com foco em:
 

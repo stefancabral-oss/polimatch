@@ -5,6 +5,7 @@
 - Registrado por: agente (Claude), a pedido dele
 - Issues: #318 ([ICM 67]) e #277 (Q1)
 - Estado: direção aprovada. **Nada desta decisão está em produção.**
+- Alterada em quatro pontos pela [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md), de 13/11/2026. Cada ponto está marcado abaixo.
 
 ## Contexto
 
@@ -27,11 +28,15 @@ o arquivo, ou pausa. O Stefan respondeu com um quarto caminho.
    recortes ficam com quem encomendou a pesquisa.
 5. **O que sai do PoliMatch.** Só a resposta somada. Nunca o dado de uma pessoa.
 6. **Assuntos de abertura.** Política, Famosos e influenciadores, Futebol.
+   (Decisão 0002: a ordem de construção é política, celebridades e
+   influenciadores, roupas. Futebol não foi tratado nela.)
 7. **Congelado.** Os jogos de leitura ("Quem disse isso?", "Fato ou fake?") e a
    parte cívica e de notícias ficam no ar sem trabalho novo.
 8. **Visual das telas novas.** Minimalista: fundo neutro que segue o
    claro/escuro do aparelho, um único verde, foto sem moldura na hora do voto.
    A pessoa pode compartilhar a própria escolha por iniciativa dela.
+   (Alterado pela decisão 0002: na hora do voto vale a carta com moldura, no
+   mesmo padrão para todas as cartas da pesquisa. O resto continua.)
 
 ## O que muda em relação às decisões aprovadas
 
@@ -49,11 +54,11 @@ protótipo aprovado e serão detalhados nessas etapas.
 | Resultado da rodada com variação de pontos nas cartas | `CONTEXT.md`, "Decisões atuais aprovadas" | Sem placar entre telas. O desfecho é a escolha final da pessoa. |
 | Perfil e contexto para escolha informada; descrição curta na carta | `CONTEXT.md`, "Decisões atuais aprovadas" e "Gate final", item 3; `AGENTS.md`, "Estado atual" | Só foto e nome. |
 | Ranking da edição e ranking pessoal como superfícies do produto | `CONTEXT.md`, "Decisões atuais aprovadas" e "Gate final", item 5 | Cada pesquisa tem o próprio resultado. Mostrar os cinco primeiros depende das pendências abaixo. |
-| Chromas na rodada | `CONTEXT.md`, "Rodada diária com Chromas e encaixe no iPhone" (#265); `AGENTS.md`, "Estado atual" | Na hora do voto a foto aparece igual para todos, sem moldura. A personalização fica na coleção. |
+| Chromas na rodada | `CONTEXT.md`, "Rodada diária com Chromas e encaixe no iPhone" (#265); `AGENTS.md`, "Estado atual" | Na hora do voto a foto aparece igual para todos, sem moldura. A personalização fica na coleção. Alterado pela decisão 0002: carta com moldura, no mesmo padrão para todas. |
 | Capa presidencial | `CONTEXT.md`, "Capa presidencial" (#261) | A entrada passa a ser a próxima pesquisa aberta. |
 | Somente `Eleições 2026` ativo como assunto | `CONTEXT.md`, "Decisões atuais aprovadas" | Abre com três assuntos: Política, Famosos e influenciadores, Futebol. |
 | Rodada do dia como centro do produto | `README.md`, "Produto atual" | Pesquisas com começo e fim, abertas por uma janela de dias. |
-| Direção de arte `Malaquita 2026 / Digital First` | `CONTEXT.md`, "Decisões atuais aprovadas"; `README.md`, "Produto atual"; `AGENTS.md`, "Estado atual" | Continua valendo para o que está no ar. Nas telas novas: fundo neutro, um único verde, foto sem moldura. |
+| Direção de arte `Malaquita 2026 / Digital First` | `CONTEXT.md`, "Decisões atuais aprovadas"; `README.md`, "Produto atual"; `AGENTS.md`, "Estado atual" | Continua valendo para o que está no ar. Nas telas novas: fundo neutro, um único verde, foto sem moldura. Alterado pela decisão 0002: a carta tem moldura; a tela continua neutra. |
 
 ## O que continua valendo
 
@@ -99,7 +104,8 @@ Nada abaixo fica liberado por esta decisão. As respostas marcadas como
   [ICM 36] a [ICM 44] vêm antes de qualquer etapa de produto da pesquisa, com
   uma exceção: a troca das fotos de pessoas públicas ([ICM 42] #284) é
   pré-requisito da monetização, não do lançamento gratuito. O registro por
-  foto da mesma issue segue agora.
+  foto da mesma issue segue agora. (Alterada pela decisão 0002: a etapa 1 da
+  pesquisa, [ICM 68] #324, começa em paralelo. Os bloqueios continuam abertos.)
 - **Processo (Q6 da #277).** Proposta do agente, a confirmar pelo Stefan,
   porque muda a forma como a aprovação dele vale: aprovação por comentário ou
   por instrução dele transcrita no PR, sem travar o fluxo; e o código do
@@ -116,6 +122,9 @@ Ainda não abertas. Depois dos bloqueios de maturidade: medir o uso
 ([ICM 60] #302), depois o servidor da pesquisa e por fim as telas. A
 [ICM 65] #307 divide o `topic-store.js` e deveria vir antes do servidor da
 pesquisa.
+
+Alterado pela decisão 0002: a primeira etapa de produto é a [ICM 68] #324, que
+traz regras, servidor e tela da primeira pesquisa em módulos próprios.
 
 ## Referências
 
