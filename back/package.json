@@ -10,7 +10,8 @@
     "start": "node src/server.js",
     "test": "node --test src/*.test.js",
     "test:integration": "node scripts/topic-store-smoke.mjs",
-    "test:abuse": "node scripts/vote-abuse-smoke.mjs"
+    "test:abuse": "node scripts/vote-abuse-smoke.mjs",
+    "test:resilience": "node scripts/api-resilience-smoke.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -20,6 +21,6 @@
     "saxes": "6.0.0"
   },
   "overrides": {
-    "qs": "^6.16.0"
+    "qs": "^6.17.1"
   }
 }

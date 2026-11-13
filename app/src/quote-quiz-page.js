@@ -1,3 +1,4 @@
+import './install-error-reporter.js';
 import './quote-quiz.css';
 import './fact-check.css';
 import './quote-quiz-checked.css';

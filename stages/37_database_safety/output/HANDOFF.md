@@ -102,8 +102,10 @@ Commits:
 6. **Cofre:** copiar `VOTER_NETWORK_SECRET` e as demais variáveis listadas em
    `docs/ops/DR.md` para o cofre de senhas.
 7. **Revisão:** se a branch estiver ok, push, PR, CI verde e merge.
-   Depois do deploy, conferir no log da API a linha
-   `PostgreSQL Eleições 2026 inicializado` com `resetApplied: false`.
+   Depois do deploy, conferir no log da API a linha de início com
+   `resetApplied: false`. Desde o estágio 39 ela é JSON, com
+   `"event":"database_ready"`; antes era `PostgreSQL Eleições 2026
+   inicializado`.
 
 ## Testes executados
 

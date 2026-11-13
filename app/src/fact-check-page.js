@@ -1,3 +1,4 @@
+import './install-error-reporter.js';
 import './quote-quiz.css';
 import './fact-check.css';
 import {FACT_EDITION as edition} from './fact-check-data.js';

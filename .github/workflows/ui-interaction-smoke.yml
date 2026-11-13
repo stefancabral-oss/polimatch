@@ -199,3 +199,9 @@ jobs:
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
         run: node app/e2e/main-navigation.mjs
+
+      - name: Report forced browser errors to the API without player data
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+          POLIMATCH_E2E_EXPECT_BUILD: ${{ github.sha }}
+        run: node app/e2e/client-error-report.mjs

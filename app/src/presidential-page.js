@@ -1,3 +1,4 @@
+import "./install-error-reporter.js";
 import "./presidential.css";
 import "./tcg-card.css";
 import { installInauguralChromas } from './inaugural-chromas.js';
