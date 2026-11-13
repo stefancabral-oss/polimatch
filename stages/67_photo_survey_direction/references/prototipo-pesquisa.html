@@ -143,6 +143,12 @@ input:disabled{background:var(--bg2);color:var(--muted)}
 .sheet{width:100%;background:var(--bg);border-radius:24px 24px 0 0;display:flex;flex-direction:column;gap:8px;animation:up .3s cubic-bezier(.2,.8,.2,1);padding-top:22px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .sheet .btn.primary{margin-top:10px}
 .shead{display:flex;justify-content:space-between;align-items:center}
+.scrim.noan,.scrim.noan .sheet{animation:none}
+.sheet .set .rt{gap:2px}
+.sheet input{margin-top:10px}
+.linkbox{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--bg2);border-radius:14px;padding:14px;margin-top:10px;font-size:15px}
+.linkbox span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;-webkit-user-select:all;user-select:all}
+.special{background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
 .pcard{display:block;height:min(38vh,320px);aspect-ratio:9/16;margin:8px auto 0;border-radius:14px;border:1px solid var(--line)}
 .toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:500;width:max-content;max-width:calc(100% - 32px);text-align:center;animation:fade .2s;z-index:5}
 
@@ -211,6 +217,7 @@ var I={
   home:'<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>',
   grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
   user:'<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.6 3.5-5.5 6.5-5.5s5.5 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.6c2.3.2 3.8 1.8 4.5 4.4"/>',
   back:'<path d="M15 5l-7 7 7 7"/>',
   x:'<path d="M6 6l12 12M18 6L6 18"/>',
   check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
@@ -222,8 +229,8 @@ var I={
 };
 function ic(n,s){s=s||22;return '<svg class="ic" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+I[n]+'</svg>'}
 
-var S={tab:'home',view:'home',cur:null,runs:{},reg:false,asked:false,sound:true,hint:true,notify:{},sheet:null,after:null,form:{age:'',gen:'',uf:''},err:''};
-var busy=false,lastKey='',toastEl=null,tt=0,ac=null;
+var S={tab:'home',view:'home',cur:null,runs:{},reg:false,asked:false,sound:true,hint:true,notify:{},novas:false,canal:'push',refs:0,sheet:null,after:null,form:{age:'',gen:'',uf:''},err:''};
+var busy=false,lastKey='',lastSheet=null,toastEl=null,tt=0,ac=null,REFLINK='polimatch.com.br/c/7K2QF';
 
 function tone(f,t0,d){try{if(!S.sound)return;var C=window.AudioContext||window.webkitAudioContext;if(!C)return;ac=ac||new C();if(ac.state==='suspended')ac.resume();var o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+t0;o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(.07,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+.03)}catch(e){}}
 function blip(){tone(740,0,.09)}
@@ -274,7 +281,15 @@ var A={
   post:function(){S.sheet=null;render();toast('Na versão real, abre o compartilhamento do celular.')},
   invite:function(){S.sheet=null;render();toast('Na versão real, isto envia só o link da pesquisa.')},
   rechamp:function(){run(S.cur).step=4;S.view='vote';render()},
-  notify:function(){S.notify[S.cur]=!S.notify[S.cur];render()},
+  notify:function(){if(!S.notify[S.cur])S.notify[S.cur]=true;S.sheet='avisos';render()},
+  avisos:function(){if(!nextSurvey())S.novas=true;S.sheet='avisos';render()},
+  avres:function(){S.notify[S.cur]=!S.notify[S.cur];render()},
+  avnov:function(){S.novas=!S.novas;render()},
+  canal:function(v){S.canal=v;render()},
+  indicar:function(){S.sheet='indicar';render()},
+  copy:function(){try{navigator.clipboard.writeText(REFLINK).then(function(){toast('Link copiado.')},function(){toast('Segure o link para copiar.')})}catch(e){toast('Segure o link para copiar.')}},
+  sendinv:function(){toast('Na versão real, abre o compartilhamento do celular.')},
+  simref:function(){if(S.refs<3)S.refs++;render();toast(S.refs>=3?'Carta especial liberada.':'Um amigo se cadastrou pelo seu link.')},
   cpf:function(){S.after=S.view==='close'?'close':'me';S.view='cpf';render()},
   sheetyes:function(){S.sheet=null;S.after='next';S.view='cpf';render()},
   sheetno:function(){var s=S.sheet;S.sheet=null;if(s==='cpf')goNext();else render()},
@@ -287,7 +302,7 @@ var A={
     if(af==='next')goNext();else if(af==='close'){S.view='close';render()}else{S.view=S.tab='me';render()}
     toast('Pronto. Seu voto agora conta.');
   },
-  reset:function(){S.runs={};S.reg=false;S.asked=false;S.hint=true;S.notify={};S.form={age:'',gen:'',uf:''};S.cur=null;S.err='';S.view=S.tab='home';render();toast('Demonstração recomeçada.')}
+  reset:function(){S.runs={};S.reg=false;S.asked=false;S.hint=true;S.notify={};S.novas=false;S.canal='push';S.refs=0;S.form={age:'',gen:'',uf:''};S.cur=null;S.err='';S.view=S.tab='home';render();toast('Demonstração recomeçada.')}
 };
 
 function home(){
@@ -297,7 +312,7 @@ function home(){
     var r=S.runs[nx.id],started=r&&picked(r)>0;
     var ids=r?r.groups[0]:SETS[nx.set].slice(0,4).map(function(x){return x.id});
     hero='<section class="hero" data-a="open" data-v="'+nx.id+'"><div class="lineup">'+ids.map(function(id){return'<span class="art">'+art(id)+'</span>'}).join('')+'</div><div class="htx"><span class="sub">'+nx.topic+'</span><h1 class="hq">'+nx.q+'</h1></div><button class="btn primary" data-a="open" data-v="'+nx.id+'">'+(started?'Continuar':'Começar')+'</button></section>';
-  }else hero='<section class="hero done"><h1 class="hq">Você respondeu tudo</h1><p class="sub lead">São três pesquisas novas por semana. A próxima chega na terça.</p></section>';
+  }else hero='<section class="hero done"><h1 class="hq">Você respondeu tudo</h1><p class="sub lead">São três pesquisas novas por semana. A próxima chega na terça.</p><button class="btn ghost" data-a="avisos">'+(S.novas?'Aviso ligado':'Avisar quando chegar')+'</button></section>';
   var rows=SURVEYS.filter(function(s){return !nx||s.id!==nx.id}).map(function(s){
     var r=S.runs[s.id],th=SETS[s.set][0].id,sub=s.topic,st;
     if(r&&r.done){th=r.champ;sub+=' · '+ITEMS[r.champ].name;st='<span class="st ok" aria-label="Respondida">'+ic('check',20)+'</span>'}
@@ -308,6 +323,7 @@ function home(){
   return '<header class="top"><span class="brand">PoliMatch</span><button class="icb" data-a="sound" aria-label="'+(S.sound?'Desligar som':'Ligar som')+'">'+ic(S.sound?'sound':'mute')+'</button></header>'+
     '<section class="week"><div class="rowx"><span class="lbl">Esta semana</span><span class="sub">'+n+' de 3</span></div><div class="segs acc">'+segs+'</div></section>'+hero+
     (rows?'<section><h2 class="h2">Mais pesquisas</h2><ul class="list">'+rows+'</ul></section>':'')+
+    '<button class="teaser" data-a="indicar">'+ic('users',22)+'<span class="tz"><b>Indique amigos</b><span class="sub">'+(S.refs>=3?'Carta especial liberada.':'3 amigos cadastrados liberam uma carta especial.')+'</span></span><span class="st">'+Math.min(S.refs,3)+' de 3</span></button>'+
     '<p class="foot">Demonstração com nomes e rostos fictícios.</p>';
 }
 function vote(){
@@ -337,13 +353,15 @@ function closeV(){
 function col(){
   var done=SURVEYS.filter(function(s){return isDone(s.id)});
   var head='<header class="top"><h1 class="title">Coleção</h1><span class="sub">'+done.length+' de '+SURVEYS.length+'</span></header>';
+  var sp=S.refs>=3?'<div class="card"><span class="art special"><span>'+ic('spark',44)+'</span></span><span class="rq">Carta especial</span><span class="sub">Você trouxe 3 amigos</span></div>':'';
+  if(sp)return head+'<div class="cards">'+sp+done.map(function(s){var c=ITEMS[S.runs[s.id].champ];return '<button class="card" data-a="open" data-v="'+s.id+'"><span class="art">'+art(c.id)+'</span><span class="rq">'+c.name+'</span><span class="sub">'+s.q+'</span></button>'}).join('')+'</div>';
   if(!done.length)return head+'<div class="empty"><h2 class="hq">Seus campeões ficam aqui</h2><p class="sub lead">Cada pesquisa que você termina vira uma carta.</p><button class="btn primary" data-a="open" data-v="'+SURVEYS[0].id+'">Responder a primeira</button></div>';
   return head+'<div class="cards">'+done.map(function(s){var c=ITEMS[S.runs[s.id].champ];return '<button class="card" data-a="open" data-v="'+s.id+'"><span class="art">'+art(c.id)+'</span><span class="rq">'+c.name+'</span><span class="sub">'+s.q+'</span></button>'}).join('')+'</div>';
 }
 function me(){
   return '<header class="top"><h1 class="title">Perfil</h1></header>'+
     '<section class="box">'+(S.reg?'<h2 class="hq sm">'+ic('check',20)+'Seu voto conta</h2><p class="sub lead">Cadastro feito. Um CPF, um voto.</p>':'<h2 class="hq sm">Seu voto ainda não conta</h2><p class="sub lead">Você pode jogar à vontade. Para entrar nas pesquisas, cadastre o CPF.</p><button class="btn primary" data-a="cpf">Cadastrar</button>')+'</section>'+
-    '<section><button class="set" data-a="sound" role="switch" aria-checked="'+(S.sound?'true':'false')+'"><span>Som</span><span class="sw'+(S.sound?' on':'')+'"></span></button><button class="set" data-a="reset"><span>Recomeçar a demonstração</span></button></section>'+
+    '<section><button class="set" data-a="sound" role="switch" aria-checked="'+(S.sound?'true':'false')+'"><span>Som</span><span class="sw'+(S.sound?' on':'')+'"></span></button><button class="set" data-a="avisos"><span>Avisos</span><span class="sub">'+(S.novas?'Ligados':'Desligados')+'</span></button><button class="set" data-a="indicar"><span>Indique amigos</span><span class="sub">'+Math.min(S.refs,3)+' de 3</span></button><button class="set" data-a="reset"><span>Recomeçar a demonstração</span></button></section>'+
     '<p class="foot">Demonstração. Nomes e rostos são fictícios e nada é enviado ou guardado.</p>';
 }
 var AGES=['16 a 24','25 a 34','35 a 44','45 a 59','60 ou mais'],GENS=['Mulher','Homem','Outro','Prefiro não dizer'],UFS='AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO'.split(' ');
@@ -375,7 +393,27 @@ function cardSVG(){
     '<text x="336" y="606" text-anchor="end" font-family="'+sans+'" font-weight="600" font-size="13" fill="#08805a">E a sua? polimatch.com.br</text></svg>';
 }
 function shareH(){return '<div class="scrim" data-a="sheetno"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t"><div class="shead"><h2 class="hq" id="sh-t">Compartilhar</h2><button class="icb" data-a="sheetno" aria-label="Fechar">'+ic('x',22)+'</button></div><p class="sub lead">Sua escolha vira uma imagem pronta para os stories.</p>'+cardSVG()+'<button class="btn primary" data-a="post">Postar meu resultado</button><button class="btn ghost" data-a="invite">Convidar sem mostrar a escolha</button></div></div>'}
-function sheetH(){if(S.sheet==='share')return shareH();return '<div class="scrim" data-a="sheetno"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t"><h2 class="hq" id="sh-t">Faça seu voto contar</h2><p class="sub lead">Por enquanto sua escolha fica só com você. Com o CPF, ela entra na pesquisa.</p><button class="btn primary" data-a="sheetyes">Cadastrar</button><button class="btn ghost" data-a="sheetno">Agora não</button></div></div>'}
+function sheetTop(t){return '<div class="scrim" data-a="sheetno"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t"><div class="shead"><h2 class="hq" id="sh-t">'+t+'</h2><button class="icb" data-a="sheetno" aria-label="Fechar">'+ic('x',22)+'</button></div>'}
+function avisosH(){
+  var inClose=S.view==='close'&&S.cur;
+  function sw(a,on,label,sub){return '<button class="set" data-a="'+a+'" role="switch" aria-checked="'+(on?'true':'false')+'"><span class="rt"><span>'+label+'</span><span class="sub">'+sub+'</span></span><span class="sw'+(on?' on':'')+'"></span></button>'}
+  return sheetTop('Avisos')+
+    (inClose?sw('avres',!!S.notify[S.cur],'Resultado desta pesquisa','Sai em 12 de dez.'):'')+
+    sw('avnov',S.novas,'Pesquisas novas','Três por semana.')+
+    '<p class="flbl" id="l-canal" style="margin-top:14px">Onde avisar</p><div class="chips" role="group" aria-labelledby="l-canal">'+[['push','Neste celular'],['wa','WhatsApp']].map(function(c){var on=S.canal===c[0];return '<button class="chipb'+(on?' on':'')+'" data-a="canal" data-v="'+c[0]+'" aria-pressed="'+(on?'true':'false')+'">'+c[1]+'</button>'}).join('')+'</div>'+
+    (S.canal==='wa'?'<input id="tel" inputmode="tel" placeholder="(00) 00000-0000" aria-label="Celular com DDD" disabled><p class="sub tip">Desligado na demonstração.</p>':'')+
+    '<button class="btn primary" data-a="sheetno">Pronto</button></div></div>';
+}
+function indicarH(){
+  var n=Math.min(S.refs,3),segs='';for(var i=0;i<3;i++)segs+='<i class="'+(i<n?'on':'')+'"></i>';
+  return sheetTop('Indique amigos')+
+    '<p class="sub lead">'+(n>=3?'Você trouxe 3 amigos. A carta especial está na sua coleção.':'Quando 3 amigos se cadastrarem pelo seu link, você ganha uma carta especial.')+'</p>'+
+    '<div class="rowx" style="margin-top:8px"><span class="lbl">Amigos cadastrados</span><span class="sub">'+n+' de 3</span></div><div class="segs acc" style="margin-top:6px">'+segs+'</div>'+
+    '<div class="linkbox"><span>'+REFLINK+'</span><button class="lnk" data-a="copy">Copiar</button></div>'+
+    '<button class="btn primary" data-a="sendinv">Enviar convite</button>'+
+    (n<3?'<button class="lnk mut" data-a="simref">Simular um amigo entrando</button>':'')+'</div></div>';
+}
+function sheetH(){if(S.sheet==='share')return shareH();if(S.sheet==='avisos')return avisosH();if(S.sheet==='indicar')return indicarH();return '<div class="scrim" data-a="sheetno"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t"><h2 class="hq" id="sh-t">Faça seu voto contar</h2><p class="sub lead">Por enquanto sua escolha fica só com você. Com o CPF, ela entra na pesquisa.</p><button class="btn primary" data-a="sheetyes">Cadastrar</button><button class="btn ghost" data-a="sheetno">Agora não</button></div></div>'}
 function tabsH(){return '<nav class="tabs" aria-label="Principal">'+[['home','Início','home'],['col','Coleção','grid'],['me','Perfil','user']].map(function(t){var on=S.tab===t[0];return '<button class="tab'+(on?' on':'')+'" data-a="tab" data-v="'+t[0]+'"'+(on?' aria-current="page"':'')+'>'+ic(t[2],24)+'<span>'+t[1]+'</span></button>'}).join('')+'</nav>'}
 
 var V={home:home,col:col,me:me,vote:vote,close:closeV,cpf:cpf};
@@ -383,7 +421,8 @@ function render(){
   var key=S.view+(S.view==='vote'?':'+S.cur+':'+run(S.cur).step:'')+(S.view==='close'?':'+S.cur:'');
   var old=app.querySelector('.view'),keep=old&&old.getAttribute('data-k')===key?old.scrollTop:0;
   var tabs=(S.view==='home'||S.view==='col'||S.view==='me')?tabsH():'';
-  app.innerHTML='<div class="view v-'+S.view+(key!==lastKey?' enter':'')+'" data-k="'+key+'">'+V[S.view]()+'</div>'+tabs+(S.sheet?sheetH():'');
+  var sh=S.sheet?sheetH():'';if(sh&&S.sheet===lastSheet)sh=sh.replace('class="scrim"','class="scrim noan"');lastSheet=S.sheet;
+  app.innerHTML='<div class="view v-'+S.view+(key!==lastKey?' enter':'')+'" data-k="'+key+'">'+V[S.view]()+'</div>'+tabs+sh;
   app.querySelector('.view').scrollTop=keep;lastKey=key;
   if(toastEl&&!toastEl.isConnected)app.appendChild(toastEl);
 }

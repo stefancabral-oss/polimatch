@@ -26,6 +26,9 @@
   telas novas.
 - `stages/67_photo_survey_direction/references/prototipo-pesquisa.html`: o
   protótipo navegável aprovado pelo Stefan, com nomes e rostos fictícios.
+  Atualizado em 12/11/2026, a pedido dele, com avisos e indicação de amigos.
+  Esses dois são proposta de tela; as pendências que levantam estão em
+  `references/README.md`.
 
 ## O que este lote não entrega
 

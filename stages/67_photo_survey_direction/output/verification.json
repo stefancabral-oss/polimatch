@@ -52,7 +52,9 @@
   },
   "prototype": {
     "path": "stages/67_photo_survey_direction/references/prototipo-pesquisa.html",
-    "bytes": 33986,
+    "bytes": 39060,
+    "updatedAt": "2026-11-13T01:20:00Z",
+    "updateNote": "avisos e indicação de amigos acrescentados a pedido do Stefan; script conferido com node --check e três telas novas vistas em navegador",
     "realPeople": false,
     "sendsOrStoresData": false,
     "inAppBuild": false
