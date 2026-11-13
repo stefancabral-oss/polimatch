@@ -4,10 +4,12 @@
 
 - Estado: `pronto para gate`
 - Issue: #279
-- Branch: `fix/database-safety` (base main `7c0bb27`)
+- Branch: `fix/database-safety` (base main `7c0bb27`; atualizada com a `main`
+  em 13/11/2026, ver "Atualização de 13/11/2026")
 - PR: https://github.com/stefancabral-oss/polimatch/pull/310, aberta pelo Stefan
   em 31/10/2026
-- Último commit de código: `7fa8b69` (este HANDOFF entra no commit seguinte)
+- Último commit de código da entrega original: `7fa8b69`. Em 13/11/2026 o
+  commit `b641000` ajustou o ensaio de restauração
 
 Commits:
 
@@ -210,15 +212,15 @@ commit `7fa8b69`:
 
 ## Próximo passo exato
 
-1. Stefan revisa a branch `fix/database-safety`, faz push e abre a PR para #279.
-2. CI verde nos jobs `back-unit` (inclui a asserção da imagem) e
+1. Feito: a PR #310 está aberta e atualizada com a `main`.
+2. Feito: CI verde nos jobs `back-unit` (inclui a asserção da imagem) e
    `back-integration-postgres` (inclui backup, ensaio e restauração parcial).
 3. Merge, deploy e itens da "Ação do Stefan".
 
 ## Atualização de 13/11/2026
 
-- A branch recebeu a `main` atual, que já traz o estágio 40 (#313), o conserto
-  do CI (#321) e a direção nova (#319 e #320).
+- A branch recebeu a `main` atual, que traz #311, #317, o estágio 40 (#313), o
+  conserto do CI (#321) e a direção nova (#319 e #320).
 - Dois conflitos, os dois de acréscimo dos dois lados, resolvidos mantendo
   tudo: no `CONTEXT.md` da raiz ficaram as seções deste estágio e do estágio
   40; em `back/src/topic-store.test.js` ficaram os imports e os testes dos
@@ -228,11 +230,19 @@ commit `7fa8b69`:
   `abuse_quota_counters` e acusaria perda num dump com recusas mais antigas
   que a retenção. `scripts/ops/drill-local.mjs` e `docs/ops/BACKUP.md`
   passaram a aceitar essa segunda poda. É a única mudança de código além dos
-  conflitos, e nenhum teste a exercita: o CI roda o ensaio com dados recentes,
-  onde nada é podado.
+  conflitos. Hoje nenhum teste a exercita, porque o dump do CI só tem recusas
+  recentes. Ele traz recusas datadas de 25/10/2026, que o boot passa a podar
+  no fim de 11/2027: sem este ajuste, o próprio ensaio do CI começaria a
+  falhar nessa data.
 - Os testes do back não rodam na máquina desta atualização, por falta das
   dependências instaladas. Conferidos aqui: sintaxe dos arquivos juntados e os
-  cinco nomes importados no teste. O resto fica com o CI do GitHub.
+  cinco nomes importados no teste.
+- CI do GitHub no commit `b641000`, em 13/11/2026: `back-unit`,
+  `back-integration-postgres`, `shared-data` e `validate` verdes.
+- Um agente independente conferiu a junção e o ajuste do ensaio, somente
+  leitura: nenhum teste ou import perdido (26 testes no arquivo, 24 de cada
+  lado), nenhum choque escondido nos arquivos juntados automaticamente e
+  nenhum bloqueio.
 
 ## Human gate
 

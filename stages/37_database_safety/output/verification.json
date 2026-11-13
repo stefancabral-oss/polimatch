@@ -94,7 +94,7 @@
   },
   "imageExclusion": {
     "local": "git check-ignore com os padrões do .dockerignore: saem os 7 *-smoke.mjs e os 6 arquivos de back/test-support; os demais 21 scripts ficam",
-    "ci": "pending: back-unit lista scripts na imagem e falha com *-smoke.mjs ou test-support"
+    "ci": "verde: back-unit lista scripts na imagem e falha com *-smoke.mjs ou test-support; passou no PR #310 em 31/10/2026 e no commit b641000 em 13/11/2026"
   },
   "backupAndDrill": {
     "backup": {
@@ -294,7 +294,16 @@
       "result": "needs-stefan"
     }
   ],
-  "remoteCi": "pending",
+  "remoteCi": "verde no commit b641000 em 13/11/2026: back-unit, back-integration-postgres, shared-data e validate",
+  "mainMergedIn": {
+    "when": "2026-11-13",
+    "includes": ["#311", "#317", "#313", "#319", "#320", "#321"],
+    "conflicts": ["CONTEXT.md", "back/src/topic-store.test.js"],
+    "resolution": "os dois lados mantidos; 26 testes no arquivo, 24 de cada lado, nenhum removido ou alterado",
+    "followUp": "b641000: scripts/ops/drill-local.mjs e docs/ops/BACKUP.md aceitam a poda de quota_rejections_daily que o estágio 40 faz no boot",
+    "independentCheck": "agente independente, somente leitura, sem bloqueios",
+    "notRunLocally": "testes do back: dependências não instaladas na máquina da atualização"
+  },
   "publication": "not deployed",
   "humanGate": "not self-approved"
 }
