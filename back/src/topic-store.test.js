@@ -26,6 +26,8 @@ import {
   assertSchemaResetAllowed,
   schemaResetAllowedFromEnvironment,
   CLEAN_START_MIGRATION,
+  networkIssuanceWindow,
+  QUOTA_REJECTION_RETENTION_DAYS,
 } from "./topic-store.js";
 import {
   DAILY_SESSION_RULESET,
@@ -723,4 +725,27 @@ test("autorização de reset exige POLIMATCH_ALLOW_RESET=1 literal", () => {
   assert.equal(schemaResetAllowedFromEnvironment({ POLIMATCH_ALLOW_RESET: "true" }), false);
   assert.equal(schemaResetAllowedFromEnvironment({ POLIMATCH_ALLOW_RESET: "0" }), false);
   assert.equal(schemaResetAllowedFromEnvironment({ POLIMATCH_ALLOW_RESET: "1" }), true);
+});
+
+test("cota de jogos novos por rede usa o dia editorial de São Paulo", () => {
+  const lateEvening = networkIssuanceWindow(new Date("2026-10-25T23:30:00-03:00"));
+  assert.deepEqual(lateEvening, {
+    day: "2026-10-25",
+    windowStart: "2026-10-25T03:00:00.000Z",
+    windowEnd: "2026-10-26T03:00:00.000Z",
+    retryAfterSeconds: 1800,
+  });
+  // 22h em Brasília já é outro dia em UTC; a janela continua sendo a de 25/10.
+  const afterUtcMidnight = networkIssuanceWindow("2026-10-26T01:00:00.000Z");
+  assert.equal(afterUtcMidnight.day, "2026-10-25");
+  assert.equal(afterUtcMidnight.windowStart, "2026-10-25T03:00:00.000Z");
+  assert.equal(afterUtcMidnight.retryAfterSeconds, 2 * 3600);
+  const justOpened = networkIssuanceWindow("2026-10-26T03:00:00.000Z");
+  assert.equal(justOpened.day, "2026-10-26");
+  assert.equal(justOpened.retryAfterSeconds, 86400);
+  assert.throws(() => networkIssuanceWindow("não é data"), TypeError);
+});
+
+test("agregado de recusas de cota é retido por mais de um ano", () => {
+  assert.ok(QUOTA_REJECTION_RETENTION_DAYS >= 400);
 });

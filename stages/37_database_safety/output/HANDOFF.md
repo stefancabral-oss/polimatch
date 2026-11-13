@@ -5,7 +5,8 @@
 - Estado: `pronto para gate`
 - Issue: #279
 - Branch: `fix/database-safety` (base main `7c0bb27`)
-- PR: não aberta; a branch só tem commits locais
+- PR: https://github.com/stefancabral-oss/polimatch/pull/310, aberta pelo Stefan
+  em 31/10/2026
 - Último commit de código: `7fa8b69` (este HANDOFF entra no commit seguinte)
 
 Commits:
@@ -213,6 +214,22 @@ commit `7fa8b69`:
 2. CI verde nos jobs `back-unit` (inclui a asserção da imagem) e
    `back-integration-postgres` (inclui backup, ensaio e restauração parcial).
 3. Merge, deploy e itens da "Ação do Stefan".
+
+## Atualização de 13/11/2026
+
+- A branch recebeu a `main` atual, que já traz o estágio 40 (#313), o conserto
+  do CI (#321) e a direção nova (#319 e #320).
+- Dois conflitos, os dois de acréscimo dos dois lados, resolvidos mantendo
+  tudo: no `CONTEXT.md` da raiz ficaram as seções deste estágio e do estágio
+  40; em `back/src/topic-store.test.js` ficaram os imports e os testes dos
+  dois estágios. Nenhum teste foi removido ou alterado.
+- O estágio 40 criou a tabela `quota_rejections_daily`, que é podada no boot.
+  O smoke de restauração parcial e o ensaio deste estágio comparam contagens
+  antes e depois do boot, então o CI desta junção é a prova de que as duas
+  mudanças convivem.
+- Os testes do back não rodam na máquina desta atualização, por falta das
+  dependências instaladas. Conferidos aqui: sintaxe dos arquivos juntados e os
+  cinco nomes importados no teste. O resto fica com o CI do GitHub.
 
 ## Human gate
 

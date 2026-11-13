@@ -1,0 +1,91 @@
+{
+  "issue": 318,
+  "relatedIssue": 277,
+  "icm": 67,
+  "checkedAt": "2026-11-13T01:39:03Z",
+  "base": "5e52ba8c38929ca9ee552f32feccea18eb8add43",
+  "branch": "icm/67-photo-survey-direction",
+  "pullRequest": "https://github.com/stefancabral-oss/polimatch/pull/319",
+  "productionUntouched": true,
+  "docsOnly": {
+    "command": "git diff --name-only origin/main | grep -E '^(app|back|shared)/'",
+    "output": "",
+    "changedFiles": [
+      "AGENTS.md",
+      "CONTEXT.md",
+      "README.md",
+      "docs/decisions/0001-pesquisa-de-preferencia-por-foto.md",
+      "stages/67_photo_survey_direction/CONTEXT.md",
+      "stages/67_photo_survey_direction/output/HANDOFF.md",
+      "stages/67_photo_survey_direction/output/verification.json",
+      "stages/67_photo_survey_direction/references/README.md",
+      "stages/67_photo_survey_direction/references/prototipo-pesquisa.html"
+    ]
+  },
+  "replacedPhrase": {
+    "command": "grep -n \"Não é pesquisa eleitoral\" CONTEXT.md README.md AGENTS.md docs/decisions/*.md",
+    "matchingLines": 2,
+    "stillInLiveProduct": [
+      "app/src/presidential-page.js: rodapé \"Jogo pessoal. Não é pesquisa eleitoral.\"",
+      "docs/security/VOTE_ABUSE_POLICY.md: a política não transforma o resultado em pesquisa eleitoral"
+    ],
+    "where": [
+      "CONTEXT.md, \"Norte do produto\": citação do norte anterior, marcada como histórico",
+      "docs/decisions/0001-pesquisa-de-preferencia-por-foto.md: linha da tabela do que é substituído"
+    ],
+    "asCurrentDefinition": 0
+  },
+  "newLinksResolve": [
+    "docs/decisions/0001-pesquisa-de-preferencia-por-foto.md",
+    "docs/legal/AGGREGATE_PUBLICATION_GATE.md",
+    "docs/security/VOTE_ABUSE_POLICY.md",
+    "stages/67_photo_survey_direction/CONTEXT.md"
+  ],
+  "tests": {
+    "shared": {
+      "command": "npm run test:shared",
+      "passed": 93,
+      "failed": 0,
+      "taxonomy": "records 125"
+    },
+    "appUnit": {
+      "command": "npm test --prefix app",
+      "passed": 245,
+      "failed": 0
+    }
+  },
+  "prototype": {
+    "path": "stages/67_photo_survey_direction/references/prototipo-pesquisa.html",
+    "bytes": 39058,
+    "updatedAt": "2026-11-13T01:35:52Z",
+    "updateNote": "compartilhar, avisos e indicação de amigos acrescentados a pedido do Stefan depois da aprovação; script conferido com node --check e telas novas vistas em navegador",
+    "realPeople": false,
+    "sendsOrStoresData": false,
+    "inAppBuild": false
+  },
+  "notRun": [
+    "testes do back: dependências do back não instaladas neste clone; nenhum arquivo do back mudou",
+    "workflows do GitHub: os quatro filtram por caminho e nenhum dispara para os arquivos deste PR",
+    "suíte e2e de browser",
+    "deploy"
+  ],
+  "independentReview": {
+    "by": "agente independente, somente leitura",
+    "when": "2026-11-13",
+    "firstPass": {
+      "blockers": 1,
+      "otherFindings": 9
+    },
+    "secondPass": {
+      "blockers": 0,
+      "note": "sem bloqueios; ajustes restantes aplicados no commit seguinte"
+    },
+    "fixed": "o bloqueio e os ajustes de texto",
+    "leftAsIs": "o conteúdo público da decisão, levado ao Stefan junto com a pergunta sobre a visibilidade do repositório"
+  },
+  "humanGate": {
+    "status": "approved",
+    "by": "Stefan",
+    "how": "instrução direta para este PR em conversa de 12/11/2026, transcrita no PR; merge a cargo do agente a pedido dele; a regra 6 do AGENTS.md não muda"
+  }
+}
