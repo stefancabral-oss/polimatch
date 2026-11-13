@@ -106,10 +106,17 @@ um bloqueio e nove ajustes:
 - As decisões antigas continuam valendo para o que está no ar, até cada etapa
   da direção nova passar pelo gate humano.
 
+## Correção posterior ao merge
+
+Em 12/11/2026, depois do merge do PR #319, o Stefan reviu a resposta à Q3: as
+fotos de pessoas públicas ficam enquanto o produto for gratuito, e a
+regularização passa a ser condição para vender ou monetizar. O comentário da
+#277 foi atualizado, e um PR pequeno ajustou as duas linhas do registro de
+decisão que traziam a resposta antiga. Nada além disso mudou.
+
 ## Próximo passo exato
 
-1. Merge deste PR e fechamento da #318, executados por agente por instrução do
-   Stefan.
+1. Feito: PR #319 mesclado e #318 fechada, por instrução do Stefan.
 2. Seguir o programa de maturidade (#309), começando pelos bloqueios. As
    etapas de produto da pesquisa vêm depois.
 
