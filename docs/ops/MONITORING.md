@@ -132,7 +132,7 @@ envia por `sendBeacon`, como `text/plain`, um objeto de no máximo 2 KB com:
 
 | Campo | Conteúdo |
 | --- | --- |
-| `build` | identificação do build da página: o SHA da meta `polimatch-release` que o ICM 45 grava no HTML; sem a meta, o `SOURCE_COMMIT` do build ou, enquanto o deploy não passa esse valor, o carimbo de horário do build |
+| `build` | identificação do build da página: o SHA da meta `polimatch-release` que o ICM 45 grava no HTML; enquanto o deploy não passa `SOURCE_COMMIT` (a meta sai com `unknown`), o nome com hash do script de entrada da página, por exemplo `main-BBiuPtfp` |
 | `page` | caminho da página, sem query string nem fragmento |
 | `kind` | `error`, `unhandledrejection` ou `preload` (import dinâmico que falhou, como um chunk antigo depois de um deploy) |
 | `message` | mensagem do erro, até 300 caracteres |
@@ -212,3 +212,5 @@ repetir.
 
 - O campo `build` dos relatos do navegador e o `rev` da API só trazem o SHA do
   commit depois que o ICM 45 passar `SOURCE_COMMIT` no build do app e da API.
+  Até lá o `build` traz o nome com hash do script de entrada, que muda quando o
+  código da página muda, e o `rev` fica `null`.
