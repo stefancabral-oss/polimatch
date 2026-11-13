@@ -4,7 +4,8 @@
 
 Protótipo navegável da pesquisa por foto. O Stefan o aprovou em 12/11/2026
 como direção das telas novas e, no mesmo dia, pediu três acréscimos que já
-estão nesta cópia: compartilhar o resultado, avisos e indicação de amigos.
+estão nesta cópia: compartilhar a própria escolha, avisos e indicação de
+amigos.
 
 - É uma página única, sem servidor. Abra o arquivo num navegador, de
   preferência em largura de celular.
@@ -38,8 +39,10 @@ Acréscimos pedidos depois da aprovação:
   ele liberam uma carta especial na coleção. O botão "Simular um amigo
   entrando" existe só para a demonstração.
 
-Esses acréscimos são proposta de tela. Nenhum está decidido como regra de
-produto nem liberado. Eles levantam pendências que vão para a revisão jurídica
+Compartilhar por iniciativa da pessoa está na decisão; a forma, uma imagem
+vertical para postar, é proposta de tela. Avisos e indicação são só proposta
+de tela, sem decisão de produto. Nenhum dos três está liberado. Avisos e
+indicação levantam pendências que vão para a revisão jurídica
 junto com as do registro de decisão: o aviso por WhatsApp pede o celular da
 pessoa e tem custo por mensagem; a recompensa por indicação pode esbarrar na
 regra de distribuição gratuita de prêmios. No iPhone, a notificação pelo

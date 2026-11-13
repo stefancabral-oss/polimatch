@@ -53,4 +53,5 @@ atualiza só o contexto e a documentação de entrada.
 - Decisão do Stefan, registrada na #318.
 - [ICM 61] #303 reescreve a documentação de entrada e mexe no mesmo
   `CONTEXT.md`. Quem entrar depois faz o rebase.
-- #277: Q1 respondida; Q2 a Q6 abertas.
+- #277: Q1 respondida pelo Stefan. Q2, Q3 e Q4 respondidas por delegação dele
+  em 12/11/2026, e a Q6 com proposta a confirmar. Q5 aberta.

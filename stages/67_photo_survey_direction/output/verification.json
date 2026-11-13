@@ -2,7 +2,7 @@
   "issue": 318,
   "relatedIssue": 277,
   "icm": 67,
-  "checkedAt": "2026-11-13T01:35:52Z",
+  "checkedAt": "2026-11-13T01:39:03Z",
   "base": "5e52ba8c38929ca9ee552f32feccea18eb8add43",
   "branch": "icm/67-photo-survey-direction",
   "pullRequest": "https://github.com/stefancabral-oss/polimatch/pull/319",
@@ -58,7 +58,7 @@
     "path": "stages/67_photo_survey_direction/references/prototipo-pesquisa.html",
     "bytes": 39058,
     "updatedAt": "2026-11-13T01:35:52Z",
-    "updateNote": "avisos e indicação de amigos acrescentados a pedido do Stefan; script conferido com node --check e três telas novas vistas em navegador",
+    "updateNote": "compartilhar, avisos e indicação de amigos acrescentados a pedido do Stefan depois da aprovação; script conferido com node --check e telas novas vistas em navegador",
     "realPeople": false,
     "sendsOrStoresData": false,
     "inAppBuild": false
@@ -72,14 +72,20 @@
   "independentReview": {
     "by": "agente independente, somente leitura",
     "when": "2026-11-13",
-    "blockers": 1,
-    "otherFindings": 9,
-    "fixedInThisPr": true,
-    "raisedToOwner": "quanto da decisão deve ficar num repositório público"
+    "firstPass": {
+      "blockers": 1,
+      "otherFindings": 9
+    },
+    "secondPass": {
+      "blockers": 0,
+      "note": "sem bloqueios; ajustes restantes aplicados no commit seguinte"
+    },
+    "fixed": "o bloqueio e os ajustes de texto",
+    "leftAsIs": "o conteúdo público da decisão, levado ao Stefan junto com a pergunta sobre a visibilidade do repositório"
   },
   "humanGate": {
     "status": "approved",
     "by": "Stefan",
-    "how": "instrução em conversa de 12/11/2026, transcrita no PR; merge executado por agente a pedido dele"
+    "how": "instrução direta para este PR em conversa de 12/11/2026, transcrita no PR; merge a cargo do agente a pedido dele; a regra 6 do AGENTS.md não muda"
   }
 }

@@ -51,6 +51,7 @@ protótipo aprovado e serão detalhados nessas etapas.
 | Ranking da edição e ranking pessoal como superfícies do produto | `CONTEXT.md`, "Decisões atuais aprovadas" e "Gate final", item 5 | Cada pesquisa tem o próprio resultado. Mostrar os cinco primeiros depende das pendências abaixo. |
 | Chromas na rodada | `CONTEXT.md`, "Rodada diária com Chromas e encaixe no iPhone" (#265); `AGENTS.md`, "Estado atual" | Na hora do voto a foto aparece igual para todos, sem moldura. A personalização fica na coleção. |
 | Capa presidencial | `CONTEXT.md`, "Capa presidencial" (#261) | A entrada passa a ser a próxima pesquisa aberta. |
+| Somente `Eleições 2026` ativo como assunto | `CONTEXT.md`, "Decisões atuais aprovadas" | Abre com três assuntos: Política, Famosos e influenciadores, Futebol. |
 | Rodada do dia como centro do produto | `README.md`, "Produto atual" | Pesquisas com começo e fim, abertas por uma janela de dias. |
 | Direção de arte `Malaquita 2026 / Digital First` | `CONTEXT.md`, "Decisões atuais aprovadas"; `README.md`, "Produto atual"; `AGENTS.md`, "Estado atual" | Continua valendo para o que está no ar. Nas telas novas: fundo neutro, um único verde, foto sem moldura. |
 
@@ -93,11 +94,13 @@ Nada abaixo fica liberado por esta decisão. As respostas marcadas como
 - **Visibilidade do repositório.** Sem resposta.
 - **Ordem do trabalho (#309).** Respondida: maturidade primeiro. Os bloqueios de
   [ICM 36] a [ICM 44] vêm antes de qualquer etapa de produto da pesquisa.
-- **Processo (Q6 da #277).** Respondida: a aprovação do Stefan passa a valer por
-  comentário ou por instrução dele transcrita no PR, sem travar o fluxo, e o
-  programa cívico é congelado com uma tag para 2028, fora da `main`
-  ([ICM 62] #304). O "congelado" da decisão acima quer dizer "no ar sem
-  trabalho novo".
+- **Processo (Q6 da #277).** Proposta do agente, a confirmar pelo Stefan,
+  porque muda a forma como a aprovação dele vale: aprovação por comentário ou
+  por instrução dele transcrita no PR, sem travar o fluxo; e o código do
+  programa cívico, que está atrás de flags desligadas, vai para uma tag para
+  2028 e sai da `main` ([ICM 62] #304), sem mudar nada do que está no ar. Até
+  a confirmação vale a regra 6 do `AGENTS.md` como está. O "congelado" da
+  decisão acima quer dizer "no ar sem trabalho novo".
 - **Quiz (Q2 da #277).** Respondida: nenhuma edição nova; a edição 1 vira a
   padrão e as edições 2 a 4 ficam como arquivo de 2026 ([ICM 44] #286).
 

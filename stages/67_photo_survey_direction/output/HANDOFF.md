@@ -5,7 +5,9 @@
 - Estado: aprovado
 - Último commit: o que acompanha este handoff no PR #319
 - Issue: #318, continua aberta
-- Relacionada: #277, com a Q1 respondida em comentário de 12/11/2026
+- Relacionada: #277, com a Q1 respondida pelo Stefan e, em comentário de
+  12/11/2026, as Q2, Q3 e Q4 respondidas por delegação dele e uma proposta para
+  a Q6. A Q5 segue aberta
 - Base: `5e52ba8` (#317 já mesclada em main)
 - Branch: `icm/67-photo-survey-direction`
 - PR: https://github.com/stefancabral-oss/polimatch/pull/319
@@ -115,7 +117,8 @@ um bloqueio e nove ajustes:
 
 - Decisão: aprovado
 - Responsável: Stefan
-- Observação: aprovado por instrução do Stefan em conversa de 12/11/2026
-  ("Pode você fazer"), transcrita no PR. A revisão foi feita por um agente
-  independente e o merge executado por agente, a pedido dele. Produção não é
-  alterada por este PR.
+- Observação: aprovado por instrução direta do Stefan para este PR, em
+  conversa de 12/11/2026 ("Revisar e mesclar o PR 319: pode você fazer"),
+  transcrita no PR. A revisão foi feita por um agente independente e o merge
+  fica a cargo do agente, a pedido dele. Vale só para este PR: a regra 6 do
+  `AGENTS.md` não muda aqui. Produção não é alterada por este PR.

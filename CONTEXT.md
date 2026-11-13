@@ -43,13 +43,13 @@ Em 12/11/2026 Stefan respondeu à Q1 da #277 com um caminho fora das três opç�
 - Os jogos de leitura e a parte cívica e de notícias ficam no ar sem trabalho novo.
 - Telas novas minimalistas: fundo neutro, um único verde, foto sem moldura na hora do voto.
 
-Nada disso está liberado para produção por este registro. A ordem do trabalho é maturidade primeiro (#309), e as respostas às Q2, Q3, Q4 e Q6 estão na #277; nenhuma delas libera produção. Continuam sem resposta a Q5 (controlador de dados e revisão jurídica), a visibilidade do repositório e a convivência entre o login Google e o CPF. O gate de publicação agregada (#177) e a política de integridade do voto continuam em vigor.
+Nada disso está liberado para produção por este registro. A ordem do trabalho é maturidade primeiro (#309), e as respostas às Q2, Q3 e Q4, com a proposta para a Q6, estão na #277; nenhuma delas libera produção. Continuam sem resposta a Q5 (controlador de dados e revisão jurídica), a visibilidade do repositório e a convivência entre o login Google e o CPF. O gate de publicação agregada (#177) e a política de integridade do voto continuam em vigor.
 
 Antes de propor ou alterar tela, regra de voto ou cadastro, ler o registro de decisão: ele lista o que continua valendo e o que deixa de valer para as telas novas.
 
 ## Decisões atuais aprovadas
 
-As decisões desta lista descrevem o que está no ar. A lista completa do que não se aplica à direção nova é a tabela do registro de decisão. A marca "Substituída para as telas da pesquisa por foto" aparece só nas principais, como atalho.
+As decisões desta lista descrevem o que está no ar. A referência para o que não se aplica à direção nova é a tabela do registro de decisão. A marca "Substituída para as telas da pesquisa por foto" aparece só nas principais, como atalho.
 
 - O frontend anterior foi rejeitado e será substituído, não remendado.
 - A direção de arte `Malaquita 2026 / Digital First` enviada em 13/09/2026 está aprovada e é a referência visual oficial. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.
