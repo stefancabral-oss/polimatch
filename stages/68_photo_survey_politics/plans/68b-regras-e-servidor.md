@@ -19,8 +19,12 @@ sub-store misturado com `Object.assign`. Três rotas novas em
 
 ## Restrições globais
 
-- `back/src/topic-store.js` muda só no registro: um import, uma linha no
-  `init()` e um `Object.assign`.
+- `back/src/topic-store.js` muda no registro (um import, uma linha no
+  `init()`, um `Object.assign` e a opção `photoSurveys` para testes) e em um
+  ponto do login Google, descoberto na Tarefa 2: `combineGoogleHistory`
+  devolvia `null` para o anônimo sem escolhas no jogo, o que deixava solta a
+  resposta de pesquisa dele. Ele passa a ser ligado à conta, com status
+  `linked`, quando tem resposta de pesquisa.
 - Tabelas novas são aditivas (`CREATE TABLE IF NOT EXISTS`) e imutáveis, com o
   gatilho `reject_vote_mutation()` que o jogo já usa.
 - A resposta não toca `votes`, `choice_rounds`, `ranking_stats`,
@@ -71,7 +75,7 @@ Entradas que a especificação implica e que precisam de teste próprio:
   `{ ok: true, pickIds, championId }` ou `{ ok: false, reason }`, com `reason`
   em `"shown" | "picks" | "pick-outside-group" | "champion"`.
 
-- [ ] **Passo 1: testes que falham**, em `shared/photo-survey.test.js`:
+- [x] **Passo 1: testes que falham**, em `shared/photo-survey.test.js`:
   - a definição `politica-2026-01` tem 20 `cardIds` únicos e ordenados,
     `drawSize` 16, `groupSize` 4 e a pergunta "Quem você prefere?";
   - `drawCards` com `randomInt` fixo devolve 16 ids únicos do conjunto, e com
@@ -84,13 +88,13 @@ Entradas que a especificação implica e que precisam de teste próprio:
     conjunto, se está no sorteio;
   - `photoSurveyStatus` devolve `scheduled` antes de `opensAt`, `open` no
     intervalo e `closed` a partir de `closesAt`; com os dois `null`, `open`.
-- [ ] **Passo 2:** `node --test shared/photo-survey.test.js` falha por módulo
+- [x] **Passo 2:** `node --test shared/photo-survey.test.js` falha por módulo
   ausente.
-- [ ] **Passo 3: implementar.** `drawCards` usa Fisher–Yates parcial sobre a
+- [x] **Passo 3: implementar.** `drawCards` usa Fisher–Yates parcial sobre a
   cópia de `cardIds`: para `i` de 0 a `drawSize - 1`, troca a posição `i` com
   `i + randomInt(n - i)`.
-- [ ] **Passo 4:** `npm run test:shared` passa.
-- [ ] **Passo 5:** commit.
+- [x] **Passo 4:** `npm run test:shared` passa.
+- [x] **Passo 5:** commit.
 
 ### Tarefa 2: Tabelas e armazenamento
 
@@ -154,10 +158,10 @@ As duas recebem o gatilho `…_are_immutable` com `reject_vote_mutation()`.
   do jogador (409 `PHOTO_SURVEY_DRAW_REQUIRED`), pesquisa `open` (409
   `PHOTO_SURVEY_CLOSED`) e chave válida (400
   `PHOTO_SURVEY_RESPONSE_INVALID`); grava com o relógio do servidor.
-- Cada operação com jogador roda em transação e trava
-  `photo-survey:<surveyId>:<playerId>` depois do `findPlayer`.
+- Cada operação com jogador roda em transação. A trava é a do próprio
+  `findPlayer` (`player:<id>`), que já enfileira as abas do mesmo jogador.
 
-- [ ] **Passo 1: smoke que falha**, `back/scripts/photo-survey-smoke.mjs`, no
+- [x] **Passo 1: smoke que falha**, `back/scripts/photo-survey-smoke.mjs`, no
   molde de `game-progress-smoke.mjs`, com `requireDisposableDatabase()` no
   topo. Cobre, com `assert`:
   - sorteio: 4 grupos de 4, ids do conjunto, e o mesmo sorteio numa segunda
@@ -179,12 +183,12 @@ As duas recebem o gatilho `…_are_immutable` com `reject_vote_mutation()`.
     (`signInWithGoogle`): `photoSurveyDraw` da conta devolve a resposta, e
     `photoSurveyRespond` dá `PHOTO_SURVEY_ALREADY_ANSWERED`;
   - um segundo `init()` no mesmo banco não falha nem perde linhas.
-- [ ] **Passo 2:** rodar o smoke contra o PostgreSQL descartável; falha por
+- [x] **Passo 2:** rodar o smoke contra o PostgreSQL descartável; falha por
   método ausente.
-- [ ] **Passo 3: implementar** o módulo e o registro no `topic-store.js`.
-- [ ] **Passo 4:** o smoke passa; `npm test --prefix back` e
+- [x] **Passo 3: implementar** o módulo e o registro no `topic-store.js`.
+- [x] **Passo 4:** o smoke passa; `npm test --prefix back` e
   `npm run test:integration --prefix back` continuam passando.
-- [ ] **Passo 5:** commit.
+- [x] **Passo 5:** commit.
 
 ### Tarefa 3: Rotas
 
@@ -202,18 +206,18 @@ As duas recebem o gatilho `…_are_immutable` com `reject_vote_mutation()`.
 - As três respondem com `Cache-Control: no-store` e usam `clock()` como
   `now`.
 
-- [ ] **Passo 1: testes que falham**, com store falso, no molde de
+- [x] **Passo 1: testes que falham**, com store falso, no molde de
   `http-app.test.js`: as duas rotas `POST` sem `Bearer` dão 401
   `PLAYER_SESSION_REQUIRED` sem chamar o store; a `GET` funciona sem
   `Bearer`; cada rota repassa `surveyId`, o corpo e o `now` ao método certo;
   um erro do store com `status` 409, `code` e `current` chega ao cliente com
   os três; as respostas têm `no-store`.
-- [ ] **Passo 2:** `node --test back/src/photo-survey-http.test.js` falha
+- [x] **Passo 2:** `node --test back/src/photo-survey-http.test.js` falha
   com 404.
-- [ ] **Passo 3: implementar** as três rotas, antes do `app.use` final de
+- [x] **Passo 3: implementar** as três rotas, antes do `app.use` final de
   erro.
-- [ ] **Passo 4:** `npm test --prefix back` passa.
-- [ ] **Passo 5:** commit.
+- [x] **Passo 4:** `npm test --prefix back` passa.
+- [x] **Passo 5:** commit.
 
 ### Tarefa 4: Política de abuso, CI e registro
 
@@ -231,11 +235,11 @@ ranking; a emissão do sorteio não consome cota; o que limita respostas
 repetidas por quem apaga o aparelho é a cota de 3 jogos novos por rede; a
 resposta é imutável.
 
-- [ ] **Passo 1:** escrever a seção da política e subir a versão.
-- [ ] **Passo 2:** acrescentar o passo do smoke no workflow e conferir
+- [x] **Passo 1:** escrever a seção da política e subir a versão.
+- [x] **Passo 2:** acrescentar o passo do smoke no workflow e conferir
   `npm test --prefix app` (o `ci-workflows.test.js` lê os workflows).
-- [ ] **Passo 3:** rodar tudo: `npm run test:shared`, `npm test --prefix back`,
+- [x] **Passo 3:** rodar tudo: `npm run test:shared`, `npm test --prefix back`,
   os smokes de integração, abuso, progresso e pesquisa contra o PostgreSQL
   descartável, e `npm test --prefix app`.
-- [ ] **Passo 4:** atualizar o handoff e a verificação com os números.
-- [ ] **Passo 5:** commit, PR e revisão independente do ramo inteiro.
+- [x] **Passo 4:** atualizar o handoff e a verificação com os números.
+- [x] **Passo 5:** commit, PR e revisão independente do ramo inteiro.

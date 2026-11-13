@@ -2,10 +2,10 @@
 
 ## Status
 
-- Estado: `em andamento`. A entrega 68a (registro) foi aprovada; faltam as entregas 68b a 68e.
+- Estado: `em andamento`. A entrega 68a (registro) foi aprovada. A 68b (regras e servidor) está pronta para gate. Faltam a 68c, a 68d e a 68e.
 - Issue: #324
-- Branch desta entrega: `icm/68-photo-survey-politics` (base main `77104a3`)
-- PR: #325
+- 68a: PR #325, mesclado em `3a59344`.
+- 68b: branch `icm/68b-photo-survey-server` (base main `3a59344`); o PR está na issue #324.
 
 ## Entregue (68a — registro)
 
@@ -15,15 +15,39 @@
 - `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md`: marca nos quatro pontos alterados. Nada foi apagado.
 - `CONTEXT.md`, `README.md` e `AGENTS.md` da raiz: apontam para a decisão 0002 e para esta etapa.
 
+## Entregue (68b — regras e servidor)
+
+- `shared/photo-survey.js`: a pesquisa `politica-2026-01` (20 cartas, sorteio de 16, telas de 4), o sorteio, as telas, a validação da chave e o estado pela janela. Funções puras, com 10 testes.
+- `back/src/photo-survey-store.js`: as tabelas `photo_survey_draws` e `photo_survey_responses`, aditivas e imutáveis, o sorteio por jogador e a resposta única por identidade.
+- `back/src/http-app.js`: `GET /api/photo-surveys/:surveyId`, `POST …/draw` e `POST …/response`.
+- `back/scripts/photo-survey-smoke.mjs` e o passo dele em `.github/workflows/back-shared.yml`.
+- `docs/security/VOTE_ABUSE_POLICY.md`, versão 4, com a seção da pesquisa por foto.
+- `README.md`: as três rotas na tabela da API.
+- `stages/68_photo_survey_politics/plans/68b-regras-e-servidor.md`: o plano seguido.
+
+O que muda no jogo atual: nada no que a pessoa vê. No servidor, o login Google passa a ligar à conta o jogador anônimo que respondeu a uma pesquisa sem ter jogado; antes ele era descartado. A resposta do login traz `merge.status: "linked"` nesse caso, e o app, que só reage a `combined` e `alreadyCombined`, não mostra aviso.
+
+Nada desta entrega é visível no site: não há tela, e as rotas novas só respondem a quem as chama direto.
+
 ## Não entregue / pendente
 
-- As entregas 68b (regras e servidor), 68c (tela), 68d (teste por agentes) e 68e (publicação). Nenhum código foi escrito.
-- O plano de implementação de cada entrega, que sai antes do primeiro PR de código.
+- As entregas 68c (tela), 68d (teste por agentes) e 68e (publicação).
+- A pesquisa `politica-2026-01` está sem janela (`opensAt` e `closesAt` nulos), ou seja, aberta assim que a API for publicada. Definir a janela é assunto da 68e.
+- Fechar uma pesquisa exige mudar a definição no código e publicar. Não há painel para isso.
 
 ## Testes executados
 
-- `npm test --prefix app` e `npm run test:shared` na branch, para confirmar que a mudança de documentação não quebra nenhum teste que leia esses arquivos. Os números estão no `verification.json`.
-- O PR não altera `app/`, `back/` nem `shared/`.
+68a: `npm test --prefix app` e `npm run test:shared`; o PR não alterava código.
+
+68b, em 13/11/2026, numa máquina com PostgreSQL 16.14 local e banco descartável:
+
+- `npm run test:shared`: 103/103 (10 novos).
+- `npm test --prefix back`: 292/292 (7 novos: 6 das rotas e a guarda de banco descartável do smoke novo).
+- `npm test --prefix app`: 286/286.
+- Smokes na ordem do CI, todos aprovados: integração, duas escolhas, duelos, abuso, progresso, cívico, resiliência e o novo, da pesquisa.
+- Backup com manifesto e ensaio de restauração: 47 tabelas, com as duas novas no manifesto e sem diferença depois do boot. Restauração parcial: aprovada.
+- A API real, local: definição, sorteio, resposta, repetição (`alreadyProcessed`), outra escolha (409) e chamada sem sessão (401).
+- O smoke novo foi escrito antes do código e falhou primeiro por método ausente; depois apontou o caso do login Google descrito acima.
 
 ## Revisão independente
 
@@ -31,6 +55,8 @@ Um agente separado, somente leitura, revisou este PR em 13/11/2026 e não achou 
 
 ## Riscos conhecidos
 
+- A 68b mexe em `combineGoogleHistory`, a função que junta o histórico no login Google. A mudança é uma condição e um status; os smokes de integração e de identidade continuam aprovados.
+- Publicar a API com a 68b abre a pesquisa para quem chamar as rotas direto, mesmo sem tela. Por isso a publicação fica para a 68e, junto com a janela.
 - A decisão 0002 muda a ordem "maturidade primeiro" da 0001. Os bloqueios de maturidade continuam abertos (#278, #279, #280, #281, #283, #284, #285 e #286) e correm em paralelo.
 - A primeira pesquisa fica sem Lula e Flávio Bolsonaro, porque as cartas deles têm moldura diferente das outras 20.
 - Das 20 cartas, 8 vêm de fotos de veículos ou de sites. Sem refazer essas 8 ou sem a confirmação do Stefan, a publicação (68e) não acontece com elas, e com 12 cartas o formato de 16 não fecha.
@@ -55,10 +81,12 @@ Escolhas de desenho do agente, dentro do que ele aprovou, a confirmar neste gate
 
 ## Próximo passo exato
 
-1. Plano de implementação da 68b e o primeiro PR de código, que pede o gate dele antes do merge.
+1. Gate do Stefan no PR da 68b.
+2. Plano e implementação da 68c, a tela.
 
 ## Ação do Stefan
 
+- Decidir o merge do PR da 68b. Ele não publica nada.
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
 - Confirmar as condições de publicação propostas no contexto do estágio.
 - Dizer se quer cartas de Lula e Flávio Bolsonaro no padrão comum, para entrarem numa próxima pesquisa.

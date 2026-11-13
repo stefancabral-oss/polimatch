@@ -44,7 +44,7 @@
   },
   "acceptance": {
     "delivery68a": "aprovada",
-    "delivery68b": "não iniciada",
+    "delivery68b": "pronta para gate",
     "delivery68c": "não iniciada",
     "delivery68d": "não iniciada",
     "delivery68e": "não iniciada"
@@ -64,5 +64,50 @@
       "frases da raiz e da decisão 0002 alinhadas"
     ]
   },
-  "pr": 325
+  "pr": 325,
+  "delivery68b": {
+    "checkedAt": "2026-11-13",
+    "branch": "icm/68b-photo-survey-server",
+    "plan": "stages/68_photo_survey_politics/plans/68b-regras-e-servidor.md",
+    "environment": "PostgreSQL 16.14 local, banco descartável polimatch_test em 127.0.0.1",
+    "redFirst": [
+      "shared/photo-survey.test.js falhou por módulo ausente antes do código",
+      "back/scripts/photo-survey-smoke.mjs falhou por método ausente e depois no caso do login Google sem escolhas no jogo",
+      "back/src/photo-survey-http.test.js falhou em 5 de 6 antes das rotas"
+    ],
+    "tests": {
+      "shared": "103 passed, 0 failed (10 novos)",
+      "backUnit": "292 passed, 0 failed (7 novos)",
+      "app": "286 passed, 0 failed",
+      "smokes": [
+        "integração",
+        "duas escolhas",
+        "duelos",
+        "abuso",
+        "progresso",
+        "cívico",
+        "resiliência",
+        "pesquisa por foto"
+      ],
+      "backupDrill": "47 tabelas, photo_survey_draws e photo_survey_responses no manifesto, sem diferença depois do boot",
+      "partialRestore": "aprovado",
+      "liveApiLocal": "definição 200, sorteio 4 telas de 4, resposta created, repetição alreadyProcessed, outra escolha 409, sem sessão 401"
+    },
+    "acceptance68b": {
+      "mesmo sorteio ao recarregar ou em outra aba": "met (smoke: chamadas repetidas e simultâneas)",
+      "sorteio uniforme": "met (teste com semente, 20.000 sorteios)",
+      "resposta única e idempotente": "met (smoke)",
+      "resposta forjada recusada": "met (smoke e teste de unidade)",
+      "tabelas novas imutáveis": "met (smoke: UPDATE e DELETE recusados)",
+      "ranking_stats, player_stats e votes intactos": "met (smoke: pegada do jogo igual antes e depois)",
+      "fora da janela, recusada": "met (smoke: antes de abrir, depois de fechar e fechando no meio)",
+      "nenhuma rota devolve soma": "met (as três rotas devolvem só definição, sorteio e a resposta do próprio jogador)"
+    },
+    "deviations": [
+      "topic-store.js muda além do registro: combineGoogleHistory liga à conta o anônimo que só respondeu pesquisa (status linked)",
+      "a trava por jogador é a do findPlayer; não há trava própria da pesquisa"
+    ],
+    "remoteCi": "ver os checks do PR da 68b",
+    "humanGate": "pendente"
+  }
 }

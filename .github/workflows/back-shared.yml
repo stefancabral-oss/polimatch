@@ -116,6 +116,8 @@ jobs:
           CIVIC_DISPOSABLE_TEST: '1'
       - name: Prove the API survives dropped connections, bad bodies and lock waits
         run: npm run test:resilience --prefix back
+      - name: Verify the photo survey draw, single response and immutability
+        run: npm run test:photo-survey --prefix back
       # pg_dump/pg_restore do próprio container, como no cron da VPS via docker exec.
       - name: Back up with manifest and rehearse the restore
         env:

@@ -1,6 +1,6 @@
 # Política de integridade do voto público
 
-Status: política normativa da API do PoliMatch, versão 3, vinculada às issues #170, #179 e #282.
+Status: política normativa da API do PoliMatch, versão 4, vinculada às issues #170, #179, #282 e #324.
 
 Esta política existe para que o placar público seja um painel de preferências declaradas com limites conhecidos. Ela não transforma o resultado em pesquisa eleitoral nem prova que cada jogador corresponde a uma pessoa única.
 
@@ -39,6 +39,20 @@ As recusas de criação de jogador são contadas na tabela agregada `quota_rejec
 O pseudônimo de rede é `HMAC-SHA-256(identidade de rede normalizada, VOTER_NETWORK_SECRET)`. IPv4 usa o endereço canônico; IPv6 usa o prefixo `/64`, para que endereços temporários da mesma rede não multipliquem cotas. Entradas de proxy que não sejam IP válidos caem numa identidade comum e não podem fabricar pseudônimos arbitrários. A cota de emissão por rede não é usada sozinha: ela limita a multiplicação de tokens, enquanto as cotas persistentes por jogador limitam a escrita. O segredo deve ser próprio do ambiente de produção e não pode ser versionado.
 
 Alterar qualquer número exige nova decisão versionada, teste e registro no handoff; não é ajuste operacional silencioso. A revisão do limite de 3 jogos novos por rede é a decisão Q4 da issue #277 e continua pendente; a versão 3 muda só a janela e a contagem das recusas.
+
+## Resposta de pesquisa por foto
+
+A versão 4 acrescenta a pesquisa por foto ([ICM 68] #324). Ela não muda nenhum número das seções acima.
+
+- A resposta de uma pesquisa é uma por identidade e por pesquisa. Identidade é o jogador mais os jogadores anônimos incorporados a ele no login Google.
+- O servidor emite o sorteio das cartas uma vez por jogador e pesquisa. A resposta só é aceita se bater com esse sorteio: cada escolha na tela em que a carta foi mostrada, e a escolhida final entre as escolhidas. As cartas mostradas nunca vêm do cliente.
+- Repetir a mesma resposta é uma recuperação idempotente e devolve o recibo original. Outra escolha depois da primeira é recusada com HTTP 409, `PHOTO_SURVEY_ALREADY_ANSWERED`, e não regrava.
+- Sorteio e resposta são gravados em tabelas próprias, imutáveis como os votos. Não há troca depois de confirmar.
+- A resposta não consome a cota de 30 escolhas, não entra no limite de 8 escolhas por minuto e não altera o ranking nem o Elo. A emissão do sorteio também não consome cota.
+- Fora da janela da pesquisa, sorteio novo e resposta são recusados com HTTP 409, `PHOTO_SURVEY_CLOSED`.
+- Quem apaga os dados do aparelho vira outro jogador e pode responder de novo. O que limita isso é a cota de 3 jogos novos por rede descrita acima. O cadastro por CPF, previsto na decisão 0001, é o que fecha essa porta, e não faz parte desta versão.
+- Um jogador anônimo que respondeu a uma pesquisa e depois entra numa conta Google já existente é ligado à conta mesmo sem ter escolhas no jogo, para a conta não responder de novo. Nesse caso nada do jogo é somado.
+- Nenhuma rota devolve soma de respostas. O [gate de publicação agregada](../legal/AGGREGATE_PUBLICATION_GATE.md) continua valendo.
 
 ## Origem e proxy
 
