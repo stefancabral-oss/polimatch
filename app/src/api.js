@@ -210,3 +210,20 @@ export function loadGameCapabilities() { return requestJson("/api/game-capabilit
 export function gameRequest(path, recoveryKey, body = {}) {
   return requestJson(path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + recoveryKey }, body: JSON.stringify(body) });
 }
+
+// Pesquisa por foto (ICM 68, #324). O sorteio é emitido pelo servidor; a
+// resposta leva o recibo que quem chama gerou uma vez, para a repetição depois
+// de um tempo esgotado não virar outra resposta.
+const photoSurveyPath = (surveyId, action = "") => `/api/photo-surveys/${encodeURIComponent(surveyId)}${action}`;
+
+export function loadPhotoSurvey(surveyId) {
+  return requestJson(photoSurveyPath(surveyId));
+}
+
+export function drawPhotoSurvey(surveyId, recoveryKey) {
+  return gameRequest(photoSurveyPath(surveyId, "/draw"), recoveryKey);
+}
+
+export function respondPhotoSurvey(surveyId, recoveryKey, { answerId, pickIds, championId } = {}) {
+  return gameRequest(photoSurveyPath(surveyId, "/response"), recoveryKey, { answerId, pickIds, championId });
+}

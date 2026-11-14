@@ -188,6 +188,11 @@ jobs:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
         run: node app/e2e/main-navigation.mjs
 
+      - name: Validate the photo survey page (ICM 68, entry, vote, undo, single response and exits)
+        env:
+          POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
+        run: node app/e2e/photo-survey.mjs
+
       - name: Report forced browser errors to the API without player data
         env:
           POLIMATCH_E2E_BROWSER: ${{ matrix.browser }}
