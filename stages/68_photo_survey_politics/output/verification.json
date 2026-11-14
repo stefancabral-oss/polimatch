@@ -65,7 +65,7 @@
     "delivery68b": "aprovada",
     "delivery68c": "aprovada (gate do Stefan em 14/11/2026)",
     "delivery68d": "aprovada (gate do Stefan em 14/11/2026)",
-    "delivery68e": "não iniciada"
+    "delivery68e": "em andamento: API e app publicados em 14/11/2026 com a pesquisa ligada e a página escondida; falta a entrada na capa e o sitemap"
   },
   "delivery68b": {
     "checkedAt": "2026-11-13",
@@ -338,7 +338,44 @@
     },
     "realStackFinalCode": "página, API e PostgreSQL de verdade, locais, sobre o código final: 3 jogadores, 3 sorteios, 2 respostas iguais às escolhas da tela; votes e ranking_stats sem mudança",
     "automatedReview": "Codex leu o commit 424bf62 e não deixou apontamento",
-    "remoteCi": "ci-gate verde no PR #328, no commit 424bf62 (Chromium e WebKit no Linux, 33 cenários); o merge exige ci-gate verde também no commit final, que só registra o gate",
+    "remoteCi": "ci-gate verde no PR #328, no commit 424bf62 (Chromium e WebKit no Linux, 33 cenários); ci-gate verde também no commit final 2e4b857; PR #328 mesclado em eb729ed, com a árvore da main igual à do commit testado",
     "humanGate": "68d aprovada por instrução do Stefan para o PR #328 em 14/11/2026 (\"Mescla\"), transcrita no PR; merge a cargo do agente com o check verde"
+  },
+  "delivery68e": {
+    "checkedAt": "2026-11-14",
+    "plan": "stages/68_photo_survey_politics/plans/68e-publicacao.md",
+    "publishedCommit": "eb729ed",
+    "alsoShipped": "estágio 45 (#314), mesclado em 13/11/2026 e ainda não publicado",
+    "steps": {
+      "1 cópia do banco": "pg_dump no contêiner do banco, saída 0; 592947 bytes; 27 tabelas; /tmp/pre-deploy-20261114.dump dentro do contêiner (provisória)",
+      "2 PHOTO_SURVEYS_ENABLED=true": "linha acrescentada e salva na aba Environment da API, a pedido do Stefan; as quatro variáveis anteriores idênticas por tamanho e resumo de linha, antes e depois de salvar; valores não lidos",
+      "3 deploy da API": "35 s; 72 de 72 respostas 200 em /api/health, de fora, a cada 5 s; rota da pesquisa de 404 para 200, status open, 20 cartas, sorteio de 16; log database_ready com resetApplied false, sem erro",
+      "4 deploy do app": "27 s; capa 200 em todas as consultas de fora a cada 5 s; /pesquisa.html de 404 para 200",
+      "5 teste do Stefan no celular": "com ele"
+    },
+    "database": {
+      "method": "contagem de linhas por tabela, no terminal do contêiner, antes e depois do deploy da API",
+      "unchanged": "24 tabelas com a mesma contagem (entre elas votes 1770, anonymous_players 208, player_stats 34060, ranking_stats 220)",
+      "expectedChanges": [
+        "photo_survey_draws e photo_survey_responses criadas, com 0 linhas",
+        "schema_migrations de 3 para 4: 2026-11-13-photo-survey-v1",
+        "abuse_quota_counters de 66 para 61: poda que a API faz ao subir"
+      ]
+    },
+    "outsideChecks": {
+      "pages": "/, /quem-disse-isso.html, /fato-ou-fake.html, /duelos-da-corrida.html e /pesquisa.html respondem 200",
+      "hidden": "pesquisa.html com meta robots noindex; sitemap.xml só com as quatro páginas antigas; nenhuma delas cita pesquisa.html",
+      "assets": "os cinco arquivos da página respondem 200; o JS publicado traz os textos da 68d",
+      "cards": "40 de 40 imagens das 20 cartas respondem 200",
+      "cors": "pré-voo OPTIONS de https://polimatch.com.br para a rota do sorteio: 204 com access-control-allow-origin",
+      "oldRoutes": "candidatos e capacidades 200; ranking 403 AGGREGATE_PUBLICATION_WITHHELD, como antes",
+      "releaseIdentity": "version.json com sha unknown e API com revision null: o build do Dokploy não recebe SOURCE_COMMIT (#287)"
+    },
+    "notDone": [
+      "navegador automatizado em produção: não aberto; o primeiro toque em Começar é do Stefan",
+      "entrada na capa e sitemap: segunda parte da 68e, com outro sim"
+    ],
+    "rollback": "tirar PHOTO_SURVEYS_ENABLED e publicar a API de novo: as rotas voltam a 404 e a página diz que a pesquisa não está disponível; as respostas gravadas ficam",
+    "humanGate": "cada passo com instrução do Stefan em 14/11/2026: \"Sim\" (cópia do banco), \"Liga vc\" (variável e deploy da API), \"Sim\" (deploy do app com as 20 cartas atuais); transcritas no HANDOFF"
   }
 }
