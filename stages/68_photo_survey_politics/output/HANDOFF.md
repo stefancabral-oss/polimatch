@@ -2,12 +2,13 @@
 
 ## Status
 
-- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor), 68c (tela) e 68d (teste por agentes) foram aprovadas. Falta a 68e.
+- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor), 68c (tela) e 68d (teste por agentes) foram aprovadas. A 68e está pela metade: em 14/11/2026 a API e o app foram publicados com a pesquisa ligada e a página escondida. Falta a entrada na capa e o sitemap, com outro sim.
 - Issue: #324
 - 68a: PR #325, mesclado em `3a59344`.
 - 68b: PR #326, mesclado em `3e1f771`.
 - 68c: PR #327, mesclado em `82ffed5`.
-- 68d: PR #328, branch `icm/68d-agent-playtest` (base main `82ffed5`).
+- 68d: PR #328, mesclado em `eb729ed`.
+- 68e: publicação de 14/11/2026 no commit `eb729ed`; registro no PR #329.
 
 ## Entregue (68a — registro)
 
@@ -65,7 +66,18 @@ O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com 
 - `stages/68_photo_survey_politics/plans/68d-teste-por-agentes.md`: os caminhos, o que cada agente viu e o que mudou.
 - `stages/68_photo_survey_politics/references/68d-ambiente/`: o roteiro do ambiente (`ambiente.sh`, `porta.mjs`) e o texto dado aos agentes, para repetir a rodada.
 
+## Entregue (68e — publicação, primeira parte)
+
+- Em 14/11/2026 a API e o app foram publicados pelo painel, no commit `eb729ed`, com `PHOTO_SURVEYS_ENABLED=true` na API. A pesquisa `politica-2026-01` está aberta em `https://polimatch.com.br/pesquisa.html`.
+- A página está escondida: fora do menu, fora do sitemap, com `noindex`, e nenhuma página do site aponta para ela.
+- A publicação levou também o estágio 45 (#314), que estava mesclado e ainda não publicado.
+- Antes do deploy foi feita uma cópia do banco, e a contagem de linhas de cada tabela foi comparada antes e depois: as 24 tabelas antigas não mudaram.
+- As respostas dadas antes do lançamento ficam gravadas, como toda resposta. Proposta do agente, por delegação: tratar `politica-2026-01` como ensaio e criar a pesquisa de lançamento com outro código, zerada.
+- `stages/68_photo_survey_politics/plans/68e-publicacao.md`: os passos, o que foi conferido e como voltar atrás.
+
 ## Não entregue / pendente
+
+- A entrada na capa e a página no sitemap (segunda parte da 68e), com outro sim.
 
 - As entregas 68d (teste por agentes) e 68e (publicação).
 - O botão voltar do navegador sai da página em vez de voltar uma tela. Ao abrir de novo, a pessoa retoma de onde parou. Fica para avaliar na 68d.
@@ -115,6 +127,13 @@ O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com 
 - Capturas conferidas: entrada com aviso de cota, final com escolhida, fechada com aviso e saída da conta, em 360×640 e 390×844.
 - Página, API e PostgreSQL de verdade, locais, sobre o código final: três pessoas, três sorteios, duas respostas iguais às escolhas da tela; `votes` e `ranking_stats` sem mudança.
 - CI do PR #328: `ci-gate` verde no commit `424bf62`, em Chromium e em WebKit no Linux, com os 33 cenários. A revisão automática do Codex leu o mesmo commit e não deixou apontamento.
+
+68e, em 14/11/2026, em produção, só por leitura fora os passos autorizados:
+
+- Cópia do banco: `pg_dump` sem erro, 592.947 bytes, 27 tabelas.
+- API: deploy em 35 s; 72 consultas de fora em 6 min, todas 200; rota da pesquisa de 404 para 200, aberta; log com `database_ready` e `resetApplied: false`; 24 tabelas antigas com a mesma contagem, as duas da pesquisa vazias, migração `2026-11-13-photo-survey-v1` registrada.
+- App: deploy em 27 s; a capa respondeu 200 em todas as consultas de fora; `/pesquisa.html` 200 com `noindex`; os cinco arquivos da página e as 40 imagens das cartas 200; sitemap só com as quatro páginas antigas; pré-voo de CORS do site para a rota do sorteio aceito.
+- Não foi aberto navegador automatizado em produção.
 
 ## Revisão independente
 
@@ -202,10 +221,14 @@ Escolhas de desenho do agente na 68c, no mesmo regime:
 
 ## Próximo passo exato
 
-1. A 68e: publicação, com um sim para cada passo: cópia do banco, API, ligar `PHOTO_SURVEYS_ENABLED` e app. A página entra escondida, fora do menu e do sitemap.
+1. O Stefan testa no celular, em `https://polimatch.com.br/pesquisa.html`. São três pessoas novas por rede por dia.
+2. Com o que ele achar: correções, e a decisão sobre a entrada na capa e o sitemap (segunda parte da 68e).
+3. Antes de chamar gente de fora: política de privacidade (#283), backup externo (#279), o destino da edição Eleições 2026 (#285), a cota de três por rede e a pesquisa de lançamento com código próprio.
 
 ## Ação do Stefan
 
+- Testar a pesquisa no celular.
+- Decidir o que fazer com as duas cópias provisórias do banco, que têm dado pessoal e ficam dentro do contêiner (`/tmp/pre-deploy-20261113.dump` e `/tmp/pre-deploy-20261114.dump`).
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
 - Confirmar as condições de publicação propostas no contexto do estágio.
 - Dizer se quer cartas de Lula e Flávio Bolsonaro no padrão comum, para entrarem numa próxima pesquisa.
@@ -224,3 +247,6 @@ Escolhas de desenho do agente na 68c, no mesmo regime:
 - Decisão da entrega 68d: `aprovado`
 - Responsável: Stefan
 - Observação: aprovado por instrução direta do Stefan para o PR #328, em conversa de 14/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 328, sim ou não?", ele respondeu: "Mescla". Quando respondeu, o CI e a revisão automática do PR ainda rodavam, e isso estava dito na mesma mensagem; os dois fecharam sem apontamento antes do merge. O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada. As correções da 68d são escolhas de tela e de texto do agente, por delegação dele, e podem ser mudadas até a publicação. A 68e tem gate próprio, com um sim para cada passo.
+- Decisão da entrega 68e: `em andamento`
+- Responsável: Stefan
+- Observação: cada passo da publicação de 14/11/2026 teve instrução direta do Stefan em conversa. À pergunta "Começo a publicação agora, pela cópia do banco, sim ou não?", ele respondeu: "Sim". À pergunta sobre quem ligaria a variável `PHOTO_SURVEYS_ENABLED=true`, com as opções "Liguei, publica a API" e "Liga você" (o agente abre a aba Environment, acrescenta a linha, salva e publica a API), ele respondeu: "Liga vc". À pergunta "Publico o app agora, com as 20 cartas atuais, sim ou não?", feita depois de lembrar que 8 delas vêm de fotos de veículos ou de sites e já estão no ar no jogo atual, ele respondeu: "Sim". A entrada na capa, o sitemap e o convite a pessoas de fora não foram autorizados e dependem de outro sim. O registro da publicação (PR #329, só documentação) também teve o sim dele: à pergunta "Com o CI verde, mesclo o PR 329, que só registra a publicação, sim ou não?", ele respondeu: "Sim". A regra 6 do `AGENTS.md` não muda.
