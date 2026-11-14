@@ -64,7 +64,7 @@
     "delivery68a": "aprovada",
     "delivery68b": "aprovada",
     "delivery68c": "aprovada (gate do Stefan em 14/11/2026)",
-    "delivery68d": "não iniciada",
+    "delivery68d": "aprovada (gate do Stefan em 14/11/2026)",
     "delivery68e": "não iniciada"
   },
   "delivery68b": {
@@ -244,7 +244,101 @@
       "testFirst": "cenário novo no e2e, que falhou antes da correção (troca liberada depois do 429)",
       "thread": "respondida e resolvida no PR depois da correção; a regra da main exige as conversas resolvidas"
     },
-    "remoteCi": "ci-gate falhou no commit fc5e153 (um cenário, nos dois navegadores) e a causa foi corrigida; ci-gate verde no commit 0d9ce3f, em Chromium e em WebKit; o merge exige ci-gate verde no commit final do PR #327",
+    "remoteCi": "ci-gate falhou no commit fc5e153 (um cenário, nos dois navegadores) e a causa foi corrigida; ci-gate verde no commit 0d9ce3f, em Chromium e em WebKit; ci-gate verde também no commit final 61509d3; PR #327 mesclado em 82ffed5, com a árvore da main igual à do commit testado",
     "humanGate": "68c aprovada por instrução do Stefan para o PR #327 em 14/11/2026 (\"Sim\"), transcrita no PR; merge a cargo do agente com o check verde"
+  },
+  "delivery68d": {
+    "checkedAt": "2026-11-14",
+    "branch": "icm/68d-agent-playtest",
+    "base": "82ffed5",
+    "plan": "stages/68_photo_survey_politics/plans/68d-teste-por-agentes.md",
+    "environment": {
+      "recipe": "stages/68_photo_survey_politics/references/68d-ambiente/ (ambiente.sh, porta.mjs, roteiro-dos-agentes.md)",
+      "what": "página e API de verdade, locais, de origens diferentes (CORS, como em produção), PHOTO_SURVEYS_ENABLED=true, PostgreSQL descartável; um banco e uma API por agente, duas redes por agente; uma API com a mesma pesquisa fechada; chave por rede para API aberta, conexão derrubada, 502 e fechada",
+      "engines": "WebKit 26 e Chromium 140 (Playwright), toques de verdade, capturas conferidas a olho",
+      "rules": "agentes somente leitura no repositório, só 127.0.0.1, só SELECT no banco; nada toca produção"
+    },
+    "round1": {
+      "commit": "0d9ce3f",
+      "paths": {
+        "direto": "passou (WebKit e Chromium): abrir não grava; uma gravação igual ao que foi tocado, na ordem; votes e ranking_stats sem mudança",
+        "voltar e trocar": "passou (WebKit): inclusive trocar a carta que era a escolhida; gravado o último estado da tela; nada gravado antes de confirmar",
+        "recarga no meio": "passou (Chromium): mesmo sorteio e mesmas escolhas em três pontos e depois de fechar a aba; nenhum jogador ou sorteio novo",
+        "segunda aba": "passou (WebKit e Chromium): gravado o que a aba que terminou mostrava; um ponto menor (aba parada com tela antiga)",
+        "troca de identidade no meio": "passou (WebKit e Chromium): nenhuma escolha de A gravada em B; um ponto a corrigir (aviso na confirmação) e um de texto (saída da conta)",
+        "cota de rede esgotada": "passou (WebKit e Chromium): quarta pessoa recusada sem estado pela metade, uma requisição por toque; as três anteriores e a outra rede sem efeito",
+        "API fora do ar": "passou (WebKit e Chromium): conexão derrubada e 502; resposta perdida depois de gravada termina em uma linha só, com o mesmo recibo",
+        "pesquisa fechada": "passou (WebKit e Chromium): nada gravado fechada; quem respondeu segue vendo a resposta; dois pontos a corrigir e um menor"
+      },
+      "databases": "pelos números finais de cada agente: 34 jogadores, 32 sorteios, 27 respostas; votes 0 e ranking_stats igual em todos; nenhum jogador com duas respostas",
+      "never": "resposta antes da confirmação, duas respostas do mesmo jogador, escolha gravada diferente da tela, escolhas de uma identidade gravadas em outra, mudança em votes ou ranking_stats"
+    },
+    "fixes": [
+      "fechou no meio: quem confirma depois do fechamento, ou volta com escolhas guardadas, lê que a escolha não foi registrada",
+      "entrada aberta antes de fechar: o toque em Começar confere a janela antes de criar o jogador",
+      "a conta muda enquanto a confirmação viaja: a pessoa lê que a resposta foi registrada, e o aparelho guarda que aquela conta respondeu",
+      "saída da conta no meio: aviso próprio e botão Começar",
+      "final em tela estreita com fonte larga: o título cabe em uma linha e a tela não rola",
+      "quem já respondeu e perdeu o registro local vê a própria resposta com a pesquisa fechada",
+      "duas abas no meio: a aba parada acompanha a outra",
+      "servidor fora do ar não manda conferir a conexão; a cota fala em participações",
+      "cartas não escolhidas mais claras, sem parecer desligadas",
+      "rodada 2: a conta que troca e volta dentro do tempo de uma confirmação vê a resposta registrada",
+      "rodada 2: entrada com aviso em tela baixa não deixa a lista atrás do botão",
+      "revisão: pesquisa fechada e conferência da resposta falhando fica na tela de fechada, com nova tentativa",
+      "revisão: quem saiu da conta no instante da confirmação vê a tela de registrada, sem convite para responder de novo",
+      "revisão: a aba que acompanha a outra lê o armazenamento atual e confere ao voltar a aparecer; o foco vai para o título",
+      "revisão: roteiro do ambiente só aceita banco local, só mexe em pasta criada por ele e só encerra o que abriu"
+    ],
+    "round2": {
+      "what": "três agentes conferiram cada correção na página e na API de verdade, com o código corrigido (commit local anterior aos dois ajustes da rodada 2)",
+      "result": "todas as correções se comportam como descrito, em WebKit e em Chromium; um caso de canto novo, corrigido",
+      "databases": "conferido direto nos três bancos: 18 jogadores, 18 sorteios, 13 respostas; votes 0; ranking_stats igual; nenhum jogador com duas respostas; 160 linhas de player_stats por jogador"
+    },
+    "tests": {
+      "app unit (npm test --prefix app)": "310/310",
+      "e2e photo-survey em WebKit local": "33 cenários aprovados",
+      "e2e photo-survey em Chromium 140 local": "33 cenários aprovados",
+      "testsFirst": "cada cenário que mudava comportamento falhou antes da correção pelo motivo esperado; os que só fixam comportamento existente passaram de primeira",
+      "capturas conferidas": ["entrada com aviso de cota", "final com escolhida", "fechada com aviso", "saída da conta", "360x640 e 390x844"]
+    },
+    "notedNotFixed": [
+      "recarregar com a API fora depois de uma confirmação incerta solta a trava; com a API de volta, o sorteio diz se a resposta foi gravada antes de a tela oferecer a troca",
+      "as escolhas parciais de uma identidade somem se outra identidade seguir e jogar: um registro por pesquisa no aparelho",
+      "o botão voltar do navegador sai da página; ao voltar, a pessoa retoma",
+      "a carta samia-bonfim mostra o nome Sâmia Bomfim: o identificador interno tem outra grafia",
+      "não exercitados no ambiente: 5xx com CORS (coberto pelo e2e simulado), a virada da cota, gestos num celular de verdade, Firefox"
+    ],
+    "acceptance68d": {
+      "agentes jogam ao menos os oito caminhos": "met",
+      "cada caminho registrado com o resultado": "met (round1.paths e o plano)",
+      "as correções que saíram entram na entrega": "met (fixes)"
+    },
+    "independentReview": {
+      "mode": "agente separado, somente leitura no repositório; rodou os testes de unidade e um arnês próprio com o módulo da página de verdade sobre DOM e API simulados",
+      "result": "sem bloqueio; nenhuma garantia enfraquecida (uma resposta por jogador, nada enviado antes de confirmar, trava da troca)",
+      "verified": [
+        "no servidor: com a pesquisa fechada, o sorteio só insere quando aberta; autenticar o jogador são leituras",
+        "cada cenário novo falha sem a correção correspondente (por leitura)",
+        "contas de quebra de linha com Menlo, DejaVu Sans Mono e Liberation Mono: nenhuma medida conferida muda no Linux"
+      ],
+      "requestedAndApplied": [
+        "fechada + falha ao conferir a resposta mostrava a entrada com 'Nenhuma escolha foi registrada'",
+        "saída da conta + confirmação registrada convidava a responder de novo",
+        "testes para os trechos novos sem cobertura",
+        "roteiro do ambiente: 403 na pasta padrão, banco fora da máquina, pastas apagadas sem conferir, processo encerrado pelo número"
+      ],
+      "notedNotFixed": [
+        "com a pesquisa fechada e identidade no aparelho, abrir a página pede o sorteio; fechada, o servidor não grava nada (uma rota só de leitura tiraria a dependência)",
+        "fechada + sessão recusada: vê Fechada, sem pista de que entrar de novo mostraria a resposta",
+        "título de 28 px em 390 px de largura com fonte muito larga",
+        "falha tardia da confirmação depois da troca de conta não é avisada; nada se perde"
+      ],
+      "notReRunByAgents": "os acertos da revisão não passaram pela segunda rodada de agentes; estão no e2e, nos dois navegadores"
+    },
+    "realStackFinalCode": "página, API e PostgreSQL de verdade, locais, sobre o código final: 3 jogadores, 3 sorteios, 2 respostas iguais às escolhas da tela; votes e ranking_stats sem mudança",
+    "automatedReview": "Codex leu o commit 424bf62 e não deixou apontamento",
+    "remoteCi": "ci-gate verde no PR #328, no commit 424bf62 (Chromium e WebKit no Linux, 33 cenários); o merge exige ci-gate verde também no commit final, que só registra o gate",
+    "humanGate": "68d aprovada por instrução do Stefan para o PR #328 em 14/11/2026 (\"Mescla\"), transcrita no PR; merge a cargo do agente com o check verde"
   }
 }

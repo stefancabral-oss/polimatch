@@ -4,12 +4,7 @@ import ARTS from "./political-chromas.json" with { type: "json" };
 import { photoSurveyById } from "../../shared/photo-survey.js";
 import { createPlayer, drawPhotoSurvey, loadPhotoSurvey, respondPhotoSurvey } from "./api.js";
 import { safeStorage } from "./safe-storage.js";
-import {
-  IDENTITY_NOTICE_COPY,
-  identityNoticeFromError,
-  isPlayerIssuanceLimit,
-  quotaResetSentence,
-} from "./identity-notice.js";
+import { identityNoticeFromError, isPlayerIssuanceLimit, quotaResetLabel } from "./identity-notice.js";
 import {
   PHOTO_SURVEY_ID,
   PHOTO_SURVEY_STORAGE_KEY,
@@ -21,6 +16,7 @@ import {
   readSavedProgress,
   responseBody,
   restoreProgress,
+  sameGroups,
   sampleCards,
   savedProgressText,
 } from "./photo-survey-flow.js";
@@ -51,6 +47,8 @@ let notice = "";
 let busy = false;
 // A confirmação foi enviada e não se sabe se chegou: até saber, não dá para trocar.
 let uncertain = false;
+// A entrada está mostrando o aviso de conta trocada, à espera do toque.
+let switched = false;
 let epoch = 0;
 let gridToken = 0;
 let advanceTimer = 0;
@@ -99,6 +97,12 @@ function persist() {
 
 function forgetSaved() {
   safeStorage.set(PHOTO_SURVEY_STORAGE_KEY, savedProgressText(readStored(PHOTO_SURVEY_STORAGE_KEY), PHOTO_SURVEY_ID, {}));
+}
+
+/** Há ao menos uma escolha desta identidade guardada neste aparelho. */
+function hasSavedPicks() {
+  const saved = savedRecord();
+  return Boolean(saved && saved.identity === identityTag(identity) && Array.isArray(saved.progress?.picks) && saved.progress.picks.some(Boolean));
 }
 
 /** Quem já começou nesta identidade tem sorteio emitido: retomar não grava nada novo. */
@@ -315,7 +319,7 @@ function armGrid() {
     () => {
       window.clearTimeout(timer);
       if (token !== gridToken) return;
-      notice = `Não conseguimos carregar as cartas. Confira a conexão. ${retryButton("reload-cards")}`;
+      notice = `Não conseguimos carregar as cartas.${navigator.onLine === false ? " Confira a conexão." : ""} ${retryButton("reload-cards")}`;
       const target = root.querySelector("#ps-notice");
       target.innerHTML = notice;
       target.hidden = false;
@@ -351,6 +355,8 @@ function applyDraw(result) {
     return;
   }
   if (survey?.status !== "open") {
+    // Quem tinha escolhas neste aparelho precisa saber que elas não chegaram a valer.
+    if (survey?.status === "closed" && hasSavedPicks()) notice = "A pesquisa fechou antes de você confirmar. Sua escolha não foi registrada.";
     renderClosed(survey?.status, { focus: true });
     return;
   }
@@ -371,6 +377,31 @@ function sessionNotice() {
   return `Sua sessão precisa ser recuperada. Volte ao início, entre de novo e abra esta pesquisa outra vez. ${HOME_LINK}`;
 }
 
+/**
+ * A entrada com o aviso de conta trocada. Sem conta nenhuma no aparelho, o
+ * toque cria um jogador novo, e o texto diz isso. `recorded`: a confirmação
+ * que viajava quando a conta mudou chegou e foi registrada na conta de antes;
+ * se a pessoa saiu da conta, vê a tela de registrada.
+ */
+function renderSwitched({ recorded = false } = {}) {
+  const signedOut = !readStored(IDENTITY_KEY);
+  if (signedOut && recorded) {
+    // A pessoa acabou de responder: a tela de registrada, sem convite para
+    // responder outra vez como visitante.
+    switched = false;
+    response = null;
+    notice = "Você saiu da conta neste aparelho. A resposta que você confirmou foi registrada.";
+    renderDone({ focus: true });
+    return;
+  }
+  notice = [
+    signedOut ? "Você saiu da conta neste aparelho." : "Sua conta mudou.",
+    recorded ? "A resposta que você confirmou foi registrada na conta anterior." : "",
+    signedOut ? "Toque em Começar para responder sem conta." : "Toque em Continuar para seguir com a conta atual.",
+  ].filter(Boolean).join(" ");
+  renderEntry({ label: signedOut ? "Começar" : "Continuar", focus: true });
+}
+
 /** A conta desta aba deixou de ser a que está salva: recomeça com a atual, com um toque. */
 function identityChanged() {
   epoch += 1;
@@ -381,8 +412,44 @@ function identityChanged() {
   progress = null;
   response = null;
   view = "entry";
-  notice = "Sua conta mudou. Toque em Continuar para seguir com a conta atual.";
-  renderEntry({ label: "Continuar", focus: true });
+  switched = true;
+  renderSwitched();
+}
+
+/**
+ * A conta mudou enquanto a confirmação viajava, e a resposta foi registrada
+ * na conta de antes. O aparelho guarda que aquela conta respondeu, e a pessoa
+ * lê que a resposta valeu. Se a conta já voltou a ser a de antes, a tela
+ * mostra a resposta.
+ */
+function recordedBeforeSwitch(key, result) {
+  if (!result?.response) return;
+  if (identity === key) {
+    // A conta trocou e voltou enquanto a confirmação viajava: a resposta é
+    // desta conta. Vale mais que o sorteio pedido na volta, que saiu do
+    // servidor antes de a confirmação chegar.
+    epoch += 1;
+    busy = false;
+    uncertain = false;
+    switched = false;
+    window.clearTimeout(advanceTimer);
+    survey = result.survey || survey;
+    response = result.response;
+    progress = null;
+    notice = "";
+    persist();
+    renderDone({ focus: true });
+    return;
+  }
+  const saved = savedRecord();
+  if (saved?.identity === identityTag(key)) {
+    safeStorage.set(PHOTO_SURVEY_STORAGE_KEY, savedProgressText(readStored(PHOTO_SURVEY_STORAGE_KEY), PHOTO_SURVEY_ID, {
+      identity: saved.identity,
+      progress: null,
+      answered: true,
+    }));
+  }
+  if (switched && view === "entry" && !busy) renderSwitched({ recorded: true });
 }
 
 /**
@@ -394,6 +461,7 @@ async function start({ auto = false, retried = false } = {}) {
   busy = true;
   notice = "";
   uncertain = false;
+  switched = false;
   const run = ++epoch;
   view = "entry";
   if (resumable()) renderOpening();
@@ -407,6 +475,15 @@ async function start({ auto = false, retried = false } = {}) {
   let result;
   try {
     if (!key) {
+      // A entrada pode estar aberta há muito tempo. Antes de criar o jogador,
+      // que gasta a cota de jogos novos da rede, confere se a pesquisa segue aberta.
+      survey = await loadPhotoSurvey(PHOTO_SURVEY_ID);
+      if (run !== epoch) return;
+      if (survey?.status !== "open") {
+        busy = false;
+        renderClosed(survey?.status, { focus: true });
+        return;
+      }
       const player = await createPlayer();
       if (run !== epoch) return;
       // Outra aba pode ter criado o jogador enquanto esta esperava: vale o que já está salvo.
@@ -442,16 +519,29 @@ function failStart(error) {
     return;
   }
   if (isPlayerIssuanceLimit(error)) {
-    notice = `${escapeText(IDENTITY_NOTICE_COPY.quotaHeading)} Entre com Google na página inicial para responder agora. ${escapeText(quotaResetSentence(identityNoticeFromError(error).retryAt))} ${HOME_LINK}`;
+    notice = `Muitas participações novas nesta rede hoje. Entre com Google na página inicial para responder agora. Novas participações nesta rede voltam a ser liberadas ${escapeText(quotaResetLabel(identityNoticeFromError(error).retryAt))}. ${HOME_LINK}`;
     renderEntry({ focus: true });
     return;
   }
   if (error.status === 401) {
+    // Com a pesquisa fechada não há o que recuperar: vale a tela de fechada.
+    if (survey && survey.status !== "open") {
+      renderClosed(survey.status, { focus: true });
+      return;
+    }
     notice = sessionNotice();
     renderEntry({ label: "Tentar de novo", focus: true });
     return;
   }
   const busyServer = error.status === 429 ? "Muitas tentativas agora. Espere um pouco e tente de novo." : "";
+  if (survey && survey.status !== "open") {
+    // A pesquisa não está aberta e não deu para conferir se há resposta desta
+    // identidade: a pessoa fica na tela de fechada, sem entrada para começar e
+    // sem ler que nada foi registrado.
+    notice = `${busyServer || "Não conseguimos conferir agora se há uma resposta sua nesta pesquisa."} ${retryButton("init")}`;
+    renderClosed(survey.status, { focus: true });
+    return;
+  }
   const saved = resumable() ? savedRecord() : null;
   if (saved?.answered) {
     // Quem já respondeu não volta para a entrada só porque o servidor não respondeu.
@@ -483,7 +573,10 @@ async function submit() {
     failSubmit(error, key);
     return;
   }
-  if (run !== epoch) return;
+  if (run !== epoch) {
+    recordedBeforeSwitch(key, result);
+    return;
+  }
   busy = false;
   uncertain = false;
   survey = result?.survey || survey;
@@ -505,6 +598,7 @@ function failSubmit(error, key) {
   }
   if (error.status === 409 && error.code === "PHOTO_SURVEY_CLOSED") {
     uncertain = false;
+    notice = "A pesquisa fechou antes de a sua confirmação chegar. Sua escolha não foi registrada.";
     renderClosed(error.body?.current?.status, { focus: true });
     return;
   }
@@ -611,14 +705,22 @@ async function init() {
       return;
     }
     view = "entry";
-    notice = error.status === 0
-      ? "Não conseguimos falar com o servidor. Confira a conexão."
-      : "O servidor não respondeu como esperado. Tente de novo em instantes.";
+    notice = error.status !== 0
+      ? "O servidor não respondeu como esperado. Tente de novo em instantes."
+      : navigator.onLine === false
+        ? "Não conseguimos falar com o servidor. Confira a conexão."
+        : "Não conseguimos falar com o servidor agora. Tente de novo em instantes.";
     renderEntry({ action: "init", label: "Tentar de novo" });
     return;
   }
   if (run !== epoch) return;
   if (survey?.status !== "open") {
+    // Fechada: quem já respondeu com a identidade deste aparelho ainda vê a
+    // própria resposta. Com a pesquisa fechada o sorteio não grava nada.
+    if (survey?.status === "closed" && readStored(IDENTITY_KEY)) {
+      start({ auto: true });
+      return;
+    }
     renderClosed(survey?.status);
     return;
   }
@@ -644,30 +746,52 @@ root.addEventListener("click", (event) => {
   }
 });
 
+/**
+ * Acerta a tela de voto com o que outra aba desta identidade deixou guardado.
+ * Lê o armazenamento como está agora, não o valor de um evento que pode ter
+ * chegado atrasado.
+ */
+function followOtherTab() {
+  if (view !== "play") return;
+  const saved = savedRecord();
+  if (!saved || saved.identity !== identityTag(identity)) return;
+  // Outra aba confirmou a resposta: esta busca a resposta no servidor em vez
+  // de seguir com a tela de voto.
+  if (saved.answered) {
+    epoch += 1;
+    busy = false;
+    uncertain = false;
+    window.clearTimeout(advanceTimer);
+    progress = null;
+    start({ auto: true });
+    return;
+  }
+  // Outra aba avançou ou trocou uma escolha no mesmo sorteio: esta acompanha,
+  // em vez de ficar numa tela antiga. Um aviso que esteja na tela continua.
+  if (busy || uncertain || !progress || !saved.progress || !sameGroups(saved.progress.groups, progress.groups)) return;
+  const next = restoreProgress(saved.progress, progress.groups);
+  if (JSON.stringify(next) === JSON.stringify(progress)) return;
+  progress = next;
+  renderPlay({ focus: true });
+}
+
 window.addEventListener("storage", (event) => {
   if (event.key === IDENTITY_KEY || event.key === null) {
     if (identity && readStored(IDENTITY_KEY) !== identity && view !== "unavailable") identityChanged();
     return;
   }
-  // Outra aba deste aparelho confirmou a resposta desta identidade: esta aba
-  // busca a resposta no servidor em vez de seguir com a tela de voto.
-  if (event.key === PHOTO_SURVEY_STORAGE_KEY && view === "play") {
-    const saved = readSavedProgress(event.newValue, PHOTO_SURVEY_ID);
-    if (saved?.answered && saved.identity === identityTag(identity)) {
-      epoch += 1;
-      busy = false;
-      uncertain = false;
-      window.clearTimeout(advanceTimer);
-      progress = null;
-      start({ auto: true });
-    }
-  }
+  if (event.key === PHOTO_SURVEY_STORAGE_KEY) followOtherTab();
 });
 
 // A troca feita nesta mesma aba (ir ao início, entrar com Google e voltar pelo
 // histórico) não gera evento de armazenamento: confere ao voltar a aparecer.
+// Uma aba congelada também não recebe o que a outra guardou: confere junto.
 function recheckIdentity() {
-  if (identity && view !== "unavailable" && readStored(IDENTITY_KEY) !== identity) identityChanged();
+  if (identity && view !== "unavailable" && readStored(IDENTITY_KEY) !== identity) {
+    identityChanged();
+    return;
+  }
+  followOtherTab();
 }
 window.addEventListener("pageshow", (event) => {
   if (event.persisted) recheckIdentity();
