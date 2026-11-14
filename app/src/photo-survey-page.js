@@ -504,23 +504,27 @@ function failSubmit(error, key) {
     return;
   }
   if (error.status === 409 && error.code === "PHOTO_SURVEY_CLOSED") {
+    uncertain = false;
     renderClosed(error.body?.current?.status, { focus: true });
     return;
   }
   if (error.status === 404) {
+    uncertain = false;
     renderStopped("unavailable", { focus: true });
     return;
   }
   // Sem resposta, ou com falha do servidor, não dá para saber se foi gravada.
-  // Até a nova tentativa responder, a escolha fica travada: trocar agora poderia
-  // mostrar uma escolha e registrar outra.
+  // Até o servidor dizer o que tem guardado, a escolha fica travada: trocar
+  // agora poderia mostrar uma escolha e registrar outra. Uma recusa que não
+  // chega a olhar a resposta guardada (limite de requisições, sessão) não
+  // desfaz a dúvida; `uncertain` só volta a falso onde o servidor respondeu
+  // sobre ela.
   if (error.status === 0 || error.status >= 500) {
     uncertain = true;
     notice = "Não deu para saber se a sua resposta chegou. Toque em Tentar de novo para conferir: nada é registrado duas vezes.";
     renderPlay({ focus: true });
     return;
   }
-  uncertain = false;
   if (error.status === 401) {
     if (readStored(IDENTITY_KEY) !== key) {
       identityChanged();
@@ -531,7 +535,9 @@ function failSubmit(error, key) {
     return;
   }
   if (error.code === "PHOTO_SURVEY_RESPONSE_INVALID" && error.body?.current?.reason === "answer-id") {
-    // O recibo foi recusado: um recibo novo resolve, as escolhas continuam.
+    // O recibo foi recusado, e o servidor só chega a essa recusa quando não
+    // tem resposta guardada deste jogador: um recibo novo resolve.
+    uncertain = false;
     progress = { ...progress, answerId: crypto.randomUUID() };
     persist();
     notice = "Não conseguimos registrar agora. Sua escolha continua aqui.";
@@ -541,6 +547,7 @@ function failSubmit(error, key) {
   if (error.code === "PHOTO_SURVEY_RESPONSE_INVALID" || error.code === "PHOTO_SURVEY_DRAW_REQUIRED") {
     // A resposta não bate com o sorteio guardado no servidor (o jogador ativo
     // da conta pode ter mudado): busca o sorteio de novo e recomeça com ele.
+    uncertain = false;
     progress = null;
     forgetSaved();
     start().then(() => {

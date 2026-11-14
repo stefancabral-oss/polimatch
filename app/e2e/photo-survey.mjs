@@ -559,6 +559,41 @@ try {
     assert.equal(server.responses.size, 1);
   });
 
+  await scenario("resposta perdida e nova tentativa recusada sem dizer se gravou: a troca segue travada", async () => {
+    const server = createServer();
+    const context = await newContext(server);
+    const page = await openSurvey(context);
+    await begin(page);
+    await step(page, "Tela 1 de 4");
+    const key = await storedKey(page);
+    const picks = await playScreens(page, server.groupsFor(key), [2, 2, 2, 2]);
+    await tap(page, picks[0]);
+    await step(page, "Confirmar");
+    const backButton = page.locator('.ps-stack [data-action="back"]');
+    // O servidor gravou e a resposta se perdeu.
+    server.dropAfterApply = 1;
+    await confirm(page);
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Não deu para saber se a sua resposta chegou" }).waitFor();
+    // Limite de requisições na nova tentativa: continua sem saber.
+    server.failResponse.push(429);
+    await confirm(page);
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Muitas tentativas agora" }).waitFor();
+    assert.equal(await backButton.isDisabled(), true, "o limite de requisições não diz se gravou: a troca segue travada");
+    assert.equal(await page.locator('[data-action="confirm"]').innerText(), "Tentar de novo");
+    // Sessão recusada com a mesma identidade: também não diz se gravou.
+    server.revoked.add(key);
+    await confirm(page);
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Sua sessão precisa ser recuperada" }).waitFor();
+    assert.equal(await backButton.isDisabled(), true, "a sessão recusada não diz se gravou: a troca segue travada");
+    assert.equal(await title(page), nameOf.get(picks[0]), "a escolha continua na tela");
+    server.revoked.delete(key);
+    await confirm(page);
+    await step(page, "Registrada");
+    assert.equal(await title(page), nameOf.get(picks[0]));
+    assert.equal(server.responses.size, 1);
+    assert.equal(server.responses.get(key).response.championId, picks[0], "ficou registrada a escolha que a tela mostrava");
+  });
+
   await scenario("pesquisa fechada na abertura e fechada no meio", async () => {
     const closed = createServer();
     closed.status = "closed";

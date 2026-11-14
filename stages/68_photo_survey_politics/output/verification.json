@@ -157,8 +157,8 @@
       "app unit (npm test --prefix app)": "310/310, 24 novos",
       "shared (npm run test:shared)": "104/104, sem mudança",
       "back unit (npm test --prefix back)": "293/293, sem mudança",
-      "e2e photo-survey em WebKit local, API simulada pelas regras de shared/photo-survey.js": "29 cenários aprovados (27 até o commit fc5e153; mais dois com fonte larga depois do primeiro CI)",
-      "e2e photo-survey em Chromium": "29 cenários no Chromium 140 em cache nesta máquina, aberto pelo caminho do executável; a revisão que o Playwright do repositório pede só o CI tem",
+      "e2e photo-survey em WebKit local, API simulada pelas regras de shared/photo-survey.js": "30 cenários aprovados (27 até o commit fc5e153; mais dois com fonte larga depois do primeiro CI; mais um da revisão automática)",
+      "e2e photo-survey em Chromium": "30 cenários no Chromium 140 em cache nesta máquina, aberto pelo caminho do executável; a revisão que o Playwright do repositório pede só o CI tem",
       "página + API + PostgreSQL reais, locais, PHOTO_SURVEYS_ENABLED=true": "3 jogadores, 3 sorteios, 2 respostas iguais às escolhas da tela; votes e ranking_stats sem mudança; player_stats dos 3 jogadores no valor inicial",
       "bateria e2e completa em WebKit local (antes das correções da revisão)": "23 de 27 roteiros; falhas conhecidas desta máquina: interaction-smoke, accessible-profile e civic-navigation (foco de teclado no WebKit do macOS) e fact-check (intermitente, #298; passou em 2 repetições)",
       "capturas conferidas": ["390x844", "375x667", "360x640", "375x548", "320x480", "320x480 com fonte larga", "667x375"]
@@ -236,7 +236,15 @@
         "com o celular deitado, na resposta registrada as finalistas pedem cerca de 20 px de rolagem"
       ]
     },
-    "remoteCi": "ci-gate falhou no commit fc5e153 (um cenário, nos dois navegadores) e a causa foi corrigida; o merge exige ci-gate verde no commit final do PR #327",
+    "automatedReview": {
+      "by": "Codex, configurado no repositório; revisou o commit fc5e153",
+      "finding": "depois de uma confirmação sem resposta, uma nova tentativa recusada por limite de requisições (429) ou por sessão (401, mesma identidade) destravava a troca sem saber se a primeira confirmação tinha sido gravada",
+      "verdict": "procedente",
+      "fix": "a trava só sai quando o servidor responde sobre a resposta guardada: resposta registrada, já respondida, fechada, recibo recusado ou sorteio diferente",
+      "testFirst": "cenário novo no e2e, que falhou antes da correção (troca liberada depois do 429)",
+      "thread": "respondida e resolvida no PR depois da correção; a regra da main exige as conversas resolvidas"
+    },
+    "remoteCi": "ci-gate falhou no commit fc5e153 (um cenário, nos dois navegadores) e a causa foi corrigida; ci-gate verde no commit 0d9ce3f, em Chromium e em WebKit; o merge exige ci-gate verde no commit final do PR #327",
     "humanGate": "68c aprovada por instrução do Stefan para o PR #327 em 14/11/2026 (\"Sim\"), transcrita no PR; merge a cargo do agente com o check verde"
   }
 }

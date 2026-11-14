@@ -92,7 +92,7 @@ O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com 
 - Causa: a fonte do sistema no Linux do CI é mais larga que a do macOS. O texto da confirmação quebrava em uma linha a mais, e a carta escolhida e as finalistas tinham tamanho fixo por faixa de altura; em 320×480 a folga era de 5 px. A tela de resposta registrada tinha o mesmo defeito, já no macOS, e não tinha medida no e2e.
 - Correção: nessas duas telas a carta escolhida ocupa a altura que sobra entre o texto e as finalistas, até o tamanho que já tinha; abaixo de 520 px de altura o sobretítulo some e as finalistas ficam menores. O botão ganhou respiro para texto em mais de uma linha. As telas de entrada, de voto e a final não mudaram.
 - O e2e passou a medir as duas telas em todos os tamanhos e ganhou dois cenários com o texto mais largo e mais alto (360×640 e 320×480), para a medida não depender da máquina. Escrito antes da correção, falhou primeiro aqui, na resposta registrada em 320×480.
-- `npm test --prefix app`: 310/310. `app/e2e/photo-survey.mjs`: 29 cenários aprovados em WebKit e em Chromium 140, locais. O Chromium abre aqui pelo caminho do executável em cache; o Playwright do repositório pede outra revisão, que só o CI tem.
+- `npm test --prefix app`: 310/310. `app/e2e/photo-survey.mjs`: 30 cenários aprovados em WebKit e em Chromium 140, locais (29 no commit `0d9ce3f`, que passou no CI nos dois navegadores; o trigésimo veio da revisão automática, abaixo). O Chromium abre aqui pelo caminho do executável em cache; o Playwright do repositório pede outra revisão, que só o CI tem.
 - Capturas e medidas conferidas na confirmação, na confirmação com aviso e na resposta registrada, em 390×844, 375×667, 360×640, 375×548, 320×480 (com e sem fonte larga) e 667×375. Com o celular deitado, na confirmação as finalistas passaram a caber sem rolar; na resposta registrada ainda pedem cerca de 20 px de rolagem.
 
 ## Revisão independente
@@ -124,6 +124,8 @@ Saiu também da revisão: depois de registrada, o aparelho guarda só que a pess
 - Na final, em 360×640 com uma fonte bem larga, o título quebra em duas linhas e a página rola 17 px; as quatro cartas e o voltar continuam à vista, com pouca folga. A 68d confere esse caso.
 - Em tela estreita, ao tocar em confirmar o botão muda de três linhas para uma e a carta escolhida cresce uns 15 px por um instante.
 - Não foram conferidos: Linux de verdade fora do CI, Firefox e Safari anterior ao 26.
+
+**68c, revisão automática no PR.** O Codex, configurado no repositório, revisou o commit `fc5e153` e deixou um apontamento, procedente: depois de uma confirmação sem resposta do servidor, se a nova tentativa voltasse com limite de requisições ou com sessão recusada, a tela destravava "Voltar e trocar" sem saber se a primeira confirmação tinha sido gravada. A pessoa podia trocar a escolha e só no fim ler que valia a primeira. Corrigido com o cenário escrito antes do código: a trava só sai quando o servidor responde sobre a resposta guardada. A regra da `main` exige as conversas de revisão resolvidas; a conversa foi respondida e resolvida depois da correção.
 
 ## Riscos conhecidos
 
