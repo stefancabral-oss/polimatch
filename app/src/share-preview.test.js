@@ -23,17 +23,33 @@ test("o build confere a prévia sem tirar a checagem de referências da borda", 
   assert.match(packageJson.scripts.build, /vite build && .*node scripts\/verify-share-preview\.mjs && node scripts\/verify-public-refs\.mjs$/);
 });
 
-test("as quatro páginas públicas são as entradas do build", () => {
+// A página da pesquisa por foto (ICM 68, #324) entra no build fora do menu e
+// do sitemap, com noindex, até a publicação (entrega 68e).
+const noindex = (entry) => /<meta\s+name="robots"\s+content="noindex"\s*\/?>/i.test(readSource(entry));
+
+test("as páginas do build são as quatro públicas e a da pesquisa por foto", () => {
   assert.deepEqual(
     htmlEntries(config).map((entry) => entry.file),
-    ["duelos-da-corrida.html", "fato-ou-fake.html", "index.html", "quem-disse-isso.html"],
+    ["duelos-da-corrida.html", "fato-ou-fake.html", "index.html", "pesquisa.html", "quem-disse-isso.html"],
   );
+  assert.deepEqual(htmlEntries(config).filter(noindex).map((entry) => entry.file), ["pesquisa.html"]);
 });
 
-test("as URLs canônicas coincidem com o sitemap da borda, sem reescrevê-lo", () => {
+test("as URLs canônicas das páginas indexáveis coincidem com o sitemap da borda, sem reescrevê-lo", () => {
   const sitemap = readFileSync(path.join(publicDir, "sitemap.xml"), "utf8");
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]).sort();
-  assert.deepEqual(locations, htmlEntries(config).map((entry) => canonicalPageUrl(entry.file)).sort());
+  const indexable = htmlEntries(config).filter((entry) => !noindex(entry));
+  assert.deepEqual(locations, indexable.map((entry) => canonicalPageUrl(entry.file)).sort());
+  assert.doesNotMatch(sitemap, /pesquisa/);
+});
+
+test("nenhuma página pública aponta para a pesquisa por foto antes da publicação", () => {
+  for (const entry of htmlEntries(config).filter((item) => !noindex(item))) {
+    assert.doesNotMatch(readSource(entry), /pesquisa\.html/, entry.file);
+  }
+  for (const source of ["main.js", "presidential-page.js", "quote-quiz-page.js", "fact-check-page.js"]) {
+    assert.doesNotMatch(readFileSync(path.join(appRoot, "src", source), "utf8"), /pesquisa\.html/, source);
+  }
 });
 
 test("a imagem de preview é a apresentação de marca já publicada, não um retrato", () => {

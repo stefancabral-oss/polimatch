@@ -119,8 +119,15 @@ test("robots.txt and sitemap.xml describe the public pages at the canonical orig
   assert.match(robots, /^Sitemap: https:\/\/polimatch\.com\.br\/sitemap\.xml$/m);
 
   const inputs = [...viteConfig.match(/input:\s*\{([^}]*)\}/)[1].matchAll(/"([^"]+\.html)"/g)].map(([, name]) => name);
-  assert.equal(inputs.length, 4);
-  const expected = inputs.map((name) => `https://polimatch.com.br/${name === "index.html" ? "" : name}`).sort();
+  assert.equal(inputs.length, 5);
+  // A página da pesquisa por foto (ICM 68, #324) fica fora do sitemap, com
+  // noindex, até a publicação.
+  const hidden = inputs.filter((name) => /<meta name="robots" content="noindex">/.test(read(`../${name}`)));
+  assert.deepEqual(hidden, ["pesquisa.html"]);
+  const expected = inputs
+    .filter((name) => !hidden.includes(name))
+    .map((name) => `https://polimatch.com.br/${name === "index.html" ? "" : name}`)
+    .sort();
   const listed = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, loc]) => loc).sort();
   assert.deepEqual(listed, expected);
   assert.match(sitemap, /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);

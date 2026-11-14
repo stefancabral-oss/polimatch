@@ -140,7 +140,7 @@ test("the beacon goes as text/plain and falls back to fetch with keepalive", asy
 });
 
 test("every page entry installs the reporter before any other module", async () => {
-  for (const entry of ["./main.js", "./quote-quiz-page.js", "./fact-check-page.js", "./presidential-page.js"]) {
+  for (const entry of ["./main.js", "./quote-quiz-page.js", "./fact-check-page.js", "./presidential-page.js", "./photo-survey-page.js"]) {
     const source = await readFile(new URL(entry, import.meta.url), "utf8");
     const firstImport = source.split("\n").find((line) => line.startsWith("import "));
     assert.match(firstImport, /^import ["']\.\/install-error-reporter\.js["'];$/, entry);
@@ -178,7 +178,7 @@ test("sem o SHA, o build do relato é o nome com hash do script de entrada da p�
 });
 
 test("cada página tem um único script de módulo, o de entrada, que dá nome ao build sem SHA", async () => {
-  for (const page of ["index.html", "quem-disse-isso.html", "fato-ou-fake.html", "duelos-da-corrida.html"]) {
+  for (const page of ["index.html", "quem-disse-isso.html", "fato-ou-fake.html", "duelos-da-corrida.html", "pesquisa.html"]) {
     const html = await readFile(new URL(`../${page}`, import.meta.url), "utf8");
     const moduleScripts = [...html.matchAll(/<script\b[^>]*\btype="module"[^>]*>/g)].map(([tag]) => tag);
     assert.equal(moduleScripts.length, 1, page);

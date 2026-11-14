@@ -1,0 +1,583 @@
+/* Pesquisa por foto (ICM 68, #324). Tela clara e mínima, como nas referências
+   de stages/68_photo_survey_politics/references. As cartas são imagens
+   completas, com moldura e nome: aqui só mudam de tamanho. */
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #fff;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, system-ui, sans-serif;
+  color: #111418;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.ps-shell,
+.ps-shell * {
+  box-sizing: border-box;
+}
+
+.ps-shell {
+  --ps-green: #08805a;
+  --ps-ink: #111418;
+  --ps-muted: #6b7280;
+  --ps-line: #e5e7eb;
+  --ps-soft: #f3f4f6;
+  /* Altura da tela de voto que não é carta: cabeçalho, pergunta e rodapé. */
+  --ps-chrome: 270px;
+  --ps-view: 100vh;
+  width: 100%;
+  max-width: 440px;
+  min-height: var(--ps-view);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow-x: clip;
+  padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+}
+
+@supports (height: 100dvh) {
+  .ps-shell {
+    --ps-view: 100dvh;
+  }
+}
+
+.ps-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+}
+
+.ps-brand {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--ps-ink);
+  text-decoration: none;
+  padding: 12px 12px 12px 0;
+  margin: -4px 0;
+}
+
+.ps-brand b {
+  color: var(--ps-green);
+}
+
+.ps-step {
+  font-size: 13px;
+  color: var(--ps-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ps-bar {
+  display: flex;
+  gap: 6px;
+  margin: 14px 0 22px;
+}
+
+.ps-bar i {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ps-line);
+}
+
+.ps-bar i.is-on {
+  background: var(--ps-green);
+}
+
+.ps-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ps-main--entry {
+  padding-top: 22px;
+}
+
+.ps-kicker {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ps-muted);
+  font-weight: 600;
+}
+
+.ps-title {
+  margin: 6px 0 4px;
+  font-size: 28px;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  outline: none;
+}
+
+.ps-hint {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--ps-muted);
+}
+
+/* Cartas ---------------------------------------------------------------- */
+
+.ps-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  aspect-ratio: 530 / 742;
+  background: var(--ps-soft);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08), 0 8px 20px rgba(16, 24, 40, 0.1);
+  font: inherit;
+  color: inherit;
+}
+
+.ps-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+button.ps-card {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.16s ease, transform 0.12s ease;
+}
+
+button.ps-card:disabled {
+  cursor: default;
+}
+
+button.ps-card:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+button.ps-card:focus-visible {
+  outline: 3px solid var(--ps-ink);
+  outline-offset: 3px;
+}
+
+button.ps-card[aria-pressed="true"] {
+  outline: 3px solid var(--ps-green);
+  outline-offset: 3px;
+}
+
+button.ps-card[aria-pressed="true"]::after {
+  content: "✓";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ps-green);
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+
+.ps-grid.has-choice button.ps-card[aria-pressed="false"] {
+  opacity: 0.38;
+}
+
+/* As quatro cartas cabem na tela sem rolar: a largura da grade acompanha a
+   altura livre. Assim nenhuma carta fica abaixo da dobra. */
+.ps-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: max(232px, calc((var(--ps-view) - var(--ps-chrome) - 12px) * 0.7143 + 12px));
+  margin: 18px auto 0;
+}
+
+/* Até as quatro imagens chegarem, as quatro cartas aparecem iguais e sem
+   toque: nenhuma sai na frente por ter carregado antes. */
+.ps-grid[data-ready="false"] .ps-card img {
+  opacity: 0;
+}
+
+.ps-grid[data-ready="true"] .ps-card img {
+  opacity: 1;
+  transition: opacity 0.18s ease;
+}
+
+.ps-grid[data-ready="false"] .ps-card {
+  pointer-events: none;
+  animation: ps-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes ps-pulse {
+  50% {
+    background: var(--ps-line);
+  }
+}
+
+/* Entrada ---------------------------------------------------------------- */
+
+.ps-fan {
+  --ps-fan-w: clamp(112px, calc((var(--ps-view) - 452px) / 1.4), 176px);
+  position: relative;
+  height: calc(var(--ps-fan-w) * 1.4 + 30px);
+  margin-top: 30px;
+}
+
+.ps-fan .ps-card {
+  position: absolute;
+  width: var(--ps-fan-w);
+  left: 50%;
+  top: 14px;
+  margin-left: calc(var(--ps-fan-w) / -2);
+}
+
+.ps-fan .ps-card:nth-child(1) {
+  transform: translateX(-46%) rotate(-8deg);
+}
+
+.ps-fan .ps-card:nth-child(2) {
+  transform: translateX(46%) rotate(8deg);
+}
+
+.ps-fan .ps-card:nth-child(3) {
+  transform: translateY(-8px);
+}
+
+.ps-list {
+  display: grid;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  line-height: 1.35;
+  color: #374151;
+}
+
+.ps-list li {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.ps-list b {
+  color: var(--ps-green);
+  font-variant-numeric: tabular-nums;
+  min-width: 12px;
+}
+
+/* Confirmação e resposta registrada --------------------------------------- */
+
+/* Nestas duas telas a carta escolhida ocupa a altura que sobra, até o tamanho
+   mínimo dela. O texto muda de altura com a fonte do aparelho; em pé, as
+   finalistas e os botões não dependem disso para ficar à vista. */
+.ps-shell--fit {
+  height: var(--ps-view);
+}
+
+.ps-main--summary > :not(.ps-hero) {
+  flex-shrink: 0;
+}
+
+.ps-hero {
+  --ps-hero-w: 176px;
+  flex: 0 1 calc(var(--ps-hero-w) * 1.4);
+  min-height: 70px;
+  margin: 14px 0 0;
+  display: flex;
+  justify-content: center;
+}
+
+.ps-hero .ps-card {
+  flex: none;
+  width: auto;
+  height: 100%;
+  max-width: var(--ps-hero-w);
+}
+
+.ps-label {
+  margin: 16px 0 0;
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--ps-muted);
+  font-weight: 600;
+}
+
+.ps-row {
+  display: grid;
+  grid-template-columns: repeat(3, 84px);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media (max-height: 720px) {
+  .ps-hero {
+    --ps-hero-w: 116px;
+  }
+
+  .ps-row {
+    grid-template-columns: repeat(3, 60px);
+  }
+}
+
+/* Abaixo disso os dois botões da confirmação ficam lado a lado: sobra altura
+   para as finalistas não ficarem atrás deles. */
+@media (max-height: 640px) {
+  .ps-hero {
+    --ps-hero-w: 104px;
+  }
+
+  .ps-row {
+    grid-template-columns: repeat(3, 56px);
+  }
+
+  .ps-stack--pair {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ps-stack--pair .ps-btn--ghost {
+    order: -1;
+  }
+}
+
+/* Rodapé e botões --------------------------------------------------------- */
+
+.ps-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding-bottom: max(22px, env(safe-area-inset-bottom));
+}
+
+.ps-muted {
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--ps-muted);
+}
+
+.ps-link {
+  appearance: none;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 12px 12px 12px 0;
+  min-height: 44px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ps-ink);
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+/* O botão principal fica sempre à vista, mesmo quando a tela é baixa. */
+.ps-stack {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  display: grid;
+  gap: 10px;
+  padding: 16px 0 max(22px, env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff 14px);
+}
+
+.ps-btn {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 52px;
+  margin: 0;
+  padding: 6px 16px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--ps-green);
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-btn--ghost {
+  background: var(--ps-soft);
+  color: var(--ps-ink);
+}
+
+.ps-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.ps-btn:focus-visible,
+.ps-link:focus-visible,
+.ps-brand:focus-visible {
+  outline: 3px solid var(--ps-ink);
+  outline-offset: 3px;
+  border-radius: 14px;
+}
+
+/* Com aviso na tela, a grade encolhe o tanto que o aviso ocupa: as quatro
+   cartas continuam à vista. */
+.ps-main:has(.ps-notice:not([hidden])) {
+  --ps-chrome: 356px;
+}
+
+.ps-notice {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff7ed;
+  color: #7c2d12;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.ps-notice a {
+  color: inherit;
+  font-weight: 600;
+}
+
+.ps-notice .ps-link {
+  display: block;
+  min-height: 44px;
+  padding: 10px 0 2px;
+  color: inherit;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.ps-notice[hidden],
+.ps-shell [hidden] {
+  display: none;
+}
+
+/* Telas baixas: navegador aberto dentro de outro aplicativo, celular pequeno.
+   O cabeçalho encolhe para as quatro cartas e o rodapé continuarem à vista. */
+@media (max-height: 600px) {
+  .ps-shell {
+    --ps-chrome: 190px;
+    padding-top: max(8px, env(safe-area-inset-top));
+  }
+
+  .ps-main:has(.ps-notice:not([hidden])) {
+    --ps-chrome: 276px;
+  }
+
+  .ps-bar {
+    margin: 8px 0 12px;
+  }
+
+  .ps-title {
+    font-size: 22px;
+  }
+
+  .ps-main--play .ps-kicker {
+    display: none;
+  }
+
+  .ps-main--entry {
+    padding-top: 10px;
+  }
+
+  .ps-grid {
+    max-width: max(200px, calc((var(--ps-view) - var(--ps-chrome) - 12px) * 0.7143 + 12px));
+    margin-top: 12px;
+  }
+
+  .ps-foot {
+    min-height: 44px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .ps-fan {
+    --ps-fan-w: clamp(84px, calc((var(--ps-view) - 440px) / 1.4), 176px);
+    margin-top: 18px;
+  }
+
+  .ps-list {
+    margin-top: 14px;
+    gap: 6px;
+  }
+
+  .ps-hero {
+    --ps-hero-w: 96px;
+    margin-top: 10px;
+  }
+
+  .ps-label {
+    margin-top: 10px;
+  }
+
+  .ps-row {
+    grid-template-columns: repeat(3, 52px);
+    margin-top: 8px;
+  }
+
+  .ps-stack {
+    padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Telas muito baixas: na confirmação cada linha conta. */
+@media (max-height: 520px) {
+  .ps-main--summary .ps-kicker {
+    display: none;
+  }
+
+  .ps-row {
+    grid-template-columns: repeat(3, 44px);
+  }
+}
+
+/* Celular deitado: as quatro cartas numa fileira só. */
+@media (max-height: 540px) and (min-aspect-ratio: 13 / 10) {
+  .ps-shell {
+    max-width: 760px;
+  }
+
+  .ps-grid {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: max(320px, calc((var(--ps-view) - var(--ps-chrome)) * 0.7143 * 4 + 36px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-shell *,
+  .ps-shell *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

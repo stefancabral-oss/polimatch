@@ -1,6 +1,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ApiError, loadDailyPredictionResults, requestJson, submitDailyPrediction, submitDailyVote, submitRoundVote } from "./api.js";
+import {
+  ApiError,
+  drawPhotoSurvey,
+  loadDailyPredictionResults,
+  loadPhotoSurvey,
+  requestJson,
+  respondPhotoSurvey,
+  submitDailyPrediction,
+  submitDailyVote,
+  submitRoundVote,
+} from "./api.js";
 
 async function withFetch(fakeFetch, callback) {
   const originalFetch = globalThis.fetch;
@@ -224,4 +234,61 @@ test("prediction results are loaded only in the player's bearer scope", async ()
   );
   assert.match(request.url, /daily-prediction-results/);
   assert.equal(request.options.headers.Authorization, "Bearer pm2_private");
+});
+
+test("a definição da pesquisa por foto é lida sem identidade e sem corpo", async () => {
+  let request;
+  await withFetch(
+    async (url, options) => {
+      request = { url, options };
+      return { ok: true, status: 200, json: async () => ({ id: "politica-2026-01", status: "open" }) };
+    },
+    async () => assert.deepEqual(await loadPhotoSurvey("politica 2026/01"), { id: "politica-2026-01", status: "open" }),
+  );
+  assert.match(request.url, /\/api\/photo-surveys\/politica%202026%2F01$/);
+  assert.equal(request.options.method, undefined);
+  assert.equal(request.options.headers, undefined);
+  assert.equal(request.options.body, undefined);
+});
+
+test("o sorteio da pesquisa vai com a identidade e não leva carta nenhuma", async () => {
+  let request;
+  await withFetch(
+    async (url, options) => {
+      request = { url, options };
+      return { ok: true, status: 200, json: async () => ({ draw: { groups: [] }, response: null }) };
+    },
+    async () => drawPhotoSurvey("politica-2026-01", "pm2_private"),
+  );
+  assert.match(request.url, /\/api\/photo-surveys\/politica-2026-01\/draw$/);
+  assert.equal(request.options.method, "POST");
+  assert.equal(request.options.headers.Authorization, "Bearer pm2_private");
+  assert.deepEqual(JSON.parse(request.options.body), {});
+});
+
+test("a resposta da pesquisa leva o recibo recebido, as escolhas e a escolhida, e mais nada", async () => {
+  const requests = [];
+  const answer = {
+    answerId: "5f0c2c0e-8a55-4a52-9d6c-0d2b8a1f3c11",
+    pickIds: ["a", "b", "c", "d"],
+    championId: "c",
+    shownIds: ["forjado"],
+    groups: [["forjado"]],
+    step: 5,
+  };
+  await withFetch(
+    async (url, options) => {
+      requests.push({ url, options, body: JSON.parse(options.body) });
+      return { ok: true, status: 200, json: async () => ({ status: "created" }) };
+    },
+    async () => respondPhotoSurvey("politica-2026-01", "pm2_private", answer),
+  );
+  assert.equal(requests.length, 1);
+  for (const request of requests) {
+    assert.match(request.url, /\/api\/photo-surveys\/politica-2026-01\/response$/);
+    assert.equal(request.options.method, "POST");
+    assert.equal(request.options.headers.Authorization, "Bearer pm2_private");
+    assert.equal(request.options.headers["Content-Type"], "application/json");
+    assert.deepEqual(request.body, { answerId: answer.answerId, pickIds: ["a", "b", "c", "d"], championId: "c" });
+  }
 });
