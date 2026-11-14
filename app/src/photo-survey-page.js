@@ -6,6 +6,7 @@ import { createPlayer, drawPhotoSurvey, loadPhotoSurvey, respondPhotoSurvey } fr
 import { safeStorage } from "./safe-storage.js";
 import { identityNoticeFromError, isPlayerIssuanceLimit, quotaResetLabel } from "./identity-notice.js";
 import {
+  ENTRY_CARD_IDS,
   PHOTO_SURVEY_ID,
   PHOTO_SURVEY_STORAGE_KEY,
   chooseChampion,
@@ -36,7 +37,7 @@ const GRID_TIMEOUT_MS = 12000;
 const root = document.querySelector("#photo-survey");
 const definition = photoSurveyById(PHOTO_SURVEY_ID);
 const artById = new Map(ARTS.map((art) => [art.id, art]));
-const entryCards = sampleCards(definition.cardIds.filter((id) => artById.has(id)), 3);
+const entryCards = sampleCards(ENTRY_CARD_IDS.filter((id) => artById.has(id)), 3);
 
 let survey = null;
 let identity = "";

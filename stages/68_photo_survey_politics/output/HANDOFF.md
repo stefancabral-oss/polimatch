@@ -2,7 +2,7 @@
 
 ## Status
 
-- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor), 68c (tela) e 68d (teste por agentes) foram aprovadas. A 68e está pela metade: em 14/11/2026 a API e o app foram publicados com a pesquisa ligada e a página escondida. Falta a entrada na capa e o sitemap, com outro sim.
+- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor), 68c (tela) e 68d (teste por agentes) foram aprovadas. A 68e está pela metade: em 14/11/2026 a API e o app foram publicados com a pesquisa ligada e a página escondida. Falta a entrada na capa e o sitemap, com outro sim. No mesmo dia o Stefan testou no celular e pediu uma mudança na ilustração da entrada, que está em PR: ainda sem merge e sem deploy.
 - Issue: #324
 - 68a: PR #325, mesclado em `3a59344`.
 - 68b: PR #326, mesclado em `3e1f771`.
@@ -35,7 +35,7 @@ Nada desta entrega é visível no site: não há tela, e as rotas novas nascem d
 ## Entregue (68c — tela)
 
 - `app/pesquisa.html`: a página nova, com `noindex`, fora do menu e do sitemap. Nenhuma página pública aponta para ela.
-- `app/src/photo-survey-flow.js`: as regras de escolher, voltar, trocar e retomar. Funções puras, com 20 testes.
+- `app/src/photo-survey-flow.js`: as regras de escolher, voltar, trocar e retomar. Funções puras, com 21 testes.
 - `app/src/photo-survey-page.js` e `app/src/photo-survey.css`: a tela. Estados: entrada, voto (4 telas), final, confirmação, registrada, fechada, ainda não abriu e indisponível.
 - `app/src/api.js`: `loadPhotoSurvey`, `drawPhotoSurvey` e `respondPhotoSurvey`.
 - `app/e2e/photo-survey.mjs`: 27 cenários de navegador, com passo próprio em `.github/workflows/ui-interaction-smoke.yml`.
@@ -74,6 +74,13 @@ O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com 
 - Antes do deploy foi feita uma cópia do banco, e a contagem de linhas de cada tabela foi comparada antes e depois: as 24 tabelas antigas não mudaram.
 - As respostas dadas antes do lançamento ficam gravadas, como toda resposta. Proposta do agente, por delegação: tratar `politica-2026-01` como ensaio e criar a pesquisa de lançamento com outro código, zerada.
 - `stages/68_photo_survey_politics/plans/68e-publicacao.md`: os passos, o que foi conferido e como voltar atrás.
+
+## Entregue (68e — correção pedida no teste do Stefan)
+
+- A entrada passa a sortear as três cartas de uma lista fixa de dez das 20: `ENTRY_CARD_IDS`, em `app/src/photo-survey-flow.js`. O Stefan pediu a mudança em 14/11/2026, ao abrir a página em produção. Quais das vinte entram na lista foi classificação do agente a partir do pedido, mostrada a ele numa folha com as dez.
+- As vinte cartas seguem na pesquisa. O sorteio de 16, as telas, a confirmação e o servidor não mudam. Nada em `back/` nem em `shared/`.
+- O `CONTEXT.md` foi atualizado, como pede a regra 4 do `AGENTS.md`: o formato dizia que a entrada sorteava entre as 20, para nenhuma ficar em destaque fixo.
+- Ainda não está em produção: depende do merge e de um deploy do app, cada um com um sim.
 
 ## Não entregue / pendente
 
@@ -135,6 +142,13 @@ O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com 
 - App: deploy em 27 s; a capa respondeu 200 em todas as consultas de fora; `/pesquisa.html` 200 com `noindex`; os cinco arquivos da página e as 40 imagens das cartas 200; sitemap só com as quatro páginas antigas; pré-voo de CORS do site para a rota do sorteio aceito.
 - Não foi aberto navegador automatizado em produção.
 
+68e, correção da entrada, em 14/11/2026, local:
+
+- O teste de unidade e o cenário de navegador foram escritos antes do código. O de unidade falhou porque a lista não existia; o de navegador, com "Fernando Haddad apareceu na entrada".
+- `npm test --prefix app`: 311/311. `app/e2e/photo-survey.mjs`: 34 cenários aprovados em WebKit e em Chromium 140, locais.
+- O cenário novo visita a entrada dez vezes: nenhuma carta de fora da lista aparece, toda carta mostrada é da lista, as cartas variam, e nenhuma visita cria jogador ou sorteio. Ele também fixa que a lista da entrada e a lista de fora somam as vinte cartas, sem sobra.
+- Captura conferida: a entrada em 390×844, em duas visitas, e a folha com as dez cartas da lista.
+
 ## Revisão independente
 
 **68a.** Um agente separado, somente leitura, revisou o PR #325 em 13/11/2026 e não achou bloqueio. Correções aplicadas depois dela: a tela de entrada, que faltava no formato; a regra do desfazer, que vale até a confirmação; critérios de aceite por entrega, com os que faltavam (resposta forjada, sorteio uniforme, tabelas imutáveis, janela, troca de identidade); a página nova fora do sitemap e os testes que fixam a lista de páginas; a troca da entrada do site só na 68e; e as condições de publicação, com os bloqueios de maturidade que pesam nesta etapa.
@@ -181,6 +195,15 @@ Da mesma revisão: a aba que acompanha a outra lê o que está guardado agora, n
 - Em 390 px de largura com uma fonte muito larga, o título de 28 px ainda pode quebrar; só pesa onde a altura aperta, como em 390×664.
 - Se a confirmação falha depois de a conta mudar, o aviso fica só em "Sua conta mudou"; nada se perde, e as escolhas continuam no aparelho.
 
+**68e (entrada).** Um agente separado, somente leitura, revisou a mudança antes do PR e não achou bloqueio no código: confirmou que só a ilustração da entrada muda, que as duas listas somam as vinte cartas e que o cenário novo não passa nem falha por acaso. Apontou, e foi corrigido antes do PR:
+
+- O comentário da lista dizia "escolha editorial do dono do produto", quando os dez nomes foram classificação do agente a partir do pedido.
+- A mudança contraria o formato escrito no `CONTEXT.md` ("para nenhuma ficar em destaque fixo"), que precisava ser atualizado, e o risco abaixo precisava estar dito ao Stefan antes do gate.
+- A contagem de testes do módulo neste documento.
+- No e2e: fixar que as duas listas somam as vinte e conferir também que cada carta mostrada é da lista.
+
+Ele não rodou o e2e em navegador, nem viu CI ou produção. Anotado, sem mudança: a lista não está ligada ao código da pesquisa; quando houver a segunda pesquisa, passa a ser por pesquisa.
+
 ## Riscos conhecidos
 
 - A 68b mexe em `combineGoogleHistory`, a função que junta o histórico no login Google. A mudança é uma condição e um status; os smokes de integração e de identidade continuam aprovados.
@@ -194,6 +217,7 @@ Da mesma revisão: a aba que acompanha a outra lê o que está guardado agora, n
 - Em 320×480, com aviso na tela da confirmação, a carta escolhida chega ao tamanho mínimo e as finalistas pedem rolagem. Os botões continuam à vista.
 - "Uma resposta por jogador" não é "uma por pessoa": quem apaga os dados do aparelho pode responder de novo, dentro da cota de rede. O cadastro por CPF é o que resolve.
 - A etapa grava escolha política ligada à identidade do jogo, como o jogo atual já faz. A [ICM 41] #283, de privacidade, continua aberta.
+- A entrada passa a ilustrar com dez das 20 cartas, e as dez são de um mesmo campo político. Quem decide tocar em "Começar" vê só essa parte do conjunto, o que pode pesar em quem responde; a pesquisa pretende vender a resposta agregada. Uma captura da entrada também pode ser lida como pesquisa de um lado só. Dentro da pesquisa nada muda: as 20 cartas, com a mesma frequência.
 
 ## Decisões tomadas
 
@@ -219,14 +243,19 @@ Escolhas de desenho do agente na 68c, no mesmo regime:
 - Depois de registrada, o aparelho guarda só que a pessoa respondeu.
 - O botão voltar do navegador sai da página; ao abrir de novo, a pessoa retoma de onde parou.
 
+Decidida pelo Stefan em 14/11/2026, no teste em produção:
+
+- A entrada ilustra só com cartas de uma lista, não com qualquer uma das 20. Por delegação, do agente: quais das vinte entram na lista; ele viu a folha com as dez e pode cortar nomes.
+
 ## Próximo passo exato
 
-1. O Stefan testa no celular, em `https://polimatch.com.br/pesquisa.html`. São três pessoas novas por rede por dia.
-2. Com o que ele achar: correções, e a decisão sobre a entrada na capa e o sitemap (segunda parte da 68e).
+1. O Stefan decide o merge do PR da entrada e, depois, o deploy do app, cada um com um sim.
+2. Ele segue o teste no celular, em `https://polimatch.com.br/pesquisa.html` (três pessoas novas por rede por dia). Com o que achar: correções, e a decisão sobre a entrada na capa e o sitemap (segunda parte da 68e).
 3. Antes de chamar gente de fora: política de privacidade (#283), backup externo (#279), o destino da edição Eleições 2026 (#285), a cota de três por rede e a pesquisa de lançamento com código próprio.
 
 ## Ação do Stefan
 
+- Ver a folha com as dez cartas da entrada e dizer se corta algum nome; decidir o merge e o deploy dessa mudança.
 - Testar a pesquisa no celular.
 - Decidir o que fazer com as duas cópias provisórias do banco, que têm dado pessoal e ficam dentro do contêiner (`/tmp/pre-deploy-20261113.dump` e `/tmp/pre-deploy-20261114.dump`).
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.

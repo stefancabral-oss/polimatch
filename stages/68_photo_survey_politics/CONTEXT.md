@@ -37,8 +37,12 @@ etapa estar testada e o Stefan autorizar a publicação.
 ## O formato desta etapa
 
 1. **Entrada.** Uma tela com a pergunta, o tamanho da pesquisa e o botão
-   "Começar". As cartas que ilustram a entrada são sorteadas a cada visita,
-   para nenhuma ficar em destaque fixo. Abrir a página não grava nada.
+   "Começar". As três cartas que ilustram a entrada são sorteadas a cada
+   visita, de uma lista de dez das 20. Abrir a página não grava nada.
+   Mudança de direção em 14/11/2026, pedida pelo Stefan no teste em produção:
+   antes o sorteio da entrada era entre as 20, para nenhuma ficar em destaque
+   fixo. A lista só decide a ilustração; o conjunto e o sorteio do item 2 não
+   mudam.
 2. **Conjunto.** As 20 cartas "Políticos 2026". Cada jogador recebe 16 delas,
    sorteadas. Assim nenhuma das 20 precisa ser excluída por escolha editorial,
    e em conjunto todas aparecem com a mesma frequência.

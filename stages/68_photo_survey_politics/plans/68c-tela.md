@@ -38,7 +38,7 @@ telas de `references/`.
 | Tema | Decisão | Motivo |
 |---|---|---|
 | Endereço | `pesquisa.html`, entrada `photoSurvey` no Vite | Uma página para as pesquisas; a de política é a primeira. |
-| Cartas da entrada | 3 das 20, sorteadas no aparelho a cada visita | Nenhuma carta fica em destaque fixo. |
+| Cartas da entrada | 3 das 20, sorteadas no aparelho a cada visita | Nenhuma carta fica em destaque fixo. Mudou em 14/11/2026: as 3 saem de uma lista de dez (ver `68e-publicacao.md`). |
 | Toque liberado | Só depois de as quatro imagens da tela carregarem | Nenhuma carta sai na frente por ter carregado antes. Se uma falha, a tela toda espera. |
 | Tamanho da grade | A largura acompanha a altura livre | As quatro cartas cabem sem rolar; nenhuma fica abaixo da dobra. |
 | Depois de trocar | Segue para a primeira tela sem escolha; com as quatro feitas, direto para a final | Trocar uma escolha não obriga a refazer as outras. |

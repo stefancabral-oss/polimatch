@@ -161,7 +161,15 @@
       "e2e photo-survey em Chromium": "30 cenários no Chromium 140 em cache nesta máquina, aberto pelo caminho do executável; a revisão que o Playwright do repositório pede só o CI tem",
       "página + API + PostgreSQL reais, locais, PHOTO_SURVEYS_ENABLED=true": "3 jogadores, 3 sorteios, 2 respostas iguais às escolhas da tela; votes e ranking_stats sem mudança; player_stats dos 3 jogadores no valor inicial",
       "bateria e2e completa em WebKit local (antes das correções da revisão)": "23 de 27 roteiros; falhas conhecidas desta máquina: interaction-smoke, accessible-profile e civic-navigation (foco de teclado no WebKit do macOS) e fact-check (intermitente, #298; passou em 2 repetições)",
-      "capturas conferidas": ["390x844", "375x667", "360x640", "375x548", "320x480", "320x480 com fonte larga", "667x375"]
+      "capturas conferidas": [
+        "390x844",
+        "375x667",
+        "360x640",
+        "375x548",
+        "320x480",
+        "320x480 com fonte larga",
+        "667x375"
+      ]
     },
     "ciFix": {
       "failedCommit": "fc5e153",
@@ -300,7 +308,13 @@
       "e2e photo-survey em WebKit local": "33 cenários aprovados",
       "e2e photo-survey em Chromium 140 local": "33 cenários aprovados",
       "testsFirst": "cada cenário que mudava comportamento falhou antes da correção pelo motivo esperado; os que só fixam comportamento existente passaram de primeira",
-      "capturas conferidas": ["entrada com aviso de cota", "final com escolhida", "fechada com aviso", "saída da conta", "360x640 e 390x844"]
+      "capturas conferidas": [
+        "entrada com aviso de cota",
+        "final com escolhida",
+        "fechada com aviso",
+        "saída da conta",
+        "360x640 e 390x844"
+      ]
     },
     "notedNotFixed": [
       "recarregar com a API fora depois de uma confirmação incerta solta a trava; com a API de volta, o sorteio diz se a resposta foi gravada antes de a tela oferecer a troca",
@@ -377,6 +391,25 @@
     ],
     "rollback": "tirar PHOTO_SURVEYS_ENABLED e publicar a API de novo: as rotas voltam a 404 e a página diz que a pesquisa não está disponível; as respostas gravadas ficam",
     "humanGate": "cada passo com instrução do Stefan em 14/11/2026: \"Sim\" (cópia do banco), \"Liga vc\" (variável e deploy da API), \"Sim\" (deploy do app com as 20 cartas atuais); transcritas no HANDOFF",
-    "recordPr": "PR #329, só documentação; mesclado por instrução do Stefan em 14/11/2026 (\"Sim\"), com o ci-gate verde; a revisão automática não deixou apontamento"
+    "recordPr": "PR #329, só documentação; mesclado por instrução do Stefan em 14/11/2026 (\"Sim\"), com o ci-gate verde; a revisão automática não deixou apontamento",
+    "entryFix": {
+      "checkedAt": "2026-11-14",
+      "request": "pedido do Stefan no teste em produção: a entrada ilustrar só com cartas de uma lista; quais das vinte entram foi classificação do agente, mostrada a ele numa folha com as dez",
+      "change": "ENTRY_CARD_IDS em app/src/photo-survey-flow.js (dez das 20); app/src/photo-survey-page.js sorteia as três cartas da entrada dessa lista; nada em back/ nem em shared/",
+      "unchanged": "as 20 cartas na pesquisa, o sorteio de 16, as telas, a confirmação e o servidor",
+      "contextUpdated": "CONTEXT.md, item 1 do formato: mudança de direção registrada (regra 4 do AGENTS.md)",
+      "testsFirst": {
+        "unidade": "falhou porque ENTRY_CARD_IDS não existia",
+        "navegador": "falhou com \"Fernando Haddad apareceu na entrada\""
+      },
+      "tests": {
+        "npm test --prefix app": "311/311",
+        "e2e photo-survey em WebKit local": "34 cenários aprovados",
+        "e2e photo-survey em Chromium 140 local": "34 cenários aprovados"
+      },
+      "independentReview": "agente separado, somente leitura, antes do PR: sem bloqueio no código; pediu comentário fiel, atualização do CONTEXT.md, contagem de testes e duas asserções a mais no e2e, tudo aplicado; não rodou e2e, CI nem produção",
+      "knownRisk": "a entrada ilustra com dez cartas de um mesmo campo político: pode pesar em quem decide responder e em como uma captura da entrada é lida; dentro da pesquisa nada muda",
+      "notInProduction": "depende do merge e de um deploy do app, cada um com um sim do Stefan"
+    }
   }
 }

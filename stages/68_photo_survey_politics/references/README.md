@@ -11,7 +11,8 @@ Uma foi desenhada depois, a pedido da revisão independente, e aprovada por ele
 no mesmo dia, junto com o PR #325 ("Toca"):
 
 - `etapa1-0-entrada.jpg`: a entrada, com o botão "Começar". No produto, as
-  cartas que a ilustram são sorteadas a cada visita.
+  cartas que a ilustram são sorteadas a cada visita; desde 14/11/2026, de uma
+  lista de dez das 20.
 
 São desenhos, não capturas do produto: foram montados fora do app com as
 cartas de `app/public/chromas/politicos`, em 390 por 844 pontos. As cartas e
