@@ -2,11 +2,12 @@
 
 ## Status
 
-- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor) e 68c (tela) foram aprovadas. Faltam a 68d e a 68e.
+- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor) e 68c (tela) foram aprovadas. A 68d (teste por agentes) está pronta para gate. Falta a 68e.
 - Issue: #324
 - 68a: PR #325, mesclado em `3a59344`.
 - 68b: PR #326, mesclado em `3e1f771`.
-- 68c: PR #327, branch `icm/68c-photo-survey-page` (base main `3e1f771`).
+- 68c: PR #327, mesclado em `82ffed5`.
+- 68d: branch `icm/68d-agent-playtest` (base main `82ffed5`); o PR está na issue #324.
 
 ## Entregue (68a — registro)
 
@@ -54,6 +55,16 @@ O que muda no jogo atual: nada. `main.js` e as outras três páginas não foram 
 
 O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com as linhas iniciais do ranking pessoal, como qualquer jogador novo. Responder a pesquisa não mexe nelas.
 
+## Entregue (68d — teste por agentes)
+
+- Seis agentes jogaram a pesquisa num ambiente local descartável, com a página e a API de verdade, de origens diferentes como em produção, e PostgreSQL novo. Cada agente teve banco e API próprios e duas "redes". Os oito caminhos pedidos no contexto foram jogados em WebKit e em Chromium: direto, voltar e trocar, recarga no meio, segunda aba, troca de identidade no meio, cota de rede esgotada, API fora do ar e pesquisa fechada.
+- Resultado da primeira rodada: os oito caminhos funcionam. Em nenhum houve resposta gravada antes de confirmar, duas respostas do mesmo jogador, escolha gravada diferente da tela, escolhas de uma identidade gravadas em outra, linha nova em `votes` ou mudança em `ranking_stats`.
+- Saíram dez correções de tela e de texto, cada uma com o cenário de e2e escrito antes do código. As que mais pesavam: quem confirmava depois de a pesquisa fechar não lia que a escolha não tinha sido registrada; um toque em "Começar" numa entrada aberta antes do fechamento criava jogador e gastava a cota da rede; e, se a conta mudasse no instante da confirmação, a resposta ia para a conta certa sem a pessoa ser avisada.
+- Segunda rodada: três agentes conferiram cada correção na página e na API de verdade, com o código corrigido. Todas se comportam como descrito. Saíram mais dois ajustes, também com teste antes: a conta que troca e volta dentro do tempo de uma confirmação passa a ver a resposta registrada, e a entrada com aviso em tela baixa não deixa a lista atrás do botão.
+- Depois da revisão do código (abaixo) entraram mais quatro acertos, que não passaram pela segunda rodada de agentes e estão cobertos pelo e2e nos dois navegadores.
+- `stages/68_photo_survey_politics/plans/68d-teste-por-agentes.md`: os caminhos, o que cada agente viu e o que mudou.
+- `stages/68_photo_survey_politics/references/68d-ambiente/`: o roteiro do ambiente (`ambiente.sh`, `porta.mjs`) e o texto dado aos agentes, para repetir a rodada.
+
 ## Não entregue / pendente
 
 - As entregas 68d (teste por agentes) e 68e (publicação).
@@ -95,6 +106,14 @@ O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com 
 - `npm test --prefix app`: 310/310. `app/e2e/photo-survey.mjs`: 30 cenários aprovados em WebKit e em Chromium 140, locais (29 no commit `0d9ce3f`, que passou no CI nos dois navegadores; o trigésimo veio da revisão automática, abaixo). O Chromium abre aqui pelo caminho do executável em cache; o Playwright do repositório pede outra revisão, que só o CI tem.
 - Capturas e medidas conferidas na confirmação, na confirmação com aviso e na resposta registrada, em 390×844, 375×667, 360×640, 375×548, 320×480 (com e sem fonte larga) e 667×375. Com o celular deitado, na confirmação as finalistas passaram a caber sem rolar; na resposta registrada ainda pedem cerca de 20 px de rolagem.
 
+68d, em 14/11/2026, na mesma máquina:
+
+- Primeira rodada, sobre o commit `0d9ce3f`: 34 jogadores, 32 sorteios e 27 respostas nos seis bancos, pelos números finais de cada agente; `votes` em zero e `ranking_stats` igual em todos.
+- Segunda rodada, sobre as correções: 18 jogadores, 18 sorteios e 13 respostas em três bancos novos; `votes` em zero e `ranking_stats` igual.
+- `npm test --prefix app`: 310/310. `app/e2e/photo-survey.mjs`: 33 cenários aprovados em WebKit e em Chromium 140, locais. Cada cenário que mudava comportamento falhou antes da correção pelo motivo esperado; os que só fixam comportamento que já existia passaram de primeira.
+- O cenário de fonte larga passou a usar uma fonte de largura fixa, que mede quase igual no macOS e no Linux, e as telas de voto e a final precisam caber sem rolar em pé.
+- Capturas conferidas: entrada com aviso de cota, final com escolhida, fechada com aviso e saída da conta, em 360×640 e 390×844.
+
 ## Revisão independente
 
 **68a.** Um agente separado, somente leitura, revisou o PR #325 em 13/11/2026 e não achou bloqueio. Correções aplicadas depois dela: a tela de entrada, que faltava no formato; a regra do desfazer, que vale até a confirmação; critérios de aceite por entrega, com os que faltavam (resposta forjada, sorteio uniforme, tabelas imutáveis, janela, troca de identidade); a página nova fora do sitemap e os testes que fixam a lista de páginas; a troca da entrada do site só na 68e; e as condições de publicação, com os bloqueios de maturidade que pesam nesta etapa.
@@ -126,6 +145,20 @@ Saiu também da revisão: depois de registrada, o aparelho guarda só que a pess
 - Não foram conferidos: Linux de verdade fora do CI, Firefox e Safari anterior ao 26.
 
 **68c, revisão automática no PR.** O Codex, configurado no repositório, revisou o commit `fc5e153` e deixou um apontamento, procedente: depois de uma confirmação sem resposta do servidor, se a nova tentativa voltasse com limite de requisições ou com sessão recusada, a tela destravava "Voltar e trocar" sem saber se a primeira confirmação tinha sido gravada. A pessoa podia trocar a escolha e só no fim ler que valia a primeira. Corrigido com o cenário escrito antes do código: a trava só sai quando o servidor responde sobre a resposta guardada. A regra da `main` exige as conversas de revisão resolvidas; a conversa foi respondida e resolvida depois da correção.
+
+**68d.** Um agente separado, somente leitura no repositório, revisou o código das correções em 14/11/2026. Não achou bloqueio, nem caminho que enfraqueça uma resposta por jogador, nada enviado antes de confirmar ou a trava da troca. Conferiu no servidor que, com a pesquisa fechada, pedir o sorteio não grava nada. Pediu quatro acertos, todos feitos, com teste antes onde mudava comportamento:
+
+- Com a pesquisa fechada e a conferência da resposta falhando, a tela voltava para a entrada e dizia "Nenhuma escolha foi registrada" a quem podia ter respondido. Agora fica na tela de fechada, com um aviso e nova tentativa.
+- Quem saía da conta no instante da confirmação lia que a resposta tinha sido registrada e, na mesma frase, um convite para responder sem conta. Agora vê a tela de registrada, sem convite.
+- Faltavam testes para trechos novos: fechada com sessão recusada, fechada com identidade que nunca abriu a pesquisa, falha tardia da confirmação depois da troca de conta, as guardas da aba que acompanha a outra e o aviso com o aparelho sem rede.
+- O roteiro do ambiente servia erro 403 na pasta padrão, aceitava banco fora da máquina, apagava pastas sem conferir e encerrava processo pelo número sem conferir o comando. Agora só aceita banco local, só mexe em pasta que ele criou e só encerra o que abriu.
+
+Da mesma revisão: a aba que acompanha a outra lê o que está guardado agora, não o evento, e confere também ao voltar a aparecer; o filtro de cenários não vale no CI e falha se não casar com nada. Ficam anotados, sem correção nesta entrega:
+
+- Com a pesquisa fechada e uma identidade no aparelho, abrir a página pede o sorteio ao servidor. Fechada, o servidor não grava nada; a garantia de "abrir não grava" passa a depender do servidor nesse caso. Uma rota só de leitura para a resposta da pessoa tiraria essa dependência.
+- Com a pesquisa fechada e a sessão recusada, a pessoa vê "Fechada", sem saber que entrar de novo mostraria a resposta dela.
+- Em 390 px de largura com uma fonte muito larga, o título de 28 px ainda pode quebrar; só pesa onde a altura aperta, como em 390×664.
+- Se a confirmação falha depois de a conta mudar, o aviso fica só em "Sua conta mudou"; nada se perde, e as escolhas continuam no aparelho.
 
 ## Riscos conhecidos
 
@@ -167,11 +200,12 @@ Escolhas de desenho do agente na 68c, no mesmo regime:
 
 ## Próximo passo exato
 
-1. A 68d: rodadas jogadas por agentes, com a página e a API de verdade num ambiente descartável.
-2. A 68e: publicação, com um sim para cada passo.
+1. Gate do Stefan no PR da 68d.
+2. A 68e: publicação, com um sim para cada passo: API, ligar `PHOTO_SURVEYS_ENABLED` e app. A página entra escondida, fora do menu e do sitemap.
 
 ## Ação do Stefan
 
+- Decidir o merge do PR da 68d. Ele não publica nada.
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
 - Confirmar as condições de publicação propostas no contexto do estágio.
 - Dizer se quer cartas de Lula e Flávio Bolsonaro no padrão comum, para entrarem numa próxima pesquisa.
@@ -186,4 +220,6 @@ Escolhas de desenho do agente na 68c, no mesmo regime:
 - Observação: aprovado por instrução direta do Stefan para o PR #326, em conversa de 13/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 326, sim ou não?", ele respondeu: "Sim". O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada: as rotas seguem desligadas, e ligar `PHOTO_SURVEYS_ENABLED` em produção é assunto da 68e, com um sim próprio. As escolhas de desenho do agente listadas acima não foram discutidas uma a uma: seguem por delegação dele e podem ser mudadas até a publicação. As entregas 68c a 68e têm gate próprio.
 - Decisão da entrega 68c: `aprovado`
 - Responsável: Stefan
-- Observação: aprovado por instrução direta do Stefan para o PR #327, em conversa de 14/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 327, sim ou não?", ele respondeu: "Sim". Antes da pergunta ele foi avisado de que o CI ainda rodava e de que, se o Chromium apontasse algo, a correção viria antes do merge; foi o que aconteceu (acima). O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada: a página fica fora do menu e do sitemap, e o servidor segue com as rotas desligadas. As escolhas de desenho do agente na 68c não foram discutidas uma a uma: seguem por delegação dele e podem ser mudadas até a publicação. As entregas 68d e 68e têm gate próprio.
+- Observação: aprovado por instrução direta do Stefan para o PR #327, em conversa de 14/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 327, sim ou não?", ele respondeu: "Sim". Antes da pergunta ele foi avisado de que o CI ainda rodava e de que, se o Chromium apontasse algo, a correção viria antes do merge; foi o que aconteceu (acima). Entrou também, antes do merge, a correção do apontamento da revisão automática. O PR foi mesclado em `82ffed5`, com o `ci-gate` verde no commit final `61509d3`. O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada: a página fica fora do menu e do sitemap, e o servidor segue com as rotas desligadas. As escolhas de desenho do agente na 68c não foram discutidas uma a uma: seguem por delegação dele e podem ser mudadas até a publicação. As entregas 68d e 68e têm gate próprio.
+- Decisão da entrega 68d: `pendente`
+- Responsável: Stefan
