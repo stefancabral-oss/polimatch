@@ -2,13 +2,14 @@
 
 ## Status
 
-- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor), 68c (tela) e 68d (teste por agentes) foram aprovadas. A 68e está pela metade: em 14/11/2026 a API e o app foram publicados com a pesquisa ligada e a página escondida. Falta a entrada na capa e o sitemap, com outro sim. No mesmo dia o Stefan testou no celular e pediu uma mudança na ilustração da entrada, que está em PR: ainda sem merge e sem deploy.
+- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor), 68c (tela) e 68d (teste por agentes) foram aprovadas. A 68e está pela metade: em 14/11/2026 a API e o app foram publicados com a pesquisa ligada e a página escondida. Falta a entrada na capa e o sitemap, com outro sim. No mesmo dia o Stefan testou no celular e pediu uma mudança na ilustração da entrada (PR #330); ele aprovou o merge e o deploy do app na mesma instrução. O deploy acontece depois do merge, e o resultado fica registrado na issue #324.
 - Issue: #324
 - 68a: PR #325, mesclado em `3a59344`.
 - 68b: PR #326, mesclado em `3e1f771`.
 - 68c: PR #327, mesclado em `82ffed5`.
 - 68d: PR #328, mesclado em `eb729ed`.
 - 68e: publicação de 14/11/2026 no commit `eb729ed`; registro no PR #329.
+- 68e, correção da entrada: PR #330.
 
 ## Entregue (68a — registro)
 
@@ -80,7 +81,7 @@ O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com 
 - A entrada passa a sortear as três cartas de uma lista fixa de dez das 20: `ENTRY_CARD_IDS`, em `app/src/photo-survey-flow.js`. O Stefan pediu a mudança em 14/11/2026, ao abrir a página em produção. Quais das vinte entram na lista foi classificação do agente a partir do pedido, mostrada a ele numa folha com as dez.
 - As vinte cartas seguem na pesquisa. O sorteio de 16, as telas, a confirmação e o servidor não mudam. Nada em `back/` nem em `shared/`.
 - O `CONTEXT.md` foi atualizado, como pede a regra 4 do `AGENTS.md`: o formato dizia que a entrada sorteava entre as 20, para nenhuma ficar em destaque fixo.
-- Ainda não está em produção: depende do merge e de um deploy do app, cada um com um sim.
+- O Stefan aprovou o merge e o deploy do app em 14/11/2026, na mesma instrução, sem cortar nomes da lista. A mudança chega à produção com o deploy do app, depois do merge; o resultado fica registrado na issue #324 e entra neste documento no próximo PR do estágio.
 
 ## Não entregue / pendente
 
@@ -148,6 +149,7 @@ O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com 
 - `npm test --prefix app`: 311/311. `app/e2e/photo-survey.mjs`: 34 cenários aprovados em WebKit e em Chromium 140, locais.
 - O cenário novo visita a entrada dez vezes: nenhuma carta de fora da lista aparece, toda carta mostrada é da lista, as cartas variam, e nenhuma visita cria jogador ou sorteio. Ele também fixa que a lista da entrada e a lista de fora somam as vinte cartas, sem sobra.
 - Captura conferida: a entrada em 390×844, em duas visitas, e a folha com as dez cartas da lista.
+- CI do PR #330: `ci-gate` verde no commit `f40854e`, em Chromium e em WebKit no Linux, com os 34 cenários. A revisão automática do Codex leu o mesmo commit e não deixou apontamento.
 
 ## Revisão independente
 
@@ -245,18 +247,17 @@ Escolhas de desenho do agente na 68c, no mesmo regime:
 
 Decidida pelo Stefan em 14/11/2026, no teste em produção:
 
-- A entrada ilustra só com cartas de uma lista, não com qualquer uma das 20. Por delegação, do agente: quais das vinte entram na lista; ele viu a folha com as dez e pode cortar nomes.
+- A entrada ilustra só com cartas de uma lista, não com qualquer uma das 20. Por delegação, do agente: quais das vinte entram na lista. Ele recebeu a folha com as dez cartas e os dez nomes por escrito, e aprovou sem cortar nenhum.
 
 ## Próximo passo exato
 
-1. O Stefan decide o merge do PR da entrada e, depois, o deploy do app, cada um com um sim.
+1. Depois do merge do PR #330: deploy do app pelo painel, já autorizado, e conferência de fora, por GET, de que a página publicada traz a lista da entrada. O resultado vai para a issue #324.
 2. Ele segue o teste no celular, em `https://polimatch.com.br/pesquisa.html` (três pessoas novas por rede por dia). Com o que achar: correções, e a decisão sobre a entrada na capa e o sitemap (segunda parte da 68e).
 3. Antes de chamar gente de fora: política de privacidade (#283), backup externo (#279), o destino da edição Eleições 2026 (#285), a cota de três por rede e a pesquisa de lançamento com código próprio.
 
 ## Ação do Stefan
 
-- Ver a folha com as dez cartas da entrada e dizer se corta algum nome; decidir o merge e o deploy dessa mudança.
-- Testar a pesquisa no celular.
+- Testar a pesquisa no celular, agora com a entrada nova.
 - Decidir o que fazer com as duas cópias provisórias do banco, que têm dado pessoal e ficam dentro do contêiner (`/tmp/pre-deploy-20261113.dump` e `/tmp/pre-deploy-20261114.dump`).
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
 - Confirmar as condições de publicação propostas no contexto do estágio.
@@ -278,4 +279,4 @@ Decidida pelo Stefan em 14/11/2026, no teste em produção:
 - Observação: aprovado por instrução direta do Stefan para o PR #328, em conversa de 14/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 328, sim ou não?", ele respondeu: "Mescla". Quando respondeu, o CI e a revisão automática do PR ainda rodavam, e isso estava dito na mesma mensagem; os dois fecharam sem apontamento antes do merge. O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada. As correções da 68d são escolhas de tela e de texto do agente, por delegação dele, e podem ser mudadas até a publicação. A 68e tem gate próprio, com um sim para cada passo.
 - Decisão da entrega 68e: `em andamento`
 - Responsável: Stefan
-- Observação: cada passo da publicação de 14/11/2026 teve instrução direta do Stefan em conversa. À pergunta "Começo a publicação agora, pela cópia do banco, sim ou não?", ele respondeu: "Sim". À pergunta sobre quem ligaria a variável `PHOTO_SURVEYS_ENABLED=true`, com as opções "Liguei, publica a API" e "Liga você" (o agente abre a aba Environment, acrescenta a linha, salva e publica a API), ele respondeu: "Liga vc". À pergunta "Publico o app agora, com as 20 cartas atuais, sim ou não?", feita depois de lembrar que 8 delas vêm de fotos de veículos ou de sites e já estão no ar no jogo atual, ele respondeu: "Sim". A entrada na capa, o sitemap e o convite a pessoas de fora não foram autorizados e dependem de outro sim. O registro da publicação (PR #329, só documentação) também teve o sim dele: à pergunta "Com o CI verde, mesclo o PR 329, que só registra a publicação, sim ou não?", ele respondeu: "Sim". A regra 6 do `AGENTS.md` não muda.
+- Observação: cada passo da publicação de 14/11/2026 teve instrução direta do Stefan em conversa. À pergunta "Começo a publicação agora, pela cópia do banco, sim ou não?", ele respondeu: "Sim". À pergunta sobre quem ligaria a variável `PHOTO_SURVEYS_ENABLED=true`, com as opções "Liguei, publica a API" e "Liga você" (o agente abre a aba Environment, acrescenta a linha, salva e publica a API), ele respondeu: "Liga vc". À pergunta "Publico o app agora, com as 20 cartas atuais, sim ou não?", feita depois de lembrar que 8 delas vêm de fotos de veículos ou de sites e já estão no ar no jogo atual, ele respondeu: "Sim". A entrada na capa, o sitemap e o convite a pessoas de fora não foram autorizados e dependem de outro sim. O registro da publicação (PR #329, só documentação) também teve o sim dele: à pergunta "Com o CI verde, mesclo o PR 329, que só registra a publicação, sim ou não?", ele respondeu: "Sim". A correção da entrada (PR #330) e o deploy do app que a publica tiveram instrução direta dele em 14/11/2026. A mensagem do agente dizia que eram dois passos, cada um com um sim, o merge e depois o deploy do app, trazia os dez nomes da lista e o risco anotado acima, e terminava com a pergunta "Com o CI verde, mesclo o PR 330, sim ou não?". Ele respondeu: "Sim mescla e coloca pra rodar". O agente leu a resposta como o sim para os dois passos. Quando ele respondeu, o `ci-gate` e a revisão automática já tinham fechado no commit `f40854e`, sem apontamento. Ele não cortou nomes. A entrada na capa do site, o sitemap e o convite a pessoas de fora continuam sem autorização. A regra 6 do `AGENTS.md` não muda.

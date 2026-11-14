@@ -65,12 +65,14 @@ Em 14/11/2026 ele abriu a página em produção e pediu uma mudança na entrada.
 
 As vinte cartas seguem na pesquisa: o sorteio de 16, as telas e o servidor não
 mudam. A lista só decide a ilustração da entrada. Quais das vinte entram nela
-foi classificação do agente a partir do pedido; o Stefan vê a folha com as dez
-e pode cortar nomes.
+foi classificação do agente a partir do pedido; o Stefan recebeu a folha com
+as dez e aprovou sem cortar nomes.
 
 O cenário de e2e foi escrito antes do código e falhou primeiro pelo motivo
 esperado (uma carta de fora da lista apareceu na entrada). A mudança é só do
-app: chega à produção com um deploy do app, com outro sim.
+app: chega à produção com um deploy do app. No mesmo dia ele aprovou o merge
+(PR #330) e esse deploy, na mesma instrução; o resultado do deploy fica na
+issue #324.
 
 ## Fica para depois, com outro sim
 

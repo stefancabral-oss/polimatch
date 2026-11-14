@@ -409,7 +409,11 @@
       },
       "independentReview": "agente separado, somente leitura, antes do PR: sem bloqueio no código; pediu comentário fiel, atualização do CONTEXT.md, contagem de testes e duas asserções a mais no e2e, tudo aplicado; não rodou e2e, CI nem produção",
       "knownRisk": "a entrada ilustra com dez cartas de um mesmo campo político: pode pesar em quem decide responder e em como uma captura da entrada é lida; dentro da pesquisa nada muda",
-      "notInProduction": "depende do merge e de um deploy do app, cada um com um sim do Stefan"
+      "pr": 330,
+      "ci": "ci-gate verde no commit f40854e; photo-survey com 34 cenários em Chromium e em WebKit no Linux",
+      "automatedReview": "Codex leu o commit f40854e e não deixou apontamento",
+      "humanGate": "instrução do Stefan em 14/11/2026 para o merge do PR #330 e para o deploy do app: \"Sim mescla e coloca pra rodar\"; não cortou nomes; transcrita no HANDOFF",
+      "production": "chega com o deploy do app, depois do merge; o resultado fica na issue #324"
     }
   }
 }
