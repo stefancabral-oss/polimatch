@@ -145,13 +145,14 @@ const offlineMarkup = () => `<p class="ps-notice" id="ps-offline" role="status"$
 
 const footHint = (text) => (safeStorage.persistent ? text : "Este navegador não salva o progresso: mantenha esta aba aberta até confirmar.");
 
-function shell({ step, filled = null, mainClass = "", body, focus = false }) {
+// `fit`: a tela tem a altura exata da janela e a carta escolhida ocupa o que sobra.
+function shell({ step, filled = null, mainClass = "", body, focus = false, fit = false }) {
   gridToken += 1;
   const segments = screens() + 1;
   const bar = filled === null
     ? ""
     : `<div class="ps-bar" aria-hidden="true">${Array.from({ length: segments }, (_, index) => `<i${index < filled ? ' class="is-on"' : ""}></i>`).join("")}</div>`;
-  root.innerHTML = `<div class="ps-shell" data-view="${view}">
+  root.innerHTML = `<div class="ps-shell${fit ? " ps-shell--fit" : ""}" data-view="${view}">
     <header class="ps-top"><a class="ps-brand" href="./" aria-label="PoliMatch, página inicial">Poli<b>Match</b></a><span class="ps-step" id="ps-step">${escapeText(step)}</span></header>
     ${bar}
     <main class="ps-main ${mainClass}" aria-labelledby="ps-title">${body}</main>
@@ -232,6 +233,8 @@ function renderPlay({ focus = false, sending = false } = {}) {
   shell({
     step: "Confirmar",
     filled: total + 1,
+    mainClass: "ps-main--summary",
+    fit: true,
     focus,
     body: `${heading("Sua escolha", cardName(current.championId), "Confira antes de registrar. Depois não dá para votar de novo nesta pesquisa.")}
       <div class="ps-hero">${staticCard(current.championId, "176px")}</div>
@@ -252,6 +255,8 @@ function renderDone({ focus = false } = {}) {
   shell({
     step: "Registrada",
     filled: screens() + 1,
+    mainClass: "ps-main--summary",
+    fit: true,
     focus,
     body: `${heading("Escolha registrada", champion ? cardName(champion) : "Sua resposta está registrada.", "Obrigado por participar. Sua resposta está registrada e não pode ser trocada nesta pesquisa.")}
       ${champion ? `<div class="ps-hero">${staticCard(champion, "176px")}</div>` : ""}

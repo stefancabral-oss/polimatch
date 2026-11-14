@@ -2,11 +2,11 @@
 
 ## Status
 
-- Estado: `em andamento`. As entregas 68a (registro) e 68b (regras e servidor) foram aprovadas. A 68c (tela) está pronta para gate. Faltam a 68d e a 68e.
+- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor) e 68c (tela) foram aprovadas. Faltam a 68d e a 68e.
 - Issue: #324
 - 68a: PR #325, mesclado em `3a59344`.
 - 68b: PR #326, mesclado em `3e1f771`.
-- 68c: branch `icm/68c-photo-survey-page` (base main `3e1f771`); o PR está na issue #324.
+- 68c: PR #327, branch `icm/68c-photo-survey-page` (base main `3e1f771`).
 
 ## Entregue (68a — registro)
 
@@ -86,6 +86,15 @@ O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com 
 - Bateria e2e completa em WebKit local, antes das correções da revisão: 23 de 27 roteiros. Os quatro que falham são os já conhecidos desta máquina e não tocam a página nova: três de foco de teclado (`interaction-smoke`, `accessible-profile`, `civic-navigation`), que passam no CI, e o `fact-check`, intermitente (#298), que passou nas duas repetições.
 - As regras e o e2e foram escritos antes do código. O e2e novo apontou um caso real depois da revisão: em 360×640 os botões cobriam as finalistas.
 
+68c, em 14/11/2026, depois do primeiro CI do PR #327:
+
+- O `ci-gate` falhou no commit `fc5e153`, em Chromium e em WebKit, num cenário só: em 320×480, na confirmação, as finalistas ficavam atrás dos botões. Os outros cenários passaram nos dois navegadores.
+- Causa: a fonte do sistema no Linux do CI é mais larga que a do macOS. O texto da confirmação quebrava em uma linha a mais, e a carta escolhida e as finalistas tinham tamanho fixo por faixa de altura; em 320×480 a folga era de 5 px. A tela de resposta registrada tinha o mesmo defeito, já no macOS, e não tinha medida no e2e.
+- Correção: nessas duas telas a carta escolhida ocupa a altura que sobra entre o texto e as finalistas, até o tamanho que já tinha; abaixo de 520 px de altura o sobretítulo some e as finalistas ficam menores. O botão ganhou respiro para texto em mais de uma linha. As telas de entrada, de voto e a final não mudaram.
+- O e2e passou a medir as duas telas em todos os tamanhos e ganhou dois cenários com o texto mais largo e mais alto (360×640 e 320×480), para a medida não depender da máquina. Escrito antes da correção, falhou primeiro aqui, na resposta registrada em 320×480.
+- `npm test --prefix app`: 310/310. `app/e2e/photo-survey.mjs`: 29 cenários aprovados em WebKit e em Chromium 140, locais. O Chromium abre aqui pelo caminho do executável em cache; o Playwright do repositório pede outra revisão, que só o CI tem.
+- Capturas e medidas conferidas na confirmação, na confirmação com aviso e na resposta registrada, em 390×844, 375×667, 360×640, 375×548, 320×480 (com e sem fonte larga) e 667×375. Com o celular deitado, na confirmação as finalistas passaram a caber sem rolar; na resposta registrada ainda pedem cerca de 20 px de rolagem.
+
 ## Revisão independente
 
 **68a.** Um agente separado, somente leitura, revisou o PR #325 em 13/11/2026 e não achou bloqueio. Correções aplicadas depois dela: a tela de entrada, que faltava no formato; a regra do desfazer, que vale até a confirmação; critérios de aceite por entrega, com os que faltavam (resposta forjada, sorteio uniforme, tabelas imutáveis, janela, troca de identidade); a página nova fora do sitemap e os testes que fixam a lista de páginas; a troca da entrada do site só na 68e; e as condições de publicação, com os bloqueios de maturidade que pesam nesta etapa.
@@ -109,6 +118,13 @@ Não corrigido, por ser igual ao resto do banco: `TRUNCATE` não é barrado pelo
 
 Saiu também da revisão: depois de registrada, o aparelho guarda só que a pessoa respondeu, não em quem.
 
+**68c, correção depois do CI.** Um agente separado, somente leitura no repositório, revisou a correção em 14/11/2026, antes do commit. Não achou bloqueio. Confirmou a causa pelas contas e por reprodução: com uma fonte larga no lugar da do Linux, o código anterior falha em 320×480 com os mesmos números do CI, a menos de 1 px. Rodou o e2e inteiro, sem alteração, em Chromium 140 e em WebKit, com a fonte do sistema e com a fonte larga: 29 de 29 em todos. Comparou 240 medidas das telas de entrada, de voto, final e fechada antes e depois: nenhuma diferença. Um pedido, atendido: o teste aceitava as finalistas até 16 px atrás dos botões; agora a folga é de 1 px e a tela precisa caber sem rolar. Ficam anotados, sem correção nesta entrega:
+
+- Com o celular deitado, a carta escolhida fica no tamanho mínimo e, na resposta registrada, as finalistas ainda pedem cerca de 20 px de rolagem. Antes eram cerca de 100.
+- Na final, em 360×640 com uma fonte bem larga, o título quebra em duas linhas e a página rola 17 px; as quatro cartas e o voltar continuam à vista, com pouca folga. A 68d confere esse caso.
+- Em tela estreita, ao tocar em confirmar o botão muda de três linhas para uma e a carta escolhida cresce uns 15 px por um instante.
+- Não foram conferidos: Linux de verdade fora do CI, Firefox e Safari anterior ao 26.
+
 ## Riscos conhecidos
 
 - A 68b mexe em `combineGoogleHistory`, a função que junta o histórico no login Google. A mudança é uma condição e um status; os smokes de integração e de identidade continuam aprovados.
@@ -118,7 +134,8 @@ Saiu também da revisão: depois de registrada, o aparelho guarda só que a pess
 - Das 20 cartas, 8 vêm de fotos de veículos ou de sites. Sem refazer essas 8 ou sem a confirmação do Stefan, a publicação (68e) não acontece com elas, e com 12 cartas o formato de 16 não fecha.
 - A cota de jogos novos por rede é de 3 por dia. Numa casa, escola ou escritório com a mesma rede, a quarta pessoa só responde entrando com Google. A tela mostra o aviso próprio, mas isso limita a pesquisa e o teste por agentes; a decisão sobre a cota é da política de abuso e fica para antes da 68e.
 - As escolhas parciais ficam no aparelho até a confirmação ou até outra identidade começar. Sair do Google na capa não as apaga. Entra nas condições da 68e, com a política de privacidade (#283).
-- Os e2e da 68c rodaram só em WebKit na máquina de desenvolvimento. O Chromium fica com o CI.
+- Na máquina de desenvolvimento os e2e rodam em WebKit e num Chromium de revisão diferente da do CI, com a fonte do macOS. A fonte do Linux só aparece no CI, que já apontou uma diferença (acima).
+- Em 320×480, com aviso na tela da confirmação, a carta escolhida chega ao tamanho mínimo e as finalistas pedem rolagem. Os botões continuam à vista.
 - "Uma resposta por jogador" não é "uma por pessoa": quem apaga os dados do aparelho pode responder de novo, dentro da cota de rede. O cadastro por CPF é o que resolve.
 - A etapa grava escolha política ligada à identidade do jogo, como o jogo atual já faz. A [ICM 41] #283, de privacidade, continua aberta.
 
@@ -148,13 +165,11 @@ Escolhas de desenho do agente na 68c, no mesmo regime:
 
 ## Próximo passo exato
 
-1. Gate do Stefan no PR da 68c.
-2. A 68d: rodadas jogadas por agentes, com a página e a API de verdade num ambiente descartável.
-3. A 68e: publicação, com um sim para cada passo.
+1. A 68d: rodadas jogadas por agentes, com a página e a API de verdade num ambiente descartável.
+2. A 68e: publicação, com um sim para cada passo.
 
 ## Ação do Stefan
 
-- Decidir o merge do PR da 68c. Ele não publica nada.
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
 - Confirmar as condições de publicação propostas no contexto do estágio.
 - Dizer se quer cartas de Lula e Flávio Bolsonaro no padrão comum, para entrarem numa próxima pesquisa.
@@ -167,5 +182,6 @@ Escolhas de desenho do agente na 68c, no mesmo regime:
 - Decisão da entrega 68b: `aprovado`
 - Responsável: Stefan
 - Observação: aprovado por instrução direta do Stefan para o PR #326, em conversa de 13/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 326, sim ou não?", ele respondeu: "Sim". O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada: as rotas seguem desligadas, e ligar `PHOTO_SURVEYS_ENABLED` em produção é assunto da 68e, com um sim próprio. As escolhas de desenho do agente listadas acima não foram discutidas uma a uma: seguem por delegação dele e podem ser mudadas até a publicação. As entregas 68c a 68e têm gate próprio.
-- Decisão da entrega 68c: `pendente`
+- Decisão da entrega 68c: `aprovado`
 - Responsável: Stefan
+- Observação: aprovado por instrução direta do Stefan para o PR #327, em conversa de 14/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 327, sim ou não?", ele respondeu: "Sim". Antes da pergunta ele foi avisado de que o CI ainda rodava e de que, se o Chromium apontasse algo, a correção viria antes do merge; foi o que aconteceu (acima). O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada: a página fica fora do menu e do sitemap, e o servidor segue com as rotas desligadas. As escolhas de desenho do agente na 68c não foram discutidas uma a uma: seguem por delegação dele e podem ser mudadas até a publicação. As entregas 68d e 68e têm gate próprio.

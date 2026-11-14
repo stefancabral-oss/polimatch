@@ -63,7 +63,7 @@
   "acceptance": {
     "delivery68a": "aprovada",
     "delivery68b": "aprovada",
-    "delivery68c": "pronta para gate",
+    "delivery68c": "aprovada (gate do Stefan em 14/11/2026)",
     "delivery68d": "não iniciada",
     "delivery68e": "não iniciada"
   },
@@ -134,7 +134,7 @@
     }
   },
   "delivery68c": {
-    "checkedAt": "2026-11-13",
+    "checkedAt": "2026-11-14",
     "branch": "icm/68c-photo-survey-page",
     "base": "3e1f771",
     "plan": "stages/68_photo_survey_politics/plans/68c-tela.md",
@@ -157,11 +157,41 @@
       "app unit (npm test --prefix app)": "310/310, 24 novos",
       "shared (npm run test:shared)": "104/104, sem mudança",
       "back unit (npm test --prefix back)": "293/293, sem mudança",
-      "e2e photo-survey em WebKit local, API simulada pelas regras de shared/photo-survey.js": "27 cenários aprovados",
-      "e2e photo-survey em Chromium": "não roda nesta máquina; fica com o CI",
+      "e2e photo-survey em WebKit local, API simulada pelas regras de shared/photo-survey.js": "29 cenários aprovados (27 até o commit fc5e153; mais dois com fonte larga depois do primeiro CI)",
+      "e2e photo-survey em Chromium": "29 cenários no Chromium 140 em cache nesta máquina, aberto pelo caminho do executável; a revisão que o Playwright do repositório pede só o CI tem",
       "página + API + PostgreSQL reais, locais, PHOTO_SURVEYS_ENABLED=true": "3 jogadores, 3 sorteios, 2 respostas iguais às escolhas da tela; votes e ranking_stats sem mudança; player_stats dos 3 jogadores no valor inicial",
       "bateria e2e completa em WebKit local (antes das correções da revisão)": "23 de 27 roteiros; falhas conhecidas desta máquina: interaction-smoke, accessible-profile e civic-navigation (foco de teclado no WebKit do macOS) e fact-check (intermitente, #298; passou em 2 repetições)",
-      "capturas conferidas": ["390x844", "375x667", "360x640", "375x548", "667x375"]
+      "capturas conferidas": ["390x844", "375x667", "360x640", "375x548", "320x480", "320x480 com fonte larga", "667x375"]
+    },
+    "ciFix": {
+      "failedCommit": "fc5e153",
+      "failure": "ci-gate bloqueado por ui-interaction-smoke: em Chromium e em WebKit, só o cenário 320x480, na confirmação: 'as finalistas não ficam atrás dos botões' (430 e 428 contra 399)",
+      "rootCause": "a fonte do sistema no Linux do CI é mais larga; o texto da confirmação quebrava em uma linha a mais (+20 px) e a carta escolhida e as finalistas tinham tamanho fixo por faixa de altura, com 5 px de folga em 320x480; a resposta registrada tinha o mesmo defeito no macOS e não era medida",
+      "fix": "na confirmação e na resposta registrada a carta escolhida ocupa a altura que sobra, até o tamanho que já tinha; abaixo de 520 px de altura o sobretítulo some e as finalistas ficam menores; botão com respiro para texto em mais de uma linha",
+      "testFirst": "o e2e passou a medir as duas telas em todos os tamanhos e ganhou dois cenários com o texto mais largo e mais alto; falhou antes da correção na resposta registrada em 320x480 (428 contra 404)",
+      "unchanged": "telas de entrada, de voto e a final",
+      "independentReview": {
+        "mode": "agente separado, somente leitura no repositório, antes do commit; prévia local própria",
+        "result": "sem bloqueio",
+        "verifiedByRunning": [
+          "e2e do repositório sem alteração: 29 de 29 em Chromium 140 e em WebKit, com a fonte do sistema e com uma fonte larga",
+          "com o CSS do commit fc5e153 o e2e novo falha em 320x480, com os números do CI a menos de 1 px",
+          "240 comparações das telas de entrada, voto, final e fechada antes e depois: nenhuma diferença",
+          "caso sem espaço (320x480 com aviso): botões à vista e página rolando, nos dois motores"
+        ],
+        "requestedAndApplied": [
+          "a folga do teste caiu de 16 px para 1 px e a tela precisa caber sem rolar em pé",
+          "a escolhida precisa ser maior que uma finalista (a medida antiga não podia falhar)",
+          "o cenário de fonte larga fixa o texto de apoio em quatro linhas, para não depender da máquina",
+          "a regra de encolher não depende mais da ordem no CSS"
+        ],
+        "notedNotFixed": [
+          "celular deitado: escolhida no tamanho mínimo; na resposta registrada as finalistas pedem cerca de 20 px de rolagem",
+          "final em 360x640 com fonte bem larga: título em duas linhas e 17 px de rolagem, cartas e voltar à vista com pouca folga (conferir na 68d)",
+          "em tela estreita o botão de confirmar muda de três linhas para uma ao enviar",
+          "não conferidos: Linux fora do CI, Firefox, Safari anterior ao 26"
+        ]
+      }
     },
     "testsFirst": "regras do percurso, cliente da API, listas de páginas e e2e escritos antes do código; o e2e apontou, depois da revisão, os botões cobrindo as finalistas em 360x640",
     "acceptance68c": {
@@ -202,10 +232,11 @@
       ],
       "notFixed": [
         "escolhas parciais ficam no aparelho até a confirmação ou até outra identidade começar; sair do Google na capa não as apaga (condição para a 68e, com a #283)",
-        "com o celular deitado, na confirmação as finalistas pedem rolagem"
+        "em 320x480 com aviso na confirmação, a carta escolhida chega ao mínimo e as finalistas pedem rolagem; os botões continuam à vista",
+        "com o celular deitado, na resposta registrada as finalistas pedem cerca de 20 px de rolagem"
       ]
     },
-    "remoteCi": "ver os checks do PR da 68c",
-    "humanGate": "pendente"
+    "remoteCi": "ci-gate falhou no commit fc5e153 (um cenário, nos dois navegadores) e a causa foi corrigida; o merge exige ci-gate verde no commit final do PR #327",
+    "humanGate": "68c aprovada por instrução do Stefan para o PR #327 em 14/11/2026 (\"Sim\"), transcrita no PR; merge a cargo do agente com o check verde"
   }
 }

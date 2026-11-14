@@ -292,9 +292,31 @@ button.ps-card[aria-pressed="true"]::after {
 
 /* Confirmação e resposta registrada --------------------------------------- */
 
+/* Nestas duas telas a carta escolhida ocupa a altura que sobra, até o tamanho
+   mínimo dela. O texto muda de altura com a fonte do aparelho; em pé, as
+   finalistas e os botões não dependem disso para ficar à vista. */
+.ps-shell--fit {
+  height: var(--ps-view);
+}
+
+.ps-main--summary > :not(.ps-hero) {
+  flex-shrink: 0;
+}
+
 .ps-hero {
-  width: 176px;
-  margin: 14px auto 0;
+  --ps-hero-w: 176px;
+  flex: 0 1 calc(var(--ps-hero-w) * 1.4);
+  min-height: 70px;
+  margin: 14px 0 0;
+  display: flex;
+  justify-content: center;
+}
+
+.ps-hero .ps-card {
+  flex: none;
+  width: auto;
+  height: 100%;
+  max-width: var(--ps-hero-w);
 }
 
 .ps-label {
@@ -314,7 +336,7 @@ button.ps-card[aria-pressed="true"]::after {
 
 @media (max-height: 720px) {
   .ps-hero {
-    width: 116px;
+    --ps-hero-w: 116px;
   }
 
   .ps-row {
@@ -326,7 +348,7 @@ button.ps-card[aria-pressed="true"]::after {
    para as finalistas não ficarem atrás deles. */
 @media (max-height: 640px) {
   .ps-hero {
-    width: 104px;
+    --ps-hero-w: 104px;
   }
 
   .ps-row {
@@ -394,7 +416,7 @@ button.ps-card[aria-pressed="true"]::after {
   width: 100%;
   min-height: 52px;
   margin: 0;
-  padding: 0 16px;
+  padding: 6px 16px;
   border: 0;
   border-radius: 14px;
   background: var(--ps-green);
@@ -511,7 +533,7 @@ button.ps-card[aria-pressed="true"]::after {
   }
 
   .ps-hero {
-    width: 96px;
+    --ps-hero-w: 96px;
     margin-top: 10px;
   }
 
@@ -526,6 +548,17 @@ button.ps-card[aria-pressed="true"]::after {
 
   .ps-stack {
     padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Telas muito baixas: na confirmação cada linha conta. */
+@media (max-height: 520px) {
+  .ps-main--summary .ps-kicker {
+    display: none;
+  }
+
+  .ps-row {
+    grid-template-columns: repeat(3, 44px);
   }
 }
 

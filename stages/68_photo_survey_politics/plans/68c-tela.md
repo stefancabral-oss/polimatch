@@ -172,3 +172,18 @@ Notas que ficam: os e2e rodaram só em WebKit nesta máquina, e o Chromium fica
 com o CI. As escolhas parciais ficam no aparelho até a confirmação ou até outra
 identidade começar; sair do Google na capa não as apaga. Esse ponto entra nas
 condições da 68e, junto com a política de privacidade (#283).
+
+## Depois do primeiro CI
+
+O `ci-gate` do PR #327 falhou no commit `fc5e153`, nos dois navegadores, num
+cenário só: em 320×480, na confirmação, as finalistas ficavam atrás dos botões.
+
+| O que o CI mostrou | O que mudou |
+| --- | --- |
+| No Linux a fonte do sistema é mais larga: o texto da confirmação quebra em uma linha a mais, e a carta escolhida e as finalistas tinham tamanho fixo, com 5 px de folga em 320×480 | Na confirmação e na resposta registrada a carta escolhida ocupa a altura que sobra, até o tamanho que já tinha. Abaixo de 520 px de altura o sobretítulo some e as finalistas ficam menores |
+| A resposta registrada tinha o mesmo defeito, já no macOS, sem medida no e2e | O e2e mede as duas telas em todos os tamanhos |
+| O teste dependia da fonte da máquina | Dois cenários com o texto mais largo e mais alto (360×640 e 320×480) |
+| O teste aceitava as finalistas até 16 px atrás dos botões (apontado na revisão da correção) | Folga de 1 px, e a tela precisa caber sem rolar em pé |
+| O texto do botão em três linhas encostava nas bordas | O botão ganhou respiro vertical |
+
+As telas de entrada, de voto e a final não mudaram.

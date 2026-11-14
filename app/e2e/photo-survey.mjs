@@ -9,7 +9,9 @@
  *   1. Abrir a página não cria jogador nem sorteio; a página fica fora do
  *      menu e do sitemap, com noindex.
  *   2. Caminho direto: um toque por tela, final, confirmação e uma gravação.
- *   3. As quatro cartas têm o mesmo tamanho e cabem na tela em três celulares.
+ *   3. As quatro cartas têm o mesmo tamanho e cabem na tela em seis tamanhos,
+ *      e em dois deles com o texto mais largo e mais alto; a confirmação e a
+ *      resposta registrada cabem sem cobrir a escolhida nem as finalistas.
  *   4. Voltar e trocar, inclusive a carta que era a escolhida.
  *   5. Recarregar no meio retoma o mesmo sorteio e as mesmas escolhas.
  *   6. Segunda aba: retoma o mesmo ponto e vê a resposta quando a outra confirma.
@@ -322,13 +324,37 @@ try {
     assert.equal(await page.getByRole("link", { name: "Ir para o início" }).getAttribute("href"), "./");
   });
 
-  for (const [width, height] of [[390, 844], [375, 667], [360, 640], [375, 548], [320, 480], [667, 375]]) {
-    await scenario(`as quatro cartas têm o mesmo tamanho e cabem na tela em ${width}×${height}`, async () => {
+  // A fonte do sistema muda de aparelho para aparelho, e com ela o número de
+  // linhas de cada texto. `wide` imita uma fonte mais larga e, na confirmação e
+  // na resposta registrada, fixa o texto de apoio em quatro linhas, para a
+  // medida não depender da máquina do teste.
+  const WIDE_FONT = ".ps-shell { letter-spacing: 0.08em; } .ps-main--summary .ps-hint { min-height: 5.4em; }";
+  for (const [width, height, wide = false] of [[390, 844], [375, 667], [360, 640], [375, 548], [320, 480], [667, 375], [360, 640, true], [320, 480, true]]) {
+    await scenario(`as quatro cartas têm o mesmo tamanho e cabem na tela em ${width}×${height}${wide ? " com fonte larga" : ""}`, async () => {
       const portrait = height > width;
       const minimum = height >= 640 ? 120 : 90;
       const server = createServer();
       const context = await newContext(server, { width, height });
       const page = await openSurvey(context);
+      if (wide) await page.addStyleTag({ content: WIDE_FONT });
+      // A escolhida e as finalistas, na confirmação e na resposta registrada.
+      const summary = async (label, action) => {
+        const button = await page.locator(action).boundingBox();
+        assert.ok(button.y >= 0 && button.y + button.height <= height + 0.5, `${label}: o botão principal fica à vista`);
+        assert.ok(button.height >= 44, `${label}: o botão principal tem altura de toque`);
+        const stack = await page.locator(".ps-stack").boundingBox();
+        const hero = await page.locator(".ps-hero .ps-card").boundingBox();
+        const finalist = await page.locator(".ps-row .ps-card").first().boundingBox();
+        assert.ok(hero.width > finalist.width, `${label}: a escolhida não é maior que uma finalista (${hero.width} e ${finalist.width})`);
+        assert.ok(Math.abs(hero.height / hero.width - 742 / 530) < 0.02, `${label}: a escolhida saiu da proporção (${hero.width}×${hero.height})`);
+        assert.ok(hero.x >= 0 && hero.x + hero.width <= width + 0.5, `${label}: a escolhida cortada na lateral`);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, `${label}: rolagem lateral`);
+        if (!portrait) return;
+        assert.ok(hero.y >= 0 && hero.y + hero.height <= stack.y + 1, `${label}: a escolhida não fica atrás dos botões (${hero.y + hero.height} > ${stack.y})`);
+        const row = await page.locator(".ps-row").boundingBox();
+        assert.ok(row.y + row.height <= stack.y + 1, `${label}: as finalistas não ficam atrás dos botões (${row.y + row.height} > ${stack.y})`);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1), true, `${label}: a tela cabe sem rolar`);
+      };
       await begin(page);
       await step(page, "Tela 1 de 4");
       const groups = server.groupsFor(await storedKey(page));
@@ -351,14 +377,10 @@ try {
       assert.ok(backLink.y >= 0 && backLink.y + backLink.height <= height + 0.5, "o voltar da final fica à vista");
       await tap(page, groups[0][0]);
       await step(page, "Confirmar");
-      const button = await page.locator('[data-action="confirm"]').boundingBox();
-      assert.ok(button.y >= 0 && button.y + button.height <= height + 0.5, "o botão de confirmar fica à vista");
-      assert.ok(button.height >= 44, "o botão de confirmar tem altura de toque");
-      if (portrait) {
-        const stack = await page.locator(".ps-stack").boundingBox();
-        const row = await page.locator(".ps-row").boundingBox();
-        assert.ok(row.y + row.height <= stack.y + 16.5, `as finalistas não ficam atrás dos botões (${row.y + row.height} > ${stack.y})`);
-      }
+      await summary("confirmação", '[data-action="confirm"]');
+      await confirm(page);
+      await step(page, "Registrada");
+      await summary("resposta registrada", ".ps-stack .ps-btn");
     });
   }
 
