@@ -376,6 +376,7 @@
       "entrada na capa e sitemap: segunda parte da 68e, com outro sim"
     ],
     "rollback": "tirar PHOTO_SURVEYS_ENABLED e publicar a API de novo: as rotas voltam a 404 e a página diz que a pesquisa não está disponível; as respostas gravadas ficam",
-    "humanGate": "cada passo com instrução do Stefan em 14/11/2026: \"Sim\" (cópia do banco), \"Liga vc\" (variável e deploy da API), \"Sim\" (deploy do app com as 20 cartas atuais); transcritas no HANDOFF"
+    "humanGate": "cada passo com instrução do Stefan em 14/11/2026: \"Sim\" (cópia do banco), \"Liga vc\" (variável e deploy da API), \"Sim\" (deploy do app com as 20 cartas atuais); transcritas no HANDOFF",
+    "recordPr": "PR #329, só documentação; mesclado por instrução do Stefan em 14/11/2026 (\"Sim\"), com o ci-gate verde; a revisão automática não deixou apontamento"
   }
 }

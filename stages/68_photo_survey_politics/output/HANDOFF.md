@@ -8,7 +8,7 @@
 - 68b: PR #326, mesclado em `3e1f771`.
 - 68c: PR #327, mesclado em `82ffed5`.
 - 68d: PR #328, mesclado em `eb729ed`.
-- 68e: publicação de 14/11/2026 no commit `eb729ed`; registro no branch `icm/68e-publicacao`.
+- 68e: publicação de 14/11/2026 no commit `eb729ed`; registro no PR #329.
 
 ## Entregue (68a — registro)
 
@@ -249,4 +249,4 @@ Escolhas de desenho do agente na 68c, no mesmo regime:
 - Observação: aprovado por instrução direta do Stefan para o PR #328, em conversa de 14/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 328, sim ou não?", ele respondeu: "Mescla". Quando respondeu, o CI e a revisão automática do PR ainda rodavam, e isso estava dito na mesma mensagem; os dois fecharam sem apontamento antes do merge. O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada. As correções da 68d são escolhas de tela e de texto do agente, por delegação dele, e podem ser mudadas até a publicação. A 68e tem gate próprio, com um sim para cada passo.
 - Decisão da entrega 68e: `em andamento`
 - Responsável: Stefan
-- Observação: cada passo da publicação de 14/11/2026 teve instrução direta do Stefan em conversa. À pergunta "Começo a publicação agora, pela cópia do banco, sim ou não?", ele respondeu: "Sim". À pergunta sobre quem ligaria a variável `PHOTO_SURVEYS_ENABLED=true`, com as opções "Liguei, publica a API" e "Liga você" (o agente abre a aba Environment, acrescenta a linha, salva e publica a API), ele respondeu: "Liga vc". À pergunta "Publico o app agora, com as 20 cartas atuais, sim ou não?", feita depois de lembrar que 8 delas vêm de fotos de veículos ou de sites e já estão no ar no jogo atual, ele respondeu: "Sim". A entrada na capa, o sitemap e o convite a pessoas de fora não foram autorizados e dependem de outro sim. A regra 6 do `AGENTS.md` não muda.
+- Observação: cada passo da publicação de 14/11/2026 teve instrução direta do Stefan em conversa. À pergunta "Começo a publicação agora, pela cópia do banco, sim ou não?", ele respondeu: "Sim". À pergunta sobre quem ligaria a variável `PHOTO_SURVEYS_ENABLED=true`, com as opções "Liguei, publica a API" e "Liga você" (o agente abre a aba Environment, acrescenta a linha, salva e publica a API), ele respondeu: "Liga vc". À pergunta "Publico o app agora, com as 20 cartas atuais, sim ou não?", feita depois de lembrar que 8 delas vêm de fotos de veículos ou de sites e já estão no ar no jogo atual, ele respondeu: "Sim". A entrada na capa, o sitemap e o convite a pessoas de fora não foram autorizados e dependem de outro sim. O registro da publicação (PR #329, só documentação) também teve o sim dele: à pergunta "Com o CI verde, mesclo o PR 329, que só registra a publicação, sim ou não?", ele respondeu: "Sim". A regra 6 do `AGENTS.md` não muda.
