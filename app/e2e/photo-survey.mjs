@@ -68,6 +68,7 @@ function createServer() {
     failResponse: [],
     refuseReceipt: 0,
     beforeDraw: null,
+    beforeResponse: null,
     revoked: new Set(),
     requests: [],
     draws: new Map(),
@@ -114,6 +115,7 @@ function createServer() {
     if (surveyId !== SURVEY.id) return send(404, { error: "pesquisa não encontrada", code: "PHOTO_SURVEY_NOT_FOUND" });
     if (!action && method === "GET") return send(200, server.view());
     if (action === "draw" && server.beforeDraw) await server.beforeDraw(key);
+    if (action === "response" && server.beforeResponse) await server.beforeResponse(key);
     if (!key || server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
 
     const prior = server.responses.get(key);
@@ -245,7 +247,10 @@ async function confirm(page) {
 }
 
 const results = [];
+// POLIMATCH_E2E_ONLY=trecho roda só os cenários com esse trecho no nome (uso local).
+const only = process.env.POLIMATCH_E2E_ONLY || "";
 async function scenario(name, run) {
+  if (only && !name.includes(only)) return;
   await run();
   results.push(name);
   console.log(`ok - ${name}`);
@@ -325,10 +330,11 @@ try {
   });
 
   // A fonte do sistema muda de aparelho para aparelho, e com ela o número de
-  // linhas de cada texto. `wide` imita uma fonte mais larga e, na confirmação e
-  // na resposta registrada, fixa o texto de apoio em quatro linhas, para a
-  // medida não depender da máquina do teste.
-  const WIDE_FONT = ".ps-shell { letter-spacing: 0.08em; } .ps-main--summary .ps-hint { min-height: 5.4em; }";
+  // linhas de cada texto. `wide` troca a fonte por uma de largura fixa, que é
+  // mais larga que as de sistema e tem a mesma medida no macOS e no Linux; na
+  // confirmação e na resposta registrada, fixa o texto de apoio em quatro
+  // linhas. Assim a medida não depende da máquina do teste.
+  const WIDE_FONT = '.ps-shell, .ps-shell button, .ps-shell a { font-family: Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace !important; } .ps-main--summary .ps-hint { min-height: 5.4em; }';
   for (const [width, height, wide = false] of [[390, 844], [375, 667], [360, 640], [375, 548], [320, 480], [667, 375], [360, 640, true], [320, 480, true]]) {
     await scenario(`as quatro cartas têm o mesmo tamanho e cabem na tela em ${width}×${height}${wide ? " com fonte larga" : ""}`, async () => {
       const portrait = height > width;
@@ -369,6 +375,7 @@ try {
           assert.ok(Math.abs(card.height / card.width - 742 / 530) < 0.02, `${label}: carta fora da proporção`);
         }
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, `${label}: rolagem lateral`);
+        if (portrait) assert.equal(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1), true, `${label}: a tela cabe sem rolar`);
       };
       await check("tela de voto");
       await playScreens(page, groups, [0, 0, 0, 0]);
@@ -481,6 +488,15 @@ try {
     await step(second, "Tela 2 de 4");
     assert.deepEqual((await grid(second)).map((card) => card.id), groups[1], "a segunda aba recebe o mesmo sorteio");
     assert.equal(server.count("POST", "/api/player"), 1);
+
+    // A aba parada acompanha a outra: não fica numa tela antiga, pronta para trocar a escolha em silêncio.
+    await tap(second, groups[1][2]);
+    await step(second, "Tela 3 de 4");
+    await step(first, "Tela 3 de 4");
+    await first.locator('[data-action="back"]').click();
+    await step(first, "Tela 2 de 4");
+    assert.deepEqual((await grid(first)).filter((card) => card.pressed).map((card) => card.id), [groups[1][2]], "a escolha feita na outra aba aparece nesta");
+    await step(second, "Tela 2 de 4");
 
     const picks = [groups[0][0], ...(await playScreens(first, groups, [0, 1, 1, 1], 1))];
     await tap(first, picks[1]);
@@ -620,9 +636,41 @@ try {
     await confirm(mid);
     await step(mid, "Fechada");
     assert.equal(server.responses.size, 0);
-    // Quem tinha sorteio e volta depois do fechamento vê que fechou.
+    assert.match(await mid.locator("#ps-notice:not([hidden])").innerText(), /Sua escolha não foi registrada/, "quem confirmou depois do fechamento lê que a escolha não foi registrada");
+    // Quem tinha sorteio e volta depois do fechamento vê que fechou, e que nada foi registrado.
     await mid.reload({ waitUntil: "domcontentloaded" });
     await step(mid, "Fechada");
+    assert.match(await mid.locator("#ps-notice:not([hidden])").innerText(), /Sua escolha não foi registrada/);
+    // Quem chega de novo não tinha escolha nenhuma: sem aviso.
+    assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+
+    // A2: a entrada estava aberta, a pesquisa fechou e só então veio o toque em Começar.
+    const late = createServer();
+    const idle = await openSurvey(await newContext(late));
+    await actionButton(idle).and(idle.locator(":not([disabled])")).waitFor();
+    late.status = "closed";
+    await begin(idle);
+    await step(idle, "Fechada");
+    assert.equal(late.count("POST", "/api/player"), 0, "o toque depois do fechamento não cria jogador nem gasta a cota da rede");
+    assert.equal(await storedKey(idle), null);
+
+    // M1: quem já respondeu e perdeu o registro da pesquisa neste aparelho vê a própria resposta, mesmo fechada.
+    const kept = createServer();
+    const answering = await openSurvey(await newContext(kept));
+    await begin(answering);
+    await step(answering, "Tela 1 de 4");
+    const keptKey = await storedKey(answering);
+    const keptPicks = await playScreens(answering, kept.groupsFor(keptKey), [1, 1, 1, 1]);
+    await tap(answering, keptPicks[2]);
+    await step(answering, "Confirmar");
+    await confirm(answering);
+    await step(answering, "Registrada");
+    kept.status = "closed";
+    const returning = await openSurvey(await newContext(kept, { storedKey: keptKey }));
+    await step(returning, "Registrada");
+    assert.equal(await title(returning), nameOf.get(keptPicks[2]));
+    assert.equal(kept.count("POST", "/api/player"), 1);
+    assert.equal(kept.responses.size, 1);
   });
 
   await scenario("rotas desligadas e API fora do ar", async () => {
@@ -637,6 +685,7 @@ try {
     server.down = true;
     const offline = await openSurvey(await newContext(server));
     await offline.locator("#ps-notice:not([hidden])", { hasText: "Não conseguimos falar com o servidor" }).waitFor();
+    assert.doesNotMatch(await offline.locator("#ps-notice:not([hidden])").innerText(), /Confira a conexão/, "com o aparelho conectado, a falha não é da conexão da pessoa");
     assert.equal(await title(offline), "Quem você prefere?", "a entrada continua na tela");
     server.down = false;
     await begin(offline, "Tentar de novo");
@@ -664,9 +713,10 @@ try {
     const box = await notice.boundingBox();
     const button = await actionButton(page).boundingBox();
     assert.ok(box.y >= 0 && box.y + box.height <= button.y, "o aviso aparece inteiro, sem rolar e sem ficar atrás do botão");
-    assert.match(text, /Muitos jogos novos nesta rede hoje\./);
+    assert.match(text, /Muitas participações novas nesta rede hoje\./);
     assert.match(text, /Entre com Google na página inicial/);
-    assert.match(text, /voltam a ser liberados às \d{2}:\d{2}/);
+    assert.match(text, /voltam a ser liberadas às \d{2}:\d{2}/);
+    assert.doesNotMatch(text, /jogos/, "na pesquisa, o aviso não fala em jogos");
     assert.equal(await notice.getByRole("link", { name: "Ir para o início" }).getAttribute("href"), "./");
     assert.equal(server.count("POST", "/draw"), 0);
     assert.equal(await storedKey(page), null);
@@ -709,6 +759,41 @@ try {
     await begin(page, "Continuar");
     await step(page, "Tela 1 de 4");
     assert.deepEqual((await grid(page)).map((card) => card.id), server.groupsFor(third)[0]);
+  });
+
+  await scenario("a conta muda enquanto a confirmação viaja: a pessoa lê que a resposta foi registrada", async () => {
+    const server = createServer();
+    const context = await newContext(server);
+    const page = await openSurvey(context);
+    await begin(page);
+    await step(page, "Tela 1 de 4");
+    const before = await storedKey(page);
+    const picks = await playScreens(page, server.groupsFor(before), [0, 0, 0, 0]);
+    await tap(page, picks[3]);
+    await step(page, "Confirmar");
+    const other = keyFor("depois");
+    const helper = await context.newPage();
+    await helper.goto(new URL("robots.txt", appUrl).href);
+    // A confirmação chega ao servidor; antes de a resposta voltar, outra aba troca a conta.
+    server.beforeResponse = async () => {
+      server.beforeResponse = null;
+      await helper.evaluate(([name, key]) => localStorage.setItem(name, key), [IDENTITY_KEY, other]);
+      await page.locator("#ps-notice:not([hidden])", { hasText: "Sua conta mudou" }).waitFor();
+    };
+    await confirm(page);
+    const notice = page.locator("#ps-notice:not([hidden])", { hasText: "foi registrada" });
+    await notice.waitFor();
+    assert.match(await notice.innerText(), /Sua conta mudou/);
+    assert.equal(server.responses.get(before).response.championId, picks[3], "a resposta ficou na conta que estava na tela");
+    assert.equal(server.responses.has(other), false);
+    const saved = await page.evaluate(([name, id]) => JSON.parse(localStorage.getItem(name))[id], [PROGRESS_KEY, SURVEY.id]);
+    assert.equal(saved.answered, true, "o aparelho guarda que aquela conta respondeu");
+    assert.equal(saved.progress, null);
+    // A conta atual segue com o sorteio dela.
+    await begin(page, "Continuar");
+    await step(page, "Tela 1 de 4");
+    assert.deepEqual((await grid(page)).map((card) => card.id), server.groupsFor(other)[0]);
+    assert.equal(server.count("POST", "/response"), 1);
   });
 
   await scenario("sorteio da conta mudou: a página busca de novo e recomeça", async () => {
@@ -994,9 +1079,11 @@ try {
     const helper = await context.newPage();
     await helper.goto(new URL("robots.txt", appUrl).href);
     await helper.evaluate((name) => localStorage.removeItem(name), IDENTITY_KEY);
-    await page.locator("#ps-notice:not([hidden])", { hasText: "Sua conta mudou" }).waitFor();
+    const signedOut = page.locator("#ps-notice:not([hidden])", { hasText: "Você saiu da conta" });
+    await signedOut.waitFor();
+    assert.doesNotMatch(await signedOut.innerText(), /conta atual/, "sem conta, o aviso não fala em conta atual");
     assert.equal(server.count("POST", "/api/player"), 1, "sem toque, nenhum jogador novo");
-    await begin(page, "Continuar");
+    await begin(page, "Começar");
     await step(page, "Tela 1 de 4");
     assert.equal(server.count("POST", "/api/player"), 2);
     assert.notEqual(await storedKey(page), first);
@@ -1065,6 +1152,8 @@ try {
     await page.locator('[data-action="back"]').click();
     await step(page, "Tela 1 de 4");
     assert.deepEqual((await grid(page)).filter((card) => card.pressed).map((card) => card.id), [groups[0][3]]);
+    const faded = await page.locator('.ps-grid button[aria-pressed="false"]').first().evaluate((card) => Number(getComputedStyle(card).opacity));
+    assert.ok(faded >= 0.55 && faded < 1, `as outras cartas ficam mais claras, sem parecer desligadas (${faded})`);
   });
 
   assert.deepEqual(pageErrors, [], `erros de página: ${pageErrors.join(" | ")}`);

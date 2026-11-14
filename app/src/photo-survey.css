@@ -201,8 +201,10 @@ button.ps-card[aria-pressed="true"]::after {
   place-items: center;
 }
 
+/* As outras ficam mais claras, mas não a ponto de parecerem desligadas: até a
+   confirmação dá para trocar. */
 .ps-grid.has-choice button.ps-card[aria-pressed="false"] {
-  opacity: 0.38;
+  opacity: 0.6;
 }
 
 /* As quatro cartas cabem na tela sem rolar: a largura da grade acompanha a
@@ -482,6 +484,14 @@ button.ps-card[aria-pressed="true"]::after {
 .ps-notice[hidden],
 .ps-shell [hidden] {
   display: none;
+}
+
+/* Telas estreitas: com uma fonte de sistema mais larga, o título de 28 px da
+   final quebrava em duas linhas e empurrava as cartas para fora da tela. */
+@media (max-width: 380px) {
+  .ps-title {
+    font-size: 24px;
+  }
 }
 
 /* Telas baixas: navegador aberto dentro de outro aplicativo, celular pequeno.
