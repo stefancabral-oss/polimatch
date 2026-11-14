@@ -64,7 +64,7 @@
     "delivery68a": "aprovada",
     "delivery68b": "aprovada",
     "delivery68c": "aprovada (gate do Stefan em 14/11/2026)",
-    "delivery68d": "pronta para gate",
+    "delivery68d": "aprovada (gate do Stefan em 14/11/2026)",
     "delivery68e": "não iniciada"
   },
   "delivery68b": {
@@ -336,7 +336,9 @@
       ],
       "notReRunByAgents": "os acertos da revisão não passaram pela segunda rodada de agentes; estão no e2e, nos dois navegadores"
     },
-    "remoteCi": "ver os checks do PR da 68d",
-    "humanGate": "pendente"
+    "realStackFinalCode": "página, API e PostgreSQL de verdade, locais, sobre o código final: 3 jogadores, 3 sorteios, 2 respostas iguais às escolhas da tela; votes e ranking_stats sem mudança",
+    "automatedReview": "Codex leu o commit 424bf62 e não deixou apontamento",
+    "remoteCi": "ci-gate verde no PR #328, no commit 424bf62 (Chromium e WebKit no Linux, 33 cenários); o merge exige ci-gate verde também no commit final, que só registra o gate",
+    "humanGate": "68d aprovada por instrução do Stefan para o PR #328 em 14/11/2026 (\"Mescla\"), transcrita no PR; merge a cargo do agente com o check verde"
   }
 }

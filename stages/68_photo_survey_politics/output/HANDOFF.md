@@ -2,12 +2,12 @@
 
 ## Status
 
-- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor) e 68c (tela) foram aprovadas. A 68d (teste por agentes) está pronta para gate. Falta a 68e.
+- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor), 68c (tela) e 68d (teste por agentes) foram aprovadas. Falta a 68e.
 - Issue: #324
 - 68a: PR #325, mesclado em `3a59344`.
 - 68b: PR #326, mesclado em `3e1f771`.
 - 68c: PR #327, mesclado em `82ffed5`.
-- 68d: branch `icm/68d-agent-playtest` (base main `82ffed5`); o PR está na issue #324.
+- 68d: PR #328, branch `icm/68d-agent-playtest` (base main `82ffed5`).
 
 ## Entregue (68a — registro)
 
@@ -113,6 +113,8 @@ O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com 
 - `npm test --prefix app`: 310/310. `app/e2e/photo-survey.mjs`: 33 cenários aprovados em WebKit e em Chromium 140, locais. Cada cenário que mudava comportamento falhou antes da correção pelo motivo esperado; os que só fixam comportamento que já existia passaram de primeira.
 - O cenário de fonte larga passou a usar uma fonte de largura fixa, que mede quase igual no macOS e no Linux, e as telas de voto e a final precisam caber sem rolar em pé.
 - Capturas conferidas: entrada com aviso de cota, final com escolhida, fechada com aviso e saída da conta, em 360×640 e 390×844.
+- Página, API e PostgreSQL de verdade, locais, sobre o código final: três pessoas, três sorteios, duas respostas iguais às escolhas da tela; `votes` e `ranking_stats` sem mudança.
+- CI do PR #328: `ci-gate` verde no commit `424bf62`, em Chromium e em WebKit no Linux, com os 33 cenários. A revisão automática do Codex leu o mesmo commit e não deixou apontamento.
 
 ## Revisão independente
 
@@ -200,12 +202,10 @@ Escolhas de desenho do agente na 68c, no mesmo regime:
 
 ## Próximo passo exato
 
-1. Gate do Stefan no PR da 68d.
-2. A 68e: publicação, com um sim para cada passo: API, ligar `PHOTO_SURVEYS_ENABLED` e app. A página entra escondida, fora do menu e do sitemap.
+1. A 68e: publicação, com um sim para cada passo: cópia do banco, API, ligar `PHOTO_SURVEYS_ENABLED` e app. A página entra escondida, fora do menu e do sitemap.
 
 ## Ação do Stefan
 
-- Decidir o merge do PR da 68d. Ele não publica nada.
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
 - Confirmar as condições de publicação propostas no contexto do estágio.
 - Dizer se quer cartas de Lula e Flávio Bolsonaro no padrão comum, para entrarem numa próxima pesquisa.
@@ -221,5 +221,6 @@ Escolhas de desenho do agente na 68c, no mesmo regime:
 - Decisão da entrega 68c: `aprovado`
 - Responsável: Stefan
 - Observação: aprovado por instrução direta do Stefan para o PR #327, em conversa de 14/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 327, sim ou não?", ele respondeu: "Sim". Antes da pergunta ele foi avisado de que o CI ainda rodava e de que, se o Chromium apontasse algo, a correção viria antes do merge; foi o que aconteceu (acima). Entrou também, antes do merge, a correção do apontamento da revisão automática. O PR foi mesclado em `82ffed5`, com o `ci-gate` verde no commit final `61509d3`. O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada: a página fica fora do menu e do sitemap, e o servidor segue com as rotas desligadas. As escolhas de desenho do agente na 68c não foram discutidas uma a uma: seguem por delegação dele e podem ser mudadas até a publicação. As entregas 68d e 68e têm gate próprio.
-- Decisão da entrega 68d: `pendente`
+- Decisão da entrega 68d: `aprovado`
 - Responsável: Stefan
+- Observação: aprovado por instrução direta do Stefan para o PR #328, em conversa de 14/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 328, sim ou não?", ele respondeu: "Mescla". Quando respondeu, o CI e a revisão automática do PR ainda rodavam, e isso estava dito na mesma mensagem; os dois fecharam sem apontamento antes do merge. O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada. As correções da 68d são escolhas de tela e de texto do agente, por delegação dele, e podem ser mudadas até a publicação. A 68e tem gate próprio, com um sim para cada passo.
