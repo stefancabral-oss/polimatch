@@ -45,7 +45,7 @@ telas de `references/`.
 | Trocar a carta que era a escolhida | A escolhida é apagada | A final nunca aponta para uma carta que saiu. |
 | Recibo (`answerId`) | Um por percurso, guardado com as escolhas | A nova tentativa depois de falha de rede repete o mesmo recibo. |
 | Retomada | Quem já começou nesta identidade vai direto ao sorteio ao abrir | O sorteio já existe: retomar não grava nada novo. |
-| O que fica no aparelho | Grupos, escolhas, recibo, tela atual e a resposta registrada | Escolhas parciais só no aparelho, como manda o contexto. |
+| O que fica no aparelho | Até confirmar: grupos, escolhas, recibo e tela atual. Depois: só que a pessoa respondeu | Escolhas parciais só no aparelho, como manda o contexto. A escolha registrada vem sempre do servidor. |
 | Identidade no que fica salvo | Uma marca curta da chave (FNV-1a), nunca a chave | Não espalhar a chave de acesso por outra entrada do armazenamento. |
 | Troca de identidade | A página volta à entrada com aviso e pede um toque em "Continuar" | A identidade nova só recebe sorteio com um toque da pessoa. |
 | Resposta recusada por não bater com o sorteio | A página busca o sorteio de novo e recomeça | Nota da revisão da 68b. |
@@ -85,7 +85,7 @@ telas de `references/`.
   `savedProgressText(text, surveyId, { identity, progress, response })`.
 
 - [x] Escrever `photo-survey-flow.test.js` (18 testes) e ver falhar por módulo ausente.
-- [x] Implementar e ver os 18 passarem.
+- [x] Implementar e ver os 18 passarem. Com a revisão, 20.
 
 ## Tarefa 2 — Cliente da API e entradas do build
 
@@ -117,7 +117,9 @@ Respostas do servidor e o que a tela faz:
 | 400 pelos outros motivos, ou 409 `PHOTO_SURVEY_DRAW_REQUIRED` | Busca o sorteio de novo e recomeça, com aviso |
 | 401 com a chave trocada no aparelho | Entrada com "Sua conta mudou" e "Continuar" |
 | 401 com a mesma chave | Aviso de sessão, com o caminho do início; escolhas mantidas |
-| Sem resposta na confirmação | Aviso; "Tentar de novo" repete o mesmo recibo |
+| Sem resposta, ou erro do servidor, na confirmação | Aviso de que não deu para saber se chegou; "Voltar e trocar" travado; "Tentar de novo" repete o mesmo recibo |
+| Sem resposta na retomada de quem já respondeu | "Sua resposta está registrada.", com aviso e nova tentativa |
+| Carta que falha ou não chega em 12 s | A tela inteira espera, com aviso; a nova tentativa pede outro endereço |
 
 - [x] Escrever `app/e2e/photo-survey.mjs` com a API simulada pelas mesmas
   regras de `shared/photo-survey.js`.
@@ -145,4 +147,28 @@ Respostas do servidor e o que a tela faz:
 
 ## Depois da revisão independente
 
-A preencher com o que a revisão achar.
+Um agente separado, somente leitura, revisou o commit `c3a83f5` em 13/11/2026.
+Veredito: sem bloqueio, com correções. Ele não achou caminho para duas
+respostas, perda de resposta confirmada ou escolha trocada no servidor. O que
+ele reproduziu e o que mudou, sempre com o teste antes do código:
+
+| Achado | Correção |
+|---|---|
+| Quem já respondeu e recarregava com a API fora via a entrada com "Nenhuma escolha foi registrada" | A retomada sem servidor mostra "Sua resposta está registrada." com nova tentativa; quem estava no meio lê que as escolhas continuam no aparelho |
+| Tempo esgotado na confirmação dizia "não conseguimos registrar" e deixava trocar; a pessoa via uma escolha e ficava registrada outra | O aviso diz que não deu para saber, e "Voltar e trocar" fica travado até a nova tentativa responder |
+| Em tela baixa (celular deitado, navegador embutido) a fileira de baixo saía da tela, e na confirmação as finalistas ficavam atrás dos botões | Cabeçalho compacto abaixo de 600 px de altura, quatro cartas numa fileira com o celular deitado, botões lado a lado abaixo de 640 px; cenários de tamanho em 375×548, 320×480 e 667×375 |
+| Imagem que nunca respondia deixava a tela travada sem saída | Prazo de 12 s com o mesmo aviso de falha; a nova tentativa pede outro endereço |
+| Número vindo do servidor chegava ao HTML sem escape | `drawSize` e `groupSize` só valem como número pequeno; tudo que entra no HTML é escapado |
+| A retomada podia criar jogador e sorteio sem toque, numa corrida estreita | Na retomada sem toque nunca se cria jogador nem se troca de identidade: a página avisa e pede "Continuar" |
+| Recarregar na confirmação voltava para a final | Volta para a confirmação; linhas mortas removidas |
+| A trava de toque dependia só do atributo `disabled` | `choose` confere o botão, e a grade travada não recebe ponteiro; o e2e toca de verdade numa carta travada |
+| Foco no `<body>` depois de falha; etapa não anunciada | O foco volta ao título depois de cada falha; o título leva a etapa como descrição; área de toque da marca com 44 px |
+| Textos imprecisos; erro de renderização virava "falha de rede" | Textos por tipo de falha; a renderização saiu de dentro do `try` da rede; aviso quando o navegador não salva o progresso |
+
+Saiu também da revisão: depois de registrada, o aparelho guarda só que a pessoa
+respondeu, não em quem. A escolha vem do servidor.
+
+Notas que ficam: os e2e rodaram só em WebKit nesta máquina, e o Chromium fica
+com o CI. As escolhas parciais ficam no aparelho até a confirmação ou até outra
+identidade começar; sair do Google na capa não as apaga. Esse ponto entra nas
+condições da 68e, junto com a política de privacidade (#283).

@@ -104,11 +104,11 @@ export function restoreProgress(saved, groups, uuid = newUuid) {
   const savedPicks = Array.isArray(saved.picks) ? saved.picks : [];
   const picks = groups.map((group, index) => (group.includes(savedPicks[index]) ? savedPicks[index] : null));
   const championId = picks.includes(saved.championId) && saved.championId !== null ? saved.championId : null;
+  // O mais longe que o salvo pode levar: a primeira tela sem escolha; com as
+  // quatro feitas, a final; com a escolhida válida, a confirmação.
   const open = firstOpenStep(picks);
-  let step = Number.isInteger(saved.step) ? Math.max(0, saved.step) : open;
-  if (step > open) step = open;
-  if (step > screens && !championId) step = screens;
-  if (step > screens + 1) step = screens + 1;
+  const furthest = open === screens && championId ? screens + 1 : open;
+  const step = Number.isInteger(saved.step) ? Math.min(Math.max(0, saved.step), furthest) : open;
   return {
     groups: groups.map((group) => [...group]),
     picks,
@@ -141,18 +141,22 @@ function parseSaved(text) {
   }
 }
 
-/** O registro de uma pesquisa no armazenamento, ou null. */
+/**
+ * O registro de uma pesquisa no armazenamento, ou null. Depois de registrada,
+ * o aparelho guarda só que a pessoa respondeu (`answered`), nunca a escolha:
+ * quem mostra a escolha é o servidor.
+ */
 export function readSavedProgress(text, surveyId) {
   const record = parseSaved(text)[surveyId];
   if (!record || typeof record !== "object" || Array.isArray(record)) return null;
   return {
     identity: typeof record.identity === "string" ? record.identity : "",
     progress: record.progress && typeof record.progress === "object" ? record.progress : null,
-    response: record.response && typeof record.response === "object" ? record.response : null,
+    answered: record.answered === true,
   };
 }
 
 /** O texto a gravar, preservando o que estiver salvo de outras pesquisas. */
-export function savedProgressText(text, surveyId, { identity = "", progress = null, response = null }) {
-  return JSON.stringify({ ...parseSaved(text), [surveyId]: { identity, progress, response } });
+export function savedProgressText(text, surveyId, { identity = "", progress = null, answered = false }) {
+  return JSON.stringify({ ...parseSaved(text), [surveyId]: { identity, progress, answered: answered === true } });
 }

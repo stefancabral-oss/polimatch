@@ -157,6 +157,16 @@ test("o progresso salvo volta quando o sorteio é o mesmo", () => {
   assert.deepEqual(restored, saved);
 });
 
+test("quem recarrega na confirmação volta para a confirmação", () => {
+  const saved = chooseChampion(atFinal(), "b2");
+  const restored = restoreProgress(JSON.parse(JSON.stringify(saved)), GROUPS, () => "outro");
+  assert.deepEqual(restored, saved);
+  assert.deepEqual(progressView(restored), { kind: "confirm", championId: "b2", otherIds: ["a1", "c3", "d4"] });
+  // Sem escolhida válida não há confirmação para onde voltar.
+  assert.equal(progressView(restoreProgress({ ...saved, championId: "a2" }, GROUPS, () => "outro")).kind, "final");
+  assert.equal(progressView(restoreProgress({ ...saved, championId: null }, GROUPS, () => "outro")).kind, "final");
+});
+
 test("sorteio diferente, ou nada salvo, começa do zero com recibo novo", () => {
   const other = [GROUPS[3], GROUPS[2], GROUPS[1], GROUPS[0]];
   const next = "0b0f6f0a-1111-4222-8333-444455556666";
@@ -204,16 +214,27 @@ test("a marca da identidade não guarda a chave e muda quando a chave muda", () 
 test("o que vai para o armazenamento volta igual, por pesquisa", () => {
   const progress = chooseChampion(atFinal(), "a1");
   const text = savedProgressText(null, PHOTO_SURVEY_ID, { identity: "abc12345", progress });
-  assert.deepEqual(readSavedProgress(text, PHOTO_SURVEY_ID), { identity: "abc12345", progress, response: null });
+  assert.deepEqual(readSavedProgress(text, PHOTO_SURVEY_ID), { identity: "abc12345", progress, answered: false });
   assert.equal(readSavedProgress(text, "outra-pesquisa"), null);
 
-  const response = { answerId: UUID, pickIds: ["a1", "b2", "c3", "d4"], championId: "a1", respondedAt: "2026-11-20T15:00:00.000Z" };
-  const both = savedProgressText(text, "outra-pesquisa", { identity: "ffff0000", progress: fresh(), response });
+  const both = savedProgressText(text, "outra-pesquisa", { identity: "ffff0000", answered: true });
   assert.equal(readSavedProgress(both, PHOTO_SURVEY_ID).identity, "abc12345", "gravar uma pesquisa não apaga a outra");
-  assert.deepEqual(readSavedProgress(both, "outra-pesquisa").response, response);
+  assert.deepEqual(readSavedProgress(both, "outra-pesquisa"), { identity: "ffff0000", progress: null, answered: true });
 
   for (const broken of [null, "", "{não é json", "[]", "7", JSON.stringify({ [PHOTO_SURVEY_ID]: "x" })]) {
     assert.equal(readSavedProgress(broken, PHOTO_SURVEY_ID), null);
   }
   assert.doesNotThrow(() => savedProgressText("{não é json", PHOTO_SURVEY_ID, { identity: "", progress: fresh() }));
+});
+
+test("depois de registrada, o aparelho guarda que respondeu, não em quem", () => {
+  const text = savedProgressText(null, PHOTO_SURVEY_ID, { identity: "abc12345", answered: true });
+  assert.deepEqual(JSON.parse(text), { [PHOTO_SURVEY_ID]: { identity: "abc12345", progress: null, answered: true } });
+  // Um registro antigo com a resposta inteira conta como respondido e não devolve a escolha.
+  const legacy = JSON.stringify({ [PHOTO_SURVEY_ID]: { identity: "abc12345", progress: null, response: { championId: "a1" } } });
+  assert.deepEqual(readSavedProgress(legacy, PHOTO_SURVEY_ID), { identity: "abc12345", progress: null, answered: false });
+  for (const value of ["true", 1, {}, null]) {
+    const forged = JSON.stringify({ [PHOTO_SURVEY_ID]: { identity: "x", progress: null, answered: value } });
+    assert.equal(readSavedProgress(forged, PHOTO_SURVEY_ID).answered, false);
+  }
 });

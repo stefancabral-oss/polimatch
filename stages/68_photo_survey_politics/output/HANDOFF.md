@@ -2,10 +2,11 @@
 
 ## Status
 
-- Estado: `em andamento`. As entregas 68a (registro) e 68b (regras e servidor) foram aprovadas. Faltam a 68c, a 68d e a 68e.
+- Estado: `em andamento`. As entregas 68a (registro) e 68b (regras e servidor) foram aprovadas. A 68c (tela) está pronta para gate. Faltam a 68d e a 68e.
 - Issue: #324
 - 68a: PR #325, mesclado em `3a59344`.
-- 68b: PR #326, branch `icm/68b-photo-survey-server` (base main `3a59344`).
+- 68b: PR #326, mesclado em `3e1f771`.
+- 68c: branch `icm/68c-photo-survey-page` (base main `3e1f771`); o PR está na issue #324.
 
 ## Entregue (68a — registro)
 
@@ -29,9 +30,35 @@ O que muda no jogo atual: nada no que a pessoa vê. No servidor, o login Google 
 
 Nada desta entrega é visível no site: não há tela, e as rotas novas nascem desligadas. Só `PHOTO_SURVEYS_ENABLED=true` no ambiente da API as liga; sem isso respondem 404 `PHOTO_SURVEYS_DISABLED`.
 
+## Entregue (68c — tela)
+
+- `app/pesquisa.html`: a página nova, com `noindex`, fora do menu e do sitemap. Nenhuma página pública aponta para ela.
+- `app/src/photo-survey-flow.js`: as regras de escolher, voltar, trocar e retomar. Funções puras, com 20 testes.
+- `app/src/photo-survey-page.js` e `app/src/photo-survey.css`: a tela. Estados: entrada, voto (4 telas), final, confirmação, registrada, fechada, ainda não abriu e indisponível.
+- `app/src/api.js`: `loadPhotoSurvey`, `drawPhotoSurvey` e `respondPhotoSurvey`.
+- `app/e2e/photo-survey.mjs`: 27 cenários de navegador, com passo próprio em `.github/workflows/ui-interaction-smoke.yml`.
+- `app/vite.config.js`: a página entra no build.
+- `stages/68_photo_survey_politics/plans/68c-tela.md`: o plano seguido, com as decisões que o contexto deixava abertas.
+
+Como a tela se comporta:
+
+- Abrir a página só lê a definição da pesquisa. O jogador e o sorteio nascem no toque em "Começar". Quem já começou nesta identidade vai direto ao sorteio ao abrir de novo, que não grava nada novo.
+- As escolhas parciais ficam no aparelho. A resposta vai ao servidor uma vez, na confirmação, sempre com o mesmo recibo. Depois de registrada, o aparelho guarda só que a pessoa respondeu; a escolha vem do servidor.
+- Se a confirmação fica sem resposta, a tela diz que não deu para saber se chegou e trava a troca até a nova tentativa responder.
+- O toque só é liberado quando as quatro cartas da tela carregaram. Se uma falha, a tela inteira espera.
+- As quatro cartas cabem na tela sem rolar: a largura da grade acompanha a altura livre. Em tela baixa o cabeçalho encolhe, e com o celular deitado as quatro ficam numa fileira.
+- Depois de trocar uma escolha, a pessoa segue para a primeira tela sem escolha, ou direto para a final. Trocar a carta que era a escolhida apaga a escolhida.
+- Com as rotas desligadas, que é o estado de hoje em qualquer ambiente sem `PHOTO_SURVEYS_ENABLED=true`, a página diz que a pesquisa não está disponível.
+
+O que muda no jogo atual: nada. `main.js` e as outras três páginas não foram alterados. Só mudaram os três testes que fixam a lista de páginas do build.
+
+O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com as linhas iniciais do ranking pessoal, como qualquer jogador novo. Responder a pesquisa não mexe nelas.
+
 ## Não entregue / pendente
 
-- As entregas 68c (tela), 68d (teste por agentes) e 68e (publicação).
+- As entregas 68d (teste por agentes) e 68e (publicação).
+- O botão voltar do navegador sai da página em vez de voltar uma tela. Ao abrir de novo, a pessoa retoma de onde parou. Fica para avaliar na 68d.
+- Som e háptica das telas novas, fora do escopo da etapa.
 - A pesquisa `politica-2026-01` está sem janela (`opensAt` e `closesAt` nulos), ou seja, aberta assim que as rotas forem ligadas. Definir a janela e ligar `PHOTO_SURVEYS_ENABLED` em produção são assunto da 68e.
 - Fechar uma pesquisa exige mudar a definição no código e publicar. Não há painel para isso.
 
@@ -49,6 +76,16 @@ Nada desta entrega é visível no site: não há tela, e as rotas novas nascem d
 - A API real, local: definição, sorteio, resposta, repetição (`alreadyProcessed`), outra escolha (409) e chamada sem sessão (401).
 - O smoke novo foi escrito antes do código e falhou primeiro por método ausente; depois apontou o caso do login Google descrito acima.
 
+68c, em 13/11/2026, na mesma máquina:
+
+- `npm test --prefix app`: 310/310 (24 novos: 20 das regras do percurso, 3 do cliente da API e 1 das listas de páginas).
+- `npm run test:shared` 104/104 e `npm test --prefix back` 293/293, sem mudança.
+- `app/e2e/photo-survey.mjs` em WebKit, contra o build local: 27 cenários aprovados. O Chromium não abre nesta máquina e fica com o CI.
+- Página, API e PostgreSQL de verdade, locais, com `PHOTO_SURVEYS_ENABLED=true` e sem simulação: três pessoas, três sorteios, duas respostas iguais às escolhas feitas na tela; votos e ranking do jogo sem mudança; o ranking pessoal dos três jogadores no valor inicial.
+- Capturas conferidas em 390×844, 375×667, 360×640, 375×548 e 667×375.
+- Bateria e2e completa em WebKit local, antes das correções da revisão: 23 de 27 roteiros. Os quatro que falham são os já conhecidos desta máquina e não tocam a página nova: três de foco de teclado (`interaction-smoke`, `accessible-profile`, `civic-navigation`), que passam no CI, e o `fact-check`, intermitente (#298), que passou nas duas repetições.
+- As regras e o e2e foram escritos antes do código. O e2e novo apontou um caso real depois da revisão: em 360×640 os botões cobriam as finalistas.
+
 ## Revisão independente
 
 **68a.** Um agente separado, somente leitura, revisou o PR #325 em 13/11/2026 e não achou bloqueio. Correções aplicadas depois dela: a tela de entrada, que faltava no formato; a regra do desfazer, que vale até a confirmação; critérios de aceite por entrega, com os que faltavam (resposta forjada, sorteio uniforme, tabelas imutáveis, janela, troca de identidade); a página nova fora do sitemap e os testes que fixam a lista de páginas; a troca da entrada do site só na 68e; e as condições de publicação, com os bloqueios de maturidade que pesam nesta etapa.
@@ -64,6 +101,14 @@ Notas que ficam para a 68c: quando o anônimo vira o jogador ativo da conta, out
 
 Não corrigido, por ser igual ao resto do banco: `TRUNCATE` não é barrado pelos gatilhos de imutabilidade, nas tabelas novas nem nas antigas.
 
+**68c.** Outro agente separado, somente leitura no repositório, revisou a tela em 13/11/2026. Não achou bloqueio nem caminho para duas respostas, perda de resposta confirmada ou escolha trocada no servidor. Reproduziu dez pontos, todos corrigidos com teste antes do código; a lista completa está no plano da 68c. Os três que mais pesavam:
+
+- Quem já tinha respondido e recarregava com a API fora via a entrada com "Nenhuma escolha foi registrada". Agora vê que a resposta está registrada.
+- Com a confirmação sem resposta do servidor, a tela dizia que não tinha registrado e deixava trocar; a pessoa via uma escolha e ficava registrada outra. Agora a tela diz que não deu para saber e trava a troca até conferir.
+- Em tela baixa, duas das quatro cartas saíam da tela. Agora cabem as quatro, inclusive com o celular deitado.
+
+Saiu também da revisão: depois de registrada, o aparelho guarda só que a pessoa respondeu, não em quem.
+
 ## Riscos conhecidos
 
 - A 68b mexe em `combineGoogleHistory`, a função que junta o histórico no login Google. A mudança é uma condição e um status; os smokes de integração e de identidade continuam aprovados.
@@ -71,6 +116,9 @@ Não corrigido, por ser igual ao resto do banco: `TRUNCATE` não é barrado pelo
 - A decisão 0002 muda a ordem "maturidade primeiro" da 0001. Os bloqueios de maturidade continuam abertos (#278, #279, #280, #281, #283, #284, #285 e #286) e correm em paralelo.
 - A primeira pesquisa fica sem Lula e Flávio Bolsonaro, porque as cartas deles têm moldura diferente das outras 20.
 - Das 20 cartas, 8 vêm de fotos de veículos ou de sites. Sem refazer essas 8 ou sem a confirmação do Stefan, a publicação (68e) não acontece com elas, e com 12 cartas o formato de 16 não fecha.
+- A cota de jogos novos por rede é de 3 por dia. Numa casa, escola ou escritório com a mesma rede, a quarta pessoa só responde entrando com Google. A tela mostra o aviso próprio, mas isso limita a pesquisa e o teste por agentes; a decisão sobre a cota é da política de abuso e fica para antes da 68e.
+- As escolhas parciais ficam no aparelho até a confirmação ou até outra identidade começar. Sair do Google na capa não as apaga. Entra nas condições da 68e, com a política de privacidade (#283).
+- Os e2e da 68c rodaram só em WebKit na máquina de desenvolvimento. O Chromium fica com o CI.
 - "Uma resposta por jogador" não é "uma por pessoa": quem apaga os dados do aparelho pode responder de novo, dentro da cota de rede. O cadastro por CPF é o que resolve.
 - A etapa grava escolha política ligada à identidade do jogo, como o jogo atual já faz. A [ICM 41] #283, de privacidade, continua aberta.
 
@@ -90,13 +138,23 @@ Escolhas de desenho do agente, dentro do que ele aprovou. Estão implementadas n
 - A coleção fica fora desta etapa.
 - A resposta da pesquisa não altera o Elo do jogo atual.
 
+Escolhas de desenho do agente na 68c, no mesmo regime:
+
+- O endereço `pesquisa.html`.
+- O toque só é liberado quando as quatro cartas carregaram.
+- Depois de trocar uma escolha, a pessoa vai para a primeira tela sem escolha, ou direto para a final.
+- Depois de registrada, o aparelho guarda só que a pessoa respondeu.
+- O botão voltar do navegador sai da página; ao abrir de novo, a pessoa retoma de onde parou.
+
 ## Próximo passo exato
 
-1. Plano e implementação da 68c, a tela, em PR próprio e com gate próprio.
-2. Depois dela, a 68d (teste por agentes) e a 68e (publicação).
+1. Gate do Stefan no PR da 68c.
+2. A 68d: rodadas jogadas por agentes, com a página e a API de verdade num ambiente descartável.
+3. A 68e: publicação, com um sim para cada passo.
 
 ## Ação do Stefan
 
+- Decidir o merge do PR da 68c. Ele não publica nada.
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
 - Confirmar as condições de publicação propostas no contexto do estágio.
 - Dizer se quer cartas de Lula e Flávio Bolsonaro no padrão comum, para entrarem numa próxima pesquisa.
@@ -105,7 +163,9 @@ Escolhas de desenho do agente, dentro do que ele aprovou. Estão implementadas n
 
 - Decisão da entrega 68a: `aprovado`
 - Responsável: Stefan
-- Observação: aprovado por instrução direta do Stefan para este PR, em conversa de 13/11/2026. À pergunta "Mesclo o PR 325, com a tela de entrada incluída, ou quer mudar alguma coisa?", ele respondeu: "Toca". O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. As entregas 68b a 68e têm gate próprio. A regra 6 do `AGENTS.md` não muda.
+- Observação: aprovado por instrução direta do Stefan para o PR #325, em conversa de 13/11/2026. À pergunta "Mesclo o PR 325, com a tela de entrada incluída, ou quer mudar alguma coisa?", ele respondeu: "Toca". O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. As entregas 68b a 68e têm gate próprio. A regra 6 do `AGENTS.md` não muda.
 - Decisão da entrega 68b: `aprovado`
 - Responsável: Stefan
-- Observação: aprovado por instrução direta do Stefan para este PR, em conversa de 13/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 326, sim ou não?", ele respondeu: "Sim". O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada: as rotas seguem desligadas, e ligar `PHOTO_SURVEYS_ENABLED` em produção é assunto da 68e, com um sim próprio. As escolhas de desenho do agente listadas acima não foram discutidas uma a uma: seguem por delegação dele e podem ser mudadas até a publicação. As entregas 68c a 68e têm gate próprio.
+- Observação: aprovado por instrução direta do Stefan para o PR #326, em conversa de 13/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 326, sim ou não?", ele respondeu: "Sim". O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada: as rotas seguem desligadas, e ligar `PHOTO_SURVEYS_ENABLED` em produção é assunto da 68e, com um sim próprio. As escolhas de desenho do agente listadas acima não foram discutidas uma a uma: seguem por delegação dele e podem ser mudadas até a publicação. As entregas 68c a 68e têm gate próprio.
+- Decisão da entrega 68c: `pendente`
+- Responsável: Stefan

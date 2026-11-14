@@ -64,7 +64,8 @@ body {
   letter-spacing: -0.01em;
   color: var(--ps-ink);
   text-decoration: none;
-  padding: 8px 8px 8px 0;
+  padding: 12px 12px 12px 0;
+  margin: -4px 0;
 }
 
 .ps-brand b {
@@ -227,6 +228,7 @@ button.ps-card[aria-pressed="true"]::after {
 }
 
 .ps-grid[data-ready="false"] .ps-card {
+  pointer-events: none;
   animation: ps-pulse 1.2s ease-in-out infinite;
 }
 
@@ -312,11 +314,31 @@ button.ps-card[aria-pressed="true"]::after {
 
 @media (max-height: 720px) {
   .ps-hero {
-    width: 124px;
+    width: 116px;
   }
 
   .ps-row {
-    grid-template-columns: repeat(3, 64px);
+    grid-template-columns: repeat(3, 60px);
+  }
+}
+
+/* Abaixo disso os dois botões da confirmação ficam lado a lado: sobra altura
+   para as finalistas não ficarem atrás deles. */
+@media (max-height: 640px) {
+  .ps-hero {
+    width: 104px;
+  }
+
+  .ps-row {
+    grid-template-columns: repeat(3, 56px);
+  }
+
+  .ps-stack--pair {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ps-stack--pair .ps-btn--ghost {
+    order: -1;
   }
 }
 
@@ -426,9 +448,97 @@ button.ps-card[aria-pressed="true"]::after {
   font-weight: 600;
 }
 
+.ps-notice .ps-link {
+  display: block;
+  min-height: 44px;
+  padding: 10px 0 2px;
+  color: inherit;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
 .ps-notice[hidden],
 .ps-shell [hidden] {
   display: none;
+}
+
+/* Telas baixas: navegador aberto dentro de outro aplicativo, celular pequeno.
+   O cabeçalho encolhe para as quatro cartas e o rodapé continuarem à vista. */
+@media (max-height: 600px) {
+  .ps-shell {
+    --ps-chrome: 190px;
+    padding-top: max(8px, env(safe-area-inset-top));
+  }
+
+  .ps-main:has(.ps-notice:not([hidden])) {
+    --ps-chrome: 276px;
+  }
+
+  .ps-bar {
+    margin: 8px 0 12px;
+  }
+
+  .ps-title {
+    font-size: 22px;
+  }
+
+  .ps-main--play .ps-kicker {
+    display: none;
+  }
+
+  .ps-main--entry {
+    padding-top: 10px;
+  }
+
+  .ps-grid {
+    max-width: max(200px, calc((var(--ps-view) - var(--ps-chrome) - 12px) * 0.7143 + 12px));
+    margin-top: 12px;
+  }
+
+  .ps-foot {
+    min-height: 44px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .ps-fan {
+    --ps-fan-w: clamp(84px, calc((var(--ps-view) - 440px) / 1.4), 176px);
+    margin-top: 18px;
+  }
+
+  .ps-list {
+    margin-top: 14px;
+    gap: 6px;
+  }
+
+  .ps-hero {
+    width: 96px;
+    margin-top: 10px;
+  }
+
+  .ps-label {
+    margin-top: 10px;
+  }
+
+  .ps-row {
+    grid-template-columns: repeat(3, 52px);
+    margin-top: 8px;
+  }
+
+  .ps-stack {
+    padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Celular deitado: as quatro cartas numa fileira só. */
+@media (max-height: 540px) and (min-aspect-ratio: 13 / 10) {
+  .ps-shell {
+    max-width: 760px;
+  }
+
+  .ps-grid {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: max(320px, calc((var(--ps-view) - var(--ps-chrome)) * 0.7143 * 4 + 36px));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

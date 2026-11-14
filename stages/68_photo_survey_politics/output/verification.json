@@ -63,7 +63,7 @@
   "acceptance": {
     "delivery68a": "aprovada",
     "delivery68b": "aprovada",
-    "delivery68c": "não iniciada",
+    "delivery68c": "pronta para gate",
     "delivery68d": "não iniciada",
     "delivery68e": "não iniciada"
   },
@@ -132,5 +132,80 @@
         "token inválido com corpo inválido responde 400 antes do 401"
       ]
     }
+  },
+  "delivery68c": {
+    "checkedAt": "2026-11-13",
+    "branch": "icm/68c-photo-survey-page",
+    "base": "3e1f771",
+    "plan": "stages/68_photo_survey_politics/plans/68c-tela.md",
+    "files": [
+      "app/pesquisa.html",
+      "app/src/photo-survey-flow.js",
+      "app/src/photo-survey-flow.test.js",
+      "app/src/photo-survey-page.js",
+      "app/src/photo-survey.css",
+      "app/src/api.js",
+      "app/src/api.test.js",
+      "app/e2e/photo-survey.mjs",
+      "app/vite.config.js",
+      "app/src/share-preview.test.js",
+      "app/src/edge-delivery.test.js",
+      "app/src/error-reporter.test.js",
+      ".github/workflows/ui-interaction-smoke.yml"
+    ],
+    "tests": {
+      "app unit (npm test --prefix app)": "310/310, 24 novos",
+      "shared (npm run test:shared)": "104/104, sem mudança",
+      "back unit (npm test --prefix back)": "293/293, sem mudança",
+      "e2e photo-survey em WebKit local, API simulada pelas regras de shared/photo-survey.js": "27 cenários aprovados",
+      "e2e photo-survey em Chromium": "não roda nesta máquina; fica com o CI",
+      "página + API + PostgreSQL reais, locais, PHOTO_SURVEYS_ENABLED=true": "3 jogadores, 3 sorteios, 2 respostas iguais às escolhas da tela; votes e ranking_stats sem mudança; player_stats dos 3 jogadores no valor inicial",
+      "bateria e2e completa em WebKit local (antes das correções da revisão)": "23 de 27 roteiros; falhas conhecidas desta máquina: interaction-smoke, accessible-profile e civic-navigation (foco de teclado no WebKit do macOS) e fact-check (intermitente, #298; passou em 2 repetições)",
+      "capturas conferidas": ["390x844", "375x667", "360x640", "375x548", "667x375"]
+    },
+    "testsFirst": "regras do percurso, cliente da API, listas de páginas e e2e escritos antes do código; o e2e apontou, depois da revisão, os botões cobrindo as finalistas em 360x640",
+    "acceptance68c": {
+      "abrir a página não cria jogador nem grava nada": "met (e2e: só o GET da definição; nenhuma chave gravada)",
+      "o jogador nasce no toque em Começar": "met (e2e e percurso real)",
+      "um toque por tela; voltar e trocar até a confirmação": "met (e2e e testes de unidade)",
+      "quem já respondeu vê a própria escolha e não responde de novo, com recarga ou duas abas": "met (e2e: recarga, segunda aba, dois aparelhos, terceiro aparelho)",
+      "mesmo padrão de moldura e mesmo tamanho na tela": "met (e2e em seis tamanhos de tela; toque só com as quatro carregadas)",
+      "celular em Chromium e em WebKit": "WebKit met localmente; Chromium pelo CI",
+      "API fora do ar, cota esgotada e pesquisa fechada com saída clara": "met (e2e)",
+      "fora do menu e do sitemap, com noindex": "met (testes de unidade e e2e sobre o build)",
+      "testes e e2e do jogo atual passam; só mudam os que fixam a lista de páginas": "met localmente nos testes de unidade; e2e do jogo atual pelo CI (3 testes de lista de páginas ajustados: share-preview, edge-delivery, error-reporter)"
+    },
+    "deviations": [
+      "error-reporter.test.js também fixa a lista de páginas e mudou, além dos dois citados no contexto",
+      "o botão voltar do navegador sai da página; a pessoa retoma ao abrir de novo (a avaliar na 68d)"
+    ],
+    "independentReview": {
+      "mode": "agente separado, somente leitura no repositório, com prévia local própria em WebKit",
+      "reviewedCommit": "c3a83f5",
+      "result": "sem bloqueio, com correções",
+      "reproducedAndFixed": [
+        "quem respondeu e recarregava sem API via a entrada com 'Nenhuma escolha foi registrada'",
+        "confirmação sem resposta do servidor negava a gravação e deixava trocar",
+        "tela baixa: duas cartas fora da tela; finalistas atrás dos botões na confirmação",
+        "imagem que nunca respondia travava a tela sem saída",
+        "número vindo do servidor chegava ao HTML sem escape",
+        "retomada podia criar jogador e sorteio sem toque (corrida estreita)",
+        "recarregar na confirmação voltava para a final",
+        "trava de toque dependia só do atributo disabled",
+        "foco no body depois de falha; etapa não anunciada; área de toque da marca",
+        "textos imprecisos; erro de renderização tratado como falha de rede"
+      ],
+      "alsoApplied": [
+        "depois de registrada, o aparelho guarda só que a pessoa respondeu, não a escolha",
+        "nova tentativa de carregar as cartas pede outro endereço",
+        "cenários novos no e2e: toques repetidos, falhas 429/5xx, recibo recusado, saída da conta, mesmo sorteio na conta nova, retomada com chave trocada"
+      ],
+      "notFixed": [
+        "escolhas parciais ficam no aparelho até a confirmação ou até outra identidade começar; sair do Google na capa não as apaga (condição para a 68e, com a #283)",
+        "com o celular deitado, na confirmação as finalistas pedem rolagem"
+      ]
+    },
+    "remoteCi": "ver os checks do PR da 68c",
+    "humanGate": "pendente"
   }
 }

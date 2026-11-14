@@ -266,7 +266,7 @@ test("o sorteio da pesquisa vai com a identidade e não leva carta nenhuma", asy
   assert.deepEqual(JSON.parse(request.options.body), {});
 });
 
-test("a resposta da pesquisa leva só o recibo, as escolhas e a escolhida, e repete o mesmo recibo", async () => {
+test("a resposta da pesquisa leva o recibo recebido, as escolhas e a escolhida, e mais nada", async () => {
   const requests = [];
   const answer = {
     answerId: "5f0c2c0e-8a55-4a52-9d6c-0d2b8a1f3c11",
@@ -281,12 +281,9 @@ test("a resposta da pesquisa leva só o recibo, as escolhas e a escolhida, e rep
       requests.push({ url, options, body: JSON.parse(options.body) });
       return { ok: true, status: 200, json: async () => ({ status: "created" }) };
     },
-    async () => {
-      await respondPhotoSurvey("politica-2026-01", "pm2_private", answer);
-      await respondPhotoSurvey("politica-2026-01", "pm2_private", answer);
-    },
+    async () => respondPhotoSurvey("politica-2026-01", "pm2_private", answer),
   );
-  assert.equal(requests.length, 2);
+  assert.equal(requests.length, 1);
   for (const request of requests) {
     assert.match(request.url, /\/api\/photo-surveys\/politica-2026-01\/response$/);
     assert.equal(request.options.method, "POST");

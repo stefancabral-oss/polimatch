@@ -22,8 +22,11 @@
  *  13. Troca de identidade no meio.
  *  14. Sorteio da conta mudou: a página busca de novo e recomeça.
  *  15. Sessão recusada: saída clara, sem perder as escolhas.
- *  16. Carta que não carrega trava a tela inteira até carregar.
+ *  16. Carta que não carrega, ou que não chega, trava a tela inteira até carregar.
  *  17. Armazenamento bloqueado: dá para responder na mesma aba.
+ *  18. Toques repetidos e voltar durante a troca de tela.
+ *  19. Falhas do servidor no sorteio e na resposta, e recibo recusado.
+ *  20. Quem respondeu e abre sem servidor não volta para a entrada.
  */
 import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
@@ -58,6 +61,11 @@ function createServer() {
     down: false,
     quota: false,
     dropAfterApply: 0,
+    // Falhas programadas: cada entrada é o status HTTP da próxima chamada.
+    failDraw: [],
+    failResponse: [],
+    refuseReceipt: 0,
+    beforeDraw: null,
     revoked: new Set(),
     requests: [],
     draws: new Map(),
@@ -103,10 +111,15 @@ function createServer() {
     const [surveyId, action] = pathname.slice("/api/photo-surveys/".length).split("/");
     if (surveyId !== SURVEY.id) return send(404, { error: "pesquisa não encontrada", code: "PHOTO_SURVEY_NOT_FOUND" });
     if (!action && method === "GET") return send(200, server.view());
+    if (action === "draw" && server.beforeDraw) await server.beforeDraw(key);
     if (!key || server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
 
     const prior = server.responses.get(key);
+    const failure = (status) => send(status, status === 429
+      ? { error: "muitas requisições", code: "RATE_LIMITED", retryAfterSeconds: 30 }
+      : { error: "erro interno", code: "INTERNAL_ERROR" });
     if (action === "draw" && method === "POST") {
+      if (server.failDraw.length) return failure(server.failDraw.shift());
       if (prior) return send(200, { survey: server.view(), draw: { groups: drawGroups(prior.shownIds, SURVEY.groupSize) }, response: prior.response });
       if (!server.draws.has(key)) {
         if (server.status !== "open") return send(409, { error: "pesquisa fechada", code: "PHOTO_SURVEY_CLOSED", current: { status: server.status } });
@@ -115,6 +128,7 @@ function createServer() {
       return send(200, { survey: server.view(), draw: { groups: server.groupsFor(key) }, response: null });
     }
     if (action === "response" && method === "POST") {
+      if (server.failResponse.length) return failure(server.failResponse.shift());
       if (prior) {
         const same = JSON.stringify(prior.response.pickIds) === JSON.stringify(body?.pickIds) && prior.response.championId === body?.championId;
         if (same) return send(200, { status: "alreadyProcessed", survey: server.view(), draw: { groups: drawGroups(prior.shownIds, SURVEY.groupSize) }, response: prior.response });
@@ -124,6 +138,10 @@ function createServer() {
       if (!shownIds) return send(409, { error: "sorteio ainda não emitido", code: "PHOTO_SURVEY_DRAW_REQUIRED" });
       if (server.status !== "open") return send(409, { error: "pesquisa fechada", code: "PHOTO_SURVEY_CLOSED", current: { status: server.status } });
       const bracket = validateBracket(SURVEY, shownIds, { pickIds: body?.pickIds, championId: body?.championId });
+      if (bracket.ok && server.refuseReceipt > 0) {
+        server.refuseReceipt -= 1;
+        return send(400, { error: "resposta não corresponde ao sorteio", code: "PHOTO_SURVEY_RESPONSE_INVALID", current: { reason: "answer-id" } });
+      }
       if (!bracket.ok || !UUID.test(String(body?.answerId))) {
         return send(400, { error: "resposta não corresponde ao sorteio", code: "PHOTO_SURVEY_RESPONSE_INVALID", current: { reason: bracket.ok ? "answer-id" : bracket.reason } });
       }
@@ -304,8 +322,10 @@ try {
     assert.equal(await page.getByRole("link", { name: "Ir para o início" }).getAttribute("href"), "./");
   });
 
-  for (const [width, height] of [[390, 844], [375, 667], [360, 640]]) {
+  for (const [width, height] of [[390, 844], [375, 667], [360, 640], [375, 548], [320, 480], [667, 375]]) {
     await scenario(`as quatro cartas têm o mesmo tamanho e cabem na tela em ${width}×${height}`, async () => {
+      const portrait = height > width;
+      const minimum = height >= 640 ? 120 : 90;
       const server = createServer();
       const context = await newContext(server, { width, height });
       const page = await openSurvey(context);
@@ -319,7 +339,7 @@ try {
           assert.ok(Math.abs(card.width - cards[0].width) < 0.6 && Math.abs(card.height - cards[0].height) < 0.6, `${label}: cartas de tamanhos diferentes`);
           assert.ok(card.top >= 0 && card.bottom <= height + 0.5, `${label}: carta fora da tela (${card.top}–${card.bottom} em ${height})`);
           assert.ok(card.left >= 0 && card.right <= width + 0.5, `${label}: carta cortada na lateral`);
-          assert.ok(card.width >= 120, `${label}: carta estreita demais para tocar (${card.width})`);
+          assert.ok(card.width >= minimum, `${label}: carta estreita demais para tocar (${card.width})`);
           assert.ok(Math.abs(card.height / card.width - 742 / 530) < 0.02, `${label}: carta fora da proporção`);
         }
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, `${label}: rolagem lateral`);
@@ -327,11 +347,18 @@ try {
       await check("tela de voto");
       await playScreens(page, groups, [0, 0, 0, 0]);
       await check("final");
+      const backLink = await page.locator('.ps-foot [data-action="back"]').boundingBox();
+      assert.ok(backLink.y >= 0 && backLink.y + backLink.height <= height + 0.5, "o voltar da final fica à vista");
       await tap(page, groups[0][0]);
       await step(page, "Confirmar");
       const button = await page.locator('[data-action="confirm"]').boundingBox();
       assert.ok(button.y >= 0 && button.y + button.height <= height + 0.5, "o botão de confirmar fica à vista");
       assert.ok(button.height >= 44, "o botão de confirmar tem altura de toque");
+      if (portrait) {
+        const stack = await page.locator(".ps-stack").boundingBox();
+        const row = await page.locator(".ps-row").boundingBox();
+        assert.ok(row.y + row.height <= stack.y + 16.5, `as finalistas não ficam atrás dos botões (${row.y + row.height} > ${stack.y})`);
+      }
     });
   }
 
@@ -401,6 +428,20 @@ try {
     await step(page, "Tela 2 de 4");
     assert.deepEqual((await grid(page)).filter((card) => card.pressed).map((card) => card.id), [groups[1][1]]);
     assert.equal(server.count("POST", "/response"), 0);
+
+    // Recarregar na confirmação volta para a confirmação, com a mesma escolhida.
+    await tap(page, groups[1][1]);
+    const rest = await playScreens(page, groups, [0, 0, 3, 0], 2);
+    await tap(page, rest[0]);
+    await step(page, "Confirmar");
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await step(page, "Confirmar");
+    assert.equal(await title(page), nameOf.get(rest[0]));
+    await confirm(page);
+    await step(page, "Registrada");
+    assert.deepEqual(server.bodies("/response").map(({ pickIds, championId }) => ({ pickIds, championId })), [
+      { pickIds: [groups[0][2], groups[1][1], rest[0], rest[1]], championId: rest[0] },
+    ]);
   });
 
   await scenario("segunda aba retoma o mesmo ponto e vê a resposta quando a outra confirma", async () => {
@@ -483,9 +524,11 @@ try {
     await step(page, "Confirmar");
     server.dropAfterApply = 1;
     await confirm(page);
-    await page.locator("#ps-notice:not([hidden])", { hasText: "Não conseguimos registrar agora" }).waitFor();
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Não deu para saber se a sua resposta chegou" }).waitFor();
     assert.equal(await title(page), nameOf.get(picks[1]), "a escolha continua na tela");
     assert.equal(await page.locator('[data-action="confirm"]').innerText(), "Tentar de novo");
+    assert.equal(await page.locator('.ps-stack [data-action="back"]').isDisabled(), true, "sem saber se gravou, não dá para trocar");
+    assert.equal(await page.evaluate(() => document.activeElement?.id), "ps-title", "o foco volta para o título depois da falha");
     await confirm(page);
     await step(page, "Registrada");
     const bodies = server.bodies("/response");
@@ -594,7 +637,7 @@ try {
     await step(page, "Tela 1 de 4");
     const cards = await grid(page);
     assert.deepEqual(cards.map((card) => card.id), server.groupsFor(other)[0]);
-    assert.ok(cards.every((card) => !card.pressed), "as escolhas da identidade anterior não vêm junto");
+    assert.ok(cards.every((card) => !card.pressed), "com outro sorteio, as escolhas anteriores não vêm junto");
     assert.equal(server.count("POST", "/api/player"), 1);
 
     // Troca feita na mesma aba, sem evento de armazenamento: a página confere ao voltar do histórico.
@@ -625,7 +668,7 @@ try {
     server.draws.set(key, [...server.draws.get(key)].reverse());
     await confirm(page);
     await step(page, "Tela 1 de 4");
-    await page.locator("#ps-notice:not([hidden])", { hasText: "As cartas desta pesquisa mudaram" }).waitFor();
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Estas são as cartas da sua conta" }).waitFor();
     const cards = await grid(page);
     assert.deepEqual(cards.map((card) => card.id), server.groupsFor(key)[0]);
     assert.ok(cards.every((card) => !card.pressed));
@@ -685,11 +728,36 @@ try {
       disabled: [...element.querySelectorAll("button")].map((button) => button.disabled),
     }));
     assert.deepEqual(state, { ready: "false", disabled: [true, true, true, true] }, "nenhuma carta aceita toque enquanto uma falta");
+    // Um toque de verdade numa carta travada não escolhe nada.
+    const loadedCard = server.groupsFor(key)[0][0];
+    await page.locator(`button[data-card="${loadedCard}"]`).click({ force: true });
+    await page.locator(`button[data-card="${loadedCard}"] img`).dispatchEvent("click");
+    await page.waitForTimeout(400);
+    assert.equal(await page.locator("#ps-step").innerText(), "Tela 1 de 4");
+    assert.equal(await page.locator('.ps-grid button[aria-pressed="true"]').count(), 0);
     await context.unroute(pattern);
     await page.locator('[data-action="reload-cards"]').click();
     const cards = await grid(page);
     assert.ok(cards.every((card) => card.loaded && !card.disabled));
     assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+  });
+
+  await scenario("carta que nunca chega: a tela avisa e oferece nova tentativa", async () => {
+    const server = createServer();
+    const key = keyFor("lenta");
+    server.draws.set(key, drawCards(SURVEY, (limit) => randomInt(limit)));
+    const slow = server.groupsFor(key)[0][2];
+    const context = await newContext(server, { storedKey: key });
+    const pattern = new RegExp(`/chromas/politicos/${slow}-`);
+    await context.route(pattern, () => {}); // a requisição fica pendurada
+    const page = await openSurvey(context);
+    await begin(page);
+    await step(page, "Tela 1 de 4");
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Não conseguimos carregar as cartas" }).waitFor({ timeout: 20000 });
+    assert.equal(await page.locator(".ps-grid").getAttribute("data-ready"), "false");
+    await context.unroute(pattern);
+    await page.locator('[data-action="reload-cards"]').click();
+    assert.ok((await grid(page)).every((card) => card.loaded && !card.disabled));
   });
 
   await scenario("armazenamento bloqueado: dá para responder na mesma aba", async () => {
@@ -705,6 +773,225 @@ try {
     await step(page, "Registrada");
     assert.equal(server.count("POST", "/api/player"), 1);
     assert.equal(server.responses.get(key).response.championId, picks[1]);
+  });
+
+  await scenario("toques repetidos e voltar durante a troca de tela valem uma vez só", async () => {
+    const server = createServer();
+    const page = await openSurvey(await newContext(server));
+    await begin(page);
+    await step(page, "Tela 1 de 4");
+    const key = await storedKey(page);
+    const groups = server.groupsFor(key);
+    await grid(page);
+    // Dois toques seguidos, em cartas diferentes, antes de a tela trocar: vale o primeiro.
+    await page.evaluate(([first, second]) => {
+      document.querySelector(`button[data-card="${first}"]`).click();
+      document.querySelector(`button[data-card="${second}"]`).click();
+    }, [groups[0][1], groups[0][2]]);
+    await step(page, "Tela 2 de 4");
+    await grid(page);
+    // Toque e voltar no mesmo instante: o voltar é ignorado e a escolha vale.
+    await page.evaluate((card) => {
+      document.querySelector(`button[data-card="${card}"]`).click();
+      document.querySelector('[data-action="back"]').click();
+    }, groups[1][3]);
+    await step(page, "Tela 3 de 4");
+    const rest = await playScreens(page, groups, [0, 0, 0, 0], 2);
+    assert.deepEqual((await grid(page)).map((card) => card.id), [groups[0][1], groups[1][3], ...rest]);
+    await tap(page, rest[1]);
+    await step(page, "Confirmar");
+    // Dois toques em Confirmar: uma requisição só.
+    await page.evaluate(() => {
+      const button = document.querySelector('[data-action="confirm"]');
+      button.click();
+      button.click();
+    });
+    await step(page, "Registrada");
+    assert.equal(server.count("POST", "/response"), 1);
+  });
+
+  await scenario("falhas do servidor no sorteio e na resposta, e recibo recusado", async () => {
+    const server = createServer();
+    const page = await openSurvey(await newContext(server));
+    // Sorteio com erro do servidor: nada foi registrado, e dá para tentar de novo.
+    server.failDraw.push(500);
+    await begin(page);
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Nenhuma escolha foi registrada" }).waitFor();
+    assert.equal(await page.evaluate(() => document.activeElement?.id), "ps-title");
+    server.failDraw.push(429);
+    await begin(page, "Tentar de novo");
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Muitas tentativas agora" }).waitFor();
+    await begin(page, "Tentar de novo");
+    await step(page, "Tela 1 de 4");
+    const key = await storedKey(page);
+    assert.equal(server.count("POST", "/api/player"), 1, "as novas tentativas usam o mesmo jogador");
+    const picks = await playScreens(page, server.groupsFor(key), [1, 2, 3, 0]);
+    await tap(page, picks[3]);
+    await step(page, "Confirmar");
+
+    // Limite de requisições: não foi registrado, e dá para trocar.
+    server.failResponse.push(429);
+    await confirm(page);
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Muitas tentativas agora" }).waitFor();
+    assert.equal(await page.locator('.ps-stack [data-action="back"]').isDisabled(), false);
+
+    // Erro interno: não dá para saber; a troca fica travada até a nova tentativa responder.
+    server.failResponse.push(503);
+    await confirm(page);
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Não deu para saber se a sua resposta chegou" }).waitFor();
+    assert.equal(await page.locator('.ps-stack [data-action="back"]').isDisabled(), true);
+
+    // Recibo recusado: recibo novo, mesmas escolhas.
+    server.refuseReceipt = 1;
+    await confirm(page);
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Sua escolha continua aqui" }).waitFor();
+    assert.equal(await page.locator('.ps-stack [data-action="back"]').isDisabled(), false);
+    await confirm(page);
+    await step(page, "Registrada");
+    const bodies = server.bodies("/response");
+    assert.equal(bodies.length, 4);
+    assert.equal(new Set(bodies.slice(0, 3).map((body) => body.answerId)).size, 1, "as tentativas repetem o recibo");
+    assert.notEqual(bodies[3].answerId, bodies[2].answerId, "depois da recusa, o recibo é outro");
+    assert.ok(bodies.every((body) => JSON.stringify(body.pickIds) === JSON.stringify(picks) && body.championId === picks[3]));
+    assert.equal(server.responses.size, 1);
+
+    // A definição com erro do servidor não manda a pessoa conferir a conexão.
+    const broken = createServer();
+    const original = broken.handler;
+    let failures = 1;
+    broken.handler = async (route) => {
+      if (failures > 0 && route.request().method() === "GET") {
+        failures -= 1;
+        return route.fulfill({ status: 503, json: { error: "indisponível" } });
+      }
+      return original(route);
+    };
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" });
+    contexts.push(context);
+    await context.route(/\/api(?:\/|$)/, (route) => broken.handler(route));
+    const other = await openSurvey(context);
+    const text = await other.locator("#ps-notice:not([hidden])").innerText();
+    assert.match(text, /O servidor não respondeu como esperado/);
+    assert.doesNotMatch(text, /conexão/);
+    await begin(other, "Tentar de novo");
+    await other.locator("#ps-action:not([disabled])", { hasText: "Começar" }).waitFor();
+  });
+
+  await scenario("quem respondeu e abre sem servidor não volta para a entrada", async () => {
+    const server = createServer();
+    const page = await openSurvey(await newContext(server));
+    await begin(page);
+    await step(page, "Tela 1 de 4");
+    const key = await storedKey(page);
+    const picks = await playScreens(page, server.groupsFor(key), [0, 1, 0, 1]);
+    await tap(page, picks[2]);
+    await step(page, "Confirmar");
+    await confirm(page);
+    await step(page, "Registrada");
+
+    // O aparelho guarda que a pessoa respondeu, não em quem.
+    const saved = await page.evaluate((name) => localStorage.getItem(name), PROGRESS_KEY);
+    assert.equal(JSON.parse(saved)[SURVEY.id].answered, true);
+    for (const id of SURVEY.cardIds) assert.ok(!saved.includes(id), `a escolha não fica no aparelho (${id})`);
+
+    server.down = true;
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await step(page, "Registrada");
+    assert.equal(await title(page), "Sua resposta está registrada.");
+    const notice = page.locator("#ps-notice:not([hidden])");
+    assert.match(await notice.innerText(), /Não conseguimos falar com o servidor para mostrar a sua escolha/);
+    assert.equal(await page.locator("#ps-action, .ps-grid").count(), 0, "sem servidor, quem respondeu não vê a entrada");
+    server.down = false;
+    await notice.getByRole("button", { name: "Tentar de novo" }).click();
+    await step(page, "Registrada");
+    await page.locator("#ps-title", { hasText: nameOf.get(picks[2]) }).waitFor();
+    assert.equal(server.count("POST", "/response"), 1);
+
+    // Quem estava no meio e recarrega sem servidor não lê que nada foi registrado.
+    const mid = createServer();
+    const half = await openSurvey(await newContext(mid));
+    await begin(half);
+    await step(half, "Tela 1 de 4");
+    await tap(half, mid.groupsFor(await storedKey(half))[0][0]);
+    await step(half, "Tela 2 de 4");
+    mid.down = true;
+    await half.reload({ waitUntil: "domcontentloaded" });
+    const text = await half.locator("#ps-notice:not([hidden])").innerText();
+    assert.match(text, /Suas escolhas continuam neste aparelho/);
+    assert.doesNotMatch(text, /Nenhuma escolha foi registrada/);
+    mid.down = false;
+    await begin(half, "Tentar de novo");
+    await step(half, "Tela 2 de 4");
+  });
+
+  await scenario("saída da conta no meio, mesmo sorteio na conta nova e retomada com chave trocada", async () => {
+    // Sair da conta em outra aba: a página pede um toque, e só o toque cria o jogador novo.
+    const server = createServer();
+    const context = await newContext(server);
+    const page = await openSurvey(context);
+    await begin(page);
+    await step(page, "Tela 1 de 4");
+    const first = await storedKey(page);
+    await tap(page, server.groupsFor(first)[0][0]);
+    await step(page, "Tela 2 de 4");
+    const helper = await context.newPage();
+    await helper.goto(new URL("robots.txt", appUrl).href);
+    await helper.evaluate((name) => localStorage.removeItem(name), IDENTITY_KEY);
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Sua conta mudou" }).waitFor();
+    assert.equal(server.count("POST", "/api/player"), 1, "sem toque, nenhum jogador novo");
+    await begin(page, "Continuar");
+    await step(page, "Tela 1 de 4");
+    assert.equal(server.count("POST", "/api/player"), 2);
+    assert.notEqual(await storedKey(page), first);
+
+    // Entrar com Google mantendo o mesmo jogador: o sorteio é o mesmo e as escolhas continuam.
+    const linked = createServer();
+    const linkedContext = await newContext(linked);
+    const same = await openSurvey(linkedContext);
+    await begin(same);
+    await step(same, "Tela 1 de 4");
+    const anonymous = await storedKey(same);
+    const groups = linked.groupsFor(anonymous);
+    await tap(same, groups[0][2]);
+    await step(same, "Tela 2 de 4");
+    const session = keyFor("sessao");
+    linked.draws.set(session, linked.draws.get(anonymous));
+    linked.revoked.add(anonymous);
+    const tab = await linkedContext.newPage();
+    await tab.goto(new URL("robots.txt", appUrl).href);
+    await tab.evaluate(([name, key]) => localStorage.setItem(name, key), [IDENTITY_KEY, session]);
+    await same.locator("#ps-notice:not([hidden])", { hasText: "Sua conta mudou" }).waitFor();
+    await begin(same, "Continuar");
+    await step(same, "Tela 2 de 4");
+    await same.locator('[data-action="back"]').click();
+    await step(same, "Tela 1 de 4");
+    assert.deepEqual((await grid(same)).filter((card) => card.pressed).map((card) => card.id), [groups[0][2]], "mesmo sorteio: a escolha continua");
+
+    // Retomada sem toque com a sessão recusada e a chave já trocada no aparelho:
+    // a página avisa e não cria jogador nem sorteio por conta própria.
+    const stale = createServer();
+    const staleContext = await newContext(stale);
+    const resumed = await openSurvey(staleContext);
+    await begin(resumed);
+    await step(resumed, "Tela 1 de 4");
+    const old = await storedKey(resumed);
+    await tap(resumed, stale.groupsFor(old)[0][0]);
+    await step(resumed, "Tela 2 de 4");
+    stale.revoked.add(old);
+    const next = keyFor("trocada");
+    let swapped = false;
+    stale.beforeDraw = async () => {
+      if (swapped) return;
+      swapped = true;
+      // Troca feita no próprio documento: não gera evento de armazenamento.
+      await resumed.evaluate(([name, key]) => localStorage.setItem(name, key), [IDENTITY_KEY, next]);
+    };
+    const playersBefore = stale.count("POST", "/api/player");
+    await resumed.reload({ waitUntil: "domcontentloaded" });
+    await resumed.locator("#ps-notice:not([hidden])", { hasText: "Sua conta mudou" }).waitFor();
+    await resumed.waitForTimeout(300);
+    assert.equal(stale.count("POST", "/api/player"), playersBefore, "a retomada não cria jogador");
+    assert.equal(stale.draws.has(next), false, "a retomada não emite sorteio para a identidade nova");
   });
 
   await scenario("teclado: foco na carta e Enter escolhem", async () => {
