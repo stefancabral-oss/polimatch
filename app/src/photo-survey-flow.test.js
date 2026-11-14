@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import ARTS from "./political-chromas.json" with { type: "json" };
+import { photoSurveyById } from "../../shared/photo-survey.js";
 import {
+  ENTRY_CARD_IDS,
   PHOTO_SURVEY_ID,
   PHOTO_SURVEY_STORAGE_KEY,
   chooseChampion,
@@ -28,6 +31,17 @@ const uuid = () => UUID;
 const fresh = () => freshProgress(GROUPS, uuid);
 const play = (progress, ...cardIds) => cardIds.reduce((current, id) => pickCard(current, id), progress);
 const atFinal = () => play(fresh(), "a1", "b2", "c3", "d4");
+
+test("as cartas da entrada são uma lista fixa, dentro da pesquisa e com arte", () => {
+  const survey = photoSurveyById(PHOTO_SURVEY_ID);
+  assert.ok(Object.isFrozen(ENTRY_CARD_IDS));
+  assert.ok(ENTRY_CARD_IDS.length > 3, "sobra carta para o sorteio variar");
+  assert.equal(new Set(ENTRY_CARD_IDS).size, ENTRY_CARD_IDS.length, "sem carta repetida");
+  for (const id of ENTRY_CARD_IDS) {
+    assert.ok(survey.cardIds.includes(id), `${id} está na pesquisa`);
+    assert.ok(ARTS.some((art) => art.id === id), `${id} tem arte`);
+  }
+});
 
 test("a pesquisa da página e a chave de armazenamento são fixas", () => {
   assert.equal(PHOTO_SURVEY_ID, "politica-2026-01");

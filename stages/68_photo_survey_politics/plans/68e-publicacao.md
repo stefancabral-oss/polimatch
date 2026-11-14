@@ -55,6 +55,25 @@ Se a API não subir no passo 3, o agente para e avisa; não conserta no escuro.
 - Cada resposta é única e não muda. Para testar de novo, é outra pessoa
   (outro aparelho, aba anônima ou outra rede).
 
+## Do teste do Stefan no celular
+
+Em 14/11/2026 ele abriu a página em produção e pediu uma mudança na entrada.
+
+| O que ele pediu | O que mudou |
+|---|---|
+| A entrada ilustrar só com cartas de uma lista escolhida por ele | A entrada sorteia as três cartas de uma lista fixa de dez (`ENTRY_CARD_IDS`, em `app/src/photo-survey-flow.js`). Antes sorteava entre as vinte |
+
+As vinte cartas seguem na pesquisa: o sorteio de 16, as telas e o servidor não
+mudam. A lista só decide a ilustração da entrada. Quais das vinte entram nela
+foi classificação do agente a partir do pedido; o Stefan recebeu a folha com
+as dez e aprovou sem cortar nomes.
+
+O cenário de e2e foi escrito antes do código e falhou primeiro pelo motivo
+esperado (uma carta de fora da lista apareceu na entrada). A mudança é só do
+app: chega à produção com um deploy do app. No mesmo dia ele aprovou o merge
+(PR #330) e esse deploy, na mesma instrução; o resultado do deploy fica na
+issue #324.
+
 ## Fica para depois, com outro sim
 
 - A entrada na capa e a página no sitemap.

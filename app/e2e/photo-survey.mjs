@@ -29,6 +29,7 @@
  *  18. Toques repetidos e voltar durante a troca de tela.
  *  19. Falhas do servidor no sorteio e na resposta, e recibo recusado.
  *  20. Quem respondeu e abre sem servidor não volta para a entrada.
+ *  21. A entrada só ilustra com as cartas da lista da entrada.
  */
 import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
@@ -41,6 +42,7 @@ import {
   validateBracket,
 } from "../../shared/photo-survey.js";
 import ARTS from "../src/political-chromas.json" with { type: "json" };
+import { ENTRY_CARD_IDS } from "../src/photo-survey-flow.js";
 
 const browserName = process.env.POLIMATCH_E2E_BROWSER || "chromium";
 const appUrl = process.env.POLIMATCH_E2E_URL || "http://127.0.0.1:4173/";
@@ -54,6 +56,12 @@ const PROGRESS_KEY = "polimatch:photo-survey:v1";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const nameOf = new Map(ARTS.map((art) => [art.id, art.name]));
 const keyFor = (label) => `pm2_${label.padEnd(43, "x").slice(0, 43)}`;
+// A entrada ilustra com três cartas de uma lista fixa (ENTRY_CARD_IDS). Estas
+// dez seguem na pesquisa e no sorteio, mas não aparecem na entrada.
+const OFF_ENTRY_CARD_IDS = [
+  "andre-janones", "erika-hilton", "fernando-haddad", "geraldo-alckmin", "guilherme-boulos",
+  "joao-campos", "lindbergh-farias", "marina-silva", "samia-bonfim", "simone-tebet",
+];
 
 /** API simulada. As regras de sorteio e validação são as do módulo compartilhado. */
 function createServer() {
@@ -286,6 +294,33 @@ try {
     await home.goto(appUrl, { waitUntil: "domcontentloaded" });
     await home.waitForTimeout(600);
     assert.equal(await home.locator('a[href*="pesquisa"]').count(), 0, "a capa não tem entrada para a pesquisa");
+  });
+
+  await scenario("a entrada só ilustra com as cartas da lista da entrada", async () => {
+    const server = createServer();
+    const context = await newContext(server);
+    const page = await openSurvey(context);
+    assert.deepEqual([...ENTRY_CARD_IDS, ...OFF_ENTRY_CARD_IDS].sort(), [...SURVEY.cardIds], "as duas listas somam as vinte cartas, sem sobra");
+    const namesBySrc = (ids) => new Map(ARTS.filter((art) => ids.includes(art.id)).map((art) => [art.src, art.name]));
+    const entryNames = namesBySrc(ENTRY_CARD_IDS);
+    const offEntryNames = namesBySrc(OFF_ENTRY_CARD_IDS);
+    assert.equal(entryNames.size, ENTRY_CARD_IDS.length);
+    assert.equal(offEntryNames.size, OFF_ENTRY_CARD_IDS.length);
+    const seen = new Set();
+    for (let visit = 0; visit < 10; visit += 1) {
+      if (visit > 0) await page.reload({ waitUntil: "domcontentloaded" });
+      await actionButton(page).and(page.locator(":not([disabled])")).waitFor();
+      const fan = await page.locator(".ps-fan img").evaluateAll((images) => images.map((image) => image.getAttribute("src")));
+      assert.equal(fan.length, 3);
+      for (const src of fan) {
+        assert.ok(!offEntryNames.has(src), `${offEntryNames.get(src)} apareceu na entrada`);
+        assert.ok(entryNames.has(src), `${src} é uma carta da lista da entrada`);
+        seen.add(src);
+      }
+    }
+    assert.ok(seen.size > 3, "as cartas da entrada continuam sorteadas a cada visita");
+    assert.equal(server.count("POST", "/api/player"), 0);
+    assert.equal(server.count("POST", "/draw"), 0);
   });
 
   await scenario("caminho direto: um toque por tela, final, confirmação e uma gravação", async () => {

@@ -5,10 +5,19 @@
 export const PHOTO_SURVEY_ID = "politica-2026-01";
 export const PHOTO_SURVEY_STORAGE_KEY = "polimatch:photo-survey:v1";
 
+// Cartas que podem ilustrar a entrada da pesquisa de política, a pedido do
+// dono do produto (14/11/2026). As outras dez seguem na pesquisa e no sorteio;
+// isto só decide a ilustração. Ao trocar as cartas da pesquisa, ou ao abrir
+// outra pesquisa, rever esta lista com ele.
+export const ENTRY_CARD_IDS = Object.freeze([
+  "bruno-zambelli", "cabo-gilberto-silva", "carlos-bolsonaro", "deltan-dallagnol", "guilherme-derrite",
+  "gustavo-gayer", "jeffrey-chiquini", "lucas-pavanato", "nikolas-ferreira", "sergio-moro",
+]);
+
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const newUuid = () => crypto.randomUUID();
 
-/** Cartas que ilustram a entrada: distintas e sorteadas a cada visita. */
+/** Sorteia as cartas que ilustram a entrada: distintas, a cada visita. */
 export function sampleCards(cardIds, count, randomInt = (limit) => Math.floor(Math.random() * limit)) {
   const pool = [...cardIds];
   const size = Math.min(count, pool.length);
