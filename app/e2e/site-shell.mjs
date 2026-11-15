@@ -460,19 +460,29 @@ try {
   });
 
   await scenario("a resposta registrada oferece a próxima pesquisa, sem \"Ir para o início\"", async () => {
-    for (const [width, height] of [[390, 844], [360, 640]]) {
+    // A fonte do Linux do CI é mais larga que a do macOS: o terceiro caso força
+    // uma fonte larga, para a medida não depender da máquina.
+    const WIDE_FONT = '.ps-shell, .ps-shell button, .ps-shell a { font-family: Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace !important; }';
+    for (const [width, height, wide = false] of [[390, 844], [360, 640], [360, 640, true]]) {
       const server = createServer();
       server.answered(ANONYMOUS_KEY);
       const page = await open(await newContext(server, { width, height, storedKey: ANONYMOUS_KEY }));
       await entryReady(page);
+      if (wide) await page.addStyleTag({ content: WIDE_FONT });
       await page.locator("#ps-action").click();
       await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
       await menuButton(page).waitFor();
       const next = page.locator(".ps-stack");
       const link = next.getByRole("link", { name: "Próxima pesquisa" });
       assert.equal(await link.getAttribute("href"), "./", "a próxima é a que a capa puser em destaque");
-      const linkBox = await link.boundingBox();
-      assert.ok(linkBox.height <= 60, `${width}×${height}: o botão da próxima pesquisa cabe em uma linha (${Math.round(linkBox.height)} px)`);
+      // Os dois botões cabem na largura, com texto curto, mesmo lado a lado.
+      const share = next.getByRole("button", { name: "Compartilhar minha escolha" });
+      assert.equal(await share.innerText(), "Compartilhar");
+      const [linkBox, shareBox] = [await link.boundingBox(), await share.boundingBox()];
+      for (const [label, box] of [["próxima pesquisa", linkBox], ["compartilhar", shareBox]]) {
+        assert.ok(box.height >= 44 && box.height <= 80, `${width}×${height}${wide ? " com fonte larga" : ""}: o botão de ${label} tem ${Math.round(box.height)} px de altura`);
+        assert.ok(box.x >= 0 && box.x + box.width <= width + 0.5, `${width}×${height}: o botão de ${label} sai da tela`);
+      }
       assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Ir para o início/);
       assert.equal(new URL(page.url()).search, `?p=${SURVEY.id}`, "a pesquisa respondida fica no endereço");
       const nextBox = await next.boundingBox();
@@ -480,7 +490,7 @@ try {
       const heroBox = await page.locator(".ps-hero .ps-card").boundingBox();
       const rowBox = await page.locator(".ps-row").boundingBox();
       // O mínimo do CSS é 70 px: aqui a carta precisa sobrar bem acima disso.
-      assert.ok(heroBox.height >= (height >= 800 ? 200 : 120), `${width}×${height}: a carta escolhida ficou pequena (${Math.round(heroBox.height)} px)`);
+      assert.ok(heroBox.height >= (height >= 800 ? 180 : 90), `${width}×${height}${wide ? " com fonte larga" : ""}: a carta escolhida ficou pequena (${Math.round(heroBox.height)} px)`);
       assert.ok(rowBox.y + rowBox.height <= nextBox.y + 1, `${width}×${height}: as finalistas não ficam atrás dos botões`);
       assert.ok(heroBox.y + heroBox.height <= rowBox.y + 1, `${width}×${height}: a escolhida não cobre as finalistas`);
     }

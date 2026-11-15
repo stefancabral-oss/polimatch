@@ -348,7 +348,7 @@ function renderDone({ focus = false } = {}) {
     body: `${heading("Escolha registrada", champion ? cardName(champion) : "Sua resposta está registrada.", "Obrigado por participar. Sua resposta está registrada e não pode ser trocada nesta pesquisa.")}
       ${champion ? `<div class="ps-hero">${staticCard(champion, "176px")}</div>` : ""}
       ${others.length ? `<p class="ps-label">Suas finalistas</p><div class="ps-row">${others.map((id) => staticCard(id, "84px", cardName(id))).join("")}</div>` : ""}
-      <div class="ps-stack ps-stack--pair">${champion ? '<button class="ps-btn" data-action="share" type="button">Compartilhar minha escolha</button>' : ""}${nextLink()}</div>`,
+      <div class="ps-stack ps-stack--pair">${champion ? '<button class="ps-btn" data-action="share" type="button" aria-label="Compartilhar minha escolha">Compartilhar</button>' : ""}${nextLink()}</div>`,
   });
   prepareShare(champion);
 }

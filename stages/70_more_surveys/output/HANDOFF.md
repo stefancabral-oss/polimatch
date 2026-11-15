@@ -33,7 +33,7 @@
 
 ## Entregue (70d — compartilhar)
 
-- Na tela de resposta registrada: "Compartilhar minha escolha" e "Próxima pesquisa" (ou "Ver pesquisas", quando não há outra sem resposta). Os dois levam à capa, que decide o destaque.
+- Na tela de resposta registrada: "Compartilhar" (para o leitor de tela, "Compartilhar minha escolha") e "Próxima pesquisa" (ou "Ver pesquisas", quando não há outra sem resposta). Os dois últimos levam à capa, que decide o destaque. Os textos são curtos porque em tela baixa os dois botões ficam lado a lado.
 - `app/src/share-choice.js`: a imagem (1080×1350, JPEG) com "Minha escolha", o nome, a carta, a pergunta e "Responda em polimatch.com.br"; o texto; e o endereço da pesquisa.
 - A imagem é montada quando a tela aparece, para o toque abrir o compartilhamento do aparelho na hora. Sem suporte a arquivo vai o texto com o endereço; sem compartilhamento, o endereço é copiado e a tela avisa. Fechar a folha de compartilhar não é erro.
 - Nada é compartilhado sem o toque, e compartilhar não fala com a API.
@@ -47,6 +47,8 @@
 - Rota só de leitura para a resposta da pessoa: a capa usa o pedido de sorteio, que para quem já respondeu só devolve a resposta.
 
 ## Testes executados
+
+No CI do PR #335, o commit `918f34c` falhou num cenário do roteiro novo, nos dois navegadores: com a fonte do Linux, mais larga, "Compartilhar minha escolha" quebrava em três linhas em 360×640 e o botão vizinho crescia junto. A asserção que falhou era minha e media "uma linha". O texto do botão ficou mais curto, e o cenário passou a rodar também com uma fonte larga, medindo altura de toque e largura em vez de linhas. Os testes de unidade, do servidor (com PostgreSQL) e a imagem do app passaram nesse commit.
 
 Em 14/11/2026, local (macOS), no código do PR:
 
