@@ -223,5 +223,6 @@ de o aplicativo estar testado.
 Decisão 0003, de 14/11/2026: `polimatch.com.br` passa a abrir direto na
 pesquisa aberta, com menu no padrão novo, e as páginas do produto anterior
 saem do site. Estágio `stages/69_survey_home/CONTEXT.md`. Nada muda no
-servidor nem no banco. Enquanto a troca não for publicada, as seções acima
-continuam descrevendo o que está no ar; depois, viram histórico.
+servidor nem no banco. A troca foi publicada em 14/11/2026: as seções acima
+sobre a capa, a rodada diária, os quizzes e o visual do jogo passam a ser
+histórico. O código dessas páginas saiu de `app/` na entrega 69d.
