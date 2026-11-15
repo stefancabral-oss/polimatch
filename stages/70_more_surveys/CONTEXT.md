@@ -42,14 +42,17 @@ vêm, as escolhas que a pessoa já fez e um jeito de compartilhar a escolha.
 3. **Pesquisa com endereço.** Tocar numa pesquisa da lista leva a
    `/?p=<id>`, que mostra a entrada dela. Tocar em "Começar" na capa também
    põe `?p=<id>` no endereço, para a recarga voltar à mesma pesquisa.
-   `/` com uma pesquisa em andamento neste aparelho retoma essa pesquisa.
+   Uma pesquisa que a pessoa deixou pela metade neste aparelho, se ainda
+   estiver aberta, vira o destaque da capa, com "Continuar". A capa não
+   redireciona: continua sendo a capa.
 4. **Suas escolhas.** Para cada pesquisa que este aparelho sabe respondida
    pela identidade atual, a capa busca a resposta no servidor (o mesmo
    pedido de sorteio que já devolve a resposta, sem gravar nada novo) e
    mostra a carta escolhida, com link para a tela da resposta.
-5. **Depois de responder.** Dois botões: "Compartilhar minha escolha" e a
-   próxima pesquisa aberta sem resposta ("Próxima: <pergunta>"). Sem
-   próxima, "Ver pesquisas", que volta à capa.
+5. **Depois de responder.** Dois botões: "Compartilhar minha escolha" e
+   "Próxima pesquisa", quando há outra sem resposta neste aparelho, ou "Ver
+   pesquisas". Os dois levam à capa: é ela que sabe quais estão abertas e
+   qual fica em destaque.
 6. **Compartilhar.** No toque, a página monta uma imagem (a carta, o nome, a
    pergunta e "polimatch.com.br") e chama o compartilhamento do aparelho.
    Onde o aparelho não compartilha arquivo, vai o texto com o link; onde não
@@ -63,7 +66,14 @@ vêm, as escolhas que a pessoa já fez e um jeito de compartilhar a escolha.
 - **Tudo é por pesquisa.** Sorteio, escolhas guardadas no aparelho e
   resposta: responder uma não mexe na outra. O servidor já é assim.
 - **Abrir não grava.** A capa lê as definições e, só para quem já respondeu
-  neste aparelho, a resposta. Não cria jogador nem sorteio.
+  neste aparelho ou para uma pesquisa já fechada, a resposta. Não cria
+  jogador. Há um caso de borda: se o aparelho diz que uma pesquisa aberta
+  foi respondida e o servidor não tem a resposta (perda de dados no
+  servidor), o pedido da resposta emite o sorteio dela para o jogador. Não
+  grava resposta.
+- **Uma leitura que falha não vira lista pela metade.** Se a definição de
+  alguma pesquisa não chega (fora o 404 de uma pesquisa que o servidor não
+  conhece), a capa avisa e oferece tentar de novo.
 - **As regras do estágio 68 valem para cada pesquisa**, sem mudança.
 - **Sem resultado público.** Compartilhar leva a escolha da pessoa, nunca
   soma de respostas (#177).
@@ -102,6 +112,8 @@ Um PR, com commits por parte:
   na primeira pesquisa; a segunda em "Mais pesquisas"; duas "em breve".
 - `/?p=politica-2026-02` abre a entrada da segunda pesquisa; um `p`
   desconhecido cai na capa.
+- Uma pesquisa pela metade que fecha não prende a pessoa: a capa continua
+  alcançável.
 - Responder a primeira e voltar à capa: a escolha aparece em "Suas
   escolhas" e a segunda vira o destaque. Respondidas as duas, a capa diz
   que não há pesquisa aberta sem resposta.

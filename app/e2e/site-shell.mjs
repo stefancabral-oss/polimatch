@@ -37,7 +37,8 @@
  *  25. Cada pesquisa tem endereço; um código desconhecido cai na capa.
  *  26. Responder a primeira: a capa mostra a escolha e destaca a segunda;
  *      respondidas as duas, a capa diz isso. Uma não mexe na outra.
- *  27. A capa leva de volta à pesquisa que ficou pela metade.
+ *  27. A capa destaca a pesquisa que ficou pela metade, com "Continuar"; se
+ *      ela fecha, a capa não fica presa nela.
  *  28. Uma pesquisa fechada sai do destaque e aparece como fechada.
  *  29. Com a API fora do ar, a capa avisa e tenta de novo.
  *  30. Compartilhar: a imagem com a carta, o texto e o endereço, só no toque.
@@ -45,6 +46,9 @@
  *      endereço é copiado; fechar a folha de compartilhar não é erro.
  *  32. Servidor que ainda não conhece a segunda pesquisa: a capa mostra só a
  *      primeira (é o que acontece se o app for publicado antes da API).
+ *  33. Uma leitura que falha não vira informação falsa: a capa pede para
+ *      tentar de novo.
+ *  34. Outra aba sai da conta: a capa desta se refaz.
  */
 import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
@@ -465,9 +469,8 @@ try {
       await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
       await menuButton(page).waitFor();
       const next = page.locator(".ps-stack");
-      const link = next.getByRole("link", { name: "Próxima pesquisa: Em quem você confia mais?" });
-      assert.equal(await link.getAttribute("href"), `./?p=${SECOND.id}`);
-      assert.equal(await link.innerText(), "Próxima pesquisa");
+      const link = next.getByRole("link", { name: "Próxima pesquisa" });
+      assert.equal(await link.getAttribute("href"), "./", "a próxima é a que a capa puser em destaque");
       const linkBox = await link.boundingBox();
       assert.ok(linkBox.height <= 60, `${width}×${height}: o botão da próxima pesquisa cabe em uma linha (${Math.round(linkBox.height)} px)`);
       assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Ir para o início/);
@@ -785,8 +788,8 @@ try {
     assert.equal(new URL(page.url()).search, `?p=${SURVEY.id}`);
     assert.equal(server.responseOf(ANONYMOUS_KEY, SECOND), null, "responder a primeira não responde a segunda");
 
-    // De volta à capa: a escolha aparece e a segunda pesquisa vira o destaque.
-    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
+    // "Próxima pesquisa" leva à capa: a escolha aparece e a segunda vira o destaque.
+    await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Próxima pesquisa" }).click()]);
     await entryReady(page);
     assert.equal(await page.locator("#ps-title").innerText(), "Em quem você confia mais?");
     const pick = page.locator(".ps-home .ps-pick");
@@ -820,7 +823,7 @@ try {
     assert.equal(await page.locator("#ps-title").innerText(), first);
   });
 
-  await scenario("a capa leva de volta à pesquisa que ficou pela metade", async () => {
+  await scenario("a capa destaca a pesquisa que ficou pela metade, com Continuar, e não fica presa se ela fecha", async () => {
     const server = createServer();
     const page = await open(await newContext(server), surveyUrl(SECOND));
     await entryReady(page);
@@ -832,11 +835,26 @@ try {
     await page.goto(surveyUrl(SURVEY), { waitUntil: "domcontentloaded" });
     await entryReady(page);
     assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
-    // A capa retoma a que ficou pela metade, no ponto em que parou.
+    // A capa continua sendo a capa: destaca a que ficou pela metade e oferece continuar.
     await page.goto(appUrl, { waitUntil: "domcontentloaded" });
+    await entryReady(page, "Continuar");
+    assert.equal(new URL(page.url()).search, "");
+    assert.equal(await page.locator("#ps-title").innerText(), "Em quem você confia mais?");
+    assert.match(await page.locator(".ps-hint").first().innerText(), /Você parou no meio/);
+    assert.deepEqual(await page.locator(".ps-home a.ps-survey b").allInnerTexts(), ["Quem você prefere?"]);
+    assert.equal(server.count("POST", `/api/photo-surveys/${SURVEY.id}/draw`), 0);
+    await page.locator("#ps-action").click();
     await waitStep(page, "Tela 2 de 4");
     assert.equal(new URL(page.url()).search, `?p=${SECOND.id}`);
-    assert.equal(server.count("POST", `/api/photo-surveys/${SURVEY.id}/draw`), 0);
+    assert.equal(await page.locator('.ps-grid button[aria-pressed="true"]').count(), 0, "a tela 2 ainda não tem escolha");
+
+    // A pesquisa pela metade fecha: a capa segue alcançável e destaca a outra.
+    server.closed.add(SECOND.id);
+    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
+    await entryReady(page, "Começar");
+    assert.equal(new URL(page.url()).search, "", "a capa não manda para a pesquisa fechada");
+    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
+    assert.deepEqual(await page.locator(".ps-home a.ps-survey").evaluateAll((rows) => rows.map((row) => `${row.querySelector("b").textContent} | ${row.querySelector(".pm-tag").textContent}`)), ["Em quem você confia mais? | Fechada"]);
   });
 
   await scenario("uma pesquisa fechada sai do destaque e aparece como fechada", async () => {
@@ -856,6 +874,23 @@ try {
     await empty.locator("#ps-title", { hasText: "Nenhuma pesquisa aberta agora." }).waitFor();
     assert.equal(await empty.locator("#ps-action").count(), 0);
     assert.equal(await empty.locator(".ps-home a.ps-survey .pm-tag", { hasText: "Fechada" }).count(), 2);
+
+    // Quem tem conta no aparelho e respondeu antes de fechar vê a escolha, mesmo sem registro local.
+    const past = createServer();
+    past.status = "closed";
+    const chosen = past.answered(GOOGLE_KEY, SECOND);
+    const mine = await open(await newContext(past, { storedKey: GOOGLE_KEY }));
+    await mine.locator(".ps-home .ps-pick img").waitFor();
+    assert.equal(await mine.locator(".ps-home .ps-pick").getAttribute("href"), `./?p=${SECOND.id}`);
+    assert.equal(await mine.locator(".ps-home .ps-pick img").getAttribute("src"), (await import("../src/political-chromas.json", { with: { type: "json" } })).default.find((art) => art.id === chosen.championId).src);
+    assert.deepEqual(past.writes().filter((entry) => !entry.endsWith("/draw")), [], "só o pedido da resposta, que fechada não grava nada");
+
+    // Um estado que a página não conhece vale como fechada, sem quebrar a capa.
+    const odd = createServer();
+    odd.status = "constructor";
+    const strange = await open(await newContext(odd));
+    await strange.locator("#ps-title", { hasText: "Nenhuma pesquisa aberta agora." }).waitFor();
+    assert.equal(await strange.locator(".ps-home a.ps-survey .pm-tag", { hasText: "Fechada" }).count(), 2);
   });
 
   await scenario("com a API fora do ar, a capa avisa e tenta de novo", async () => {
@@ -892,6 +927,8 @@ try {
     define("share", async (data) => {
       record(data);
       if (mode === "cancel") throw new DOMException("cancelado", "AbortError");
+      // A folha de compartilhar fica aberta um instante, como num aparelho de verdade.
+      await new Promise((resolve) => setTimeout(resolve, 400));
     });
   };
   async function answeredPage(mode) {
@@ -899,7 +936,10 @@ try {
     const answered = server.answered(ANONYMOUS_KEY);
     const context = await newContext(server, { storedKey: ANONYMOUS_KEY });
     await context.addInitScript(SHARE_STUB, mode);
+    const images = [];
+    context.on("request", (request) => { if (request.url().includes("/chromas/")) images.push(new URL(request.url()).pathname); });
     const page = await open(context, surveyUrl(SURVEY));
+    page.cardRequests = images;
     await entryReady(page);
     await page.locator("#ps-action").click();
     await waitStep(page, "Registrada");
@@ -914,8 +954,13 @@ try {
     await page.waitForTimeout(300);
     assert.deepEqual(await page.evaluate(() => window.__shared), [], "nada é compartilhado sem o toque");
     const before = server.requests.length;
+    assert.ok(page.cardRequests.some((path) => path.endsWith("-1060.webp")), "a imagem compartilhada usa a carta no tamanho maior");
+    // Dois toques seguidos abrem o compartilhamento uma vez só.
     await button.click();
-    await page.waitForFunction(() => window.__shared.length === 1);
+    await button.click();
+    await page.waitForFunction(() => window.__shared.length >= 1);
+    await page.waitForTimeout(700);
+    assert.equal(await page.evaluate(() => window.__shared.length), 1, "um compartilhamento por toque, sem repetir");
     const [shared] = await page.evaluate(() => window.__shared);
     assert.equal(shared.title, "PoliMatch");
     assert.equal(shared.text, `Quem você prefere? Minha escolha no PoliMatch: ${name}. E a sua?`);
@@ -971,6 +1016,52 @@ try {
     const direct = await open(context, surveyUrl(SECOND));
     await direct.locator("#ps-title", { hasText: "Esta pesquisa não está disponível." }).waitFor();
     assert.equal(await direct.getByRole("link", { name: "Ver pesquisas" }).getAttribute("href"), "./");
+  });
+
+  await scenario("uma leitura que falha não vira informação falsa: a capa pede para tentar de novo", async () => {
+    const server = createServer();
+    server.answered(ANONYMOUS_KEY);
+    const context = await newContext(server, { storedKey: ANONYMOUS_KEY });
+    // A pessoa respondeu a primeira neste aparelho.
+    const first = await open(context, surveyUrl(SURVEY));
+    await entryReady(first);
+    await first.locator("#ps-action").click();
+    await waitStep(first, "Registrada");
+    // A leitura da segunda falha: a capa não pode dizer que tudo foi respondido.
+    let down = true;
+    await context.route(new RegExp(`/api/photo-surveys/${SECOND.id}$`), (route) => (down ? route.abort("connectionrefused") : route.fallback()));
+    const page = await open(context);
+    await page.locator("#ps-notice:not([hidden])").waitFor();
+    assert.match(await page.locator("#ps-notice").innerText(), /Não conseguimos falar com o servidor/);
+    assert.equal(await page.locator("#ps-action").innerText(), "Tentar de novo");
+    assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Você respondeu todas/);
+    down = false;
+    await page.locator("#ps-action").click();
+    await entryReady(page, "Começar");
+    assert.equal(await page.locator("#ps-title").innerText(), "Em quem você confia mais?");
+    assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+  });
+
+  await scenario("outra aba sai da conta: a capa desta se refaz", async () => {
+    const server = createServer();
+    server.answered(GOOGLE_KEY);
+    const context = await newContext(server, { storedKey: GOOGLE_KEY });
+    const first = await open(context, surveyUrl(SURVEY));
+    await entryReady(first);
+    await first.locator("#ps-action").click();
+    await waitStep(first, "Registrada");
+    await first.goto(appUrl, { waitUntil: "domcontentloaded" });
+    await first.locator(".ps-home .ps-pick img").waitFor();
+    assert.equal(await first.locator("#ps-title").innerText(), "Em quem você confia mais?");
+
+    const second = await open(context);
+    await entryReady(second);
+    await openMenu(second);
+    await second.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
+    await second.locator("dialog.pm-menu[open] #e2e-google").waitFor();
+    // Sem a conta, a escolha dela some da capa e o destaque volta para a primeira pesquisa.
+    await first.waitForFunction(() => document.querySelectorAll(".ps-home .ps-pick").length === 0 && document.querySelector("#ps-title")?.textContent === "Quem você prefere?");
+    assert.deepEqual(await first.locator(".ps-home .ps-label").allInnerTexts(), ["Mais pesquisas", "Em breve"]);
   });
 
   assert.deepEqual(pageErrors, [], `erros de página: ${pageErrors.join(" | ")}`);

@@ -58,6 +58,10 @@ let atHome = false;
 // identidade já respondeu, a resposta (null enquanto não chega).
 let homeViews = [];
 const homeChoices = new Map();
+// A identidade com que a capa foi montada, e se o destaque é uma pesquisa que
+// a pessoa deixou pela metade neste aparelho.
+let homeKey = "";
+let homeResume = false;
 // O leque da entrada é sorteado uma vez por pesquisa e por visita.
 const fans = new Map();
 
@@ -212,12 +216,14 @@ const heading = (eyebrow, title, hint) => `<p class="ps-kicker">${escapeText(eye
 const MENU_LINK = '<button class="ps-link" data-action="menu" type="button">Abrir o menu</button>';
 const ALL_SURVEYS_LINK = '<a class="ps-btn ps-btn--ghost" href="./">Ver pesquisas</a>';
 
-/** Depois de responder: a próxima pesquisa que esta identidade ainda não respondeu neste aparelho. */
+/**
+ * Depois de responder. Havendo outra pesquisa que esta identidade ainda não
+ * respondeu neste aparelho, o botão convida para a próxima. Os dois levam à
+ * capa: é ela que sabe quais estão abertas e qual fica em destaque.
+ */
 function nextLink() {
   const answered = answeredSurveyIds(readStored(PHOTO_SURVEY_STORAGE_KEY), identityTag(readStored(IDENTITY_KEY)));
-  const nextId = nextSurveyId(surveyId, answered);
-  if (!nextId) return ALL_SURVEYS_LINK;
-  return `<a class="ps-btn ps-btn--ghost" href="${surveyHref(nextId)}" aria-label="Próxima pesquisa: ${escapeText(photoSurveyById(nextId).question)}">Próxima pesquisa</a>`;
+  return nextSurveyId(surveyId, answered) ? '<a class="ps-btn ps-btn--ghost" href="./">Próxima pesquisa</a>' : ALL_SURVEYS_LINK;
 }
 const retryButton = (action, label = "Tentar de novo") => `<button class="ps-link" data-action="${action}" type="button">${label}</button>`;
 
@@ -229,7 +235,7 @@ const surveyHref = (id) => `./?p=${encodeURIComponent(id)}`;
 // O que vem do servidor (pergunta, assunto) entra sempre escapado.
 function surveyRow(view) {
   const base = photoSurveyById(view.id);
-  const [tag, modifier] = STATUS_TAG[view.status] || STATUS_TAG.closed;
+  const [tag, modifier] = Object.hasOwn(STATUS_TAG, view.status) ? STATUS_TAG[view.status] : STATUS_TAG.closed;
   const title = (typeof view.question === "string" && view.question) || base.question;
   const topic = (typeof view.subject === "string" && view.subject) || base.subject;
   return `<a class="ps-survey" href="${surveyHref(view.id)}"><span class="ps-survey-text"><b>${escapeText(title)}</b><small>${escapeText(topic)} · ${count(view.drawSize, base.drawSize)} cartas</small></span><em class="pm-tag${modifier}">${tag}</em></a>`;
@@ -256,9 +262,9 @@ function homeSections() {
  * as listas embaixo; sem destaque (tudo respondido, ou nada aberto), só o
  * título e as listas.
  */
-function renderEntry({ pending = "", action = "start", label = "Começar", focus = false } = {}) {
+function renderEntry({ pending = "", action = "start", label = atHome && homeResume ? "Continuar" : "Começar", focus = false } = {}) {
   const featured = surveyId
-    ? `${heading(kicker(), question(), "Leva menos de um minuto.")}
+    ? `${heading(kicker(), question(), atHome && homeResume ? "Você parou no meio. Continue de onde parou." : "Leva menos de um minuto.")}
       <div class="ps-fan" aria-hidden="true">${entryCards().map((id) => staticCard(id, "176px")).join("")}</div>
       <div class="ps-cta"><button class="ps-btn" id="ps-action" data-action="${action}" type="button"${pending ? " disabled" : ""}>${escapeText(pending || label)}</button>
         <p class="ps-muted ps-cta-note">Sua escolha só é registrada quando você confirmar.</p></div>`
@@ -376,15 +382,18 @@ async function share() {
   const outcome = await shareChoice({ surveyId, name: cardName(champion), question: question(), file: shareFile });
   sharing = false;
   if (view !== "done") return;
-  notice = {
+  const text = {
     copied: "Link copiado. Cole onde quiser compartilhar.",
     unavailable: "Este navegador não compartilha por aqui. O endereço é polimatch.com.br.",
     failed: "Não deu para compartilhar agora. Tente de novo.",
-  }[outcome] || "";
+  }[outcome];
+  // Compartilhou ou fechou a folha: nada a dizer, e o aviso que estiver na tela fica.
+  if (!text) return;
+  notice = text;
   const target = root.querySelector("#ps-notice");
   if (!target) return;
-  target.textContent = notice;
-  target.hidden = !notice;
+  target.textContent = text;
+  target.hidden = false;
 }
 
 function renderStopped(kind, { focus = false } = {}) {
@@ -872,39 +881,41 @@ async function openHome() {
   view = "loading";
   notice = "";
   survey = null;
+  identity = "";
   const key = readStored(IDENTITY_KEY);
   const tag = identityTag(key);
   const saved = readStored(PHOTO_SURVEY_STORAGE_KEY);
-  const pending = inProgressSurveyId(saved, tag);
-  if (pending) {
-    // Há uma pesquisa pela metade neste aparelho: a capa leva de volta a ela.
-    useSurvey(pending);
-    leaveHome();
-    return openSurvey();
-  }
   const answered = answeredSurveyIds(saved, tag);
+  const pending = inProgressSurveyId(saved, tag);
+  homeKey = key;
+  homeResume = false;
   homeViews = [];
   homeChoices.clear();
-  useSurvey(nextSurveyId("", answered) || PHOTO_SURVEYS[0].id);
+  useSurvey(pending || nextSurveyId("", answered) || PHOTO_SURVEYS[0].id);
   renderEntry({ pending: "Carregando…" });
   const run = ++epoch;
   const results = await Promise.all(PHOTO_SURVEYS.map((item) => loadPhotoSurvey(item.id).then((value) => ({ value }), (error) => ({ error }))));
   if (run !== epoch) return;
-  homeViews = results.filter((result) => result.value && photoSurveyById(result.value.id)).map((result) => result.value);
-  if (!homeViews.length) {
-    const failure = results.find((result) => result.error && result.error.status !== 404)?.error;
-    if (!failure) {
-      useSurvey("");
-      renderStopped("unavailable");
-      return;
-    }
+  // Uma pesquisa que o servidor não conhece (404) só some da lista. Qualquer
+  // outra falha deixa a capa sem saber o que está aberto: em vez de mostrar
+  // uma lista pela metade, ela pede para tentar de novo.
+  const failure = results.find((result) => result.error && result.error.status !== 404)?.error;
+  if (failure) {
     view = "entry";
     notice = unreachableNotice(failure);
     renderEntry({ action: "init", label: "Tentar de novo" });
     return;
   }
+  homeViews = results.filter((result) => result.value && photoSurveyById(result.value.id)).map((result) => result.value);
+  if (!homeViews.length) {
+    useSurvey("");
+    renderStopped("unavailable");
+    return;
+  }
   for (const id of answered) if (homeViews.some((item) => item.id === id)) homeChoices.set(id, null);
-  const featured = featuredSurveyId(homeViews, answered);
+  // A pesquisa que ficou pela metade vem primeiro, se ainda estiver aberta.
+  homeResume = homeViews.some((item) => item.id === pending && item.status === "open");
+  const featured = homeResume ? pending : featuredSurveyId(homeViews, answered);
   useSurvey(featured);
   survey = homeViews.find((item) => item.id === featured) || null;
   view = "entry";
@@ -914,7 +925,8 @@ async function openHome() {
   await Promise.all(wanted.map(async (id) => {
     try {
       const result = await drawPhotoSurvey(id, key);
-      if (result?.response) homeChoices.set(id, result.response);
+      // A capa pode ter sido refeita para outra identidade enquanto isto viajava.
+      if (run === epoch && result?.response) homeChoices.set(id, result.response);
     } catch {
       // Sem a resposta, a linha fica sem a carta e leva à tela da pesquisa.
     }
@@ -922,6 +934,13 @@ async function openHome() {
   // Só as listas são refeitas: o destaque e o foco ficam como estão.
   const lists = root.querySelector(".ps-home");
   if (run === epoch && atHome && view === "entry" && lists) lists.innerHTML = homeSections();
+}
+
+/** A capa foi montada para outra identidade: refaz, sem gravar nada. */
+function refreshHome() {
+  if (!atHome || busy || view !== "entry" || readStored(IDENTITY_KEY) === homeKey) return false;
+  init();
+  return true;
 }
 
 async function openSurvey() {
@@ -1015,6 +1034,7 @@ function followOtherTab() {
 window.addEventListener("storage", (event) => {
   if (event.key === IDENTITY_KEY || event.key === null) {
     if (identity && readStored(IDENTITY_KEY) !== identity && view !== "unavailable") identityChanged();
+    else refreshHome();
     return;
   }
   if (event.key === PHOTO_SURVEY_STORAGE_KEY) followOtherTab();
@@ -1044,10 +1064,15 @@ function recheckIdentity() {
     identityChanged();
     return;
   }
+  if (refreshHome()) return;
   followOtherTab();
 }
 window.addEventListener("pageshow", (event) => {
-  if (event.persisted) recheckIdentity();
+  if (!event.persisted) return;
+  // A capa que volta do histórico pode estar velha: a pessoa respondeu uma
+  // pesquisa e tocou em voltar. Refaz, sem gravar nada.
+  if (atHome && !busy && view === "entry") init();
+  else recheckIdentity();
 });
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") recheckIdentity();

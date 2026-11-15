@@ -76,6 +76,9 @@ test("o aparelho sabe quais pesquisas esta identidade respondeu e qual está em 
   assert.equal(inProgressSurveyId(text, tag), SECOND_SURVEY_ID);
   assert.equal(inProgressSurveyId(text, other), "");
   assert.equal(inProgressSurveyId(text, ""), "");
+  // Respondida, mesmo com escolhas ainda guardadas: não é "em andamento".
+  const leftover = savedProgressText(null, SECOND_SURVEY_ID, { identity: tag, progress: play(fresh(), "a1"), answered: true });
+  assert.equal(inProgressSurveyId(leftover, tag), "");
   // Sorteio emitido sem nenhuma escolha ainda: a capa não puxa a pessoa de volta.
   const untouched = savedProgressText(null, SECOND_SURVEY_ID, { identity: tag, progress: fresh() });
   assert.equal(inProgressSurveyId(untouched, tag), "");

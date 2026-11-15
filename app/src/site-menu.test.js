@@ -35,6 +35,7 @@ test("o menu lista as pesquisas que recebe, com o texto escapado", () => {
   const markup = menuMarkup({ surveys: [{ id: "x-1", subject: "A & B", question: "<b>Qual?</b>" }] });
   assert.match(markup, /href="\.\/\?p=x-1"><span>&lt;b&gt;Qual\?&lt;\/b&gt;<\/span><small class="pm-sub">A &amp; B<\/small>/);
   assert.doesNotMatch(markup, /politica-2026/);
+  assert.match(menuMarkup({ surveys: [{ id: "a b&c", subject: "S", question: "Q?" }] }), /href="\.\/\?p=a%20b%26c"/);
 });
 
 test("o menu marca a página em que a pessoa está", () => {

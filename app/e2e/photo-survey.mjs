@@ -358,7 +358,7 @@ try {
     assert.equal(bodies[0].championId, picks[2]);
     assert.equal(server.responses.size, 1);
     assert.equal(await page.locator(".ps-grid, [data-action=confirm], #ps-action").count(), 0, "depois de registrar não há como responder de novo");
-    assert.equal(await page.getByRole("link", { name: "Próxima pesquisa: Em quem você confia mais?" }).getAttribute("href"), "./?p=politica-2026-02");
+    assert.equal(await page.getByRole("link", { name: "Próxima pesquisa" }).getAttribute("href"), "./", "a próxima é a que a capa puser em destaque");
   });
 
   // A fonte do sistema muda de aparelho para aparelho, e com ela o número de

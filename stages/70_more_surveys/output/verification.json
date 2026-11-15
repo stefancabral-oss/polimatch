@@ -22,8 +22,8 @@
     "npm test --prefix back": "293/293",
     "back/scripts/photo-survey-smoke.mjs em PostgreSQL 16 local": "aprovado, com as duas pesquisas independentes",
     "npm test --prefix app": "195/195",
-    "e2e site-shell em WebKit": "32 cenários aprovados",
-    "e2e site-shell em Chromium 140": "31 cenários aprovados; o 32º entrou depois e roda no CI",
+    "e2e site-shell em WebKit": "34 cenários aprovados",
+    "e2e site-shell em Chromium 140": "34 cenários aprovados",
     "e2e photo-survey": "34 cenários em WebKit e em Chromium 140",
     "e2e client-error-report": "aprovado nos dois",
     "capturas conferidas": "capa em dois tamanhos, capa de quem respondeu uma e as duas, resposta registrada com dois botões, entrada da segunda pesquisa, menu e a imagem compartilhada (1080x1350, 362 KB)"
@@ -37,13 +37,36 @@
     "escolhas de uma não aparecem na outra; a capa retoma a pesquisa pela metade": "e2e site-shell, cenários 26 e 27",
     "compartilhar só no toque, com imagem e texto; sem arquivo, texto; sem compartilhamento, copia": "share-choice.test.js; e2e site-shell, cenários 30 e 31",
     "os cenários dos estágios 68 e 69 passam": "photo-survey 34; site-shell 1 a 24",
-    "app novo com API antiga mostra só a primeira pesquisa": "e2e site-shell, cenário 32"
+    "app novo com API antiga mostra só a primeira pesquisa": "e2e site-shell, cenário 32",
+    "uma pesquisa pela metade que fecha não prende a pessoa; a capa a destaca com Continuar enquanto aberta": "e2e site-shell, cenário 27",
+    "uma leitura que falha mostra aviso com tentar de novo": "e2e site-shell, cenários 29 e 33"
   },
   "notVerified": [
     "navigator.share num aparelho de verdade: nos testes é simulado",
     "fontes do Linux nas telas novas: só pelos e2e do CI",
     "produção: nada deste estágio foi publicado"
   ],
-  "independentReview": "a preencher",
+  "independentReview": {
+    "who": "o mesmo agente das revisões do estágio 69, somente leitura, num clone à parte, sobre db7d079..918f34c",
+    "verdict": "sem bloqueio; dois pontos importantes",
+    "ran": "shared 106/106, back 293/293, app 195/195; site-shell 32/32 e photo-survey 34/34 em WebKit; smoke do servidor num banco próprio; 47 mutações do código",
+    "fixedBeforeMerge": [
+      "a capa não redireciona para a pesquisa pela metade: ela vira o destaque com Continuar, se aberta",
+      "falha em qualquer leitura (fora 404) mostra aviso com tentar de novo",
+      "a capa se refaz quando outra aba entra ou sai da conta e ao voltar do histórico; resposta atrasada não vale para outra identidade",
+      "Próxima pesquisa leva à capa",
+      "compartilhar não apaga aviso que já estava na tela",
+      "estado desconhecido do servidor vale como fechada",
+      "testes novos: resposta em pesquisa fechada, dois toques no compartilhar, imagem no tamanho maior, duas mutações de unidade"
+    ],
+    "scenariosWrittenAfterCode": "25 mutações do código, todas pegas pelo cenário correspondente",
+    "notedOnly": [
+      "título fixo na prévia do endereço compartilhado",
+      "celular deitado e 320x480: itens abaixo da dobra",
+      "a imagem é montada em toda tela de resposta registrada",
+      "o menu ainda lista uma pesquisa que o servidor não conhece"
+    ],
+    "notDoneByReviewer": "Chromium, CI no Linux, navigator.share num celular, volta pelo histórico, servidor de verdade junto com o app, produção"
+  },
   "humanGate": "pendente"
 }

@@ -25,15 +25,16 @@ teste, que precisa falhar pelo motivo esperado antes do código.
   `forgetSaved`, `resumable`, `start`, `submit` e os pedidos à API usam o
   `surveyId` atual. O leque da entrada é sorteado uma vez por pesquisa e por
   visita.
-- `init()`: com `?p=` válido, abre essa pesquisa (como hoje). Sem `p`: se há
-  pesquisa em andamento para a identidade atual, retoma essa; senão, capa.
+- `init()`: com `?p=` válido, abre essa pesquisa (como hoje). Sem `p`, a
+  capa. Uma pesquisa em andamento para a identidade atual, se aberta, vira o
+  destaque com "Continuar"; a capa não redireciona.
 - "Começar" troca o endereço para `?p=<id>` (`history.replaceState`).
 
 ## 70c — Capa e menu
 
 - `renderHome()`: lê as visões públicas de todas as pesquisas em paralelo;
-  uma que falhe com 404 some da lista; falha de rede em todas mostra o aviso
-  de hoje com "Tentar de novo". Monta: entrada da pesquisa em destaque
+  uma que falhe com 404 some da lista; qualquer outra falha, em qualquer
+  leitura, mostra o aviso com "Tentar de novo". Monta: entrada da pesquisa em destaque
   (`#ps-title`, `.ps-fan`, `#ps-action` continuam com esses ids), "Suas
   escolhas", "Mais pesquisas", "Em breve".
 - "Suas escolhas": para cada id respondido, `drawPhotoSurvey` devolve a
