@@ -32,8 +32,9 @@ function validBracket(shownIds) {
 }
 
 test("a primeira pesquisa tem 20 cartas de política, sorteio de 16 e telas de 4", () => {
-  assert.equal(PHOTO_SURVEYS.length, 1);
+  assert.equal(PHOTO_SURVEYS[0], SURVEY);
   assert.equal(SURVEY.id, "politica-2026-01");
+  assert.equal(SURVEY.subject, "Política");
   assert.equal(SURVEY.question, "Quem você prefere?");
   assert.equal(SURVEY.cardIds.length, 20);
   assert.equal(new Set(SURVEY.cardIds).size, 20);
@@ -43,6 +44,29 @@ test("a primeira pesquisa tem 20 cartas de política, sorteio de 16 e telas de 4
   assert.ok(Object.isFrozen(SURVEY) && Object.isFrozen(SURVEY.cardIds));
   assert.equal(photoSurveyById("nao-existe"), null);
   assert.equal(photoSurveyById(undefined), null);
+});
+
+test("a segunda pesquisa faz outra pergunta sobre as mesmas 20 cartas", () => {
+  const second = photoSurveyById("politica-2026-02");
+  assert.equal(PHOTO_SURVEYS.length, 2);
+  assert.equal(PHOTO_SURVEYS[1], second);
+  assert.equal(second.subject, "Política");
+  assert.equal(second.question, "Em quem você confia mais?");
+  assert.deepEqual(second.cardIds, SURVEY.cardIds);
+  assert.equal(second.drawSize, 16);
+  assert.equal(second.groupSize, 4);
+  assert.equal(second.opensAt, null);
+  assert.equal(second.closesAt, null);
+  assert.ok(Object.isFrozen(second) && Object.isFrozen(second.cardIds));
+});
+
+test("cada pesquisa tem código, assunto e pergunta próprios", () => {
+  assert.equal(new Set(PHOTO_SURVEYS.map((survey) => survey.id)).size, PHOTO_SURVEYS.length);
+  assert.equal(new Set(PHOTO_SURVEYS.map((survey) => survey.question)).size, PHOTO_SURVEYS.length);
+  for (const survey of PHOTO_SURVEYS) {
+    assert.match(survey.id, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, survey.id);
+    assert.ok(survey.subject.length > 0 && survey.question.endsWith("?"), survey.id);
+  }
 });
 
 test("o sorteio devolve 16 cartas únicas do conjunto e não altera a definição", () => {
@@ -170,8 +194,9 @@ test("a janela define se a pesquisa está agendada, aberta ou fechada", () => {
 test("a visão pública traz só a definição e o estado, sem contagem de respostas", () => {
   const view = publicPhotoSurvey(SURVEY, new Date("2026-11-13T12:00:00Z"));
   assert.deepEqual(Object.keys(view).sort(), [
-    "cardIds", "closesAt", "drawSize", "groupSize", "id", "opensAt", "question", "screens", "status",
+    "cardIds", "closesAt", "drawSize", "groupSize", "id", "opensAt", "question", "screens", "status", "subject",
   ]);
+  assert.equal(view.subject, "Política");
   assert.equal(view.screens, 4);
   assert.deepEqual(view.cardIds, SURVEY.cardIds);
   assert.notEqual(view.cardIds, SURVEY.cardIds, "a lista devolvida é uma cópia");

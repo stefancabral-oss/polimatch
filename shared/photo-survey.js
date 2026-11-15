@@ -2,27 +2,42 @@
 // servidor e pela tela: definição das pesquisas, sorteio, telas e validação
 // da chave. Nada aqui lê relógio, banco ou rede.
 
-function definePhotoSurvey({ id, question, cardIds, drawSize, groupSize, opensAt = null, closesAt = null }) {
+function definePhotoSurvey({ id, subject, question, cardIds, drawSize, groupSize, opensAt = null, closesAt = null }) {
+  if (!subject || !question) throw new Error(`pesquisa ${id}: falta o assunto ou a pergunta`);
   const cards = Object.freeze([...cardIds].sort());
   if (new Set(cards).size !== cards.length) throw new Error(`pesquisa ${id}: carta repetida`);
   if (drawSize > cards.length || drawSize % groupSize !== 0) {
     throw new Error(`pesquisa ${id}: sorteio de ${drawSize} não fecha em telas de ${groupSize}`);
   }
-  return Object.freeze({ id, question, cardIds: cards, drawSize, groupSize, opensAt, closesAt });
+  return Object.freeze({ id, subject, question, cardIds: cards, drawSize, groupSize, opensAt, closesAt });
 }
 
+// As 20 cartas "Políticos 2026", todas com a mesma moldura
+// (app/public/chromas/politicos). Cada jogador recebe 16 por sorteio.
+const POLITICS_CARD_IDS = Object.freeze([
+  "andre-janones", "bruno-zambelli", "cabo-gilberto-silva", "carlos-bolsonaro", "deltan-dallagnol",
+  "erika-hilton", "fernando-haddad", "geraldo-alckmin", "guilherme-boulos", "guilherme-derrite",
+  "gustavo-gayer", "jeffrey-chiquini", "joao-campos", "lindbergh-farias", "lucas-pavanato",
+  "marina-silva", "nikolas-ferreira", "samia-bonfim", "sergio-moro", "simone-tebet",
+]);
+
+// A ordem é a da capa: a primeira pesquisa aberta sem resposta fica em destaque.
 export const PHOTO_SURVEYS = Object.freeze([
   definePhotoSurvey({
     id: "politica-2026-01",
+    subject: "Política",
     question: "Quem você prefere?",
-    // As 20 cartas "Políticos 2026", todas com a mesma moldura
-    // (app/public/chromas/politicos). Cada jogador recebe 16 por sorteio.
-    cardIds: [
-      "andre-janones", "bruno-zambelli", "cabo-gilberto-silva", "carlos-bolsonaro", "deltan-dallagnol",
-      "erika-hilton", "fernando-haddad", "geraldo-alckmin", "guilherme-boulos", "guilherme-derrite",
-      "gustavo-gayer", "jeffrey-chiquini", "joao-campos", "lindbergh-farias", "lucas-pavanato",
-      "marina-silva", "nikolas-ferreira", "samia-bonfim", "sergio-moro", "simone-tebet",
-    ],
+    cardIds: POLITICS_CARD_IDS,
+    drawSize: 16,
+    groupSize: 4,
+  }),
+  // Segunda pergunta sobre as mesmas cartas (ICM 70, #334). Sorteio e resposta
+  // são por pesquisa: responder uma não responde a outra.
+  definePhotoSurvey({
+    id: "politica-2026-02",
+    subject: "Política",
+    question: "Em quem você confia mais?",
+    cardIds: POLITICS_CARD_IDS,
     drawSize: 16,
     groupSize: 4,
   }),
@@ -44,6 +59,7 @@ export function photoSurveyStatus(survey, now) {
 export function publicPhotoSurvey(survey, now) {
   return {
     id: survey.id,
+    subject: survey.subject,
     question: survey.question,
     cardIds: [...survey.cardIds],
     drawSize: survey.drawSize,

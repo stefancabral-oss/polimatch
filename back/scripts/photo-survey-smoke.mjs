@@ -11,6 +11,7 @@ import { requireDisposableDatabase } from "../test-support/disposable-db.js";
 const connection = requireDisposableDatabase();
 
 const SURVEY = PHOTO_SURVEYS[0];
+const SECOND = PHOTO_SURVEYS[1];
 const WINDOWED = Object.freeze({
   ...SURVEY,
   id: "smoke-janela",
@@ -24,7 +25,7 @@ let now = OPEN_INSTANT;
 const options = {
   candidateRegistry: createApprovedTestRegistry(CATALOG.map((person) => person.id)),
   clock: () => now,
-  photoSurveys: [SURVEY, WINDOWED],
+  photoSurveys: [SURVEY, SECOND, WINDOWED],
 };
 const store = createTopicStore(connection, options);
 const audit = new pg.Pool({ connectionString: connection });
@@ -336,7 +337,27 @@ try {
   }
   assert.equal(await count("schema_migrations", "WHERE id = '2026-11-13-photo-survey-v1'"), 1);
 
-  console.log("Smoke da pesquisa por foto aprovado: sorteio estável e simultâneo, resposta única e idempotente, corrida de duas abas, respostas forjadas recusadas, janela, imutabilidade, jogo atual intacto, identidade Google e segundo boot.");
+  // --- Duas pesquisas (ICM 70): sorteio e resposta são por pesquisa ---
+  const vera = await newPlayer();
+  const veraOne = await store.photoSurveyDraw(vera.recoveryKey, SURVEY.id);
+  const veraTwo = await store.photoSurveyDraw(vera.recoveryKey, SECOND.id);
+  assert.equal(veraTwo.survey.id, SECOND.id);
+  assert.equal(veraTwo.survey.question, "Em quem você confia mais?");
+  assert.equal(veraTwo.response, null);
+  const answeredOne = await respond(vera, { pickIds: picksOf(veraOne.draw), championId: picksOf(veraOne.draw)[0] });
+  // Responder a primeira não responde a segunda nem troca o sorteio dela.
+  const veraTwoAgain = await store.photoSurveyDraw(vera.recoveryKey, SECOND.id);
+  assert.equal(veraTwoAgain.response, null);
+  assert.deepEqual(veraTwoAgain.draw, veraTwo.draw);
+  // A chave de uma pesquisa não serve na outra, a não ser que os sorteios coincidam.
+  const answeredTwo = await respond(vera, { pickIds: picksOf(veraTwo.draw, 1), championId: picksOf(veraTwo.draw, 1)[1] }, SECOND.id);
+  assert.equal(answeredTwo.status, "created");
+  assert.notEqual(answeredTwo.response.answerId, answeredOne.response.answerId);
+  assert.equal((await store.photoSurveyDraw(vera.recoveryKey, SURVEY.id)).response.championId, answeredOne.response.championId);
+  assert.equal((await store.photoSurveyDraw(vera.recoveryKey, SECOND.id)).response.championId, answeredTwo.response.championId);
+  await rejectsWith(respond(vera, { pickIds: picksOf(veraTwo.draw), championId: picksOf(veraTwo.draw)[0] }, SECOND.id), 409, "PHOTO_SURVEY_ALREADY_ANSWERED");
+
+  console.log("Smoke da pesquisa por foto aprovado: sorteio estável e simultâneo, resposta única e idempotente, corrida de duas abas, respostas forjadas recusadas, janela, imutabilidade, jogo atual intacto, identidade Google, duas pesquisas independentes e segundo boot.");
 } finally {
   await audit.end();
   await store.close();
