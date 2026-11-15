@@ -5,8 +5,8 @@
   appearance: none;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   margin: 0;
   padding: 0;
   border: 0;
@@ -38,6 +38,9 @@
 }
 
 .pm-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
   --ps-green: #08805a;
   --ps-ink: #111418;
   --ps-muted: #6b7280;
@@ -54,6 +57,10 @@
   background: #fff;
   color: var(--ps-ink);
   overflow-y: auto;
+}
+
+.pm-menu:not([open]) {
+  display: none;
 }
 
 .pm-menu[open] {
@@ -107,8 +114,9 @@
   flex: none;
 }
 
+/* "Em breve" é informação, não item desligado: o texto continua legível. */
 .pm-item.is-soon {
-  color: #9ca3af;
+  color: #6b7280;
   font-weight: 500;
 }
 
@@ -126,7 +134,7 @@
   padding: 5px 11px;
   border-radius: 999px;
   background: var(--ps-soft);
-  color: var(--ps-muted);
+  color: #4b5563;
   white-space: nowrap;
 }
 
@@ -206,7 +214,11 @@
   }
 }
 
-/* "Como funciona". */
+/* "Como funciona": o botão acompanha o texto em vez de ficar por cima dele. */
+.ps-shell[data-view="how"] .ps-stack {
+  position: static;
+}
+
 .pm-note {
   margin: 22px 0 0;
   padding: 14px 16px;

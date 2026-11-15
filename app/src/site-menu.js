@@ -39,7 +39,7 @@ export const upcomingMarkup = () => UPCOMING_SURVEYS
 function accountMarkup({ account, googleReady, busy, error }) {
   const alert = error ? `<p class="pm-error" role="alert">${escapeText(error)}</p>` : "";
   if (account === "google") {
-    return `<div class="pm-account">${alert}<p class="pm-account-state">Você entrou com Google.</p>
+    return `<div class="pm-account">${alert}<p class="pm-account-state" role="status">Você entrou com Google.</p>
       <button class="ps-btn ps-btn--ghost" type="button" data-menu="signout"${busy ? " disabled" : ""}>${busy ? "Saindo…" : "Sair da conta"}</button></div>`;
   }
   if (!googleReady) return "";
@@ -62,9 +62,16 @@ export function menuMarkup({ account = "none", googleReady = false, busy = false
     ${accountMarkup({ account, googleReady, busy, error })}`;
 }
 
+/**
+ * Lê direto do navegador, como a página da pesquisa: vale o que está no
+ * aparelho agora, inclusive o que outra aba mudou. A cópia em memória só
+ * serve quando o navegador não deixa guardar nada.
+ */
 function readKey() {
   try {
-    return window.localStorage.getItem(IDENTITY_KEY) || safeStorage.get(IDENTITY_KEY) || "";
+    const value = window.localStorage.getItem(IDENTITY_KEY);
+    if (value) return value;
+    return safeStorage.persistent ? "" : safeStorage.get(IDENTITY_KEY) || "";
   } catch {
     return safeStorage.get(IDENTITY_KEY) || "";
   }
@@ -84,11 +91,17 @@ export function mountSiteMenu({ host = document.body, current = "", onIdentityCh
   host.append(dialog);
   const state = { busy: false, error: "" };
   let opener = null;
+  // Sem `showModal` (Safari antes do 15.4) o painel abre pelo atributo: perde
+  // o foco preso, mas continua sendo a saída de quem precisa entrar na conta.
+  const modal = typeof dialog.showModal === "function" && typeof dialog.close === "function";
+  const isOpen = () => dialog.hasAttribute("open");
 
   function render() {
     const account = accountKind(readKey());
     const googleReady = Boolean(googleClientId());
     dialog.innerHTML = menuMarkup({ account, googleReady, busy: state.busy, error: state.error, current });
+    // Trocar o conteúdo leva embora o elemento que tinha o foco: ele volta ao painel.
+    if (isOpen() && !dialog.contains(document.activeElement)) dialog.focus({ preventScroll: true });
     if (account !== "google" && googleReady && !state.busy) mountGoogle();
   }
 
@@ -98,7 +111,7 @@ export function mountSiteMenu({ host = document.body, current = "", onIdentityCh
     try {
       await mountGoogleButton(slot, { callback: signIn });
     } catch (error) {
-      if (!dialog.open || !slot.isConnected) return;
+      if (!isOpen() || !slot.isConnected) return;
       slot.innerHTML = `<button class="ps-link" type="button" data-menu="retry-google">Tentar carregar o Google de novo</button>`;
       state.error = error.message || "Não foi possível abrir o Google agora.";
       const alert = document.createElement("p");
@@ -115,9 +128,8 @@ export function mountSiteMenu({ host = document.body, current = "", onIdentityCh
     state.error = "";
     render();
     try {
-      // A chave de quem respondia sem conta vai junto: o servidor liga as
-      // escolhas dela à conta.
-      const result = await exchangeGoogleCredential(response.credential, readKey());
+      const result = await exchange(response.credential);
+      if (typeof result?.sessionToken !== "string" || !result.sessionToken) throw new Error("resposta sem sessão");
       safeStorage.set(IDENTITY_KEY, result.sessionToken);
     } catch (error) {
       state.busy = false;
@@ -130,13 +142,29 @@ export function mountSiteMenu({ host = document.body, current = "", onIdentityCh
     onIdentityChange();
   }
 
+  /**
+   * A chave de quem respondia sem conta vai junto, para o servidor ligar as
+   * escolhas dela à conta. Se o servidor não reconhece mais essa chave, a
+   * entrada é refeita sem ela: senão a pessoa nunca conseguiria entrar.
+   */
+  async function exchange(credential) {
+    const key = readKey();
+    try {
+      return await exchangeGoogleCredential(credential, key);
+    } catch (error) {
+      if (error.status === 401 && key) return exchangeGoogleCredential(credential, "");
+      throw error;
+    }
+  }
+
   async function signOut() {
     if (state.busy) return;
     state.busy = true;
     state.error = "";
     render();
+    const key = readKey();
     try {
-      await endSession(readKey());
+      await endSession(key);
     } catch (error) {
       // Sessão que o servidor já não reconhece não tem o que revogar: o
       // aparelho esquece mesmo assim. Com qualquer outra falha a sessão fica,
@@ -148,29 +176,43 @@ export function mountSiteMenu({ host = document.body, current = "", onIdentityCh
         return;
       }
     }
-    safeStorage.remove(IDENTITY_KEY);
+    // Só esquece a sessão que acabou de encerrar: outra aba pode ter entrado
+    // de novo enquanto o servidor respondia.
+    if (readKey() === key) safeStorage.remove(IDENTITY_KEY);
     state.busy = false;
     render();
     onIdentityChange();
   }
 
   function open(trigger = null) {
-    if (dialog.open) return;
+    if (isOpen()) return;
     opener = trigger;
     state.error = "";
     render();
-    dialog.showModal();
+    if (modal) dialog.showModal();
+    else dialog.setAttribute("open", "");
     dialog.focus({ preventScroll: true });
   }
 
-  function close() {
-    if (dialog.open) dialog.close();
+  function closed() {
+    // O botão que abriu pode ter saído da tela enquanto o menu estava aberto.
+    const target = opener?.isConnected ? opener : document.querySelector('[data-action="menu"]') || document.querySelector("h1");
+    target?.focus({ preventScroll: true });
+    opener = null;
   }
 
-  dialog.addEventListener("close", () => {
-    if (opener?.isConnected) opener.focus();
-    else document.querySelector('[data-action="menu"]')?.focus();
-    opener = null;
+  function close() {
+    if (!isOpen()) return;
+    if (modal) dialog.close();
+    else {
+      dialog.removeAttribute("open");
+      closed();
+    }
+  }
+
+  dialog.addEventListener("close", closed);
+  dialog.addEventListener("keydown", (event) => {
+    if (!modal && event.key === "Escape") close();
   });
 
   dialog.addEventListener("click", (event) => {
@@ -185,7 +227,7 @@ export function mountSiteMenu({ host = document.body, current = "", onIdentityCh
 
   // A outra aba entrou ou saiu: o menu aberto acompanha.
   window.addEventListener("storage", (event) => {
-    if ((event.key === IDENTITY_KEY || event.key === null) && dialog.open && !state.busy) render();
+    if ((event.key === IDENTITY_KEY || event.key === null) && isOpen() && !state.busy) render();
   });
 
   return { open, close };

@@ -19,6 +19,15 @@
  *   9. A resposta registrada mostra as próximas pesquisas, sem "Ir para o início".
  *  10. "Como funciona" cabe na tela, abre o menu e leva ao início.
  *  11. As páginas antigas saíram do build e o sitemap lista as duas novas.
+ *  12. O script do Google falha: o menu avisa, e tentar de novo carrega.
+ *  13. A entrada falha no servidor: o menu avisa e a chave não muda.
+ *  14. Chave anônima recusada: a entrada tenta de novo sem ela.
+ *  15. Duas abas: a outra sai da conta e o menu desta acompanha.
+ *  16. Sair na resposta registrada não convida a responder de novo.
+ *  17. Pesquisa fechada: entrar com Google mostra a resposta da conta.
+ *  18. Entrar enquanto a pesquisa abre não cria jogador anônimo.
+ *  19. O foco fica no menu quando o conteúdo dele muda.
+ *  20. Navegador sem showModal: o menu abre e fecha mesmo assim.
  */
 import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
@@ -42,6 +51,14 @@ function createServer() {
   const server = {
     quota: false,
     logout: "ok",
+    status: "open",
+    googleDown: false,
+    // Falhas programadas da entrada com Google: cada item é um status HTTP.
+    failAuth: [],
+    // Chaves que o servidor deixou de reconhecer.
+    revoked: new Set(),
+    // Segura a próxima leitura da pesquisa até `release()` ser chamada.
+    holdSurvey: null,
     requests: [],
     draws: new Map(),
     responses: new Map(),
@@ -56,7 +73,7 @@ function createServer() {
       return server.requests.filter((request) => request.method === method && request.pathname.endsWith(suffix)).length;
     },
   };
-  const view = () => publicPhotoSurvey(SURVEY, new Date());
+  const view = () => ({ ...publicPhotoSurvey(SURVEY, new Date()), status: server.status });
   server.handler = async (route) => {
     const request = route.request();
     const { pathname } = new URL(request.url());
@@ -71,18 +88,28 @@ function createServer() {
       return send(201, { recoveryKey: ANONYMOUS_KEY });
     }
     if (pathname === "/api/auth/google" && method === "POST") {
+      if (server.failAuth.length) return send(server.failAuth.shift(), { error: "falha passageira de login" });
+      // Como o servidor de verdade: uma chave que ele não reconhece recusa a entrada.
+      if (key && server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
+      // E a resposta de quem respondia sem conta passa a ser da conta.
+      if (key && server.responses.has(key) && !server.responses.has(GOOGLE_KEY)) server.responses.set(GOOGLE_KEY, server.responses.get(key));
       return send(200, { sessionToken: GOOGLE_KEY, account: { displayName: "Bia" }, player: { version: 0 }, merge: null });
     }
     if (pathname === "/api/auth/logout" && method === "POST") {
       if (server.logout === "down") return route.abort("connectionrefused");
+      if (server.logout === "error") return send(500, { error: "erro interno", code: "INTERNAL_ERROR" });
       if (server.logout === "expired") return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
       return route.fulfill({ status: 204, body: "" });
     }
-    if (pathname === `/api/photo-surveys/${SURVEY.id}` && method === "GET") return send(200, view());
+    if (pathname === `/api/photo-surveys/${SURVEY.id}` && method === "GET") {
+      if (server.holdSurvey) await server.holdSurvey.promise;
+      return send(200, view());
+    }
     if (pathname === `/api/photo-surveys/${SURVEY.id}/draw` && method === "POST") {
-      if (!key) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
+      if (!key || server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
       const prior = server.responses.get(key);
       if (prior) return send(200, { survey: view(), draw: { groups: drawGroups(prior.shownIds, SURVEY.groupSize) }, response: prior.response });
+      if (server.status !== "open") return send(409, { error: "pesquisa fechada", code: "PHOTO_SURVEY_CLOSED", current: { status: server.status } });
       if (!server.draws.has(key)) server.draws.set(key, drawCards(SURVEY, (limit) => randomInt(limit)));
       return send(200, { survey: view(), draw: { groups: drawGroups(server.draws.get(key), SURVEY.groupSize) }, response: null });
     }
@@ -112,7 +139,9 @@ async function newContext(server, { width = 390, height = 844, storedKey = "" } 
       }
     }, [IDENTITY_KEY, storedKey]);
   }
-  await context.route("https://accounts.google.com/gsi/client", (route) => route.fulfill({ contentType: "application/javascript", body: GOOGLE_SCRIPT }));
+  await context.route("https://accounts.google.com/gsi/client", (route) => (server.googleDown
+    ? route.abort("connectionrefused")
+    : route.fulfill({ contentType: "application/javascript", body: GOOGLE_SCRIPT })));
   await context.route(/\/api(?:\/|$)/, server.handler);
   return context;
 }
@@ -267,8 +296,10 @@ try {
     await entryReady(page, "Continuar");
     assert.match(await page.locator("#ps-notice").innerText(), /Sua conta mudou\./);
     await page.locator("#ps-action").click();
-    await page.locator('.ps-grid[data-ready="true"]').waitFor({ timeout: 20000 });
+    // A resposta dada sem conta agora é da conta: a pessoa vê a escolha, não um voto novo.
+    await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
     assert.equal(server.last("/draw").key, GOOGLE_KEY);
+    assert.equal(await page.locator(".ps-grid, #ps-action").count(), 0, "quem já respondeu não vota de novo");
   });
 
   await scenario("sair revoga a sessão e esquece a chave", async () => {
@@ -303,6 +334,16 @@ try {
     assert.match(await second.locator('dialog.pm-menu[open] [role="alert"]').innerText(), /Você continua na conta\./);
     assert.equal(await storedKey(second), GOOGLE_KEY, "sem revogar no servidor, a sessão fica");
     assert.equal(await second.locator('dialog.pm-menu[open] [data-menu="signout"]:not([disabled])').count(), 1);
+
+    const broken = createServer();
+    broken.logout = "error";
+    const third = await open(await newContext(broken, { storedKey: GOOGLE_KEY }));
+    await entryReady(third);
+    await openMenu(third);
+    await third.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
+    await third.locator('dialog.pm-menu[open] [role="alert"]').waitFor();
+    assert.match(await third.locator('dialog.pm-menu[open] [role="alert"]').innerText(), /Não foi possível sair agora\./);
+    assert.equal(await storedKey(third), GOOGLE_KEY, "com erro do servidor, a sessão fica");
   });
 
   await scenario("cota de rede esgotada: o aviso aponta o menu, e entrar com Google libera", async () => {
@@ -346,7 +387,11 @@ try {
       const nextBox = await next.boundingBox();
       assert.ok(nextBox.y + nextBox.height <= height + 1, `${width}×${height}: as próximas pesquisas aparecem sem rolar`);
       const heroBox = await page.locator(".ps-hero .ps-card").boundingBox();
-      assert.ok(heroBox.height >= 70, `${width}×${height}: a carta escolhida continua visível (${Math.round(heroBox.height)} px)`);
+      const rowBox = await page.locator(".ps-row").boundingBox();
+      // O mínimo do CSS é 70 px: aqui a carta precisa sobrar bem acima disso.
+      assert.ok(heroBox.height >= (height >= 800 ? 200 : 120), `${width}×${height}: a carta escolhida ficou pequena (${Math.round(heroBox.height)} px)`);
+      assert.ok(rowBox.y + rowBox.height <= nextBox.y + 1, `${width}×${height}: as finalistas não ficam atrás das próximas pesquisas`);
+      assert.ok(heroBox.y + heroBox.height <= rowBox.y + 1, `${width}×${height}: a escolhida não cobre as finalistas`);
     }
   });
 
@@ -379,16 +424,174 @@ try {
       [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]),
       ["https://polimatch.com.br/", "https://polimatch.com.br/como-funciona.html"],
     );
+    const home = await (await fetch(appUrl)).text();
     for (const old of ["pesquisa.html", "quem-disse-isso.html", "fato-ou-fake.html", "duelos-da-corrida.html", "integridade.html"]) {
       const response = await fetch(new URL(old, appUrl));
       const body = await response.text();
-      // O preview não redireciona (isso é do nginx): ou responde 404, ou cai na capa nova.
-      assert.ok(response.status === 404 || /photo-survey/.test(body), `${old}: ${response.status}`);
-      assert.doesNotMatch(body, /quote-quiz|fact-check|presidential-page|id="app"/, `${old} não serve mais a página antiga`);
+      // O preview não redireciona (isso é do nginx): ou responde 404, ou devolve
+      // a própria capa. Uma página antiga ainda no build teria outro HTML.
+      assert.ok(response.status === 404 || body === home, `${old}: ${response.status}, com HTML próprio`);
     }
     const manifest = await (await fetch(new URL("manifest.webmanifest", appUrl))).json();
     assert.equal(manifest.name, "PoliMatch");
     assert.equal(manifest.theme_color, "#ffffff");
+  });
+
+  await scenario("o script do Google falha: o menu avisa, e tentar de novo carrega", async () => {
+    const server = createServer();
+    server.googleDown = true;
+    const page = await open(await newContext(server));
+    await entryReady(page);
+    await openMenu(page);
+    await page.locator('dialog.pm-menu[open] [role="alert"]').waitFor();
+    const retry = page.locator('dialog.pm-menu[open] [data-menu="retry-google"]');
+    assert.equal(await retry.innerText(), "Tentar carregar o Google de novo");
+    server.googleDown = false;
+    await retry.click();
+    await page.locator("dialog.pm-menu[open] #e2e-google").waitFor();
+    assert.equal(await page.locator('dialog.pm-menu[open] [role="alert"]').count(), 0);
+    await signIn(page);
+    assert.equal(await storedKey(page), GOOGLE_KEY);
+  });
+
+  await scenario("a entrada falha no servidor: o menu avisa e a chave não muda", async () => {
+    const server = createServer();
+    server.failAuth.push(503);
+    const page = await open(await newContext(server, { storedKey: ANONYMOUS_KEY }));
+    await entryReady(page);
+    await openMenu(page);
+    await page.locator("dialog.pm-menu[open] #e2e-google").click();
+    await page.locator('dialog.pm-menu[open] [role="alert"]').waitFor();
+    assert.match(await page.locator('dialog.pm-menu[open] [role="alert"]').innerText(), /Não foi possível entrar agora\./);
+    assert.equal(await storedKey(page), ANONYMOUS_KEY);
+    // O botão do Google volta, e a segunda tentativa entra.
+    await signIn(page);
+    assert.equal(await storedKey(page), GOOGLE_KEY);
+  });
+
+  await scenario("chave anônima recusada: a entrada tenta de novo sem ela", async () => {
+    const server = createServer();
+    server.revoked.add(ANONYMOUS_KEY);
+    const page = await open(await newContext(server, { storedKey: ANONYMOUS_KEY }));
+    await entryReady(page);
+    await openMenu(page);
+    await signIn(page);
+    const attempts = server.requests.filter((request) => request.pathname === "/api/auth/google").map((request) => request.key);
+    assert.deepEqual(attempts, [ANONYMOUS_KEY, ""], "a segunda tentativa vai sem a chave que o servidor recusou");
+    assert.equal(await storedKey(page), GOOGLE_KEY);
+  });
+
+  await scenario("duas abas: a outra sai da conta e o menu desta acompanha", async () => {
+    const server = createServer();
+    const context = await newContext(server);
+    const first = await open(context);
+    await entryReady(first);
+    await openMenu(first);
+    await signIn(first);
+    await first.keyboard.press("Escape");
+    const second = await open(context);
+    await entryReady(second);
+    await openMenu(second);
+    await second.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
+    await second.locator("dialog.pm-menu[open] #e2e-google").waitFor();
+    // A primeira aba guardava a sessão em memória; vale o que está no aparelho.
+    await openMenu(first);
+    await first.locator("dialog.pm-menu[open] #e2e-google").waitFor();
+    assert.doesNotMatch(await menu(first).innerText(), /Você entrou com Google|Sair da conta/);
+  });
+
+  await scenario("sair na resposta registrada não convida a responder de novo", async () => {
+    const server = createServer();
+    server.answered(GOOGLE_KEY);
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    await entryReady(page);
+    await page.locator("#ps-action").click();
+    await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
+    await openMenu(page);
+    await page.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
+    await page.locator("dialog.pm-menu[open] #e2e-google").waitFor();
+    await page.keyboard.press("Escape");
+    await page.locator("#ps-notice:not([hidden])").waitFor();
+    assert.match(await page.locator("#ps-notice").innerText(), /Você saiu da conta neste aparelho\. A sua resposta continua registrada\./);
+    assert.equal(await stepText(page), "Registrada");
+    assert.equal(await page.locator("#ps-action, .ps-grid").count(), 0, "sem botão para responder de novo");
+    assert.equal(await storedKey(page), null);
+  });
+
+  await scenario("pesquisa fechada: entrar com Google mostra a resposta da conta", async () => {
+    const server = createServer();
+    server.status = "closed";
+    server.answered(GOOGLE_KEY);
+    const page = await open(await newContext(server));
+    await page.locator("#ps-title", { hasText: "Esta pesquisa está fechada." }).waitFor();
+    assert.match(await page.locator(".ps-next").innerText(), /Próximas pesquisas/);
+    await openMenu(page);
+    await signIn(page);
+    await page.keyboard.press("Escape");
+    await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
+    assert.equal(server.count("POST", "/api/player"), 0);
+    // E sair, com a pesquisa fechada, volta para a tela de fechada, sem "Começar".
+    await openMenu(page);
+    await page.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
+    await page.locator("dialog.pm-menu[open] #e2e-google").waitFor();
+    await page.keyboard.press("Escape");
+    await page.locator("#ps-title", { hasText: "Esta pesquisa está fechada." }).waitFor();
+    assert.equal(await page.locator("#ps-action").count(), 0);
+  });
+
+  await scenario("entrar enquanto a pesquisa abre não cria jogador anônimo", async () => {
+    const server = createServer();
+    const page = await open(await newContext(server));
+    await entryReady(page);
+    let release;
+    server.holdSurvey = { promise: new Promise((resolve) => { release = resolve; }) };
+    await page.locator("#ps-action").click();
+    await page.locator("#ps-action[disabled]", { hasText: "Abrindo…" }).waitFor();
+    await openMenu(page);
+    await signIn(page);
+    await page.keyboard.press("Escape");
+    server.holdSurvey = null;
+    release();
+    await page.locator('.ps-grid[data-ready="true"]').waitFor({ timeout: 20000 });
+    assert.equal(server.count("POST", "/api/player"), 0, "a conta chegou antes: não nasce jogador anônimo");
+    assert.equal(server.last("/draw").key, GOOGLE_KEY);
+  });
+
+  await scenario("o foco fica no menu quando o conteúdo dele muda", async () => {
+    const server = createServer();
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    await entryReady(page);
+    await openMenu(page);
+    assert.equal(await page.locator("dialog.pm-menu[open] .pm-account-state").getAttribute("role"), "status");
+    await page.locator('dialog.pm-menu[open] [data-menu="signout"]').focus();
+    await page.keyboard.press("Enter");
+    await page.locator("dialog.pm-menu[open] #e2e-google").waitFor();
+    assert.equal(await page.evaluate(() => Boolean(document.activeElement?.closest("dialog.pm-menu"))), true, "depois de sair, o foco continua no menu");
+    await page.locator("#e2e-google").focus();
+    await page.keyboard.press("Enter");
+    await page.locator('dialog.pm-menu[open] [data-menu="signout"]').waitFor();
+    assert.equal(await page.evaluate(() => Boolean(document.activeElement?.closest("dialog.pm-menu"))), true, "depois de entrar, o foco continua no menu");
+  });
+
+  await scenario("navegador sem showModal: o menu abre e fecha mesmo assim", async () => {
+    const server = createServer();
+    const context = await newContext(server);
+    await context.addInitScript(() => {
+      delete HTMLDialogElement.prototype.showModal;
+      delete HTMLDialogElement.prototype.close;
+    });
+    const page = await open(context);
+    await entryReady(page);
+    await menuButton(page).click();
+    const panel = page.locator(".pm-menu[open]");
+    await panel.waitFor();
+    const box = await panel.boundingBox();
+    assert.ok(box.width >= 389 && box.height >= 843 && box.y === 0, `sem showModal o painel ainda cobre a tela (${box.width}×${box.height} em ${box.y})`);
+    assert.equal(await page.locator(".pm-menu[open] .pm-item").count(), 4);
+    await page.locator('.pm-menu[open] [data-menu="close"]').click();
+    await page.waitForFunction(() => !document.querySelector(".pm-menu").hasAttribute("open"));
+    assert.equal(await page.locator(".pm-menu").isVisible(), false);
+    await entryReady(page);
   });
 
   assert.deepEqual(pageErrors, [], `erros de página: ${pageErrors.join(" | ")}`);

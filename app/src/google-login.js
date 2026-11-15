@@ -12,9 +12,15 @@ export function loadGoogleIdentity(windowRef = window, documentRef = document) {
   scriptPromise = new Promise((resolve, reject) => {
     const existing = documentRef.getElementById(GOOGLE_SCRIPT_ID);
     const script = existing || documentRef.createElement("script");
-    const onLoad = () => windowRef.google?.accounts?.id ? resolve(windowRef.google) : reject(new Error("Google Identity Services indisponível"));
+    // Um script que falhou não dispara mais eventos: ele sai do documento,
+    // para a próxima tentativa pedir o arquivo de novo.
+    const fail = (message) => {
+      script.remove?.();
+      reject(new Error(message));
+    };
+    const onLoad = () => windowRef.google?.accounts?.id ? resolve(windowRef.google) : fail("Google Identity Services indisponível");
     script.addEventListener("load", onLoad, { once: true });
-    script.addEventListener("error", () => reject(new Error("Não foi possível carregar o acesso com Google")), { once: true });
+    script.addEventListener("error", () => fail("Não foi possível carregar o acesso com Google"), { once: true });
     if (!existing) {
       script.id = GOOGLE_SCRIPT_ID;
       script.src = GOOGLE_SCRIPT_SRC;

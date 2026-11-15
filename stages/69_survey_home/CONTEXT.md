@@ -84,7 +84,7 @@ As páginas do produto anterior saem do site. O que o estágio 68 construiu
 |---|---|---|
 | 69a — Registro | Decisão 0003, este contexto, o plano, a folha e os ajustes no 0001, no `CONTEXT.md`, no `README.md`, no `AGENTS.md` e no contexto do estágio 68. | o mesmo da 69b e da 69c |
 | 69b — Casca nova | Menu, entrada com Google no menu e a página "Como funciona". | o mesmo |
-| 69c — Troca da capa | `/` serve a pesquisa; redirecionamentos; sitemap e manifesto; as páginas antigas saem do build; os testes de navegador delas saem do CI. | o mesmo |
+| 69c — Troca da capa | `/` serve a pesquisa; redirecionamentos; sitemap e manifesto; as páginas antigas saem do build; os 26 passos de teste de navegador delas saem do CI. | o mesmo |
 | 69d — Limpeza | O código, os testes e os roteiros das páginas antigas saem da `main`. | próprio, depois da 69c publicada |
 | 69e — Publicação | App publicado e conferido de fora. | registro próprio |
 
@@ -115,6 +115,10 @@ Casca nova (69b):
   o aviso de conta trocada.
 - Sair pelo menu revoga a sessão e esquece a chave. Com a sessão já inválida
   no servidor, o aparelho esquece mesmo assim.
+- Sair na tela de resposta registrada mantém a tela, com aviso, sem convidar
+  a responder de novo; com a pesquisa fechada, volta a tela de fechada.
+- Uma chave do aparelho que o servidor não reconhece mais não impede a
+  entrada com Google.
 - O aviso de cota de rede esgotada aponta para o menu, não para outra página.
 - "Como funciona" cabe na tela em 390×844 e em 360×640, com o botão que leva
   ao início.

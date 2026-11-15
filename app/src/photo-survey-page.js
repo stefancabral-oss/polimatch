@@ -413,6 +413,7 @@ function renderSwitched({ recorded = false } = {}) {
 
 /** A conta desta aba deixou de ser a que está salva: recomeça com a atual, com um toque. */
 function identityChanged() {
+  const wasDone = view === "done";
   epoch += 1;
   busy = false;
   uncertain = false;
@@ -420,6 +421,21 @@ function identityChanged() {
   identity = "";
   progress = null;
   response = null;
+  // Com a pesquisa parada não há entrada para oferecer: a página reabre e
+  // mostra a resposta da conta atual, se houver.
+  if (survey && survey.status !== "open") {
+    switched = false;
+    init();
+    return;
+  }
+  // Quem estava vendo a própria resposta e saiu da conta não é convidado a
+  // responder de novo como visitante.
+  if (wasDone && !readStored(IDENTITY_KEY)) {
+    switched = false;
+    notice = "Você saiu da conta neste aparelho. A sua resposta continua registrada.";
+    renderDone({ focus: true });
+    return;
+  }
   view = "entry";
   switched = true;
   renderSwitched();
@@ -493,11 +509,16 @@ async function start({ auto = false, retried = false } = {}) {
         renderClosed(survey?.status, { focus: true });
         return;
       }
-      const player = await createPlayer();
-      if (run !== epoch) return;
-      // Outra aba pode ter criado o jogador enquanto esta esperava: vale o que já está salvo.
-      key = readStored(IDENTITY_KEY) || player.recoveryKey;
-      if (key === player.recoveryKey) safeStorage.set(IDENTITY_KEY, key);
+      // A pessoa pode ter entrado com Google pelo menu enquanto a pesquisa
+      // era lida: com a conta no aparelho não nasce jogador anônimo.
+      key = readStored(IDENTITY_KEY);
+      if (!key) {
+        const player = await createPlayer();
+        if (run !== epoch) return;
+        // Outra aba pode ter criado o jogador enquanto esta esperava: vale o que já está salvo.
+        key = readStored(IDENTITY_KEY) || player.recoveryKey;
+        if (key === player.recoveryKey) safeStorage.set(IDENTITY_KEY, key);
+      }
     }
     identity = key;
     result = await drawPhotoSurvey(PHOTO_SURVEY_ID, key);
@@ -804,7 +825,7 @@ function identityUpdated() {
     identityChanged();
     return;
   }
-  if (!identity && !busy && (view === "entry" || view === "done")) init();
+  if (!identity && !busy && ["entry", "done", "closed", "scheduled"].includes(view)) init();
 }
 
 const siteMenu = mountSiteMenu({ current: "survey", onIdentityChange: identityUpdated });

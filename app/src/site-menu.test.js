@@ -52,7 +52,7 @@ test("sem o identificador do Google no build, o menu não oferece entrada", () =
 
 test("com conta Google, o menu diz que a pessoa entrou e oferece sair", () => {
   const markup = menuMarkup({ account: "google", googleReady: true });
-  assert.match(markup, /Você entrou com Google\./);
+  assert.match(markup, /<p class="pm-account-state" role="status">Você entrou com Google\.<\/p>/);
   assert.match(markup, /<button class="ps-btn ps-btn--ghost" type="button" data-menu="signout">Sair da conta<\/button>/);
   assert.doesNotMatch(markup, /id="pm-google"/);
   // Sair precisa funcionar mesmo num build sem o identificador do Google.

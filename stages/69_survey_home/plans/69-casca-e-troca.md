@@ -58,13 +58,15 @@ aparece com `role="alert"`; nenhum texto recebido entra sem escape.
 
 ### 2. Menu no DOM
 
-`mountSiteMenu({ host, onIdentityChange })` cria o `<dialog class="pm-menu">`
-dentro de `host` e devolve `{ open(), close(), buttonMarkup }`. O botão que
-abre tem `data-action="menu"`. Entrar: `mountGoogleButton` →
+`mountSiteMenu({ host, current, onIdentityChange })` cria o
+`<dialog class="pm-menu">` dentro de `host` e devolve `{ open(), close() }`. O
+botão que abre vem de `menuButtonMarkup()` e tem `data-action="menu"`. Entrar: `mountGoogleButton` →
 `exchangeGoogleCredential(credential, chave atual)` → grava `sessionToken` na
 chave do aparelho → `onIdentityChange()`. Sair: `endSession(chave)`; com
-resposta 401 a chave é esquecida mesmo assim; com falha de rede fica e o erro
-aparece → `onIdentityChange()`.
+resposta 401 a chave é esquecida mesmo assim; com falha de rede ou erro do
+servidor ela fica e o erro aparece → `onIdentityChange()`. Se a entrada é
+recusada com 401 e havia uma chave no aparelho, ela é refeita sem a chave.
+Sem `showModal`, o painel abre pelo atributo `open`.
 
 ### 3. A página da pesquisa
 
@@ -83,8 +85,8 @@ aparece → `onIdentityChange()`.
 ### 4. Como funciona
 
 HTML estático com o mesmo cabeçalho; o módulo só liga o menu. Título, quatro
-linhas numeradas, a nota "O PoliMatch só usa o resultado somado. A escolha de
-uma pessoa não é mostrada a ninguém." (decisão 0001, item 5) e o botão
+linhas numeradas, a nota "Do PoliMatch só sai o resultado somado, nunca a
+escolha de uma pessoa." (decisão 0001, item 5) e o botão
 "Responder a pesquisa", que leva a `./`.
 
 ### 5. Troca da capa
@@ -116,5 +118,8 @@ uma pessoa não é mostrada a ninguém." (decisão 0001, item 5) e o botão
   o identificador do cliente precisa aceitar a origem; ele já é usado na capa
   atual, na mesma origem.
 - O redirecionamento: só o smoke da imagem, no CI, exercita o nginx.
-- `<dialog>` em navegador antigo (antes do Safari 15.4): o menu não abre. O
-  botão "Começar" não depende dele.
+- `<dialog>` em navegador antigo (antes do Safari 15.4): o menu abre pelo
+  atributo, sem prender o foco. O e2e simula a falta de `showModal`; um
+  aparelho de verdade com esse navegador não foi usado.
+- Abrir o menu carrega o script do Google (`accounts.google.com`), como a
+  capa antiga fazia ao abrir a tela de entrada.
