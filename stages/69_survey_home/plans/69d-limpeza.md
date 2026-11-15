@@ -9,7 +9,8 @@ Um arquivo de `app/src` fica se for alcançado, seguindo os imports, a partir
 de:
 
 - as páginas do build (`index.html` e `como-funciona.html`);
-- os scripts de `app/scripts`, que rodam no build e no CI;
+- os scripts de `app/scripts` (a maioria roda no build e no CI; os dois
+  validadores de resultado do piloto são de uso manual);
 - `back/`, `shared/` e `scripts/` da raiz, inclusive os testes deles.
 
 Um teste de `app/src` fica se o que ele testa fica. Um roteiro de `app/e2e`
@@ -40,6 +41,15 @@ fica se o workflow de navegador o roda.
 
 `app/src/repo-hygiene.test.js` refaz essa conta a cada execução dos testes.
 Foi escrito antes da limpeza e falhou listando o que saiu.
+
+O teste é uma rede larga, não uma prova: conta como uso qualquer import
+vindo de `app/scripts`, de `back/` (testes inclusive) ou de um comentário, e
+não olha funções exportadas sem uso, scripts que nada chama nem `app/public`.
+
+O teste das 20 cartas (`political-chromas.test.js`) saiu junto com os
+módulos antigos que ele também testava e voltou, só com a parte que confere o
+catálogo e os arquivos publicados: era a única conferência de unidade do que
+a capa mostra.
 
 Nada em `back/` nem em `shared/` muda. O build publicado não muda de
 comportamento: o que sai já não entrava nele.

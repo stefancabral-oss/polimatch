@@ -157,7 +157,7 @@
     "kept": "site novo (13 arquivos), testes do que fica, piloto de arte com styles.css, photos.js (usado por um teste do servidor)",
     "testsFirst": "repo-hygiene.test.js: três dos quatro testes falharam com o código antigo no repositório",
     "tests": {
-      "npm test --prefix app": "183/183",
+      "npm test --prefix app": "185/185",
       "npm run test:card-art-pilot-contract --prefix app": "64/64",
       "formulário do piloto em WebKit": "aprovado",
       "npm run test:shared": "104/104",
@@ -175,7 +175,24 @@
       "imagens do produto anterior em app/public (dist com 75 MB)",
       "piloto de arte e verificadores de imagens do build"
     ],
-    "independentReview": "a preencher",
-    "humanGate": "pendente"
+    "independentReview": {
+      "who": "o mesmo agente das revisões anteriores, somente leitura, num clone à parte, sobre o commit 8774fa5",
+      "verdict": "sem bloqueio; um ponto importante",
+      "fixedBeforeMerge": [
+        "o teste das 20 cartas voltou, só com a conferência do catálogo e dos arquivos publicados; falha com uma imagem apagada ou uma carta a menos"
+      ],
+      "notedOnly": [
+        "o teste de limpeza é uma rede larga, não uma prova",
+        "restos sem uso listados no HANDOFF"
+      ],
+      "notDoneByReviewer": "produção, Chromium, CI no Linux, smokes do servidor com banco (imports lidos)"
+    },
+    "humanGate": "pendente",
+    "builtOutput": "build antes e depois da limpeza: 311 arquivos, mesmo conteúdo, fora builtAt em version.json (conferido pela revisão)",
+    "ci": {
+      "pr": 333,
+      "commit 8774fa5": "ci-gate verde; 183 testes do app, 64 do piloto, site-shell 24 e photo-survey 34 cenários em Chromium e em WebKit, smoke-nginx",
+      "finalCommit": "passa pelo CI de novo antes do merge"
+    }
   }
 }

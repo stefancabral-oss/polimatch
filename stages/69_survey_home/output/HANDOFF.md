@@ -6,7 +6,7 @@
 - Issue: #331
 - 69a, 69b e 69c: PR #332, mesclado em `6de6bbe`.
 - 69e: publicação de 14/11/2026 no commit `6de6bbe`; registro na issue #331 e neste documento.
-- 69d: branch `icm/69d-cleanup`, PR a abrir.
+- 69d: branch `icm/69d-cleanup`, PR #333.
 
 ## Entregue (69a — registro)
 
@@ -43,12 +43,15 @@
 - Ficaram em `app/src`, além do site novo:
   - O piloto de arte das cartas (`card-art-pilot-*`), com os testes dele e `styles.css`, que o formulário do piloto lê como referência de geometria. O piloto é do estágio 12 e segue no build e no CI; decidir o destino dele não é desta entrega.
   - `photos.js`, que um teste do servidor (`back/src/photo-recovery.test.js`) confere contra a API.
-- Nada em `back/` nem em `shared/`. O build publicado não muda de comportamento: o que saiu já não entrava nele.
+- `app/src/political-chromas.test.js` voltou, só com a conferência das 20 cartas contra o elenco, as artes de origem e os arquivos publicados, e com a conferência de que a pesquisa usa exatamente essas cartas. O arquivo antigo tinha saído porque também testava módulos do jogo.
+- Nada em `back/` nem em `shared/`. O build publicado não muda: um build antes e outro depois da limpeza dão os mesmos 311 arquivos, com o mesmo conteúdo, fora a data em `version.json`.
 
 ## Não entregue / pendente
 
 - **`app/src/api.js`.** O módulo fica, com funções das rotas do jogo anterior que nenhuma página chama mais; elas não entram no arquivo publicado. Enxugar é mexer nos testes do cliente da API, e ficou fora.
 - **O piloto de arte e os três verificadores de imagens do build** (`editorial-assets`, `portraits`, `presidential-assets`) continuam: validam imagens que ainda estão em `app/public`.
+- **Outros restos, sem uso pelo site.** Em `identity-notice.js`, os textos do jogo e duas funções que só os testes chamam. O build ainda calcula o resumo das imagens de `portraits/` e `chromas/approved` para `photos.js`, que só um teste do servidor lê. No `ci.yml`, dois filtros de caminho de artes antigas e um comentário que cita um módulo apagado. `docs/design/APPROVED_CHROMA_BATCH.md` aponta para um módulo apagado.
+- **README.** Ainda abre descrevendo o jogo e traz o produto anterior em "Produto atual", com um aviso em cima. A correção é da [ICM 61] #303.
 - **Privacidade.** A folha traz a página; ela não foi construída. Entra no menu quando houver texto aprovado (#283).
 - **Imagens do produto anterior.** Continuam em `app/public` e seguem servidas pelos endereços diretos (`/portraits/`, `/chromas/`, `/candidates/`): o `dist` tem 75 MB, quase tudo delas. Nenhuma página aponta para elas, fora as 20 cartas da pesquisa. Tirar pede cuidado com os testes do servidor, que leem algumas, e conversa com a #284.
 - **Rotas do jogo anterior.** Continuam respondendo na API. Este estágio não toca no servidor.
@@ -80,7 +83,7 @@ O que não seguiu essa ordem: a montagem do menu no DOM (`mountSiteMenu`) foi es
 69d, em 14/11/2026, local (macOS), depois da limpeza:
 
 - O teste de limpeza veio antes: com o código antigo no repositório, três dos quatro testes falharam, listando os módulos sem uso, os testes de código sem uso e os roteiros fora do CI.
-- `npm test --prefix app`: 183/183 (eram 321; saíram 142 testes do produto anterior e entraram os 4 de limpeza).
+- `npm test --prefix app`: 185/185 (eram 321; saíram 142 testes do produto anterior, entraram os 4 de limpeza e os 2 das cartas).
 - `npm run test:card-art-pilot-contract --prefix app`: 64/64. Formulário do piloto: aprovado em WebKit.
 - `npm run test:shared`: 104/104. `npm test --prefix back`: 293/293. A checagem de planejamento do estágio 17: aprovada.
 - `npm run build --prefix app`: sem erro. `site-shell` (24 cenários), `photo-survey` (34) e o relato de erros: aprovados em WebKit e em Chromium 140.
@@ -96,6 +99,14 @@ O que não seguiu essa ordem: a montagem do menu no DOM (`mountSiteMenu`) foi es
 - Não foi feito: abrir a produção em navegador automatizado, nem entrar com Google pelo menu em produção.
 
 ## Revisão independente
+
+**69d.** O mesmo agente das revisões anteriores, somente leitura, revisou o commit da limpeza (`8774fa5`) num clone à parte. Sem bloqueio. Conferiu que nada apagado é referenciado por código, workflows, Dockerfiles, scripts de pacote, `back/`, `shared/` ou scripts de estágio, e que o build antes e depois é idêntico. Desfez a limpeza de várias formas para ver o teste de limpeza pegar. Apontou um ponto importante, corrigido antes do merge:
+
+| O que a revisão apontou | O que mudou |
+|---|---|
+| O teste das 20 cartas tinha saído inteiro, e a parte dele que conferia o catálogo e os arquivos publicados era a única conferência de unidade do que a capa mostra: com uma imagem apagada ou uma carta a menos, tudo passava | O teste voltou, só com essa parte; apagar uma imagem ou tirar uma carta do catálogo faz falhar, conferido |
+
+Anotado, sem mudança: o teste de limpeza é uma rede larga (o que ele deixa passar está no plano da 69d), e os restos listados em "Não entregue / pendente". Ele não conferiu produção, Chromium, o CI no Linux nem os smokes do servidor com banco, cujos imports ele leu.
 
 Um agente separado, somente leitura, revisou os commits `548440a` e `fd22a56` em 14/11/2026. Rodou os testes de unidade, os três roteiros de navegador em WebKit e o smoke do nginx num nginx local, e escreveu roteiros próprios para os casos que testou. Não achou bloqueio: nada perde nem duplica a resposta de uma identidade. Apontou seis pontos importantes, todos corrigidos antes do PR, cada um com teste escrito antes da correção:
 
