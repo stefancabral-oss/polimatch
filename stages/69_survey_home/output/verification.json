@@ -10,7 +10,7 @@
     "69b": "menu, entrada e saída com Google no menu, página Como funciona",
     "69c": "/ serve a pesquisa; cinco endereços aposentados com 302; sitemap e manifesto; páginas antigas fora do build; 26 passos de e2e antigos fora do CI",
     "69d": "não começou: limpeza do código das páginas antigas, em PR próprio",
-    "69e": "não começou: publicação, com o sim do Stefan"
+    "69e": "autorizada com o merge; acontece depois dele; o resultado fica na issue #331"
   },
   "scope": {
     "backAndSharedUntouched": true,
@@ -115,11 +115,12 @@
       ]
     }
   },
-  "humanGate": "pendente",
+  "humanGate": "instrução do Stefan em 14/11/2026 para o merge do PR #332 e para a publicação do app: \"Sim mescla e publica\"; transcrita no HANDOFF, com o que foi dito a ele antes da pergunta",
   "ci": {
     "pr": 332,
     "commit 8d85655": "ci-gate verde; no Linux, site-shell 20 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; design-validator com os testes de unidade, a imagem do app e smoke-nginx 14 de 14 na imagem nginx 1.27",
     "automatedReview": "Codex leu o commit 8d85655 e não deixou apontamento",
-    "finalCommit": "passa pelo CI de novo antes do merge"
+    "finalCommit": "o commit do gate, só de documentação, passa pelo CI antes do merge",
+    "commit 482d1e7": "ci-gate verde; no Linux, site-shell 24 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; smoke-nginx 14 de 14"
   }
 }

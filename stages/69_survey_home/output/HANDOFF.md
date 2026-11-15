@@ -2,11 +2,11 @@
 
 ## Status
 
-- Estado: `pronto para gate` nas entregas 69a, 69b e 69c, que vão num PR só. A 69d (limpeza do código antigo) e a 69e (publicação) não começaram.
+- Estado: `aprovado` nas entregas 69a, 69b e 69c, que vão num PR só. O Stefan aprovou o merge e a publicação do app na mesma instrução, em 14/11/2026. A publicação (69e) acontece depois do merge; o resultado fica registrado na issue #331 e entra neste documento no próximo PR do estágio. A 69d (limpeza do código antigo) não começou.
 - Issue: #331
 - Branch: `icm/69-survey-home`
 - PR: #332
-- Nada deste estágio está em produção.
+- Até o merge deste PR, nada deste estágio está em produção.
 
 ## Entregue (69a — registro)
 
@@ -51,7 +51,7 @@ Em 14/11/2026, local (macOS), no código final do PR:
 - `app/scripts/smoke-nginx.mjs` contra um nginx 1.31 local com o `nginx.conf` do app e o `dist` do build: 14 de 14. Os cinco endereços aposentados respondem 302 com `Location: /`; um `.html` que não existe continua respondendo 404.
 - Capturas conferidas a olho: início, menu sem conta, menu com conta, resposta registrada em 390×844, 360×640 e 320×480, pesquisa fechada, "Como funciona" em 390×844 e 360×640, e a tela de voto, sem menu.
 
-No CI do PR #332, no commit `8d85655` (antes da segunda passada da revisão): `ci-gate` verde. No Linux, `site-shell` com 20 cenários e `photo-survey` com 34, em Chromium e em WebKit; relato de erros nos dois; os testes de unidade, a imagem do app e o `smoke-nginx` com 14 de 14 na imagem nginx 1.27, incluídos os cinco redirecionamentos. A revisão automática do Codex leu esse commit e não deixou apontamento. O commit final passa pelo CI de novo antes do merge.
+No CI do PR #332, no commit `8d85655` (antes da segunda passada da revisão): `ci-gate` verde. No Linux, `site-shell` com 20 cenários e `photo-survey` com 34, em Chromium e em WebKit; relato de erros nos dois; os testes de unidade, a imagem do app e o `smoke-nginx` com 14 de 14 na imagem nginx 1.27, incluídos os cinco redirecionamentos. A revisão automática do Codex leu esse commit e não deixou apontamento. No commit `482d1e7`, com as correções da segunda passada: `ci-gate` verde de novo, com `site-shell` em 24 cenários e `photo-survey` em 34, em Chromium e em WebKit, e o `smoke-nginx` com 14 de 14. O commit que registra o gate, só de documentação, passa pelo CI antes do merge.
 
 O que veio antes do código, e falhou primeiro pelo motivo esperado:
 
@@ -131,19 +131,18 @@ Escolhas do agente, por delegação dele, que pode mudar qualquer uma:
 
 ## Próximo passo exato
 
-1. Gate do Stefan para o PR das entregas 69a, 69b e 69c.
-2. Com o sim dele para publicar: deploy do app pelo painel e conferência de fora (a capa com a pesquisa, os redirecionamentos, a API intocada). A API não precisa de deploy.
+1. Merge do PR #332, já autorizado, com o `ci-gate` verde no commit final.
+2. Deploy do app pelo painel, já autorizado, e conferência de fora, só por leitura: a capa com a pesquisa, "Como funciona", os cinco redirecionamentos, o sitemap e a API intocada. A API não precisa de deploy. O resultado vai para a issue #331.
 3. Depois da troca publicada: a 69d, em PR próprio.
 
 ## Ação do Stefan
 
-- Decidir o merge deste PR e, depois, a publicação.
-- Decidir, para a publicação: seguir com privacidade (#283) e backup (#279) abertos ou esperar; abrir ou não a pesquisa de lançamento com código novo.
-- Texto da página de Privacidade, com o advogado.
 - Entrar com Google pelo menu no celular depois de publicado: é o teste que os roteiros não fazem.
+- Texto da página de Privacidade, com o advogado (#283), e o backup externo (#279): seguem abertos com a pesquisa à vista.
+- Dizer se quer a pesquisa de lançamento com código novo, zerada. A que vai ao ar é a `politica-2026-01`, com as respostas de ensaio.
 
 ## Human gate
 
-- Decisão das entregas 69a, 69b e 69c: `pendente`
+- Decisão das entregas 69a, 69b e 69c: `aprovado`
 - Responsável: Stefan
-- Observação: a construção teve instrução direta dele em 14/11/2026 ("Pode seguir, vai pra frente. Pode ir construindo."), transcrita na decisão 0003. O merge e a publicação pedem o sim dele, um a um. A regra 6 do `AGENTS.md` não muda.
+- Observação: a construção teve instrução direta dele em 14/11/2026 ("Pode seguir, vai pra frente. Pode ir construindo."), transcrita na decisão 0003. O merge do PR #332 e a publicação do app também tiveram instrução direta dele, no mesmo dia. A mensagem do agente dizia o que ficou pronto, que o CI estava verde no commit final e que a revisão independente não achou bloqueio; que o botão real do Google não foi testado; que a página de Privacidade e a limpeza do código antigo não entraram; e, antes da pergunta, que ao publicar a pesquisa fica à vista de qualquer visitante, com a política de privacidade e o backup externo ainda em aberto, e que o site novo deixa de mostrar a frase "Não é pesquisa eleitoral". A pergunta foi: "Mesclo o PR 332 e publico o app em seguida? Pode responder 'sim, mescla e publica' ou 'só mescla'." Ele respondeu: "Sim mescla e publica". O merge e o deploy ficam a cargo do agente, a pedido dele, com o check verde no commit final. A pesquisa de lançamento com código novo não foi tratada na pergunta: vai ao ar a `politica-2026-01`. A limpeza (69d) tem gate próprio. A regra 6 do `AGENTS.md` não muda.
