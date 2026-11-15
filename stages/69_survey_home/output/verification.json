@@ -1,0 +1,126 @@
+{
+  "checkedAt": "2026-11-14",
+  "issue": 331,
+  "stage": "69_survey_home",
+  "base": "2080596",
+  "decision": "docs/decisions/0003-a-pesquisa-vira-a-capa.md",
+  "instruction": "Stefan, 14/11/2026, por voz: a pesquisa no lugar da capa atual, as páginas existentes substituídas, menus arrumados, no padrão novo; depois da folha com as telas: \"Pode seguir, vai pra frente. Pode ir construindo.\"",
+  "deliveries": {
+    "69a": "registro: decisão 0003, contexto, plano, folha e ajustes nos documentos anteriores",
+    "69b": "menu, entrada e saída com Google no menu, página Como funciona",
+    "69c": "/ serve a pesquisa; cinco endereços aposentados com 302; sitemap e manifesto; páginas antigas fora do build; 26 passos de e2e antigos fora do CI",
+    "69d": "não começou: limpeza do código das páginas antigas, em PR próprio",
+    "69e": "autorizada com o merge; acontece depois dele; o resultado fica na issue #331"
+  },
+  "scope": {
+    "backAndSharedUntouched": true,
+    "pagesInBuild": [
+      "index.html",
+      "como-funciona.html"
+    ],
+    "retiredAddresses": [
+      "/pesquisa.html",
+      "/quem-disse-isso.html",
+      "/fato-ou-fake.html",
+      "/duelos-da-corrida.html",
+      "/integridade.html"
+    ],
+    "sitemap": [
+      "https://polimatch.com.br/",
+      "https://polimatch.com.br/como-funciona.html"
+    ]
+  },
+  "testsFirst": {
+    "site-menu.test.js": "com o módulo vazio, 9 de 10 falharam; o décimo só negava textos e ganhou uma afirmação",
+    "e2e site-shell": "falhou antes da troca porque a capa ainda era a do jogo",
+    "listas de páginas, nginx e relato de erros": "8 testes falharam antes da troca",
+    "exceções": "a montagem do menu no DOM foi escrita junto com as regras, antes do roteiro de navegador; as asserções de texto trocado no e2e da pesquisa foram ajustadas junto com o código"
+  },
+  "tests": {
+    "environment": "macOS, local, 14/11/2026",
+    "npm test --prefix app": "321/321",
+    "npm run test:card-art-pilot-contract --prefix app": "64/64",
+    "npm run build --prefix app": "sem erro, com verify-share-preview e verify-public-refs",
+    "e2e site-shell em WebKit": "24 cenários aprovados",
+    "e2e site-shell em Chromium 140": "24 cenários aprovados",
+    "e2e photo-survey em WebKit": "34 cenários aprovados, com a página em /",
+    "e2e photo-survey em Chromium 140": "34 cenários aprovados, com a página em /",
+    "e2e client-error-report": "aprovado em WebKit e em Chromium 140, nas duas páginas",
+    "smoke-nginx contra nginx 1.31 local": "14 de 14; 302 com Location relativo nos cinco endereços; .html inexistente responde 404",
+    "capturas conferidas": "início, menu sem conta e com conta, resposta registrada em 390x844, 360x640 e 320x480, pesquisa fechada, Como funciona em dois tamanhos, tela de voto sem menu"
+  },
+  "acceptance": {
+    "69b": {
+      "menu abre, fecha por botão e por Esc, foco entra no painel e volta ao botão": "e2e site-shell, cenário 2",
+      "pesquisa aberta com link e próximas sem link": "site-menu.test.js e e2e site-shell, cenário 2",
+      "abrir o menu não grava": "e2e site-shell, cenários 1 e 2",
+      "entrar com Google na entrada não cria jogador": "e2e site-shell, cenário 4",
+      "quem respondeu sem conta e entra recomeça com a conta, com aviso": "e2e site-shell, cenário 5",
+      "sair revoga e esquece; sessão inválida esquece; servidor fora do ar mantém": "e2e site-shell, cenários 6 e 7",
+      "aviso de cota aponta o menu e entrar libera": "e2e site-shell, cenário 8; e2e photo-survey, cenário da cota",
+      "Como funciona cabe em 390x844 e 360x640 e leva ao início": "e2e site-shell, cenário 10",
+      "sem menu durante o voto": "e2e site-shell, cenário 3",
+      "sair na resposta registrada mantém a tela; com a pesquisa fechada volta a tela de fechada": "e2e site-shell, cenários 16 e 17",
+      "chave do aparelho recusada não impede a entrada": "e2e site-shell, cenário 14",
+      "script do Google que falha pode ser tentado de novo": "google-login.test.js e e2e site-shell, cenário 12"
+    },
+    "69c": {
+      "/ mostra a entrada e abrir não grava": "e2e site-shell, cenário 1; e2e photo-survey, cenário 1",
+      "34 cenários da pesquisa com a página em /": "e2e photo-survey nos dois navegadores",
+      "build com duas páginas, sitemap com as duas, sem noindex": "share-preview.test.js e edge-delivery.test.js; e2e site-shell, cenário 11",
+      "302 com Location relativo e 404 para arquivo ausente": "edge-delivery.test.js e smoke-nginx (local e no CI)"
+    }
+  },
+  "notVerified": [
+    "o botão real do Google: nos testes o script do Google é simulado",
+    "fontes do Linux: os tamanhos foram conferidos a olho no macOS; no Linux, só pelos e2e do CI",
+    "produção: nada deste estágio foi publicado"
+  ],
+  "independentReview": {
+    "who": "agente separado, somente leitura, sobre os commits 548440a e fd22a56",
+    "verdict": "sem bloqueio; seis pontos importantes",
+    "ran": "npm test (320/320), contrato do piloto (64/64), site-shell (11/11), photo-survey (34/34) e client-error-report em WebKit, smoke-nginx 14/14 num nginx 1.31 local, e roteiros próprios",
+    "fixedBeforePr": [
+      "script do Google que falha sai do documento, para a nova tentativa funcionar",
+      "o menu lê a chave do aparelho, não a cópia em memória da aba",
+      "entrada recusada com 401 é refeita sem a chave do aparelho",
+      "sair na resposta registrada mantém a tela; com a pesquisa fechada a página reabre",
+      "o foco volta ao painel quando o conteúdo do menu muda; estado da conta com role=status",
+      "9 cenários novos no site-shell, um cenário com o desfecho corrigido e três asserções trocadas",
+      "menores: corrida entre entrar e começar, entrar com a pesquisa fechada, corrida na saída, sessão sem valor, navegador sem showModal, contraste e tamanho de toque, nota atrás do botão em 320x480, documentos"
+    ],
+    "notedOnly": [
+      "build sem identificador do Google: avisos ainda apontam o menu",
+      "menu aberto no instante em que a pesquisa abre fica sobre a tela de voto",
+      "celular deitado: rolagem na resposta registrada e no menu",
+      "320x480 na entrada: lista 15 px atrás do botão, como antes",
+      "abrir o menu carrega o script do Google"
+    ],
+    "notDoneByReviewer": "Chromium, botão real do Google, imagem nginx do CI, servidor de verdade (comportamento lido no código)",
+    "secondPass": {
+      "on": "commit 8d85655",
+      "verdict": "sem bloqueio; os seis pontos confirmados como corrigidos; um ponto novo, importante",
+      "how": "roteiros próprios refeitos; cenários novos rodados contra um build do commit anterior (oito falham ali); correções desfeitas uma a uma para ver os testes pegarem",
+      "fixedBeforeMerge": [
+        "a nova tentativa de entrada sem a chave não vale para a recusa da credencial do Google (INVALID_GOOGLE_CREDENTIAL)",
+        "a recusa 409 de pesquisa fechada passa a valer como estado da pesquisa",
+        "sem showModal, o Esc é ouvido no documento",
+        "cenários novos para a sessão ausente na resposta e para a corrida na saída, cada um conferido com a correção desfeita",
+        "contraste da etiqueta Aberta"
+      ],
+      "notedOnly": [
+        "aviso de saída continua na tela se outra aba entra de novo na conta",
+        "role=status pode não ser anunciado; não testado com leitor de tela",
+        "o e2e simula 401 na saída com sessão vencida; o servidor de verdade responde 204"
+      ]
+    }
+  },
+  "humanGate": "instrução do Stefan em 14/11/2026 para o merge do PR #332 e para a publicação do app: \"Sim mescla e publica\"; transcrita no HANDOFF, com o que foi dito a ele antes da pergunta",
+  "ci": {
+    "pr": 332,
+    "commit 8d85655": "ci-gate verde; no Linux, site-shell 20 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; design-validator com os testes de unidade, a imagem do app e smoke-nginx 14 de 14 na imagem nginx 1.27",
+    "automatedReview": "Codex leu o commit 8d85655 e não deixou apontamento",
+    "finalCommit": "o commit do gate, só de documentação, passa pelo CI antes do merge",
+    "commit 482d1e7": "ci-gate verde; no Linux, site-shell 24 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; smoke-nginx 14 de 14"
+  }
+}

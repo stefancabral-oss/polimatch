@@ -23,16 +23,15 @@ test("o build confere a prévia sem tirar a checagem de referências da borda", 
   assert.match(packageJson.scripts.build, /vite build && .*node scripts\/verify-share-preview\.mjs && node scripts\/verify-public-refs\.mjs$/);
 });
 
-// A página da pesquisa por foto (ICM 68, #324) entra no build fora do menu e
-// do sitemap, com noindex, até a publicação (entrega 68e).
+// Desde a ICM 69 (#331) a capa é a pesquisa por foto. O build tem a capa e
+// "Como funciona"; as duas são públicas.
 const noindex = (entry) => /<meta\s+name="robots"\s+content="noindex"\s*\/?>/i.test(readSource(entry));
+const RETIRED_PAGES = ["pesquisa.html", "quem-disse-isso.html", "fato-ou-fake.html", "duelos-da-corrida.html", "integridade.html"];
 
-test("as páginas do build são as quatro públicas e a da pesquisa por foto", () => {
-  assert.deepEqual(
-    htmlEntries(config).map((entry) => entry.file),
-    ["duelos-da-corrida.html", "fato-ou-fake.html", "index.html", "pesquisa.html", "quem-disse-isso.html"],
-  );
-  assert.deepEqual(htmlEntries(config).filter(noindex).map((entry) => entry.file), ["pesquisa.html"]);
+test("as páginas do build são a capa, que é a pesquisa, e Como funciona", () => {
+  assert.deepEqual(htmlEntries(config).map((entry) => entry.file), ["como-funciona.html", "index.html"]);
+  assert.deepEqual(htmlEntries(config).filter(noindex).map((entry) => entry.file), []);
+  assert.match(readSource({ file: "index.html" }), /<script type="module" src="\/src\/photo-survey-page\.js"><\/script>/);
 });
 
 test("as URLs canônicas das páginas indexáveis coincidem com o sitemap da borda, sem reescrevê-lo", () => {
@@ -40,15 +39,17 @@ test("as URLs canônicas das páginas indexáveis coincidem com o sitemap da bor
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]).sort();
   const indexable = htmlEntries(config).filter((entry) => !noindex(entry));
   assert.deepEqual(locations, indexable.map((entry) => canonicalPageUrl(entry.file)).sort());
-  assert.doesNotMatch(sitemap, /pesquisa/);
+  assert.deepEqual(locations, ["https://polimatch.com.br/", "https://polimatch.com.br/como-funciona.html"]);
 });
 
-test("nenhuma página pública aponta para a pesquisa por foto antes da publicação", () => {
-  for (const entry of htmlEntries(config).filter((item) => !noindex(item))) {
-    assert.doesNotMatch(readSource(entry), /pesquisa\.html/, entry.file);
+test("nenhuma página do build aponta para um endereço aposentado", () => {
+  const retired = new RegExp(RETIRED_PAGES.map((name) => name.replace(".", "\\.")).join("|"));
+  for (const entry of htmlEntries(config)) assert.doesNotMatch(readSource(entry), retired, entry.file);
+  for (const source of ["photo-survey-page.js", "site-menu.js", "how-it-works-page.js"]) {
+    assert.doesNotMatch(readFileSync(path.join(appRoot, "src", source), "utf8"), retired, source);
   }
-  for (const source of ["main.js", "presidential-page.js", "quote-quiz-page.js", "fact-check-page.js"]) {
-    assert.doesNotMatch(readFileSync(path.join(appRoot, "src", source), "utf8"), /pesquisa\.html/, source);
+  for (const name of RETIRED_PAGES.filter((page) => page !== "integridade.html")) {
+    assert.doesNotMatch(readFileSync(path.join(appRoot, "vite.config.js"), "utf8"), new RegExp(name.replace(".", "\\.")), name);
   }
 });
 
@@ -57,7 +58,7 @@ test("a imagem de preview é a apresentação de marca já publicada, não um re
   assert.equal(SHARE_IMAGE_URL, "https://polimatch.com.br/brand/logo-volumetric.png");
   assert.doesNotMatch(SHARE_IMAGE_PATH, /portraits|chromas|presidential/);
   assert.equal(canonicalPageUrl("index.html"), "https://polimatch.com.br/");
-  assert.equal(canonicalPageUrl("quem-disse-isso.html"), "https://polimatch.com.br/quem-disse-isso.html");
+  assert.equal(canonicalPageUrl("como-funciona.html"), "https://polimatch.com.br/como-funciona.html");
 });
 
 test("cada entrada do build traz a prévia no HTML inicial e a imagem existe em public", () => {

@@ -1,5 +1,6 @@
 import "./install-error-reporter.js";
 import "./photo-survey.css";
+import "./site-menu.css";
 import ARTS from "./political-chromas.json" with { type: "json" };
 import { photoSurveyById } from "../../shared/photo-survey.js";
 import { createPlayer, drawPhotoSurvey, loadPhotoSurvey, respondPhotoSurvey } from "./api.js";
@@ -21,8 +22,10 @@ import {
   sampleCards,
   savedProgressText,
 } from "./photo-survey-flow.js";
+import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingMarkup } from "./site-menu.js";
 
-// Pesquisa por foto (ICM 68, #324). Abrir esta página não grava nada: o
+// Pesquisa por foto (ICM 68, #324), que desde a ICM 69 (#331) é a capa do
+// site. Abrir esta página não grava nada: o
 // jogador e o sorteio nascem no toque em "Começar", e a resposta só vai para o
 // servidor na confirmação. Até lá as escolhas ficam neste aparelho. Depois de
 // registrada, o aparelho guarda só que a pessoa respondeu: a escolha vem
@@ -157,8 +160,11 @@ function shell({ step, filled = null, mainClass = "", body, focus = false, fit =
   const bar = filled === null
     ? ""
     : `<div class="ps-bar" aria-hidden="true">${Array.from({ length: segments }, (_, index) => `<i${index < filled ? ' class="is-on"' : ""}></i>`).join("")}</div>`;
+  // Fora do voto, o canto traz o menu e o rótulo de etapa fica só para o
+  // leitor de tela. No voto, na final e na confirmação não há menu.
+  const withMenu = view !== "play";
   root.innerHTML = `<div class="ps-shell${fit ? " ps-shell--fit" : ""}" data-view="${view}">
-    <header class="ps-top"><a class="ps-brand" href="./" aria-label="PoliMatch, página inicial">Poli<b>Match</b></a><span class="ps-step" id="ps-step">${escapeText(step)}</span></header>
+    <header class="ps-top"><a class="ps-brand" href="./" aria-label="PoliMatch, início">Poli<b>Match</b></a><span class="ps-step${withMenu ? " ps-step--quiet" : ""}" id="ps-step">${escapeText(step)}</span>${withMenu ? menuButtonMarkup() : ""}</header>
     ${bar}
     <main class="ps-main ${mainClass}" aria-labelledby="ps-title">${body}</main>
   </div>`;
@@ -173,7 +179,8 @@ function shell({ step, filled = null, mainClass = "", body, focus = false, fit =
 // O título leva a etapa como descrição, para o leitor de tela dizer "Tela 2 de 4".
 const heading = (eyebrow, title, hint) => `<p class="ps-kicker">${escapeText(eyebrow)}</p><h1 class="ps-title" id="ps-title" tabindex="-1" aria-describedby="ps-step">${escapeText(title)}</h1><p class="ps-hint">${escapeText(hint)}</p>${noticeMarkup()}${offlineMarkup()}`;
 
-const HOME_LINK = '<a href="./">Ir para o início</a>';
+const MENU_LINK = '<button class="ps-link" data-action="menu" type="button">Abrir o menu</button>';
+const nextSurveys = () => `<div class="ps-next"><p class="ps-label">Próximas pesquisas</p>${upcomingMarkup()}</div>`;
 const retryButton = (action, label = "Tentar de novo") => `<button class="ps-link" data-action="${action}" type="button">${label}</button>`;
 
 // Telas ---------------------------------------------------------------------
@@ -266,7 +273,7 @@ function renderDone({ focus = false } = {}) {
     body: `${heading("Escolha registrada", champion ? cardName(champion) : "Sua resposta está registrada.", "Obrigado por participar. Sua resposta está registrada e não pode ser trocada nesta pesquisa.")}
       ${champion ? `<div class="ps-hero">${staticCard(champion, "176px")}</div>` : ""}
       ${others.length ? `<p class="ps-label">Suas finalistas</p><div class="ps-row">${others.map((id) => staticCard(id, "84px", cardName(id))).join("")}</div>` : ""}
-      <div class="ps-stack"><a class="ps-btn ps-btn--ghost" href="./">Ir para o início</a></div>`,
+      ${nextSurveys()}`,
   });
 }
 
@@ -281,8 +288,7 @@ function renderStopped(kind, { focus = false } = {}) {
     step: copy[0],
     mainClass: "ps-main--entry",
     focus,
-    body: `${heading("Pesquisa", copy[1], copy[2])}
-      <div class="ps-stack"><a class="ps-btn ps-btn--ghost" href="./">Ir para o início</a></div>`,
+    body: `${heading("Pesquisa", copy[1], copy[2])}${kind === "closed" ? nextSurveys() : ""}`,
   });
 }
 
@@ -375,7 +381,9 @@ function applyDraw(result) {
 }
 
 function sessionNotice() {
-  return `Sua sessão precisa ser recuperada. Volte ao início, entre de novo e abra esta pesquisa outra vez. ${HOME_LINK}`;
+  // Com conta Google a saída é sair e entrar de novo; sem conta, entrar.
+  const way = accountKind(readStored(IDENTITY_KEY)) === "google" ? "Abra o menu, saia da conta e entre de novo." : "Abra o menu e entre com Google.";
+  return `Sua sessão precisa ser recuperada. ${way} ${MENU_LINK}`;
 }
 
 /**
@@ -405,6 +413,7 @@ function renderSwitched({ recorded = false } = {}) {
 
 /** A conta desta aba deixou de ser a que está salva: recomeça com a atual, com um toque. */
 function identityChanged() {
+  const wasDone = view === "done";
   epoch += 1;
   busy = false;
   uncertain = false;
@@ -412,6 +421,21 @@ function identityChanged() {
   identity = "";
   progress = null;
   response = null;
+  // Com a pesquisa parada não há entrada para oferecer: a página reabre e
+  // mostra a resposta da conta atual, se houver.
+  if (survey && survey.status !== "open") {
+    switched = false;
+    init();
+    return;
+  }
+  // Quem estava vendo a própria resposta e saiu da conta não é convidado a
+  // responder de novo como visitante.
+  if (wasDone && !readStored(IDENTITY_KEY)) {
+    switched = false;
+    notice = "Você saiu da conta neste aparelho. A sua resposta continua registrada.";
+    renderDone({ focus: true });
+    return;
+  }
   view = "entry";
   switched = true;
   renderSwitched();
@@ -485,11 +509,16 @@ async function start({ auto = false, retried = false } = {}) {
         renderClosed(survey?.status, { focus: true });
         return;
       }
-      const player = await createPlayer();
-      if (run !== epoch) return;
-      // Outra aba pode ter criado o jogador enquanto esta esperava: vale o que já está salvo.
-      key = readStored(IDENTITY_KEY) || player.recoveryKey;
-      if (key === player.recoveryKey) safeStorage.set(IDENTITY_KEY, key);
+      // A pessoa pode ter entrado com Google pelo menu enquanto a pesquisa
+      // era lida: com a conta no aparelho não nasce jogador anônimo.
+      key = readStored(IDENTITY_KEY);
+      if (!key) {
+        const player = await createPlayer();
+        if (run !== epoch) return;
+        // Outra aba pode ter criado o jogador enquanto esta esperava: vale o que já está salvo.
+        key = readStored(IDENTITY_KEY) || player.recoveryKey;
+        if (key === player.recoveryKey) safeStorage.set(IDENTITY_KEY, key);
+      }
     }
     identity = key;
     result = await drawPhotoSurvey(PHOTO_SURVEY_ID, key);
@@ -510,17 +539,27 @@ async function start({ auto = false, retried = false } = {}) {
   applyDraw(result);
 }
 
+/**
+ * O servidor recusou porque a pesquisa parou depois de esta página ser
+ * aberta. A página guarda isso: quem troca de conta em seguida vê a pesquisa
+ * parada, não a entrada.
+ */
+function stoppedByServer(error) {
+  survey = { ...(survey || {}), status: error.body?.current?.status === "scheduled" ? "scheduled" : "closed" };
+}
+
 function failStart(error) {
   if (error.status === 404) {
     renderStopped("unavailable", { focus: true });
     return;
   }
   if (error.status === 409 && error.code === "PHOTO_SURVEY_CLOSED") {
+    stoppedByServer(error);
     renderClosed(error.body?.current?.status, { focus: true });
     return;
   }
   if (isPlayerIssuanceLimit(error)) {
-    notice = `Muitas participações novas nesta rede hoje. Entre com Google na página inicial para responder agora. Novas participações nesta rede voltam a ser liberadas ${escapeText(quotaResetLabel(identityNoticeFromError(error).retryAt))}. ${HOME_LINK}`;
+    notice = `Muitas participações novas nesta rede hoje. Entre com Google no menu para responder agora. Novas participações nesta rede voltam a ser liberadas ${escapeText(quotaResetLabel(identityNoticeFromError(error).retryAt))}. ${MENU_LINK}`;
     renderEntry({ focus: true });
     return;
   }
@@ -599,6 +638,7 @@ function failSubmit(error, key) {
   }
   if (error.status === 409 && error.code === "PHOTO_SURVEY_CLOSED") {
     uncertain = false;
+    stoppedByServer(error);
     notice = "A pesquisa fechou antes de a sua confirmação chegar. Sua escolha não foi registrada.";
     renderClosed(error.body?.current?.status, { focus: true });
     return;
@@ -740,6 +780,7 @@ root.addEventListener("click", (event) => {
   else if (action === "init") init();
   else if (action === "back") back();
   else if (action === "confirm") submit();
+  else if (action === "menu") siteMenu.open(event.target.closest("[data-action]"));
   else if (action === "reload-cards" && view === "play" && !busy) {
     notice = "";
     imageRetry += 1;
@@ -784,8 +825,24 @@ window.addEventListener("storage", (event) => {
   if (event.key === PHOTO_SURVEY_STORAGE_KEY) followOtherTab();
 });
 
-// A troca feita nesta mesma aba (ir ao início, entrar com Google e voltar pelo
-// histórico) não gera evento de armazenamento: confere ao voltar a aparecer.
+/**
+ * A pessoa entrou ou saiu da conta pelo menu, nesta aba. Com uma identidade
+ * em uso, vale o mesmo caminho da troca feita em outra aba. Sem identidade em
+ * uso (a entrada, antes do primeiro toque), a página reabre: o aviso de cota
+ * sai e o próximo toque já vale para a conta.
+ */
+function identityUpdated() {
+  if (identity && view !== "unavailable" && readStored(IDENTITY_KEY) !== identity) {
+    identityChanged();
+    return;
+  }
+  if (!identity && !busy && ["entry", "done", "closed", "scheduled"].includes(view)) init();
+}
+
+const siteMenu = mountSiteMenu({ current: "survey", onIdentityChange: identityUpdated });
+
+// A troca feita nesta mesma aba por outro caminho (voltar pelo histórico com a
+// conta já trocada) não gera evento de armazenamento: confere ao voltar a aparecer.
 // Uma aba congelada também não recebe o que a outra guardou: confere junto.
 function recheckIdentity() {
   if (identity && view !== "unavailable" && readStored(IDENTITY_KEY) !== identity) {
@@ -807,5 +864,8 @@ for (const name of ["online", "offline"]) {
     if (target) target.hidden = navigator.onLine !== false;
   });
 }
+
+// O sw.js não intercepta nada: só limpa caches de versões antigas.
+if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
 
 init();

@@ -40,7 +40,7 @@ Em 12/11/2026 Stefan respondeu à Q1 da #277 com um caminho fora das três opç�
 - Qualquer pessoa joga. A escolha só entra na pesquisa com cadastro por CPF.
 - Quem jogou vê os cinco primeiros. Só a resposta somada sai do PoliMatch, nunca o dado de uma pessoa.
 - Abre com Política, Famosos e influenciadores, e Futebol. A decisão 0002 fixou a ordem das três primeiras construções: política, celebridades e influenciadores, roupas.
-- Os jogos de leitura e a parte cívica e de notícias ficam no ar sem trabalho novo.
+- Os jogos de leitura e a parte cívica e de notícias ficam no ar sem trabalho novo. (Alterado pela decisão 0003, de 14/11/2026: saem do site quando a pesquisa virar a capa.)
 - Telas novas minimalistas: fundo neutro e um único verde. Na hora do voto vale a carta com moldura, no mesmo padrão para todas as cartas da pesquisa (decisão 0002, de 13/11/2026, que alterou o "foto sem moldura" da 0001).
 
 Nada disso está liberado para produção por este registro. A ordem do trabalho era maturidade primeiro (#309); desde a decisão 0002 a etapa 1 da pesquisa ([ICM 68] #324) corre em paralelo, sem dispensar nenhum bloqueio de maturidade. As respostas às Q2, Q3 e Q4, com a proposta para a Q6, estão na #277; nenhuma delas libera produção. Continuam sem resposta a Q5 (controlador de dados e revisão jurídica), a visibilidade do repositório e a convivência entre o login Google e o CPF. O gate de publicação agregada (#177) e a política de integridade do voto continuam em vigor.
@@ -218,3 +218,10 @@ e influenciadores; depois roupas com imagens próprias. Estágio
 e confirmação, em página própria ao lado do jogo atual. Sem CPF, sem resultado
 público e sem mudança no jogo que está no ar. Ninguém de fora é chamado antes
 de o aplicativo estar testado.
+
+## A pesquisa vira a capa — issue #331
+Decisão 0003, de 14/11/2026: `polimatch.com.br` passa a abrir direto na
+pesquisa aberta, com menu no padrão novo, e as páginas do produto anterior
+saem do site. Estágio `stages/69_survey_home/CONTEXT.md`. Nada muda no
+servidor nem no banco. Enquanto a troca não for publicada, as seções acima
+continuam descrevendo o que está no ar; depois, viram histórico.
