@@ -1,0 +1,218 @@
+/* Menu do site (ICM 69, #331). Mesmo padrão da pesquisa por foto: fundo
+   branco, um único verde, nada além do necessário. */
+
+.pm-menu-btn {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: #f3f4f6;
+  color: #111418;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pm-menu-btn svg {
+  display: block;
+}
+
+.pm-menu-btn:focus-visible,
+.pm-item:focus-visible {
+  outline: 3px solid #111418;
+  outline-offset: 3px;
+}
+
+/* Onde há botão de menu, o rótulo de etapa fica só para o leitor de tela. */
+.ps-step--quiet {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.pm-menu {
+  --ps-green: #08805a;
+  --ps-ink: #111418;
+  --ps-muted: #6b7280;
+  --ps-line: #e5e7eb;
+  --ps-soft: #f3f4f6;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  max-height: none;
+  margin: 0 auto;
+  padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  border: 0;
+  background: #fff;
+  color: var(--ps-ink);
+  overflow-y: auto;
+}
+
+.pm-menu[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.pm-menu:focus {
+  outline: none;
+}
+
+.pm-menu::backdrop {
+  background: #fff;
+}
+
+.pm-menu *,
+.ps-next * {
+  box-sizing: border-box;
+}
+
+.pm-menu-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  flex: none;
+}
+
+.pm-group {
+  margin: 28px 0 4px;
+  font-size: 12px;
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ps-muted);
+  font-weight: 600;
+  flex: none;
+}
+
+.pm-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 58px;
+  border-bottom: 1px solid var(--ps-line);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ps-ink);
+  text-decoration: none;
+  flex: none;
+}
+
+.pm-item.is-soon {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.pm-item i {
+  font-style: normal;
+  color: #9ca3af;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.pm-tag {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--ps-soft);
+  color: var(--ps-muted);
+  white-space: nowrap;
+}
+
+.pm-tag--open {
+  background: #e6f4ee;
+  color: var(--ps-green);
+}
+
+.pm-account {
+  margin-top: auto;
+  padding-top: 28px;
+  flex: none;
+}
+
+.pm-account-state,
+.pm-account-hint {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--ps-muted);
+  text-align: center;
+}
+
+.pm-account-hint {
+  margin: 10px 0 0;
+  font-size: 13px;
+}
+
+.pm-google {
+  display: grid;
+  place-items: center;
+  min-height: 52px;
+  font-size: 14px;
+  color: var(--ps-muted);
+}
+
+.pm-error {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff4d6;
+  color: #5c3d00;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+/* Próximas pesquisas, na tela de resposta registrada e na de pesquisa fechada. */
+.ps-next {
+  --ps-line: #e5e7eb;
+  --ps-soft: #f3f4f6;
+  --ps-muted: #6b7280;
+  margin-top: auto;
+  padding: 14px 0 max(18px, env(safe-area-inset-bottom));
+}
+
+.ps-next .ps-label {
+  margin: 0 0 2px;
+}
+
+.ps-next .pm-item {
+  min-height: 44px;
+  font-size: 15px;
+}
+
+.ps-next .pm-item:last-child {
+  border-bottom: 0;
+}
+
+@media (max-height: 560px) {
+  .ps-next {
+    padding-top: 8px;
+  }
+
+  .ps-next .pm-item {
+    min-height: 32px;
+    font-size: 14px;
+  }
+}
+
+/* "Como funciona". */
+.pm-note {
+  margin: 22px 0 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #f3f4f6;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #374151;
+}

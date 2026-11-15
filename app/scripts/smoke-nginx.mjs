@@ -1,5 +1,6 @@
 // Smoke da borda: faz só GET contra um nginx que serve o dist e confere
-// compressão, cache, 404 de arquivo ausente, robots, sitemap, ícones e que
+// compressão, cache, 404 de arquivo ausente, redirecionamento dos endereços
+// aposentados, robots, sitemap, ícones e que
 // nenhuma referência local volta como HTML. O dist lido aqui precisa ser o
 // mesmo que o servidor está servindo (no CI, copiado de dentro do container).
 //
@@ -86,6 +87,21 @@ check(`páginas HTML (${htmlFiles.length}) respondem com Cache-Control no-cache`
     const response = await get(`/${name}`);
     if (response.status !== 200 || !header(response, "content-type").startsWith("text/html")) failures.push(`/${name}: ${describe(response)}`);
     else if (!/\bno-cache\b/.test(header(response, "cache-control"))) failures.push(`/${name}: cache-control "${header(response, "cache-control")}"`);
+  }
+  return failures;
+});
+
+// Endereços aposentados na ICM 69 (#331): a pesquisa virou a capa.
+const RETIRED_PAGES = ["/pesquisa.html", "/quem-disse-isso.html", "/fato-ou-fake.html", "/duelos-da-corrida.html", "/integridade.html"];
+
+check(`endereços aposentados (${RETIRED_PAGES.length}) levam ao início com 302 e Location relativo`, async () => {
+  const failures = [];
+  for (const urlPath of RETIRED_PAGES) {
+    const response = await get(`${urlPath}?edicao=2`);
+    if (response.status !== 302) failures.push(`${urlPath}: esperado 302, veio ${describe(response)}`);
+    else if (header(response, "location") !== "/") failures.push(`${urlPath}: location "${header(response, "location")}"`);
+    else if (!/\bno-cache\b/.test(header(response, "cache-control"))) failures.push(`${urlPath}: cache-control "${header(response, "cache-control")}"`);
+    if (htmlFiles.includes(urlPath.slice(1))) failures.push(`${urlPath}: a página aposentada ainda está no dist`);
   }
   return failures;
 });

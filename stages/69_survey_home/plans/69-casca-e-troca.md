@@ -25,7 +25,7 @@ pelo teste, que precisa falhar pelo motivo esperado antes do código.
 | `app/src/photo-survey-page.js` | Botão do menu no cabeçalho, telas sem "Ir para o início", avisos apontando o menu, reação à troca de conta na mesma aba, registro do service worker |
 | `app/como-funciona.html` e `app/src/how-it-works-page.js` (novos) | Página "Como funciona" |
 | `app/index.html` | Passa a carregar a pesquisa |
-| `app/pesquisa.html` e as três páginas antigas | Saem do build (os arquivos das antigas ficam até a 69d) |
+| `app/pesquisa.html` e as três páginas antigas | Saem do build e do repositório; os módulos delas em `app/src` ficam até a 69d |
 | `app/vite.config.js` | Entradas: `index.html` e `como-funciona.html` |
 | `app/nginx.conf` | `absolute_redirect off` e 302 dos cinco endereços aposentados |
 | `app/public/sitemap.xml`, `app/public/manifest.webmanifest` | Páginas novas; nome e cores do padrão novo |

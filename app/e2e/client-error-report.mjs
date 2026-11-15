@@ -1,10 +1,9 @@
 // Erros forçados no navegador chegam à API como relatos pequenos, sem dados do
 // jogador: erro de execução, rejeição não tratada e falha de import dinâmico,
-// em cada tipo de página (jogo principal, quiz e checagem).
+// em cada página do site (a capa, que é a pesquisa, e "Como funciona").
 import assert from "node:assert/strict";
 import { chromium, webkit } from "playwright";
-import { completedDailySession } from "./daily-fixture.mjs";
-import { capabilityFixture } from "./aggregate-fixture.mjs";
+import { PHOTO_SURVEYS, publicPhotoSurvey } from "../../shared/photo-survey.js";
 
 const browserName = process.env.POLIMATCH_E2E_BROWSER || "chromium";
 const appUrl = process.env.POLIMATCH_E2E_URL || "http://127.0.0.1:4173/";
@@ -14,30 +13,17 @@ if (!browserType) throw new Error(`Navegador não suportado: ${browserName}`);
 
 const REPORT_KEYS = ["build", "page", "kind", "message", "source", "line", "column", "stack"];
 const RECOVERY_KEY = `pm2_${"a".repeat(43)}`;
-const daily = completedDailySession(Array.from({ length: 4 }, (_, index) => ({ id: `p${index}`, name: `Pessoa ${index}`, role: "Pessoa pública" })));
-
-function mainApi(path) {
-  if (path === "/api/capabilities") return [200, capabilityFixture([])];
-  if (path === "/api/game-capabilities") return [200, { version: 1, pairs: false, discard: false, mirror: false, collection: true }];
-  if (path === "/api/candidates") return [200, { candidates: daily.catalog }];
-  if (path === "/api/player") return [201, { recoveryKey: RECOVERY_KEY }];
-  if (path === "/api/player/state") return [200, { ranking: [], duels: 0, version: 0 }];
-  if (path === "/api/daily-session") return [200, daily];
-  if (path === "/api/collection") return [200, { enabled: true, purchasable: false, total: 0, items: [] }];
-  return [404, { error: `unexpected ${path}` }];
-}
+const SURVEY = PHOTO_SURVEYS[0];
 
 const pages = [
-  { file: "", path: "/", ready: ".bottom-nav:not([hidden])" },
-  { file: "quem-disse-isso.html", path: "/quem-disse-isso.html", ready: "#quiz *" },
-  { file: "fato-ou-fake.html", path: "/fato-ou-fake.html", ready: "#facts *" },
+  { file: "", path: "/", ready: "#ps-action:not([disabled])" },
+  { file: "como-funciona.html", path: "/como-funciona.html", ready: "h1" },
 ];
 
 const browser = await browserType.launch();
 try {
   for (const target of pages) {
     const context = await browser.newContext({ serviceWorkers: "block" });
-    await context.addInitScript(() => localStorage.setItem("polimatch:v4:round-coach", "seen"));
     const page = await context.newPage();
     const reports = [];
     await page.route("**/api/**", async (route) => {
@@ -47,8 +33,10 @@ try {
         reports.push({ body: request.postData() || "", headers: await request.allHeaders(), method: request.method() });
         return route.fulfill({ status: 204, body: "" });
       }
-      const [status, json] = mainApi(path);
-      return route.fulfill({ status, json });
+      if (path === `/api/photo-surveys/${SURVEY.id}` && request.method() === "GET") {
+        return route.fulfill({ status: 200, json: publicPhotoSurvey(SURVEY, new Date()) });
+      }
+      return route.fulfill({ status: 404, json: { error: `unexpected ${path}` } });
     });
 
     await page.goto(new URL(target.file, appUrl).href, { waitUntil: "domcontentloaded" });

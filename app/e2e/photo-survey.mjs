@@ -1,13 +1,14 @@
 /**
- * Pesquisa por foto, etapa 1 (ICM 68, #324): a página /pesquisa.html.
+ * Pesquisa por foto, etapa 1 (ICM 68, #324). Desde a ICM 69 (#331) ela é a
+ * capa do site: a página é `/`. O menu e a conta são do roteiro site-shell.mjs.
  *
  * O servidor aqui é simulado, com as mesmas regras de shared/photo-survey.js
  * que a API usa: sorteio por jogador, resposta única e validação da chave.
  * Ele conta cada requisição, para provar o que a página grava e quando.
  *
  * Cenários:
- *   1. Abrir a página não cria jogador nem sorteio; a página fica fora do
- *      menu e do sitemap, com noindex.
+ *   1. Abrir a página não cria jogador nem sorteio; ela é a capa do site,
+ *      está no sitemap e não tem noindex.
  *   2. Caminho direto: um toque por tela, final, confirmação e uma gravação.
  *   3. As quatro cartas têm o mesmo tamanho e cabem na tela em seis tamanhos,
  *      e em dois deles com o texto mais largo e mais alto; a confirmação e a
@@ -50,7 +51,7 @@ const browserType = { chromium, webkit }[browserName];
 if (!browserType) throw new Error(`Navegador não suportado: ${browserName}`);
 
 const SURVEY = PHOTO_SURVEYS[0];
-const SURVEY_URL = new URL("pesquisa.html", appUrl).href;
+const SURVEY_URL = appUrl;
 const IDENTITY_KEY = "polimatch:v3:recovery-key";
 const PROGRESS_KEY = "polimatch:photo-survey:v1";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -267,7 +268,7 @@ async function scenario(name, run) {
 }
 
 try {
-  await scenario("abrir a página não grava nada e ela fica fora do menu e do sitemap", async () => {
+  await scenario("abrir a página não grava nada e ela é a capa do site", async () => {
     const server = createServer();
     const context = await newContext(server);
     const page = await openSurvey(context);
@@ -282,18 +283,12 @@ try {
     assert.deepEqual(server.requests.map(({ method, pathname }) => `${method} ${pathname}`), [`GET /api/photo-surveys/${SURVEY.id}`]);
     assert.equal(await storedKey(page), null, "nenhum jogador foi criado");
     assert.equal(await page.evaluate((name) => localStorage.getItem(name), PROGRESS_KEY), null);
-    assert.equal(await page.locator('meta[name="robots"]').getAttribute("content"), "noindex");
+    assert.equal(await page.locator('meta[name="robots"]').count(), 0, "a capa não tem noindex");
+    assert.equal(new URL(page.url()).pathname, "/");
 
     const sitemap = await (await fetch(new URL("sitemap.xml", appUrl))).text();
-    assert.doesNotMatch(sitemap, /pesquisa/);
-    for (const other of ["", "quem-disse-isso.html", "fato-ou-fake.html", "duelos-da-corrida.html"]) {
-      const html = await (await fetch(new URL(other, appUrl))).text();
-      assert.doesNotMatch(html, /pesquisa\.html/, `${other || "capa"} não aponta para a pesquisa`);
-    }
-    const home = await context.newPage();
-    await home.goto(appUrl, { waitUntil: "domcontentloaded" });
-    await home.waitForTimeout(600);
-    assert.equal(await home.locator('a[href*="pesquisa"]').count(), 0, "a capa não tem entrada para a pesquisa");
+    assert.match(sitemap, /<loc>https:\/\/polimatch\.com\.br\/<\/loc>/);
+    assert.doesNotMatch(sitemap, /pesquisa\.html/);
   });
 
   await scenario("a entrada só ilustra com as cartas da lista da entrada", async () => {
@@ -363,7 +358,8 @@ try {
     assert.equal(bodies[0].championId, picks[2]);
     assert.equal(server.responses.size, 1);
     assert.equal(await page.locator(".ps-grid, [data-action=confirm], #ps-action").count(), 0, "depois de registrar não há como responder de novo");
-    assert.equal(await page.getByRole("link", { name: "Ir para o início" }).getAttribute("href"), "./");
+    assert.equal(await page.getByRole("link", { name: "Ir para o início" }).count(), 0, "a pessoa já está no início");
+    assert.match(await page.locator(".ps-next").innerText(), /Próximas pesquisas/);
   });
 
   // A fonte do sistema muda de aparelho para aparelho, e com ela o número de
@@ -381,11 +377,15 @@ try {
       const page = await openSurvey(context);
       if (wide) await page.addStyleTag({ content: WIDE_FONT });
       // A escolhida e as finalistas, na confirmação e na resposta registrada.
-      const summary = async (label, action) => {
-        const button = await page.locator(action).boundingBox();
-        assert.ok(button.y >= 0 && button.y + button.height <= height + 0.5, `${label}: o botão principal fica à vista`);
-        assert.ok(button.height >= 44, `${label}: o botão principal tem altura de toque`);
-        const stack = await page.locator(".ps-stack").boundingBox();
+      // `bottom` é o bloco do pé da tela: os botões, na confirmação, e as
+      // próximas pesquisas, na resposta registrada (que não tem botão).
+      const summary = async (label, action, bottom = ".ps-stack") => {
+        if (action) {
+          const button = await page.locator(action).boundingBox();
+          assert.ok(button.y >= 0 && button.y + button.height <= height + 0.5, `${label}: o botão principal fica à vista`);
+          assert.ok(button.height >= 44, `${label}: o botão principal tem altura de toque`);
+        }
+        const stack = await page.locator(bottom).boundingBox();
         const hero = await page.locator(".ps-hero .ps-card").boundingBox();
         const finalist = await page.locator(".ps-row .ps-card").first().boundingBox();
         assert.ok(hero.width > finalist.width, `${label}: a escolhida não é maior que uma finalista (${hero.width} e ${finalist.width})`);
@@ -424,7 +424,7 @@ try {
       await summary("confirmação", '[data-action="confirm"]');
       await confirm(page);
       await step(page, "Registrada");
-      await summary("resposta registrada", ".ps-stack .ps-btn");
+      await summary("resposta registrada", null, ".ps-next");
     });
   }
 
@@ -775,7 +775,8 @@ try {
     const page = await openSurvey(await newContext(off));
     await page.locator("#ps-title", { hasText: "Esta pesquisa não está disponível." }).waitFor();
     assert.equal(await page.locator("#ps-action, .ps-grid").count(), 0);
-    assert.equal(await page.getByRole("link", { name: "Ir para o início" }).count(), 1);
+    assert.equal(await page.getByRole("link", { name: "Ir para o início" }).count(), 0);
+    assert.equal(await page.locator('.ps-top [data-action="menu"]').count(), 1, "o menu continua à mão");
 
     const server = createServer();
     server.down = true;
@@ -817,10 +818,11 @@ try {
     const button = await actionButton(page).boundingBox();
     assert.ok(box.y >= 0 && box.y + box.height <= button.y, "o aviso aparece inteiro, sem rolar e sem ficar atrás do botão");
     assert.match(text, /Muitas participações novas nesta rede hoje\./);
-    assert.match(text, /Entre com Google na página inicial/);
+    assert.match(text, /Entre com Google no menu para responder agora\./);
     assert.match(text, /voltam a ser liberadas às \d{2}:\d{2}/);
     assert.doesNotMatch(text, /jogos/, "na pesquisa, o aviso não fala em jogos");
-    assert.equal(await notice.getByRole("link", { name: "Ir para o início" }).getAttribute("href"), "./");
+    assert.equal(await notice.getByRole("button", { name: "Abrir o menu" }).count(), 1);
+    assert.equal(await notice.getByRole("link").count(), 0, "o aviso não manda para outra página");
     assert.equal(server.count("POST", "/draw"), 0);
     assert.equal(await storedKey(page), null);
     assert.doesNotMatch(text, /servidor|conexão/i, "cota não é falha de conexão");
@@ -1045,7 +1047,8 @@ try {
     await confirm(page);
     const notice = page.locator("#ps-notice:not([hidden])", { hasText: "Sua sessão precisa ser recuperada" });
     await notice.waitFor();
-    assert.equal(await notice.getByRole("link", { name: "Ir para o início" }).getAttribute("href"), "./");
+    assert.match(await notice.innerText(), /Abra o menu e entre com Google\./);
+    assert.equal(await notice.getByRole("button", { name: "Abrir o menu" }).count(), 1);
     assert.equal(await title(page), nameOf.get(picks[3]), "a escolha continua na tela");
     server.revoked.delete(key);
     await confirm(page);

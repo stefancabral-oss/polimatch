@@ -8,7 +8,7 @@ import { collectLocalReferences, findMissingReferences } from "../scripts/verify
 const read = (relative) => readFileSync(new URL(relative, import.meta.url), "utf8");
 const nginx = read("../nginx.conf");
 const sw = read("../public/sw.js");
-const main = read("./main.js");
+const surveyPage = read("./photo-survey-page.js");
 const indexHtml = read("../index.html");
 const manifest = JSON.parse(read("../public/manifest.webmanifest"));
 const robots = read("../public/robots.txt");
@@ -76,6 +76,18 @@ test("HTML always revalidates and only extensionless paths fall back to the app"
   }
 });
 
+test("os endereços aposentados levam ao início com resposta temporária e Location relativo", () => {
+  assert.match(nginx, /^\s*absolute_redirect off;$/m);
+  for (const page of ["pesquisa", "quem-disse-isso", "fato-ou-fake", "duelos-da-corrida", "integridade"]) {
+    const block = locationBlock(`= /${page}.html`);
+    assert.match(block, /return 302 \/;/, page);
+    assert.match(block, /add_header Cache-Control "no-cache" always;/, page);
+  }
+  // Os blocos exatos vêm antes do bloco geral de .html, que responderia 404.
+  assert.ok(nginx.indexOf("location = /pesquisa.html {") < nginx.indexOf("location ~* \\.html$ {"));
+  assert.doesNotMatch(nginx, /return 301/);
+});
+
 test("portraits and Chromas get a short revalidated cache, never immutable", () => {
   for (const directory of ["/portraits/", "/chromas/"]) {
     const block = locationBlock(`^~ ${directory}`);
@@ -98,7 +110,7 @@ test("service worker only installs and never intercepts requests", () => {
   assert.doesNotMatch(sw, /respondWith/);
   assert.match(sw, /addEventListener\("install"/);
   assert.match(sw, /addEventListener\("activate"/);
-  assert.match(main, /navigator\.serviceWorker\.register\("\.\/sw\.js"\)\.catch\(\(\) => \{\}\)/);
+  assert.match(surveyPage, /navigator\.serviceWorker\.register\("\.\/sw\.js"\)\.catch\(\(\) => \{\}\)/);
 });
 
 test("PWA icons are committed PNGs with the declared sizes", () => {
@@ -119,11 +131,11 @@ test("robots.txt and sitemap.xml describe the public pages at the canonical orig
   assert.match(robots, /^Sitemap: https:\/\/polimatch\.com\.br\/sitemap\.xml$/m);
 
   const inputs = [...viteConfig.match(/input:\s*\{([^}]*)\}/)[1].matchAll(/"([^"]+\.html)"/g)].map(([, name]) => name);
-  assert.equal(inputs.length, 5);
-  // A página da pesquisa por foto (ICM 68, #324) fica fora do sitemap, com
-  // noindex, até a publicação.
+  // Desde a ICM 69 (#331) o build tem a capa, que é a pesquisa, e "Como
+  // funciona". Nenhuma das duas fica escondida.
+  assert.deepEqual(inputs, ["index.html", "como-funciona.html"]);
   const hidden = inputs.filter((name) => /<meta name="robots" content="noindex">/.test(read(`../${name}`)));
-  assert.deepEqual(hidden, ["pesquisa.html"]);
+  assert.deepEqual(hidden, []);
   const expected = inputs
     .filter((name) => !hidden.includes(name))
     .map((name) => `https://polimatch.com.br/${name === "index.html" ? "" : name}`)
