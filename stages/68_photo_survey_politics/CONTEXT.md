@@ -105,7 +105,7 @@ Cada entrega é um PR próprio, com gate do Stefan.
 | 68b — Regras e servidor | Sorteio e validação da chave em `shared/`; tabelas e rotas novas em módulos próprios do `back/`, sem mexer no `topic-store.js` além do registro das tabelas; política de abuso versionada. |
 | 68c — Tela | Página nova em `app/`, com entrada, voto, final, confirmação e os estados "já respondeu" e "pesquisa fechada". Fica fora do menu e do sitemap, e com `noindex`. |
 | 68d — Teste por agentes | Rodadas jogadas por agentes em caminhos diferentes, com o resultado no `verification.json` e as correções que saírem delas. |
-| 68e — Publicação | API primeiro e app depois. Depois, em passo separado, a capa ganha a entrada para a pesquisa e a página entra no sitemap. Cada passo com o sim do Stefan. |
+| 68e — Publicação | API primeiro e app depois. Depois, em passo separado, a capa ganha a entrada para a pesquisa e a página entra no sitemap. Cada passo com o sim do Stefan. Mudança de direção em 14/11/2026 (decisão 0003): o passo separado não acontece aqui; a pesquisa vira a capa no estágio 69 (#331). |
 
 ## Fora de escopo
 
@@ -165,7 +165,8 @@ Publicação (68e):
 - API e app publicados e conferidos de fora, com a contagem de linhas das
   tabelas antigas igual antes e depois.
 - A entrada na capa só muda com o sim do Stefan, e a rodada diária continua
-  acessível.
+  acessível. (Substituído pela decisão 0003: a capa passa a ser a pesquisa e
+  a rodada diária sai do site, no estágio 69.)
 
 ## Condições de publicação
 

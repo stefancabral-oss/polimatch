@@ -6,6 +6,7 @@
 - Issues: #318 ([ICM 67]) e #277 (Q1)
 - Estado: direção aprovada. **Nada desta decisão está em produção.**
 - Alterada em quatro pontos pela [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md), de 13/11/2026. Cada ponto está marcado abaixo.
+- Alterada no item 7 pela [decisão 0003](0003-a-pesquisa-vira-a-capa.md), de 14/11/2026: os jogos de leitura e a capa do jogo saem do site.
 
 ## Contexto
 
@@ -32,6 +33,7 @@ o arquivo, ou pausa. O Stefan respondeu com um quarto caminho.
    influenciadores, roupas. Futebol não foi tratado nela.)
 7. **Congelado.** Os jogos de leitura ("Quem disse isso?", "Fato ou fake?") e a
    parte cívica e de notícias ficam no ar sem trabalho novo.
+   (Alterado pela decisão 0003: saem do site quando a pesquisa virar a capa.)
 8. **Visual das telas novas.** Minimalista: fundo neutro que segue o
    claro/escuro do aparelho, um único verde, foto sem moldura na hora do voto.
    A pessoa pode compartilhar a própria escolha por iniciativa dela.
