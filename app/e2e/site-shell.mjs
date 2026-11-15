@@ -32,11 +32,24 @@
  *  22. Entrada sem sessão na resposta: o menu avisa e a chave não muda.
  *  23. Sair não apaga a sessão que outra aba gravou enquanto o servidor respondia.
  *  24. A pesquisa fechou depois de aberta a página: sair não oferece "Começar".
+ *
+ * Capa com várias pesquisas (ICM 70, #334):
+ *  25. Cada pesquisa tem endereço; um código desconhecido cai na capa.
+ *  26. Responder a primeira: a capa mostra a escolha e destaca a segunda;
+ *      respondidas as duas, a capa diz isso. Uma não mexe na outra.
+ *  27. A capa leva de volta à pesquisa que ficou pela metade.
+ *  28. Uma pesquisa fechada sai do destaque e aparece como fechada.
+ *  29. Com a API fora do ar, a capa avisa e tenta de novo.
+ *  30. Compartilhar: a imagem com a carta, o texto e o endereço, só no toque.
+ *  31. Sem compartilhamento de arquivo vai o texto; sem compartilhamento, o
+ *      endereço é copiado; fechar a folha de compartilhar não é erro.
+ *  32. Servidor que ainda não conhece a segunda pesquisa: a capa mostra só a
+ *      primeira (é o que acontece se o app for publicado antes da API).
  */
 import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
 import { chromium, webkit } from "playwright";
-import { PHOTO_SURVEYS, drawCards, drawGroups, publicPhotoSurvey } from "../../shared/photo-survey.js";
+import { PHOTO_SURVEYS, drawCards, drawGroups, photoSurveyById, publicPhotoSurvey, validateBracket } from "../../shared/photo-survey.js";
 
 const browserName = process.env.POLIMATCH_E2E_BROWSER || "chromium";
 const appUrl = process.env.POLIMATCH_E2E_URL || "http://127.0.0.1:4173/";
@@ -44,6 +57,8 @@ const browserType = { chromium, webkit }[browserName];
 if (!browserType) throw new Error(`Navegador não suportado: ${browserName}`);
 
 const SURVEY = PHOTO_SURVEYS[0];
+const SECOND = PHOTO_SURVEYS[1];
+const surveyUrl = (survey) => new URL(`?p=${survey.id}`, appUrl).href;
 const HOW_URL = new URL("como-funciona.html", appUrl).href;
 const IDENTITY_KEY = "polimatch:v3:recovery-key";
 const ANONYMOUS_KEY = `pm2_${"a".repeat(43)}`;
@@ -56,6 +71,10 @@ function createServer() {
     quota: false,
     logout: "ok",
     status: "open",
+    // Pesquisas fechadas uma a uma (o `status` vale para todas).
+    closed: new Set(),
+    // Pesquisas que este servidor ainda não conhece: respondem 404.
+    unknown: new Set(),
     googleDown: false,
     // Falhas programadas da entrada com Google: cada item é um status HTTP,
     // ou um objeto com status e código.
@@ -82,7 +101,8 @@ function createServer() {
       return server.requests.filter((request) => request.method === method && request.pathname.endsWith(suffix)).length;
     },
   };
-  const view = () => ({ ...publicPhotoSurvey(SURVEY, new Date()), status: server.status });
+  const view = (survey = SURVEY) => ({ ...publicPhotoSurvey(survey, new Date()), status: server.closed.has(survey.id) ? "closed" : server.status });
+  const slot = (survey, key) => `${survey.id}:${key}`;
   server.handler = async (route) => {
     const request = route.request();
     const { pathname } = new URL(request.url());
@@ -109,7 +129,10 @@ function createServer() {
       // Como o servidor de verdade: uma chave que ele não reconhece recusa a entrada.
       if (key && server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
       // E a resposta de quem respondia sem conta passa a ser da conta.
-      if (key && server.responses.has(key) && !server.responses.has(GOOGLE_KEY)) server.responses.set(GOOGLE_KEY, server.responses.get(key));
+      for (const item of PHOTO_SURVEYS) {
+        const answer = key && server.responses.get(slot(item, key));
+        if (answer && !server.responses.has(slot(item, GOOGLE_KEY))) server.responses.set(slot(item, GOOGLE_KEY), answer);
+      }
       return send(200, { sessionToken: GOOGLE_KEY, account: { displayName: "Bia" }, player: { version: 0 }, merge: null });
     }
     if (pathname === "/api/auth/logout" && method === "POST") {
@@ -119,26 +142,41 @@ function createServer() {
       if (server.logout === "expired") return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
       return route.fulfill({ status: 204, body: "" });
     }
-    if (pathname === `/api/photo-surveys/${SURVEY.id}` && method === "GET") {
+    const [, surveyId, action = ""] = pathname.match(/^\/api\/photo-surveys\/([^/]+)(?:\/(draw|response))?$/) || [];
+    const survey = server.unknown.has(surveyId) ? null : photoSurveyById(surveyId || "");
+    if (!survey) return send(404, { error: "pesquisa não encontrada", code: "PHOTO_SURVEY_NOT_FOUND" });
+    if (!action && method === "GET") {
       if (server.holdSurvey) await server.holdSurvey.promise;
-      return send(200, view());
+      return send(200, view(survey));
     }
-    if (pathname === `/api/photo-surveys/${SURVEY.id}/draw` && method === "POST") {
-      if (!key || server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
-      const prior = server.responses.get(key);
-      if (prior) return send(200, { survey: view(), draw: { groups: drawGroups(prior.shownIds, SURVEY.groupSize) }, response: prior.response });
-      if (server.status !== "open") return send(409, { error: "pesquisa fechada", code: "PHOTO_SURVEY_CLOSED", current: { status: server.status } });
-      if (!server.draws.has(key)) server.draws.set(key, drawCards(SURVEY, (limit) => randomInt(limit)));
-      return send(200, { survey: view(), draw: { groups: drawGroups(server.draws.get(key), SURVEY.groupSize) }, response: null });
+    if (method !== "POST") return send(404, { error: "rota não simulada" });
+    if (!key || server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
+    const status = view(survey).status;
+    const prior = server.responses.get(slot(survey, key));
+    if (action === "draw") {
+      if (prior) return send(200, { survey: view(survey), draw: { groups: drawGroups(prior.shownIds, survey.groupSize) }, response: prior.response });
+      if (status !== "open") return send(409, { error: "pesquisa fechada", code: "PHOTO_SURVEY_CLOSED", current: { status } });
+      if (!server.draws.has(slot(survey, key))) server.draws.set(slot(survey, key), drawCards(survey, (limit) => randomInt(limit)));
+      return send(200, { survey: view(survey), draw: { groups: drawGroups(server.draws.get(slot(survey, key)), survey.groupSize) }, response: null });
     }
-    return send(404, { error: "rota não simulada" });
+    if (prior) return send(409, { error: "esta pesquisa já foi respondida", code: "PHOTO_SURVEY_ALREADY_ANSWERED", current: prior.response });
+    const shownIds = server.draws.get(slot(survey, key));
+    const body = request.postDataJSON();
+    const bracket = shownIds ? validateBracket(survey, shownIds, { pickIds: body?.pickIds, championId: body?.championId }) : { ok: false };
+    if (!bracket.ok) return send(400, { error: "resposta não corresponde ao sorteio", code: "PHOTO_SURVEY_RESPONSE_INVALID", current: { reason: "bracket" } });
+    const response = { answerId: body.answerId, pickIds: bracket.pickIds, championId: bracket.championId, respondedAt: new Date().toISOString() };
+    server.responses.set(slot(survey, key), { shownIds, response });
+    return send(200, { status: "created", survey: view(survey), draw: { groups: drawGroups(shownIds, survey.groupSize) }, response });
   };
   /** Deixa registrada uma resposta desta chave, como se a pessoa já tivesse respondido. */
-  server.answered = (key) => {
-    const shownIds = drawCards(SURVEY, (limit) => randomInt(limit));
-    const pickIds = drawGroups(shownIds, SURVEY.groupSize).map((group) => group[0]);
-    server.responses.set(key, { shownIds, response: { answerId: "00000000-0000-4000-8000-000000000000", pickIds, championId: pickIds[0], respondedAt: new Date().toISOString() } });
+  server.answered = (key, survey = SURVEY) => {
+    const shownIds = drawCards(survey, (limit) => randomInt(limit));
+    const pickIds = drawGroups(shownIds, survey.groupSize).map((group) => group[0]);
+    const response = { answerId: "00000000-0000-4000-8000-000000000000", pickIds, championId: pickIds[0], respondedAt: new Date().toISOString() };
+    server.responses.set(slot(survey, key), { shownIds, response });
+    return response;
   };
+  server.responseOf = (key, survey = SURVEY) => server.responses.get(slot(survey, key))?.response || null;
   return server;
 }
 
@@ -188,6 +226,23 @@ async function signIn(page) {
   await page.locator('dialog.pm-menu[open] [data-menu="signout"]').waitFor();
 }
 
+const waitStep = (page, text) => page.waitForFunction((expected) => document.querySelector("#ps-step")?.textContent === expected, text, { timeout: 15000 });
+const tapCard = (page, position = 0) => page.locator('.ps-grid[data-ready="true"] button[data-card]:not([disabled])').nth(position).click();
+
+/** Joga as quatro telas, a final e confirma. Devolve o nome da carta escolhida. */
+async function answer(page, position = 0) {
+  for (let screen = 1; screen <= 4; screen += 1) {
+    await waitStep(page, `Tela ${screen} de 4`);
+    await tapCard(page, position);
+  }
+  await waitStep(page, "Final");
+  await tapCard(page, position);
+  await waitStep(page, "Confirmar");
+  await page.locator('[data-action="confirm"]:not([disabled])').click();
+  await waitStep(page, "Registrada");
+  return page.locator("#ps-title").innerText();
+}
+
 const results = [];
 const only = process.env.CI ? "" : process.env.POLIMATCH_E2E_ONLY || "";
 async function scenario(name, run) {
@@ -213,8 +268,18 @@ try {
     const stepBox = await page.locator("#ps-step").boundingBox();
     assert.ok(!stepBox || (stepBox.width <= 1 && stepBox.height <= 1), "o rótulo de etapa não aparece ao lado do menu");
     await page.waitForTimeout(400);
-    assert.deepEqual(server.requests.map(({ method, pathname }) => `${method} ${pathname}`), [`GET /api/photo-surveys/${SURVEY.id}`]);
+    // Uma leitura por pesquisa, sem identidade, e mais nada.
+    assert.deepEqual(server.requests.map(({ method, pathname, key }) => `${method} ${pathname} ${key}`).sort(), PHOTO_SURVEYS.map((survey) => `GET /api/photo-surveys/${survey.id} `).sort());
     assert.equal(await storedKey(page), null, "nenhum jogador foi criado");
+    assert.equal(await page.evaluate(() => localStorage.length), 0, "nada foi guardado no aparelho");
+    // Abaixo do destaque: a outra pesquisa aberta e as que vêm.
+    assert.equal(await page.locator(".ps-kicker").first().innerText(), "POLÍTICA · 16 CARTAS");
+    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Mais pesquisas", "Em breve"]);
+    const more = await page.locator(".ps-home a.ps-survey").evaluateAll((rows) => rows.map((row) => ({ href: row.getAttribute("href"), title: row.querySelector("b").textContent, sub: row.querySelector("small").textContent, tag: row.querySelector(".pm-tag").textContent })));
+    assert.deepEqual(more, [{ href: `./?p=${SECOND.id}`, title: "Em quem você confia mais?", sub: "Política · 16 cartas", tag: "Aberta" }]);
+    assert.deepEqual(await page.locator(".ps-home .pm-item.is-soon span").allInnerTexts(), ["Famosos e influenciadores", "Roupas"]);
+    assert.equal(await page.locator(".ps-home .ps-pick").count(), 0, "sem resposta, não há Suas escolhas");
+    assert.equal(new URL(page.url()).search, "", "a capa não tem pesquisa no endereço");
   });
 
   await scenario("o menu abre, prende o foco, fecha por Esc e pelo botão, e devolve o foco", async () => {
@@ -227,15 +292,17 @@ try {
     assert.equal(await menu(page).getAttribute("aria-label"), "Menu");
     const items = await menu(page).locator(".pm-item").evaluateAll((nodes) => nodes.map((node) => ({
       text: node.querySelector("span").textContent,
-      tag: node.querySelector(".pm-tag")?.textContent || "",
+      note: (node.querySelector(".pm-sub") || node.querySelector(".pm-tag"))?.textContent || "",
       href: node.getAttribute("href"),
       current: node.getAttribute("aria-current"),
     })));
     assert.deepEqual(items, [
-      { text: "Política", tag: "Aberta", href: "./", current: "page" },
-      { text: "Famosos e influenciadores", tag: "Em breve", href: null, current: null },
-      { text: "Roupas", tag: "Em breve", href: null, current: null },
-      { text: "Como funciona", tag: "", href: "./como-funciona.html", current: null },
+      { text: "Quem você prefere?", note: "Política", href: `./?p=${SURVEY.id}`, current: null },
+      { text: "Em quem você confia mais?", note: "Política", href: `./?p=${SECOND.id}`, current: null },
+      { text: "Famosos e influenciadores", note: "Em breve", href: null, current: null },
+      { text: "Roupas", note: "Em breve", href: null, current: null },
+      { text: "Início", note: "", href: "./", current: "page" },
+      { text: "Como funciona", note: "", href: "./como-funciona.html", current: null },
     ]);
     // O painel cobre a tela e nada dele fica cortado.
     const box = await menu(page).boundingBox();
@@ -388,7 +455,7 @@ try {
     assert.equal(server.last("/draw").key, GOOGLE_KEY);
   });
 
-  await scenario("a resposta registrada mostra as próximas pesquisas, sem \"Ir para o início\"", async () => {
+  await scenario("a resposta registrada oferece a próxima pesquisa, sem \"Ir para o início\"", async () => {
     for (const [width, height] of [[390, 844], [360, 640]]) {
       const server = createServer();
       server.answered(ANONYMOUS_KEY);
@@ -397,18 +464,21 @@ try {
       await page.locator("#ps-action").click();
       await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
       await menuButton(page).waitFor();
-      const next = page.locator(".ps-next");
-      assert.match(await next.innerText(), /Próximas pesquisas/);
-      assert.deepEqual(await next.locator(".pm-item span").allInnerTexts(), ["Famosos e influenciadores", "Roupas"]);
-      assert.equal(await page.locator('.ps-main a[href]').count(), 0, "a tela não manda a pessoa para outra página");
+      const next = page.locator(".ps-stack");
+      const link = next.getByRole("link", { name: "Próxima pesquisa: Em quem você confia mais?" });
+      assert.equal(await link.getAttribute("href"), `./?p=${SECOND.id}`);
+      assert.equal(await link.innerText(), "Próxima pesquisa");
+      const linkBox = await link.boundingBox();
+      assert.ok(linkBox.height <= 60, `${width}×${height}: o botão da próxima pesquisa cabe em uma linha (${Math.round(linkBox.height)} px)`);
       assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Ir para o início/);
+      assert.equal(new URL(page.url()).search, `?p=${SURVEY.id}`, "a pesquisa respondida fica no endereço");
       const nextBox = await next.boundingBox();
-      assert.ok(nextBox.y + nextBox.height <= height + 1, `${width}×${height}: as próximas pesquisas aparecem sem rolar`);
+      assert.ok(nextBox.y + nextBox.height <= height + 1, `${width}×${height}: a próxima pesquisa aparece sem rolar`);
       const heroBox = await page.locator(".ps-hero .ps-card").boundingBox();
       const rowBox = await page.locator(".ps-row").boundingBox();
       // O mínimo do CSS é 70 px: aqui a carta precisa sobrar bem acima disso.
       assert.ok(heroBox.height >= (height >= 800 ? 200 : 120), `${width}×${height}: a carta escolhida ficou pequena (${Math.round(heroBox.height)} px)`);
-      assert.ok(rowBox.y + rowBox.height <= nextBox.y + 1, `${width}×${height}: as finalistas não ficam atrás das próximas pesquisas`);
+      assert.ok(rowBox.y + rowBox.height <= nextBox.y + 1, `${width}×${height}: as finalistas não ficam atrás dos botões`);
       assert.ok(heroBox.y + heroBox.height <= rowBox.y + 1, `${width}×${height}: a escolhida não cobre as finalistas`);
     }
   });
@@ -540,9 +610,9 @@ try {
     const server = createServer();
     server.status = "closed";
     server.answered(GOOGLE_KEY);
-    const page = await open(await newContext(server));
+    const page = await open(await newContext(server), surveyUrl(SURVEY));
     await page.locator("#ps-title", { hasText: "Esta pesquisa está fechada." }).waitFor();
-    assert.match(await page.locator(".ps-next").innerText(), /Próximas pesquisas/);
+    assert.equal(await page.getByRole("link", { name: "Ver pesquisas" }).getAttribute("href"), "./");
     await openMenu(page);
     await signIn(page);
     await page.keyboard.press("Escape");
@@ -605,7 +675,7 @@ try {
     await panel.waitFor();
     const box = await panel.boundingBox();
     assert.ok(box.width >= 389 && box.height >= 843 && box.y === 0, `sem showModal o painel ainda cobre a tela (${box.width}×${box.height} em ${box.y})`);
-    assert.equal(await page.locator(".pm-menu[open] .pm-item").count(), 4);
+    assert.equal(await page.locator(".pm-menu[open] .pm-item").count(), 6);
     await page.locator('.pm-menu[open] [data-menu="close"]').click();
     await page.waitForFunction(() => !document.querySelector(".pm-menu").hasAttribute("open"));
     assert.equal(await page.locator(".pm-menu").isVisible(), false);
@@ -681,6 +751,226 @@ try {
     await page.waitForTimeout(400);
     assert.equal(await page.locator("#ps-action").count(), 0, "com a pesquisa fechada não há entrada para oferecer");
     assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Toque em Começar/);
+  });
+
+  await scenario("cada pesquisa tem endereço; um código desconhecido cai na capa", async () => {
+    const server = createServer();
+    const context = await newContext(server);
+    const second = await open(context, surveyUrl(SECOND));
+    await entryReady(second);
+    assert.equal(await second.locator("#ps-title").innerText(), "Em quem você confia mais?");
+    assert.equal(await second.locator(".ps-home").count(), 0, "na página da pesquisa não há as listas da capa");
+    assert.equal(await second.getByRole("link", { name: "Todas as pesquisas" }).getAttribute("href"), "./");
+    assert.deepEqual(server.requests.map(({ method, pathname }) => `${method} ${pathname}`), [`GET /api/photo-surveys/${SECOND.id}`]);
+    await openMenu(second);
+    assert.equal(await menu(second).locator('a[aria-current="page"] span').innerText(), "Em quem você confia mais?");
+    await second.keyboard.press("Escape");
+    await second.locator("#ps-action").click();
+    await waitStep(second, "Tela 1 de 4");
+    assert.equal(server.last("/draw").pathname, `/api/photo-surveys/${SECOND.id}/draw`);
+
+    const unknown = await open(await newContext(createServer()), new URL("?p=nao-existe", appUrl).href);
+    await entryReady(unknown);
+    assert.equal(await unknown.locator("#ps-title").innerText(), "Quem você prefere?");
+    assert.equal(await unknown.locator(".ps-home").count(), 1, "código desconhecido abre a capa");
+  });
+
+  await scenario("responder a primeira: a capa mostra a escolha e destaca a segunda; uma não mexe na outra", async () => {
+    const server = createServer();
+    const context = await newContext(server);
+    const page = await open(context);
+    await entryReady(page);
+    await page.locator("#ps-action").click();
+    const first = await answer(page, 0);
+    assert.equal(new URL(page.url()).search, `?p=${SURVEY.id}`);
+    assert.equal(server.responseOf(ANONYMOUS_KEY, SECOND), null, "responder a primeira não responde a segunda");
+
+    // De volta à capa: a escolha aparece e a segunda pesquisa vira o destaque.
+    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
+    await entryReady(page);
+    assert.equal(await page.locator("#ps-title").innerText(), "Em quem você confia mais?");
+    const pick = page.locator(".ps-home .ps-pick");
+    await pick.locator("b", { hasText: first }).waitFor();
+    assert.equal(await pick.count(), 1);
+    assert.equal(await pick.getAttribute("href"), `./?p=${SURVEY.id}`);
+    assert.match(await pick.locator("small").innerText(), /Política · Quem você prefere\?/);
+    assert.equal(await pick.locator("img").evaluate((image) => image.naturalWidth > 0), true, "a carta escolhida aparece");
+    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas", "Em breve"]);
+    assert.equal(await page.locator(".ps-home a.ps-survey").count(), 0, "a segunda está no destaque, não na lista");
+    assert.equal(server.count("POST", `/api/photo-surveys/${SECOND.id}/draw`), 0, "a capa não emite sorteio da pesquisa em destaque");
+
+    // A segunda começa do zero: sorteio próprio, nenhuma escolha herdada.
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Tela 1 de 4");
+    assert.equal(await page.locator('.ps-grid button[aria-pressed="true"]').count(), 0);
+    assert.equal(server.count("POST", "/api/player"), 1, "o mesmo jogador responde as duas");
+    const second = await answer(page, 1);
+    assert.equal(await page.getByRole("link", { name: "Ver pesquisas" }).getAttribute("href"), "./", "sem próxima, o botão leva à capa");
+    assert.notEqual(server.responseOf(ANONYMOUS_KEY, SURVEY).answerId, server.responseOf(ANONYMOUS_KEY, SECOND).answerId);
+
+    // Respondidas as duas, a capa diz isso e mostra as duas escolhas.
+    await page.getByRole("link", { name: "Ver pesquisas" }).click();
+    await page.locator("#ps-title", { hasText: "Você respondeu todas as pesquisas abertas." }).waitFor();
+    assert.equal(await page.locator("#ps-action").count(), 0);
+    await page.locator(".ps-home .ps-pick b", { hasText: second }).waitFor();
+    assert.deepEqual(await page.locator(".ps-home .ps-pick b").allInnerTexts(), [first, second]);
+    // Tocar numa escolha abre a tela da resposta daquela pesquisa.
+    await page.locator(".ps-home .ps-pick").first().click();
+    await waitStep(page, "Registrada");
+    assert.equal(await page.locator("#ps-title").innerText(), first);
+  });
+
+  await scenario("a capa leva de volta à pesquisa que ficou pela metade", async () => {
+    const server = createServer();
+    const page = await open(await newContext(server), surveyUrl(SECOND));
+    await entryReady(page);
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Tela 1 de 4");
+    await tapCard(page, 2);
+    await waitStep(page, "Tela 2 de 4");
+    // A primeira pesquisa não herda nada da segunda.
+    await page.goto(surveyUrl(SURVEY), { waitUntil: "domcontentloaded" });
+    await entryReady(page);
+    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
+    // A capa retoma a que ficou pela metade, no ponto em que parou.
+    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
+    await waitStep(page, "Tela 2 de 4");
+    assert.equal(new URL(page.url()).search, `?p=${SECOND.id}`);
+    assert.equal(server.count("POST", `/api/photo-surveys/${SURVEY.id}/draw`), 0);
+  });
+
+  await scenario("uma pesquisa fechada sai do destaque e aparece como fechada", async () => {
+    const server = createServer();
+    server.closed.add(SURVEY.id);
+    const page = await open(await newContext(server));
+    await entryReady(page);
+    assert.equal(await page.locator("#ps-title").innerText(), "Em quem você confia mais?");
+    const rows = await page.locator(".ps-home a.ps-survey").evaluateAll((items) => items.map((row) => `${row.querySelector("b").textContent} | ${row.querySelector(".pm-tag").textContent}`));
+    assert.deepEqual(rows, ["Quem você prefere? | Fechada"]);
+    assert.deepEqual(server.writes(), []);
+
+    // Todas fechadas: sem destaque e sem botão de começar.
+    const none = createServer();
+    none.status = "closed";
+    const empty = await open(await newContext(none));
+    await empty.locator("#ps-title", { hasText: "Nenhuma pesquisa aberta agora." }).waitFor();
+    assert.equal(await empty.locator("#ps-action").count(), 0);
+    assert.equal(await empty.locator(".ps-home a.ps-survey .pm-tag", { hasText: "Fechada" }).count(), 2);
+  });
+
+  await scenario("com a API fora do ar, a capa avisa e tenta de novo", async () => {
+    const server = createServer();
+    const context = await newContext(server);
+    let down = true;
+    await context.route(/\/api\/photo-surveys\//, (route) => (down ? route.abort("connectionrefused") : route.fallback()));
+    const page = await open(context);
+    await page.locator("#ps-notice:not([hidden])").waitFor();
+    assert.match(await page.locator("#ps-notice").innerText(), /Não conseguimos falar com o servidor/);
+    assert.equal(await page.locator("#ps-action").innerText(), "Tentar de novo");
+    down = false;
+    await page.locator("#ps-action").click();
+    await entryReady(page);
+    assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+    assert.equal(await page.locator(".ps-home a.ps-survey").count(), 1);
+  });
+
+  // O compartilhamento do aparelho é simulado: guarda o que a página mandou.
+  const SHARE_STUB = (mode) => {
+    window.__shared = [];
+    const record = (data) => window.__shared.push({
+      title: data.title, text: data.text, url: data.url,
+      files: (data.files || []).map((file) => ({ name: file.name, type: file.type, size: file.size })),
+    });
+    const define = (name, value) => Object.defineProperty(Navigator.prototype, name, { configurable: true, writable: true, value });
+    if (mode === "none") {
+      define("share", undefined);
+      define("canShare", undefined);
+      Object.defineProperty(Navigator.prototype, "clipboard", { configurable: true, get: () => ({ writeText: async (text) => { window.__copied = text; } }) });
+      return;
+    }
+    define("canShare", (data) => mode === "file" && Array.isArray(data?.files) && data.files.every((file) => file.type === "image/jpeg"));
+    define("share", async (data) => {
+      record(data);
+      if (mode === "cancel") throw new DOMException("cancelado", "AbortError");
+    });
+  };
+  async function answeredPage(mode) {
+    const server = createServer();
+    const answered = server.answered(ANONYMOUS_KEY);
+    const context = await newContext(server, { storedKey: ANONYMOUS_KEY });
+    await context.addInitScript(SHARE_STUB, mode);
+    const page = await open(context, surveyUrl(SURVEY));
+    await entryReady(page);
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Registrada");
+    return { page, server, name: await page.locator("#ps-title").innerText(), answered };
+  }
+
+  await scenario("compartilhar: a imagem com a carta, o texto e o endereço, só no toque", async () => {
+    const { page, server, name } = await answeredPage("file");
+    const button = page.getByRole("button", { name: "Compartilhar minha escolha" });
+    // A imagem fica pronta antes do toque, para o toque abrir o compartilhamento na hora.
+    await page.locator('[data-action="share"][data-ready="true"]').waitFor();
+    await page.waitForTimeout(300);
+    assert.deepEqual(await page.evaluate(() => window.__shared), [], "nada é compartilhado sem o toque");
+    const before = server.requests.length;
+    await button.click();
+    await page.waitForFunction(() => window.__shared.length === 1);
+    const [shared] = await page.evaluate(() => window.__shared);
+    assert.equal(shared.title, "PoliMatch");
+    assert.equal(shared.text, `Quem você prefere? Minha escolha no PoliMatch: ${name}. E a sua?`);
+    assert.equal(shared.url, `https://polimatch.com.br/?p=${SURVEY.id}`);
+    assert.equal(shared.files.length, 1);
+    assert.equal(shared.files[0].name, "polimatch-minha-escolha.jpg");
+    assert.equal(shared.files[0].type, "image/jpeg");
+    assert.ok(shared.files[0].size > 40000, `a imagem tem conteúdo (${shared.files[0].size} bytes)`);
+    assert.equal(server.requests.length, before, "compartilhar não fala com a API");
+    assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+    // Sem resposta carregada não há o que compartilhar: a tela de voto não tem o botão.
+    const fresh = await open(await newContext(createServer()), surveyUrl(SURVEY));
+    await entryReady(fresh);
+    assert.equal(await fresh.locator('[data-action="share"]').count(), 0);
+  });
+
+  await scenario("sem compartilhamento de arquivo vai o texto; sem compartilhamento, o endereço é copiado", async () => {
+    const text = await answeredPage("text");
+    await text.page.locator('[data-action="share"][data-ready]').waitFor();
+    await text.page.getByRole("button", { name: "Compartilhar minha escolha" }).click();
+    await text.page.waitForFunction(() => window.__shared.length === 1);
+    const [onlyText] = await text.page.evaluate(() => window.__shared);
+    assert.deepEqual(onlyText.files, []);
+    assert.match(onlyText.text, new RegExp(`Minha escolha no PoliMatch: ${text.name}\\.`));
+    assert.equal(onlyText.url, `https://polimatch.com.br/?p=${SURVEY.id}`);
+
+    const none = await answeredPage("none");
+    await none.page.getByRole("button", { name: "Compartilhar minha escolha" }).click();
+    await none.page.locator("#ps-notice:not([hidden])", { hasText: "Link copiado." }).waitFor();
+    assert.equal(await none.page.evaluate(() => window.__copied), `Quem você prefere? Minha escolha no PoliMatch: ${none.name}. E a sua? https://polimatch.com.br/?p=${SURVEY.id}`);
+
+    // Fechar a folha de compartilhar não é erro: nenhum aviso.
+    const cancel = await answeredPage("cancel");
+    await cancel.page.getByRole("button", { name: "Compartilhar minha escolha" }).click();
+    await cancel.page.waitForFunction(() => window.__shared.length === 1);
+    await cancel.page.waitForTimeout(300);
+    assert.equal(await cancel.page.locator("#ps-notice:not([hidden])").count(), 0);
+    assert.equal(await cancel.page.getByRole("button", { name: "Compartilhar minha escolha" }).isEnabled(), true);
+  });
+
+  await scenario("servidor que ainda não conhece a segunda pesquisa: a capa mostra só a primeira", async () => {
+    const server = createServer();
+    server.unknown.add(SECOND.id);
+    const context = await newContext(server);
+    const page = await open(context);
+    await entryReady(page);
+    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
+    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Em breve"], "a pesquisa desconhecida não entra na lista");
+    assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Tela 1 de 4");
+    // No endereço dela, a pesquisa desconhecida diz que não está disponível, com saída para a capa.
+    const direct = await open(context, surveyUrl(SECOND));
+    await direct.locator("#ps-title", { hasText: "Esta pesquisa não está disponível." }).waitFor();
+    assert.equal(await direct.getByRole("link", { name: "Ver pesquisas" }).getAttribute("href"), "./");
   });
 
   assert.deepEqual(pageErrors, [], `erros de página: ${pageErrors.join(" | ")}`);

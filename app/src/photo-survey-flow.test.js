@@ -1,15 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import ARTS from "./political-chromas.json" with { type: "json" };
-import { photoSurveyById } from "../../shared/photo-survey.js";
+import { PHOTO_SURVEYS, photoSurveyById } from "../../shared/photo-survey.js";
 import {
   ENTRY_CARD_IDS,
-  PHOTO_SURVEY_ID,
   PHOTO_SURVEY_STORAGE_KEY,
+  answeredSurveyIds,
   chooseChampion,
+  featuredSurveyId,
   freshProgress,
   goBack,
   identityTag,
+  inProgressSurveyId,
+  nextSurveyId,
   pickCard,
   progressView,
   readSavedProgress,
@@ -18,7 +21,11 @@ import {
   sameGroups,
   sampleCards,
   savedProgressText,
+  surveyIdFromSearch,
 } from "./photo-survey-flow.js";
+
+const PHOTO_SURVEY_ID = "politica-2026-01";
+const SECOND_SURVEY_ID = "politica-2026-02";
 
 const GROUPS = [
   ["a1", "a2", "a3", "a4"],
@@ -43,9 +50,59 @@ test("as cartas da entrada são uma lista fixa, dentro da pesquisa e com arte", 
   }
 });
 
-test("a pesquisa da página e a chave de armazenamento são fixas", () => {
-  assert.equal(PHOTO_SURVEY_ID, "politica-2026-01");
+test("a chave de armazenamento é fixa", () => {
   assert.equal(PHOTO_SURVEY_STORAGE_KEY, "polimatch:photo-survey:v1");
+});
+
+test("o endereço diz qual pesquisa abrir, e um código desconhecido cai na capa", () => {
+  assert.equal(surveyIdFromSearch("?p=politica-2026-02"), SECOND_SURVEY_ID);
+  assert.equal(surveyIdFromSearch("?x=1&p=politica-2026-01"), PHOTO_SURVEY_ID);
+  for (const search of ["", "?", "?p=", "?p=nao-existe", "?p=politica-2026-02%20", "?q=politica-2026-01", "?p=__proto__"]) {
+    assert.equal(surveyIdFromSearch(search), "", search);
+  }
+  assert.equal(surveyIdFromSearch("?p=so-esta", [{ id: "so-esta" }]), "so-esta");
+});
+
+test("o aparelho sabe quais pesquisas esta identidade respondeu e qual está em andamento", () => {
+  const tag = identityTag("pm2_ana");
+  const other = identityTag("pm2_bia");
+  let text = savedProgressText(null, PHOTO_SURVEY_ID, { identity: tag, answered: true });
+  assert.deepEqual(answeredSurveyIds(text, tag), [PHOTO_SURVEY_ID]);
+  assert.deepEqual(answeredSurveyIds(text, other), [], "o que outra identidade respondeu não conta");
+  assert.deepEqual(answeredSurveyIds(text, ""), []);
+  assert.equal(inProgressSurveyId(text, tag), "", "respondida não é em andamento");
+
+  text = savedProgressText(text, SECOND_SURVEY_ID, { identity: tag, progress: play(fresh(), "a1") });
+  assert.equal(inProgressSurveyId(text, tag), SECOND_SURVEY_ID);
+  assert.equal(inProgressSurveyId(text, other), "");
+  assert.equal(inProgressSurveyId(text, ""), "");
+  // Sorteio emitido sem nenhuma escolha ainda: a capa não puxa a pessoa de volta.
+  const untouched = savedProgressText(null, SECOND_SURVEY_ID, { identity: tag, progress: fresh() });
+  assert.equal(inProgressSurveyId(untouched, tag), "");
+  for (const broken of [null, "", "{não é json", "[]"]) {
+    assert.deepEqual(answeredSurveyIds(broken, tag), []);
+    assert.equal(inProgressSurveyId(broken, tag), "");
+  }
+  text = savedProgressText(text, SECOND_SURVEY_ID, { identity: tag, answered: true });
+  assert.deepEqual(answeredSurveyIds(text, tag), PHOTO_SURVEYS.map((survey) => survey.id));
+});
+
+test("o destaque da capa é a primeira pesquisa aberta que a pessoa ainda não respondeu", () => {
+  const views = [{ id: "a", status: "open" }, { id: "b", status: "open" }, { id: "c", status: "closed" }];
+  assert.equal(featuredSurveyId(views, []), "a");
+  assert.equal(featuredSurveyId(views, ["a"]), "b");
+  assert.equal(featuredSurveyId(views, ["a", "b"]), "", "respondidas todas as abertas, não há destaque");
+  assert.equal(featuredSurveyId([{ id: "a", status: "scheduled" }, { id: "b", status: "closed" }], []), "");
+  assert.equal(featuredSurveyId([{ id: "a", status: "closed" }, { id: "b", status: "open" }], []), "b");
+  assert.equal(featuredSurveyId([], []), "");
+});
+
+test("depois de responder, a próxima é a primeira pesquisa sem resposta, fora a atual", () => {
+  assert.equal(nextSurveyId(PHOTO_SURVEY_ID, []), SECOND_SURVEY_ID);
+  assert.equal(nextSurveyId(PHOTO_SURVEY_ID, [PHOTO_SURVEY_ID]), SECOND_SURVEY_ID);
+  assert.equal(nextSurveyId(SECOND_SURVEY_ID, [SECOND_SURVEY_ID]), PHOTO_SURVEY_ID);
+  assert.equal(nextSurveyId(PHOTO_SURVEY_ID, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID]), "");
+  assert.equal(nextSurveyId("a", [], [{ id: "a" }]), "");
 });
 
 test("as cartas da entrada são distintas, saem do conjunto e mudam com o sorteio", () => {

@@ -2,17 +2,20 @@ import "./install-error-reporter.js";
 import "./photo-survey.css";
 import "./site-menu.css";
 import ARTS from "./political-chromas.json" with { type: "json" };
-import { photoSurveyById } from "../../shared/photo-survey.js";
+import { PHOTO_SURVEYS, photoSurveyById } from "../../shared/photo-survey.js";
 import { createPlayer, drawPhotoSurvey, loadPhotoSurvey, respondPhotoSurvey } from "./api.js";
 import { safeStorage } from "./safe-storage.js";
 import { identityNoticeFromError, isPlayerIssuanceLimit, quotaResetLabel } from "./identity-notice.js";
 import {
   ENTRY_CARD_IDS,
-  PHOTO_SURVEY_ID,
   PHOTO_SURVEY_STORAGE_KEY,
+  answeredSurveyIds,
   chooseChampion,
+  featuredSurveyId,
   goBack,
   identityTag,
+  inProgressSurveyId,
+  nextSurveyId,
   pickCard,
   progressView,
   readSavedProgress,
@@ -21,7 +24,9 @@ import {
   sameGroups,
   sampleCards,
   savedProgressText,
+  surveyIdFromSearch,
 } from "./photo-survey-flow.js";
+import { shareChoice, shareImage } from "./share-choice.js";
 import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingMarkup } from "./site-menu.js";
 
 // Pesquisa por foto (ICM 68, #324), que desde a ICM 69 (#331) é a capa do
@@ -30,17 +35,41 @@ import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingMarkup } from "./
 // servidor na confirmação. Até lá as escolhas ficam neste aparelho. Depois de
 // registrada, o aparelho guarda só que a pessoa respondeu: a escolha vem
 // sempre do servidor.
+//
+// Desde a ICM 70 (#334) há mais de uma pesquisa. `/` é a capa: a entrada da
+// pesquisa em destaque e, abaixo, as outras. `/?p=<código>` abre uma pesquisa.
+// Ir de uma à outra é navegação comum, com recarga: tudo aqui vale para uma
+// pesquisa por vez, a de `surveyId`.
 
 const IDENTITY_KEY = "polimatch:v3:recovery-key";
-const SUBJECT = "Política";
 const GRID_SIZES = "(max-width: 440px) 45vw, 198px";
 const ADVANCE_MS = 220;
 const GRID_TIMEOUT_MS = 12000;
 
 const root = document.querySelector("#photo-survey");
-const definition = photoSurveyById(PHOTO_SURVEY_ID);
 const artById = new Map(ARTS.map((art) => [art.id, art]));
-const entryCards = sampleCards(ENTRY_CARD_IDS.filter((id) => artById.has(id)), 3);
+
+// A pesquisa na tela. Na capa é a pesquisa em destaque; "" quando não há uma.
+let surveyId = "";
+let definition = PHOTO_SURVEYS[0];
+// A capa: o endereço sem `?p=`. Abaixo da entrada vêm as listas de pesquisas.
+let atHome = false;
+// O que a capa leu: as visões públicas das pesquisas e, para as que esta
+// identidade já respondeu, a resposta (null enquanto não chega).
+let homeViews = [];
+const homeChoices = new Map();
+// O leque da entrada é sorteado uma vez por pesquisa e por visita.
+const fans = new Map();
+
+function useSurvey(id) {
+  surveyId = id;
+  definition = photoSurveyById(id) || PHOTO_SURVEYS[0];
+}
+
+function entryCards() {
+  if (!fans.has(surveyId)) fans.set(surveyId, sampleCards(ENTRY_CARD_IDS.filter((id) => artById.has(id)), 3));
+  return fans.get(surveyId);
+}
 
 let survey = null;
 let identity = "";
@@ -71,7 +100,8 @@ const groupSize = () => count(survey?.groupSize, definition.groupSize);
 const screens = () => Math.max(1, Math.round(drawSize() / groupSize()));
 const WORDS = { 2: "duas", 3: "três", 4: "quatro", 5: "cinco", 6: "seis" };
 const inWords = (number) => WORDS[number] || String(number);
-const kicker = () => `${SUBJECT} · ${drawSize()} cartas`;
+const subject = () => (typeof survey?.subject === "string" && survey.subject) || definition.subject;
+const kicker = () => `${subject()} · ${drawSize()} cartas`;
 const question = () => (typeof survey?.question === "string" && survey.question) || definition.question;
 
 /**
@@ -88,10 +118,10 @@ function readStored(key) {
   }
 }
 
-const savedRecord = () => readSavedProgress(readStored(PHOTO_SURVEY_STORAGE_KEY), PHOTO_SURVEY_ID);
+const savedRecord = () => readSavedProgress(readStored(PHOTO_SURVEY_STORAGE_KEY), surveyId);
 
 function persist() {
-  const text = savedProgressText(readStored(PHOTO_SURVEY_STORAGE_KEY), PHOTO_SURVEY_ID, {
+  const text = savedProgressText(readStored(PHOTO_SURVEY_STORAGE_KEY), surveyId, {
     identity: identityTag(identity),
     progress,
     answered: Boolean(response),
@@ -100,7 +130,7 @@ function persist() {
 }
 
 function forgetSaved() {
-  safeStorage.set(PHOTO_SURVEY_STORAGE_KEY, savedProgressText(readStored(PHOTO_SURVEY_STORAGE_KEY), PHOTO_SURVEY_ID, {}));
+  safeStorage.set(PHOTO_SURVEY_STORAGE_KEY, savedProgressText(readStored(PHOTO_SURVEY_STORAGE_KEY), surveyId, {}));
 }
 
 /** Há ao menos uma escolha desta identidade guardada neste aparelho. */
@@ -180,25 +210,64 @@ function shell({ step, filled = null, mainClass = "", body, focus = false, fit =
 const heading = (eyebrow, title, hint) => `<p class="ps-kicker">${escapeText(eyebrow)}</p><h1 class="ps-title" id="ps-title" tabindex="-1" aria-describedby="ps-step">${escapeText(title)}</h1><p class="ps-hint">${escapeText(hint)}</p>${noticeMarkup()}${offlineMarkup()}`;
 
 const MENU_LINK = '<button class="ps-link" data-action="menu" type="button">Abrir o menu</button>';
-const nextSurveys = () => `<div class="ps-next"><p class="ps-label">Próximas pesquisas</p>${upcomingMarkup()}</div>`;
+const ALL_SURVEYS_LINK = '<a class="ps-btn ps-btn--ghost" href="./">Ver pesquisas</a>';
+
+/** Depois de responder: a próxima pesquisa que esta identidade ainda não respondeu neste aparelho. */
+function nextLink() {
+  const answered = answeredSurveyIds(readStored(PHOTO_SURVEY_STORAGE_KEY), identityTag(readStored(IDENTITY_KEY)));
+  const nextId = nextSurveyId(surveyId, answered);
+  if (!nextId) return ALL_SURVEYS_LINK;
+  return `<a class="ps-btn ps-btn--ghost" href="${surveyHref(nextId)}" aria-label="Próxima pesquisa: ${escapeText(photoSurveyById(nextId).question)}">Próxima pesquisa</a>`;
+}
 const retryButton = (action, label = "Tentar de novo") => `<button class="ps-link" data-action="${action}" type="button">${label}</button>`;
 
 // Telas ---------------------------------------------------------------------
 
+const STATUS_TAG = { open: ["Aberta", " pm-tag--open"], scheduled: ["Em breve", ""], closed: ["Fechada", ""] };
+const surveyHref = (id) => `./?p=${encodeURIComponent(id)}`;
+
+// O que vem do servidor (pergunta, assunto) entra sempre escapado.
+function surveyRow(view) {
+  const base = photoSurveyById(view.id);
+  const [tag, modifier] = STATUS_TAG[view.status] || STATUS_TAG.closed;
+  const title = (typeof view.question === "string" && view.question) || base.question;
+  const topic = (typeof view.subject === "string" && view.subject) || base.subject;
+  return `<a class="ps-survey" href="${surveyHref(view.id)}"><span class="ps-survey-text"><b>${escapeText(title)}</b><small>${escapeText(topic)} · ${count(view.drawSize, base.drawSize)} cartas</small></span><em class="pm-tag${modifier}">${tag}</em></a>`;
+}
+
+function choiceRow(id) {
+  const base = photoSurveyById(id);
+  const answer = homeChoices.get(id);
+  const champion = artById.has(answer?.championId) ? answer.championId : "";
+  return `<a class="ps-pick" href="${surveyHref(id)}" data-survey="${escapeText(id)}">${champion ? staticCard(champion, "44px") : '<span class="ps-card" aria-hidden="true"></span>'}<span class="ps-survey-text"><small>${escapeText(base.subject)} · ${escapeText(base.question)}</small><b>${champion ? escapeText(cardName(champion)) : "Ver a sua escolha"}</b></span><i aria-hidden="true">›</i></a>`;
+}
+
+/** As listas da capa: o que a pessoa já escolheu, as outras pesquisas e as que vêm. */
+function homeSections() {
+  const chosen = homeViews.filter((view) => homeChoices.has(view.id));
+  const others = homeViews.filter((view) => view.id !== surveyId && !homeChoices.has(view.id));
+  return `${chosen.length ? `<p class="ps-label ps-home-label">Suas escolhas</p>${chosen.map((view) => choiceRow(view.id)).join("")}` : ""}
+    ${others.length ? `<p class="ps-label ps-home-label">Mais pesquisas</p>${others.map(surveyRow).join("")}` : ""}
+    <p class="ps-label ps-home-label">Em breve</p>${upcomingMarkup()}`;
+}
+
+/**
+ * A entrada de uma pesquisa. Na capa ela é a da pesquisa em destaque e leva
+ * as listas embaixo; sem destaque (tudo respondido, ou nada aberto), só o
+ * título e as listas.
+ */
 function renderEntry({ pending = "", action = "start", label = "Começar", focus = false } = {}) {
-  const total = screens();
+  const featured = surveyId
+    ? `${heading(kicker(), question(), "Leva menos de um minuto.")}
+      <div class="ps-fan" aria-hidden="true">${entryCards().map((id) => staticCard(id, "176px")).join("")}</div>
+      <div class="ps-cta"><button class="ps-btn" id="ps-action" data-action="${action}" type="button"${pending ? " disabled" : ""}>${escapeText(pending || label)}</button>
+        <p class="ps-muted ps-cta-note">Sua escolha só é registrada quando você confirmar.</p></div>`
+    : heading("Pesquisas", homeViews.some((view) => view.status === "open") ? "Você respondeu todas as pesquisas abertas." : "Nenhuma pesquisa aberta agora.", "Quando abrir outra, ela aparece aqui.");
   shell({
     step: "Pesquisa",
-    mainClass: "ps-main--entry",
+    mainClass: `ps-main--entry${atHome ? " ps-main--home" : ""}`,
     focus,
-    body: `${heading(kicker(), question(), "Leva menos de um minuto.")}
-      <div class="ps-fan" aria-hidden="true">${entryCards.map((id) => staticCard(id, "176px")).join("")}</div>
-      <ul class="ps-list">
-        <li><b>${total}</b><span>telas com ${escapeText(inWords(groupSize()))} cartas, um toque em cada.</span></li>
-        <li><b>1</b><span>final com as suas ${escapeText(inWords(total))} escolhidas.</span></li>
-        <li><b>✓</b><span>Sua escolha só é registrada quando você confirmar.</span></li>
-      </ul>
-      <div class="ps-stack"><button class="ps-btn" id="ps-action" data-action="${action}" type="button"${pending ? " disabled" : ""}>${escapeText(pending || label)}</button></div>`,
+    body: `${featured}${atHome ? `<div class="ps-home">${homeSections()}</div>` : '<p class="ps-more"><a class="ps-link" href="./">Todas as pesquisas</a></p>'}`,
   });
 }
 
@@ -273,8 +342,49 @@ function renderDone({ focus = false } = {}) {
     body: `${heading("Escolha registrada", champion ? cardName(champion) : "Sua resposta está registrada.", "Obrigado por participar. Sua resposta está registrada e não pode ser trocada nesta pesquisa.")}
       ${champion ? `<div class="ps-hero">${staticCard(champion, "176px")}</div>` : ""}
       ${others.length ? `<p class="ps-label">Suas finalistas</p><div class="ps-row">${others.map((id) => staticCard(id, "84px", cardName(id))).join("")}</div>` : ""}
-      ${nextSurveys()}`,
+      <div class="ps-stack ps-stack--pair">${champion ? '<button class="ps-btn" data-action="share" type="button">Compartilhar minha escolha</button>' : ""}${nextLink()}</div>`,
   });
+  prepareShare(champion);
+}
+
+// Compartilhar --------------------------------------------------------------
+
+// A imagem é montada quando a tela aparece. Assim o toque chama o
+// compartilhamento do aparelho na hora, como os navegadores exigem; se a
+// imagem ainda não está pronta, vai só o texto.
+let shareFile = null;
+let sharing = false;
+
+function prepareShare(champion) {
+  shareFile = null;
+  if (!champion) return;
+  const art = artById.get(champion);
+  const largest = art.srcset.split(",").map((candidate) => candidate.trim().split(/\s+/)[0]).pop() || art.src;
+  shareImage({ src: largest, name: art.name, question: question() }).then((file) => {
+    const button = root.querySelector('[data-action="share"]');
+    if (view !== "done" || response?.championId !== champion || !button) return;
+    shareFile = file;
+    button.dataset.ready = file ? "true" : "text";
+  });
+}
+
+/** Só acontece no toque. Leva a escolha da pessoa, nunca resultado somado. */
+async function share() {
+  const champion = response?.championId;
+  if (view !== "done" || sharing || !artById.has(champion)) return;
+  sharing = true;
+  const outcome = await shareChoice({ surveyId, name: cardName(champion), question: question(), file: shareFile });
+  sharing = false;
+  if (view !== "done") return;
+  notice = {
+    copied: "Link copiado. Cole onde quiser compartilhar.",
+    unavailable: "Este navegador não compartilha por aqui. O endereço é polimatch.com.br.",
+    failed: "Não deu para compartilhar agora. Tente de novo.",
+  }[outcome] || "";
+  const target = root.querySelector("#ps-notice");
+  if (!target) return;
+  target.textContent = notice;
+  target.hidden = !notice;
 }
 
 function renderStopped(kind, { focus = false } = {}) {
@@ -288,7 +398,7 @@ function renderStopped(kind, { focus = false } = {}) {
     step: copy[0],
     mainClass: "ps-main--entry",
     focus,
-    body: `${heading("Pesquisa", copy[1], copy[2])}${kind === "closed" ? nextSurveys() : ""}`,
+    body: `${heading("Pesquisa", copy[1], copy[2])}${atHome ? "" : `<div class="ps-stack">${ALL_SURVEYS_LINK}</div>`}`,
   });
 }
 
@@ -468,7 +578,7 @@ function recordedBeforeSwitch(key, result) {
   }
   const saved = savedRecord();
   if (saved?.identity === identityTag(key)) {
-    safeStorage.set(PHOTO_SURVEY_STORAGE_KEY, savedProgressText(readStored(PHOTO_SURVEY_STORAGE_KEY), PHOTO_SURVEY_ID, {
+    safeStorage.set(PHOTO_SURVEY_STORAGE_KEY, savedProgressText(readStored(PHOTO_SURVEY_STORAGE_KEY), surveyId, {
       identity: saved.identity,
       progress: null,
       answered: true,
@@ -481,8 +591,20 @@ function recordedBeforeSwitch(key, result) {
  * Abre ou retoma a pesquisa. `auto` é a retomada sem toque (abrir a página ou
  * outra aba confirmar): nela nunca se cria jogador nem se troca de identidade.
  */
+/** Põe a pesquisa no endereço, para a recarga voltar a ela e não à capa. */
+function leaveHome() {
+  if (!atHome) return;
+  atHome = false;
+  try {
+    window.history.replaceState(null, "", surveyHref(surveyId));
+  } catch {
+    // Sem histórico (página aberta de um arquivo, por exemplo) a pesquisa segue nesta visita.
+  }
+}
+
 async function start({ auto = false, retried = false } = {}) {
-  if (busy) return;
+  if (busy || !surveyId) return;
+  leaveHome();
   busy = true;
   notice = "";
   uncertain = false;
@@ -502,7 +624,7 @@ async function start({ auto = false, retried = false } = {}) {
     if (!key) {
       // A entrada pode estar aberta há muito tempo. Antes de criar o jogador,
       // que gasta a cota de jogos novos da rede, confere se a pesquisa segue aberta.
-      survey = await loadPhotoSurvey(PHOTO_SURVEY_ID);
+      survey = await loadPhotoSurvey(surveyId);
       if (run !== epoch) return;
       if (survey?.status !== "open") {
         busy = false;
@@ -521,7 +643,7 @@ async function start({ auto = false, retried = false } = {}) {
       }
     }
     identity = key;
-    result = await drawPhotoSurvey(PHOTO_SURVEY_ID, key);
+    result = await drawPhotoSurvey(surveyId, key);
   } catch (error) {
     if (run !== epoch) return;
     busy = false;
@@ -606,7 +728,7 @@ async function submit() {
   renderPlay({ sending: true });
   let result;
   try {
-    result = await respondPhotoSurvey(PHOTO_SURVEY_ID, key, body);
+    result = await respondPhotoSurvey(surveyId, key, body);
   } catch (error) {
     if (run !== epoch) return;
     busy = false;
@@ -726,7 +848,83 @@ function back() {
   renderPlay({ focus: true });
 }
 
-async function init() {
+function init() {
+  const requested = surveyIdFromSearch(window.location.search);
+  atHome = !requested;
+  if (!requested) return openHome();
+  useSurvey(requested);
+  return openSurvey();
+}
+
+const unreachableNotice = (error) => (error.status !== 0
+  ? "O servidor não respondeu como esperado. Tente de novo em instantes."
+  : navigator.onLine === false
+    ? "Não conseguimos falar com o servidor. Confira a conexão."
+    : "Não conseguimos falar com o servidor agora. Tente de novo em instantes.");
+
+/**
+ * A capa. Lê a definição de cada pesquisa (uma leitura por pesquisa, sem
+ * identidade) e escolhe o destaque. Só para o que este aparelho sabe
+ * respondido, ou para uma pesquisa já fechada, busca a resposta da pessoa:
+ * nesses dois casos o pedido de sorteio não grava nada.
+ */
+async function openHome() {
+  view = "loading";
+  notice = "";
+  survey = null;
+  const key = readStored(IDENTITY_KEY);
+  const tag = identityTag(key);
+  const saved = readStored(PHOTO_SURVEY_STORAGE_KEY);
+  const pending = inProgressSurveyId(saved, tag);
+  if (pending) {
+    // Há uma pesquisa pela metade neste aparelho: a capa leva de volta a ela.
+    useSurvey(pending);
+    leaveHome();
+    return openSurvey();
+  }
+  const answered = answeredSurveyIds(saved, tag);
+  homeViews = [];
+  homeChoices.clear();
+  useSurvey(nextSurveyId("", answered) || PHOTO_SURVEYS[0].id);
+  renderEntry({ pending: "Carregando…" });
+  const run = ++epoch;
+  const results = await Promise.all(PHOTO_SURVEYS.map((item) => loadPhotoSurvey(item.id).then((value) => ({ value }), (error) => ({ error }))));
+  if (run !== epoch) return;
+  homeViews = results.filter((result) => result.value && photoSurveyById(result.value.id)).map((result) => result.value);
+  if (!homeViews.length) {
+    const failure = results.find((result) => result.error && result.error.status !== 404)?.error;
+    if (!failure) {
+      useSurvey("");
+      renderStopped("unavailable");
+      return;
+    }
+    view = "entry";
+    notice = unreachableNotice(failure);
+    renderEntry({ action: "init", label: "Tentar de novo" });
+    return;
+  }
+  for (const id of answered) if (homeViews.some((item) => item.id === id)) homeChoices.set(id, null);
+  const featured = featuredSurveyId(homeViews, answered);
+  useSurvey(featured);
+  survey = homeViews.find((item) => item.id === featured) || null;
+  view = "entry";
+  renderEntry();
+  if (!key) return;
+  const wanted = homeViews.filter((item) => homeChoices.has(item.id) || item.status === "closed").map((item) => item.id);
+  await Promise.all(wanted.map(async (id) => {
+    try {
+      const result = await drawPhotoSurvey(id, key);
+      if (result?.response) homeChoices.set(id, result.response);
+    } catch {
+      // Sem a resposta, a linha fica sem a carta e leva à tela da pesquisa.
+    }
+  }));
+  // Só as listas são refeitas: o destaque e o foco ficam como estão.
+  const lists = root.querySelector(".ps-home");
+  if (run === epoch && atHome && view === "entry" && lists) lists.innerHTML = homeSections();
+}
+
+async function openSurvey() {
   view = "loading";
   notice = "";
   // Quem já começou nesta identidade vai direto ao sorteio, que também diz se
@@ -738,7 +936,7 @@ async function init() {
   renderEntry({ pending: "Carregando…" });
   const run = ++epoch;
   try {
-    survey = await loadPhotoSurvey(PHOTO_SURVEY_ID);
+    survey = await loadPhotoSurvey(surveyId);
   } catch (error) {
     if (run !== epoch) return;
     if (error.status === 404) {
@@ -746,11 +944,7 @@ async function init() {
       return;
     }
     view = "entry";
-    notice = error.status !== 0
-      ? "O servidor não respondeu como esperado. Tente de novo em instantes."
-      : navigator.onLine === false
-        ? "Não conseguimos falar com o servidor. Confira a conexão."
-        : "Não conseguimos falar com o servidor agora. Tente de novo em instantes.";
+    notice = unreachableNotice(error);
     renderEntry({ action: "init", label: "Tentar de novo" });
     return;
   }
@@ -780,6 +974,7 @@ root.addEventListener("click", (event) => {
   else if (action === "init") init();
   else if (action === "back") back();
   else if (action === "confirm") submit();
+  else if (action === "share") share();
   else if (action === "menu") siteMenu.open(event.target.closest("[data-action]"));
   else if (action === "reload-cards" && view === "play" && !busy) {
     notice = "";
@@ -839,7 +1034,7 @@ function identityUpdated() {
   if (!identity && !busy && ["entry", "done", "closed", "scheduled"].includes(view)) init();
 }
 
-const siteMenu = mountSiteMenu({ current: "survey", onIdentityChange: identityUpdated });
+const siteMenu = mountSiteMenu({ current: () => (atHome ? "home" : surveyId), onIdentityChange: identityUpdated });
 
 // A troca feita nesta mesma aba por outro caminho (voltar pelo histórico com a
 // conta já trocada) não gera evento de armazenamento: confere ao voltar a aparecer.

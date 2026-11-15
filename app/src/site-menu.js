@@ -1,3 +1,4 @@
+import { PHOTO_SURVEYS } from "../../shared/photo-survey.js";
 import { endSession, exchangeGoogleCredential } from "./api.js";
 import { googleClientId, mountGoogleButton } from "./google-login.js";
 import { safeStorage } from "./safe-storage.js";
@@ -50,15 +51,20 @@ function accountMarkup({ account, googleReady, busy, error }) {
 
 /**
  * A marcação do painel. `account` é o resultado de `accountKind`; `current`
- * diz em que página a pessoa está (`"survey"` ou `"how"`).
+ * diz onde a pessoa está: `"home"`, `"how"` ou o código de uma pesquisa.
+ * `surveys` são as pesquisas, na ordem da capa; cada uma tem endereço próprio.
  */
-export function menuMarkup({ account = "none", googleReady = false, busy = false, error = "", current = "" } = {}) {
+export function menuMarkup({ account = "none", googleReady = false, busy = false, error = "", current = "", surveys = PHOTO_SURVEYS } = {}) {
   const here = (page) => (current === page ? ' aria-current="page"' : "");
+  const surveyLinks = surveys
+    .map((survey) => `<a class="pm-item" href="./?p=${encodeURIComponent(survey.id)}"${here(survey.id)}><span>${escapeText(survey.question)}</span><small class="pm-sub">${escapeText(survey.subject)}</small></a>`)
+    .join("");
   return `<div class="pm-menu-top"><a class="ps-brand" href="./" aria-label="PoliMatch, início">Poli<b>Match</b></a><button class="pm-menu-btn" type="button" data-menu="close" aria-label="Fechar menu">${CLOSE_ICON}</button></div>
     <p class="pm-group">Pesquisas</p>
-    <a class="pm-item" href="./"${here("survey")}><span>Política</span><em class="pm-tag pm-tag--open">Aberta</em></a>
+    ${surveyLinks}
     ${upcomingMarkup()}
     <p class="pm-group">PoliMatch</p>
+    <a class="pm-item" href="./"${here("home")}><span>Início</span><i aria-hidden="true">›</i></a>
     <a class="pm-item" href="./como-funciona.html"${here("how")}><span>Como funciona</span><i aria-hidden="true">›</i></a>
     ${accountMarkup({ account, googleReady, busy, error })}`;
 }
@@ -84,6 +90,9 @@ function readKey() {
  * atualizada.
  */
 export function mountSiteMenu({ host = document.body, current = "", onIdentityChange = () => {} } = {}) {
+  // `current` pode ser um valor ou uma função: a página da pesquisa troca de
+  // pesquisa sem recarregar.
+  const currentPage = () => (typeof current === "function" ? current() : current);
   const dialog = document.createElement("dialog");
   dialog.className = "pm-menu";
   dialog.setAttribute("aria-label", "Menu");
@@ -100,7 +109,7 @@ export function mountSiteMenu({ host = document.body, current = "", onIdentityCh
   function render() {
     const account = accountKind(readKey());
     const googleReady = Boolean(googleClientId());
-    dialog.innerHTML = menuMarkup({ account, googleReady, busy: state.busy, error: state.error, current });
+    dialog.innerHTML = menuMarkup({ account, googleReady, busy: state.busy, error: state.error, current: currentPage() });
     // Trocar o conteúdo leva embora o elemento que tinha o foco: ele volta ao painel.
     if (isOpen() && !dialog.contains(document.activeElement)) dialog.focus({ preventScroll: true });
     if (account !== "google" && googleReady && !state.busy) mountGoogle();

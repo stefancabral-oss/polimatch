@@ -38,15 +38,17 @@ teste, que precisa falhar pelo motivo esperado antes do código.
   escolhas", "Mais pesquisas", "Em breve".
 - "Suas escolhas": para cada id respondido, `drawPhotoSurvey` devolve a
   resposta; falha de rede deixa a linha sem a carta, com "Ver".
-- Navegação entre capa e pesquisa por `history.pushState` e `popstate`.
+- Navegação entre capa e pesquisa por endereço, com recarga: links comuns. Só o
+  "Começar" da capa troca o endereço sem recarregar (`history.replaceState`).
 - `site-menu.js`: `menuMarkup` recebe `surveys` (`[{ id, subject, question }]`)
   e lista cada uma com link `./?p=<id>`.
 
 ## 70d — Compartilhar (`app/src/share-choice.js`)
 
 - `shareText({ name, question })`: o texto.
-- `shareImage({ art, name, question })`: desenha num `<canvas>` 1080×1350 e
-  devolve um `File` JPEG.
+- `shareImage({ src, name, question })`: desenha num `<canvas>` 1080×1350 e
+  devolve um `File` JPEG. A página monta a imagem quando a tela de resposta
+  aparece, para o toque chamar o compartilhamento na hora.
 - `shareChoice(...)`: `navigator.canShare({ files })` → `navigator.share` com
   arquivo; senão `navigator.share` com texto e link; senão copia o link.
   Cancelar o compartilhamento não é erro.

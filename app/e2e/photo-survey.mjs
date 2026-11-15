@@ -1,14 +1,14 @@
 /**
- * Pesquisa por foto, etapa 1 (ICM 68, #324). Desde a ICM 69 (#331) ela é a
- * capa do site: a página é `/`. O menu e a conta são do roteiro site-shell.mjs.
+ * Pesquisa por foto, etapa 1 (ICM 68, #324): o percurso de uma pesquisa, no
+ * endereço dela (`/?p=politica-2026-01`). A capa com várias pesquisas, o menu
+ * e a conta são do roteiro site-shell.mjs.
  *
  * O servidor aqui é simulado, com as mesmas regras de shared/photo-survey.js
  * que a API usa: sorteio por jogador, resposta única e validação da chave.
  * Ele conta cada requisição, para provar o que a página grava e quando.
  *
  * Cenários:
- *   1. Abrir a página não cria jogador nem sorteio; ela é a capa do site,
- *      está no sitemap e não tem noindex.
+ *   1. Abrir a página da pesquisa não cria jogador nem sorteio.
  *   2. Caminho direto: um toque por tela, final, confirmação e uma gravação.
  *   3. As quatro cartas têm o mesmo tamanho e cabem na tela em seis tamanhos,
  *      e em dois deles com o texto mais largo e mais alto; a confirmação e a
@@ -51,7 +51,7 @@ const browserType = { chromium, webkit }[browserName];
 if (!browserType) throw new Error(`Navegador não suportado: ${browserName}`);
 
 const SURVEY = PHOTO_SURVEYS[0];
-const SURVEY_URL = appUrl;
+const SURVEY_URL = new URL(`?p=${SURVEY.id}`, appUrl).href;
 const IDENTITY_KEY = "polimatch:v3:recovery-key";
 const PROGRESS_KEY = "polimatch:photo-survey:v1";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -268,7 +268,7 @@ async function scenario(name, run) {
 }
 
 try {
-  await scenario("abrir a página não grava nada e ela é a capa do site", async () => {
+  await scenario("abrir a página da pesquisa não grava nada", async () => {
     const server = createServer();
     const context = await newContext(server);
     const page = await openSurvey(context);
@@ -358,8 +358,7 @@ try {
     assert.equal(bodies[0].championId, picks[2]);
     assert.equal(server.responses.size, 1);
     assert.equal(await page.locator(".ps-grid, [data-action=confirm], #ps-action").count(), 0, "depois de registrar não há como responder de novo");
-    assert.equal(await page.getByRole("link", { name: "Ir para o início" }).count(), 0, "a pessoa já está no início");
-    assert.match(await page.locator(".ps-next").innerText(), /Próximas pesquisas/);
+    assert.equal(await page.getByRole("link", { name: "Próxima pesquisa: Em quem você confia mais?" }).getAttribute("href"), "./?p=politica-2026-02");
   });
 
   // A fonte do sistema muda de aparelho para aparelho, e com ela o número de
@@ -424,7 +423,7 @@ try {
       await summary("confirmação", '[data-action="confirm"]');
       await confirm(page);
       await step(page, "Registrada");
-      await summary("resposta registrada", null, ".ps-next");
+      await summary("resposta registrada", '[data-action="share"]');
     });
   }
 
@@ -775,7 +774,7 @@ try {
     const page = await openSurvey(await newContext(off));
     await page.locator("#ps-title", { hasText: "Esta pesquisa não está disponível." }).waitFor();
     assert.equal(await page.locator("#ps-action, .ps-grid").count(), 0);
-    assert.equal(await page.getByRole("link", { name: "Ir para o início" }).count(), 0);
+    assert.equal(await page.getByRole("link", { name: "Ver pesquisas" }).getAttribute("href"), "./");
     assert.equal(await page.locator('.ps-top [data-action="menu"]').count(), 1, "o menu continua à mão");
 
     const server = createServer();
@@ -827,15 +826,16 @@ try {
     assert.equal(await storedKey(page), null);
     assert.doesNotMatch(text, /servidor|conexão/i, "cota não é falha de conexão");
 
-    // Em tela baixa, com o aviso na entrada, a lista do formato não fica atrás do botão.
+    // Em tela baixa, com o aviso na entrada, o botão continua à vista, abaixo do aviso.
     const small = createServer();
     small.quota = true;
     const narrow = await openSurvey(await newContext(small, { width: 360, height: 640 }));
     await begin(narrow);
     await narrow.locator("#ps-notice:not([hidden])").waitFor();
-    const list = await narrow.locator(".ps-list").boundingBox();
+    const warning = await narrow.locator("#ps-notice").boundingBox();
     const start = await actionButton(narrow).boundingBox();
-    assert.ok(list.y + list.height <= start.y + 1, `a lista da entrada não fica atrás do botão (${list.y + list.height} > ${start.y})`);
+    assert.ok(warning.y + warning.height <= start.y + 1, `o aviso não cobre o botão (${warning.y + warning.height} > ${start.y})`);
+    assert.ok(start.y + start.height <= 640 + 1, `o botão aparece sem rolar (${start.y + start.height})`);
     assert.equal(await narrow.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1), true, "a entrada com aviso cabe sem rolar em 360×640");
   });
 

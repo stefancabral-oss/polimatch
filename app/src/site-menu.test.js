@@ -18,21 +18,31 @@ test("as próximas pesquisas seguem a ordem da decisão 0002 e são só anúncio
   assert.doesNotMatch(markup, /<a\b|href=/);
 });
 
-test("o menu leva a pesquisa aberta ao início e não dá link às próximas", () => {
+test("o menu leva cada pesquisa ao endereço dela e não dá link às próximas", () => {
   const markup = menuMarkup();
-  assert.match(markup, /<a class="pm-item" href="\.\/"[^>]*><span>Política<\/span><em class="pm-tag pm-tag--open">Aberta<\/em><\/a>/);
-  assert.match(markup, /<a class="pm-item" href="\.\/como-funciona\.html"[^>]*><span>Como funciona<\/span>/);
+  assert.match(markup, /<a class="pm-item" href="\.\/\?p=politica-2026-01"><span>Quem você prefere\?<\/span><small class="pm-sub">Política<\/small><\/a>/);
+  assert.match(markup, /<a class="pm-item" href="\.\/\?p=politica-2026-02"><span>Em quem você confia mais\?<\/span><small class="pm-sub">Política<\/small><\/a>/);
+  assert.ok(markup.indexOf("politica-2026-01") < markup.indexOf("politica-2026-02"), "na ordem da capa");
+  assert.match(markup, /<a class="pm-item" href="\.\/"><span>Início<\/span>/);
+  assert.match(markup, /<a class="pm-item" href="\.\/como-funciona\.html"><span>Como funciona<\/span>/);
   for (const name of UPCOMING_SURVEYS) {
     assert.match(markup, new RegExp(`<div class="pm-item is-soon"><span>${name}</span><em class="pm-tag">Em breve</em></div>`));
   }
   assert.doesNotMatch(markup, /Privacidade/);
 });
 
+test("o menu lista as pesquisas que recebe, com o texto escapado", () => {
+  const markup = menuMarkup({ surveys: [{ id: "x-1", subject: "A & B", question: "<b>Qual?</b>" }] });
+  assert.match(markup, /href="\.\/\?p=x-1"><span>&lt;b&gt;Qual\?&lt;\/b&gt;<\/span><small class="pm-sub">A &amp; B<\/small>/);
+  assert.doesNotMatch(markup, /politica-2026/);
+});
+
 test("o menu marca a página em que a pessoa está", () => {
-  assert.match(menuMarkup({ current: "survey" }), /href="\.\/" aria-current="page"/);
-  assert.doesNotMatch(menuMarkup({ current: "survey" }), /como-funciona\.html" aria-current/);
-  assert.match(menuMarkup({ current: "how" }), /href="\.\/como-funciona\.html" aria-current="page"/);
-  assert.doesNotMatch(menuMarkup({ current: "how" }), /href="\.\/" aria-current/);
+  const marked = (markup) => [...markup.matchAll(/href="([^"]+)" aria-current="page"/g)].map((match) => match[1]);
+  assert.deepEqual(marked(menuMarkup({ current: "home" })), ["./"]);
+  assert.deepEqual(marked(menuMarkup({ current: "politica-2026-02" })), ["./?p=politica-2026-02"]);
+  assert.deepEqual(marked(menuMarkup({ current: "how" })), ["./como-funciona.html"]);
+  assert.deepEqual(marked(menuMarkup()), []);
 });
 
 test("sem conta e com o Google configurado, o menu reserva o lugar do botão de entrada", () => {
@@ -46,7 +56,7 @@ test("sem conta e com o Google configurado, o menu reserva o lugar do botão de 
 
 test("sem o identificador do Google no build, o menu não oferece entrada", () => {
   const markup = menuMarkup({ account: "none", googleReady: false });
-  assert.match(markup, /<span>Política<\/span>/);
+  assert.match(markup, /<span>Quem você prefere\?<\/span>/);
   assert.doesNotMatch(markup, /pm-google|Google|Sair da conta|pm-account/);
 });
 

@@ -1,0 +1,49 @@
+{
+  "checkedAt": "2026-11-14",
+  "issue": 334,
+  "stage": "70_more_surveys",
+  "base": "icm/69d-cleanup (PR #333), a refazer sobre a main",
+  "instruction": "Stefan, 14/11/2026, com a capa nova no ar: \"Subiu. Mas está bem simples. Precisa de mais coisas.\" O pacote é escolha do agente, por delegação.",
+  "parts": {
+    "70a": "subject e a segunda pesquisa (politica-2026-02) em shared/; smoke do servidor com as duas",
+    "70b": "a página vale para qualquer pesquisa; /?p=<código>",
+    "70c": "capa com destaque, Suas escolhas, Mais pesquisas e Em breve; menu com as pesquisas",
+    "70d": "compartilhar a escolha: imagem, texto e endereço; saídas sem suporte",
+    "70e": "não começou: deploy da API e do app, com o sim do Stefan"
+  },
+  "testsFirst": {
+    "regras": "shared (4 falharam), regras da capa, menu (3 falharam) e share-choice: testes escritos e vistos falhar antes do código",
+    "navegador, compartilhar": "3 cenários falharam antes de o botão existir",
+    "exceção": "os cenários de navegador da capa (25 a 29 e 32) foram escritos depois da mudança da página e passaram de primeira"
+  },
+  "tests": {
+    "environment": "macOS, local, 14/11/2026",
+    "npm run test:shared": "106/106",
+    "npm test --prefix back": "293/293",
+    "back/scripts/photo-survey-smoke.mjs em PostgreSQL 16 local": "aprovado, com as duas pesquisas independentes",
+    "npm test --prefix app": "195/195",
+    "e2e site-shell em WebKit": "32 cenários aprovados",
+    "e2e site-shell em Chromium 140": "31 cenários aprovados; o 32º entrou depois e roda no CI",
+    "e2e photo-survey": "34 cenários em WebKit e em Chromium 140",
+    "e2e client-error-report": "aprovado nos dois",
+    "capturas conferidas": "capa em dois tamanhos, capa de quem respondeu uma e as duas, resposta registrada com dois botões, entrada da segunda pesquisa, menu e a imagem compartilhada (1080x1350, 362 KB)"
+  },
+  "acceptance": {
+    "duas pesquisas com assunto, 20 cartas, 16 e 4; ids únicos": "shared/photo-survey.test.js",
+    "o mesmo jogador responde as duas, uma vez cada": "back/scripts/photo-survey-smoke.mjs; e2e site-shell, cenário 26",
+    "capa sem identidade: uma leitura por pesquisa, nenhuma gravação": "e2e site-shell, cenário 1",
+    "?p= abre a pesquisa; código desconhecido cai na capa": "photo-survey-flow.test.js; e2e site-shell, cenário 25",
+    "responder a primeira: escolha na capa e a segunda em destaque; respondidas as duas, a capa diz": "e2e site-shell, cenário 26",
+    "escolhas de uma não aparecem na outra; a capa retoma a pesquisa pela metade": "e2e site-shell, cenários 26 e 27",
+    "compartilhar só no toque, com imagem e texto; sem arquivo, texto; sem compartilhamento, copia": "share-choice.test.js; e2e site-shell, cenários 30 e 31",
+    "os cenários dos estágios 68 e 69 passam": "photo-survey 34; site-shell 1 a 24",
+    "app novo com API antiga mostra só a primeira pesquisa": "e2e site-shell, cenário 32"
+  },
+  "notVerified": [
+    "navigator.share num aparelho de verdade: nos testes é simulado",
+    "fontes do Linux nas telas novas: só pelos e2e do CI",
+    "produção: nada deste estágio foi publicado"
+  ],
+  "independentReview": "a preencher",
+  "humanGate": "pendente"
+}
