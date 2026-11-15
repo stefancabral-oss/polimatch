@@ -539,12 +539,22 @@ async function start({ auto = false, retried = false } = {}) {
   applyDraw(result);
 }
 
+/**
+ * O servidor recusou porque a pesquisa parou depois de esta página ser
+ * aberta. A página guarda isso: quem troca de conta em seguida vê a pesquisa
+ * parada, não a entrada.
+ */
+function stoppedByServer(error) {
+  survey = { ...(survey || {}), status: error.body?.current?.status === "scheduled" ? "scheduled" : "closed" };
+}
+
 function failStart(error) {
   if (error.status === 404) {
     renderStopped("unavailable", { focus: true });
     return;
   }
   if (error.status === 409 && error.code === "PHOTO_SURVEY_CLOSED") {
+    stoppedByServer(error);
     renderClosed(error.body?.current?.status, { focus: true });
     return;
   }
@@ -628,6 +638,7 @@ function failSubmit(error, key) {
   }
   if (error.status === 409 && error.code === "PHOTO_SURVEY_CLOSED") {
     uncertain = false;
+    stoppedByServer(error);
     notice = "A pesquisa fechou antes de a sua confirmação chegar. Sua escolha não foi registrada.";
     renderClosed(error.body?.current?.status, { focus: true });
     return;

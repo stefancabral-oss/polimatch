@@ -65,7 +65,8 @@ botão que abre vem de `menuButtonMarkup()` e tem `data-action="menu"`. Entrar: 
 chave do aparelho → `onIdentityChange()`. Sair: `endSession(chave)`; com
 resposta 401 a chave é esquecida mesmo assim; com falha de rede ou erro do
 servidor ela fica e o erro aparece → `onIdentityChange()`. Se a entrada é
-recusada com 401 e havia uma chave no aparelho, ela é refeita sem a chave.
+recusada com 401 e havia uma chave no aparelho, ela é refeita sem a chave,
+menos quando a recusa é da credencial do Google (`INVALID_GOOGLE_CREDENTIAL`).
 Sem `showModal`, o painel abre pelo atributo `open`.
 
 ### 3. A página da pesquisa
@@ -78,8 +79,13 @@ Sem `showModal`, o painel abre pelo atributo `open`.
 - Aviso de cota: "Entre com Google no menu para responder agora", com um
   botão que abre o menu. Aviso de sessão: aponta o menu.
 - `identityUpdated()`: chamada pelo menu. Com identidade em uso e diferente da
-  salva, vale `identityChanged()`. Na entrada, sem identidade em uso, a
-  página reabre (`init()`), para o aviso de cota sumir e a conta ser lida.
+  salva, vale `identityChanged()`. Sem identidade em uso (entrada, resposta
+  registrada sem conta, pesquisa parada), a página reabre (`init()`), para o
+  aviso de cota sumir e a conta ser lida.
+- `identityChanged()` ganha dois desvios: com a pesquisa parada a página
+  reabre em vez de oferecer a entrada; e quem estava na resposta registrada e
+  saiu da conta continua nela, com aviso. Uma recusa 409 de pesquisa fechada
+  passa a ser guardada como estado da pesquisa.
 - O registro do `sw.js` vem da capa antiga para cá.
 
 ### 4. Como funciona

@@ -5,7 +5,7 @@
 - Estado: `pronto para gate` nas entregas 69a, 69b e 69c, que vão num PR só. A 69d (limpeza do código antigo) e a 69e (publicação) não começaram.
 - Issue: #331
 - Branch: `icm/69-survey-home`
-- PR: a abrir
+- PR: #332
 - Nada deste estágio está em produção.
 
 ## Entregue (69a — registro)
@@ -17,7 +17,7 @@
 ## Entregue (69b — casca nova)
 
 - **Menu.** `app/src/site-menu.js` e `site-menu.css`. Abre por cima da tela, num `<dialog>` nativo. Traz a pesquisa aberta, as próximas ("Famosos e influenciadores" e "Roupas", marcadas "em breve", sem link), "Como funciona" e a conta.
-- **Conta.** "Entrar com Google" e "Sair da conta" ficam no menu e usam as rotas que a capa antiga já usava. O menu reconhece a sessão Google pelo prefixo da chave do aparelho, sem consultar o servidor. Sair com a sessão já inválida no servidor esquece a chave; com falha de rede ou erro do servidor, a sessão fica e a pessoa lê o motivo. Se o servidor não reconhece mais a chave do aparelho, a entrada é refeita sem ela. Se o script do Google não carrega, o menu avisa e oferece tentar de novo.
+- **Conta.** "Entrar com Google" e "Sair da conta" ficam no menu e usam as rotas que a capa antiga já usava. O menu reconhece a sessão Google pelo prefixo da chave do aparelho, sem consultar o servidor. Sair com a sessão já inválida no servidor esquece a chave; com falha de rede ou erro do servidor, a sessão fica e a pessoa lê o motivo. Se o servidor não reconhece mais a chave do aparelho, a entrada é refeita sem ela; se a recusa é da credencial do Google, não, para a chave continuar valendo. Se o script do Google não carrega, o menu avisa e oferece tentar de novo.
 - **Página da pesquisa.** O botão do menu aparece na entrada, na resposta registrada e nas telas de pesquisa parada; no voto, na final e na confirmação continua só o indicador de etapa. A resposta registrada e a pesquisa fechada mostram as próximas pesquisas no lugar de "Ir para o início". Os avisos de cota de rede e de sessão apontam o menu. Entrar ou sair pelo menu segue o mesmo caminho da troca de conta feita em outra aba, com duas diferenças: quem sai da conta na tela de resposta registrada continua nela, com aviso, sem convite para responder de novo; e com a pesquisa fechada a página reabre em vez de oferecer "Começar".
 - **Como funciona.** `app/como-funciona.html`: página estática, com o formato em quatro linhas, a frase "Do PoliMatch só sai o resultado somado, nunca a escolha de uma pessoa." (decisão 0001, item 5) e o botão para responder.
 
@@ -45,11 +45,13 @@ Em 14/11/2026, local (macOS), no código final do PR:
 - `npm test --prefix app`: 321/321. Eram 311: saíram os 2 da página de integridade e entraram 10 das regras do menu, 1 dos redirecionamentos do nginx e 1 do carregamento do script do Google.
 - `npm run test:card-art-pilot-contract --prefix app`: 64/64. O formulário do piloto passou em WebKit.
 - `npm run build --prefix app`, com as verificações de prévia e de referências: sem erro.
-- `app/e2e/site-shell.mjs`: 20 cenários aprovados em WebKit e em Chromium 140 (11 da primeira versão e 9 que vieram da revisão).
+- `app/e2e/site-shell.mjs`: 24 cenários aprovados em WebKit e em Chromium 140 (11 da primeira versão, 9 da primeira passada da revisão e 4 da segunda).
 - `app/e2e/photo-survey.mjs`: 34 cenários aprovados em WebKit e em Chromium 140, com a página em `/`.
 - `app/e2e/client-error-report.mjs`: aprovado nos dois navegadores, nas duas páginas.
 - `app/scripts/smoke-nginx.mjs` contra um nginx 1.31 local com o `nginx.conf` do app e o `dist` do build: 14 de 14. Os cinco endereços aposentados respondem 302 com `Location: /`; um `.html` que não existe continua respondendo 404.
 - Capturas conferidas a olho: início, menu sem conta, menu com conta, resposta registrada em 390×844, 360×640 e 320×480, pesquisa fechada, "Como funciona" em 390×844 e 360×640, e a tela de voto, sem menu.
+
+No CI do PR #332, no commit `8d85655` (antes da segunda passada da revisão): `ci-gate` verde. No Linux, `site-shell` com 20 cenários e `photo-survey` com 34, em Chromium e em WebKit; relato de erros nos dois; os testes de unidade, a imagem do app e o `smoke-nginx` com 14 de 14 na imagem nginx 1.27, incluídos os cinco redirecionamentos. A revisão automática do Codex leu esse commit e não deixou apontamento. O commit final passa pelo CI de novo antes do merge.
 
 O que veio antes do código, e falhou primeiro pelo motivo esperado:
 
@@ -78,11 +80,27 @@ Ficaram anotados, sem mudança:
 
 - Num build sem o identificador do Google, os avisos ainda mandam entrar pelo menu, que nesse build não tem a entrada. Produção e CI têm o identificador.
 - Um menu aberto no instante em que a pesquisa abre continua aberto sobre a tela de voto; ao fechar, o foco vai para o título.
-- Com o celular deitado (667×375), a resposta registrada pede uns 55 px de rolagem e, no menu, o botão do Google fica abaixo da dobra.
-- Em 320×480, na entrada, a lista fica 15 px atrás do botão até rolar, como já ficava.
+- Com o celular deitado (667×375), a resposta registrada pede uns 59 px de rolagem e, no menu, o botão do Google fica abaixo da dobra.
+- Em 320×480, na entrada, a lista fica 19 px atrás do botão até rolar (eram 15 px antes de o botão do menu crescer para 44 px).
 - Abrir o menu carrega o script do Google, de `accounts.google.com`. A capa antiga fazia o mesmo ao abrir a tela de entrada.
 
 Ele não rodou Chromium, não usou o botão real do Google, nem a imagem nginx do CI, nem o servidor de verdade: o comportamento da API na entrada e na saída ele leu no código.
+
+**Segunda passada**, sobre o commit das correções (`8d85655`). O mesmo agente refez os próprios roteiros, rodou os cenários novos contra um build do commit anterior (oito falham ali; três cobrem comportamento que já estava certo) e desfez correções uma a uma para ver os testes pegarem. Confirmou os seis pontos como corrigidos e achou um ponto novo, importante, corrigido antes do merge com teste antes:
+
+| O que a segunda passada apontou | O que mudou |
+|---|---|
+| A nova tentativa de entrada sem a chave valia para qualquer 401, inclusive a recusa da credencial do Google: uma chave anônima ainda válida ficava para trás, e quem já tinha respondido via a tela de voto | A nova tentativa não acontece quando o código é `INVALID_GOOGLE_CREDENTIAL` |
+| A pesquisa que fecha depois de a página abrir chega como 409, e a página não guardava isso: sair da conta ali oferecia "Começar" | A recusa 409 passa a valer como estado da pesquisa |
+| Sem `showModal`, o Esc só fechava com o foco dentro do painel | O Esc é ouvido no documento |
+| Três correções menores não tinham teste | Cenários novos para a sessão ausente na resposta e para a corrida na saída; cada um falha com a correção desfeita |
+| Contraste da etiqueta "Aberta" (4,4:1) | Verde mais escuro no texto da etiqueta |
+
+Da segunda passada ficaram anotados, sem mudança:
+
+- O aviso "Você saiu da conta neste aparelho. A sua resposta continua registrada." continua na tela se outra aba entra de novo na conta; some ao recarregar ou ao abrir o menu e entrar nesta aba.
+- "Você entrou com Google" tem `role="status"`, mas chega junto com o painel refeito: leitores de tela podem não anunciar. Não foi testado com leitor de tela.
+- No e2e, a saída com sessão vencida é simulada com 401; o servidor de verdade responde 204 para uma sessão que não conhece. O menu trata os dois.
 
 ## Riscos conhecidos
 

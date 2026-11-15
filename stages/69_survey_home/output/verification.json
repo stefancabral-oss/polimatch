@@ -41,8 +41,8 @@
     "npm test --prefix app": "321/321",
     "npm run test:card-art-pilot-contract --prefix app": "64/64",
     "npm run build --prefix app": "sem erro, com verify-share-preview e verify-public-refs",
-    "e2e site-shell em WebKit": "20 cenários aprovados",
-    "e2e site-shell em Chromium 140": "20 cenários aprovados",
+    "e2e site-shell em WebKit": "24 cenários aprovados",
+    "e2e site-shell em Chromium 140": "24 cenários aprovados",
     "e2e photo-survey em WebKit": "34 cenários aprovados, com a página em /",
     "e2e photo-survey em Chromium 140": "34 cenários aprovados, com a página em /",
     "e2e client-error-report": "aprovado em WebKit e em Chromium 140, nas duas páginas",
@@ -73,8 +73,7 @@
   },
   "notVerified": [
     "o botão real do Google: nos testes o script do Google é simulado",
-    "a imagem nginx 1.27 do CI: local foi nginx 1.31",
-    "fontes do Linux: os tamanhos foram conferidos no macOS; o CI roda Chromium e WebKit no Linux",
+    "fontes do Linux: os tamanhos foram conferidos a olho no macOS; no Linux, só pelos e2e do CI",
     "produção: nada deste estágio foi publicado"
   ],
   "independentReview": {
@@ -97,7 +96,30 @@
       "320x480 na entrada: lista 15 px atrás do botão, como antes",
       "abrir o menu carrega o script do Google"
     ],
-    "notDoneByReviewer": "Chromium, botão real do Google, imagem nginx do CI, servidor de verdade (comportamento lido no código)"
+    "notDoneByReviewer": "Chromium, botão real do Google, imagem nginx do CI, servidor de verdade (comportamento lido no código)",
+    "secondPass": {
+      "on": "commit 8d85655",
+      "verdict": "sem bloqueio; os seis pontos confirmados como corrigidos; um ponto novo, importante",
+      "how": "roteiros próprios refeitos; cenários novos rodados contra um build do commit anterior (oito falham ali); correções desfeitas uma a uma para ver os testes pegarem",
+      "fixedBeforeMerge": [
+        "a nova tentativa de entrada sem a chave não vale para a recusa da credencial do Google (INVALID_GOOGLE_CREDENTIAL)",
+        "a recusa 409 de pesquisa fechada passa a valer como estado da pesquisa",
+        "sem showModal, o Esc é ouvido no documento",
+        "cenários novos para a sessão ausente na resposta e para a corrida na saída, cada um conferido com a correção desfeita",
+        "contraste da etiqueta Aberta"
+      ],
+      "notedOnly": [
+        "aviso de saída continua na tela se outra aba entra de novo na conta",
+        "role=status pode não ser anunciado; não testado com leitor de tela",
+        "o e2e simula 401 na saída com sessão vencida; o servidor de verdade responde 204"
+      ]
+    }
   },
-  "humanGate": "pendente"
+  "humanGate": "pendente",
+  "ci": {
+    "pr": 332,
+    "commit 8d85655": "ci-gate verde; no Linux, site-shell 20 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; design-validator com os testes de unidade, a imagem do app e smoke-nginx 14 de 14 na imagem nginx 1.27",
+    "automatedReview": "Codex leu o commit 8d85655 e não deixou apontamento",
+    "finalCommit": "passa pelo CI de novo antes do merge"
+  }
 }

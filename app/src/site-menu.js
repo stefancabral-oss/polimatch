@@ -8,6 +8,7 @@ import { safeStorage } from "./safe-storage.js";
 
 const IDENTITY_KEY = "polimatch:v3:recovery-key";
 const GOOGLE_SESSION_PREFIX = "pms_";
+const GOOGLE_CREDENTIAL_REJECTED = "INVALID_GOOGLE_CREDENTIAL";
 
 /** Próximas pesquisas, na ordem da decisão 0002. São só anúncio: sem página, data nem cartas. */
 export const UPCOMING_SURVEYS = Object.freeze(["Famosos e influenciadores", "Roupas"]);
@@ -145,14 +146,17 @@ export function mountSiteMenu({ host = document.body, current = "", onIdentityCh
   /**
    * A chave de quem respondia sem conta vai junto, para o servidor ligar as
    * escolhas dela à conta. Se o servidor não reconhece mais essa chave, a
-   * entrada é refeita sem ela: senão a pessoa nunca conseguiria entrar.
+   * entrada é refeita sem ela: senão a pessoa nunca conseguiria entrar. Uma
+   * recusa da credencial do Google também chega como 401, com código próprio:
+   * nela a chave continua valendo e não há nova tentativa, para as escolhas
+   * dadas sem conta não ficarem para trás.
    */
   async function exchange(credential) {
     const key = readKey();
     try {
       return await exchangeGoogleCredential(credential, key);
     } catch (error) {
-      if (error.status === 401 && key) return exchangeGoogleCredential(credential, "");
+      if (error.status === 401 && key && error.code !== GOOGLE_CREDENTIAL_REJECTED) return exchangeGoogleCredential(credential, "");
       throw error;
     }
   }
@@ -211,9 +215,13 @@ export function mountSiteMenu({ host = document.body, current = "", onIdentityCh
   }
 
   dialog.addEventListener("close", closed);
-  dialog.addEventListener("keydown", (event) => {
-    if (!modal && event.key === "Escape") close();
-  });
+  // Sem `showModal` o navegador não fecha no Esc nem prende o foco: o Esc é
+  // ouvido no documento, onde quer que o foco esteja.
+  if (!modal) {
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && isOpen()) close();
+    });
+  }
 
   dialog.addEventListener("click", (event) => {
     const action = event.target.closest("[data-menu]")?.dataset.menu;

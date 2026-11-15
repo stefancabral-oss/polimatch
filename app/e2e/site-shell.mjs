@@ -28,6 +28,10 @@
  *  18. Entrar enquanto a pesquisa abre não cria jogador anônimo.
  *  19. O foco fica no menu quando o conteúdo dele muda.
  *  20. Navegador sem showModal: o menu abre e fecha mesmo assim.
+ *  21. Credencial do Google recusada: a chave do aparelho não é descartada.
+ *  22. Entrada sem sessão na resposta: o menu avisa e a chave não muda.
+ *  23. Sair não apaga a sessão que outra aba gravou enquanto o servidor respondia.
+ *  24. A pesquisa fechou depois de aberta a página: sair não oferece "Começar".
  */
 import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
@@ -53,8 +57,13 @@ function createServer() {
     logout: "ok",
     status: "open",
     googleDown: false,
-    // Falhas programadas da entrada com Google: cada item é um status HTTP.
+    // Falhas programadas da entrada com Google: cada item é um status HTTP,
+    // ou um objeto com status e código.
     failAuth: [],
+    // Quantas entradas respondem 200 sem a sessão.
+    emptyAuth: 0,
+    // Chamada antes de responder à saída da conta.
+    beforeLogout: null,
     // Chaves que o servidor deixou de reconhecer.
     revoked: new Set(),
     // Segura a próxima leitura da pesquisa até `release()` ser chamada.
@@ -88,7 +97,15 @@ function createServer() {
       return send(201, { recoveryKey: ANONYMOUS_KEY });
     }
     if (pathname === "/api/auth/google" && method === "POST") {
-      if (server.failAuth.length) return send(server.failAuth.shift(), { error: "falha passageira de login" });
+      if (server.failAuth.length) {
+        const failure = server.failAuth.shift();
+        const { status, code } = typeof failure === "number" ? { status: failure, code: "" } : failure;
+        return send(status, { error: "falha de login", ...(code ? { code } : {}) });
+      }
+      if (server.emptyAuth > 0) {
+        server.emptyAuth -= 1;
+        return send(200, { account: { displayName: "Bia" }, player: { version: 0 }, merge: null });
+      }
       // Como o servidor de verdade: uma chave que ele não reconhece recusa a entrada.
       if (key && server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
       // E a resposta de quem respondia sem conta passa a ser da conta.
@@ -96,6 +113,7 @@ function createServer() {
       return send(200, { sessionToken: GOOGLE_KEY, account: { displayName: "Bia" }, player: { version: 0 }, merge: null });
     }
     if (pathname === "/api/auth/logout" && method === "POST") {
+      if (server.beforeLogout) await server.beforeLogout();
       if (server.logout === "down") return route.abort("connectionrefused");
       if (server.logout === "error") return send(500, { error: "erro interno", code: "INTERNAL_ERROR" });
       if (server.logout === "expired") return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
@@ -592,6 +610,77 @@ try {
     await page.waitForFunction(() => !document.querySelector(".pm-menu").hasAttribute("open"));
     assert.equal(await page.locator(".pm-menu").isVisible(), false);
     await entryReady(page);
+    // Esc fecha mesmo com o foco fora do painel, que aqui não prende o foco.
+    await menuButton(page).click();
+    await panel.waitFor();
+    await page.evaluate(() => document.querySelector("#ps-title").focus());
+    await page.keyboard.press("Escape");
+    await page.waitForFunction(() => !document.querySelector(".pm-menu").hasAttribute("open"));
+  });
+
+  await scenario("credencial do Google recusada: a chave do aparelho não é descartada", async () => {
+    const server = createServer();
+    server.answered(ANONYMOUS_KEY);
+    server.failAuth.push({ status: 401, code: "INVALID_GOOGLE_CREDENTIAL" });
+    const page = await open(await newContext(server, { storedKey: ANONYMOUS_KEY }));
+    await entryReady(page);
+    await openMenu(page);
+    await page.locator("dialog.pm-menu[open] #e2e-google").click();
+    await page.locator('dialog.pm-menu[open] [role="alert"]').waitFor();
+    const keys = () => server.requests.filter((request) => request.pathname === "/api/auth/google").map((request) => request.key);
+    assert.deepEqual(keys(), [ANONYMOUS_KEY], "a recusa foi da credencial: não há nova tentativa sem a chave");
+    assert.equal(await storedKey(page), ANONYMOUS_KEY);
+    // Na tentativa seguinte a chave vai junto, e a resposta dada sem conta segue com a pessoa.
+    await signIn(page);
+    assert.deepEqual(keys(), [ANONYMOUS_KEY, ANONYMOUS_KEY]);
+    await page.keyboard.press("Escape");
+    await page.locator("#ps-action:not([disabled])").click();
+    await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
+  });
+
+  await scenario("entrada sem sessão na resposta: o menu avisa e a chave não muda", async () => {
+    const server = createServer();
+    server.emptyAuth = 1;
+    const page = await open(await newContext(server, { storedKey: ANONYMOUS_KEY }));
+    await entryReady(page);
+    await openMenu(page);
+    await page.locator("dialog.pm-menu[open] #e2e-google").click();
+    await page.locator('dialog.pm-menu[open] [role="alert"]').waitFor();
+    assert.equal(await storedKey(page), ANONYMOUS_KEY, "nada foi gravado no lugar da chave");
+  });
+
+  await scenario("sair não apaga a sessão que outra aba gravou enquanto o servidor respondia", async () => {
+    const server = createServer();
+    const other = `pms_${"n".repeat(43)}`;
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    await entryReady(page);
+    server.beforeLogout = async () => {
+      server.beforeLogout = null;
+      await page.evaluate(([name, key]) => localStorage.setItem(name, key), [IDENTITY_KEY, other]);
+    };
+    await openMenu(page);
+    await page.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
+    await page.waitForFunction(() => !document.querySelector('dialog.pm-menu [data-menu="signout"][disabled]'));
+    assert.equal(server.last("/api/auth/logout").key, GOOGLE_KEY);
+    assert.equal(await storedKey(page), other, "a sessão nova continua no aparelho");
+    assert.match(await menu(page).innerText(), /Você entrou com Google\./);
+  });
+
+  await scenario("a pesquisa fechou depois de aberta a página: sair não oferece \"Começar\"", async () => {
+    const server = createServer();
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    await entryReady(page);
+    server.status = "closed";
+    await page.locator("#ps-action").click();
+    await page.locator("#ps-title", { hasText: "Esta pesquisa está fechada." }).waitFor();
+    await openMenu(page);
+    await page.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
+    await page.locator("dialog.pm-menu[open] #e2e-google").waitFor();
+    await page.keyboard.press("Escape");
+    await page.locator("#ps-title", { hasText: "Esta pesquisa está fechada." }).waitFor();
+    await page.waitForTimeout(400);
+    assert.equal(await page.locator("#ps-action").count(), 0, "com a pesquisa fechada não há entrada para oferecer");
+    assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Toque em Começar/);
   });
 
   assert.deepEqual(pageErrors, [], `erros de página: ${pageErrors.join(" | ")}`);
