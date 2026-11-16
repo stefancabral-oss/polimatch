@@ -1,0 +1,75 @@
+{
+  "checkedAt": "2026-11-16",
+  "issue": 338,
+  "stage": "72_share_image",
+  "base": "main depois do estágio 71 (PR #337); a branch foi refeita em cima dele, com conflito de emenda em quatro arquivos",
+  "instruction": "Stefan, 16/11/2026, com o estágio 70 no ar: \"Compartilhar: Deve gerar uma imagem com minhas escolhas, não apenas o link.\" As escolhas de desenho são do agente, por delegação.",
+  "parts": {
+    "72a": "a imagem traz a escolhida e as finalistas; shareImageLayout com teste",
+    "72b": "sharePlan, a prévia com Baixar imagem, o botão que espera a imagem, a recusa do arquivo abrindo a prévia",
+    "72c": "aprovada em 16/11/2026; acontece depois do merge: deploy do app, junto com o estágio 71; registro na issue #338"
+  },
+  "testsFirst": {
+    "unidade": "share-choice.test.js: plano de entrega, conta do desenho, marcação da prévia e, depois da revisão, a chamada só com o arquivo, a linha que encolhe e os estados da prévia, escritos e vistos falhar antes do código",
+    "exceção": "os cenários de navegador vieram depois da mudança da página, nas duas rodadas; depois dos consertos da revisão, catorze desfazimentos do código foram todos pegos"
+  },
+  "tests": {
+    "environment": "macOS, local, 16/11/2026, no código final do PR",
+    "npm test --prefix app": "205/205",
+    "e2e site-shell": "36 cenários em WebKit e em Chromium 140",
+    "e2e photo-survey": "34 cenários em WebKit e em Chromium 140",
+    "capturas conferidas": "a imagem gerada (1080x1350, cerca de 400 KB), a resposta registrada e a prévia em 390x844 e 360x640",
+    "depois de refeita sobre o estágio 71": "app 213/213, shared 118/118, back 305/305; site-shell 46 e photo-survey 34 cenários em WebKit e em Chromium 140"
+  },
+  "acceptance": {
+    "imagem 1080x1350 com a escolhida e até três finalistas, dentro da folha": "share-choice.test.js (conta do desenho); e2e site-shell (quatro cartas desenhadas; medidas e primeiros bytes do arquivo)",
+    "o botão espera a imagem, a falha ou o prazo": "e2e site-shell: imagem atrasada 1,5 s (ainda desabilitado aos 0,8 s); atrasada 9,8 s (desabilitado aos 7 s, liberado no prazo); montagem que falha (liberado na hora)",
+    "a imagem não baixa a carta de 1060": "e2e site-shell",
+    "com compartilhamento de arquivo, só a imagem, um toque e uma vez só": "share-choice.test.js; e2e site-shell (as chaves da chamada)",
+    "sem a imagem pronta, o toque abre a prévia, nunca o link": "share-choice.test.js (plano); e2e site-shell (imagem que demora e que falha)",
+    "sem compartilhamento de arquivo, a prévia com Baixar imagem; nada sai sem a pessoa pedir": "e2e site-shell, nos modos só texto e nenhum",
+    "o aparelho recusa o arquivo: a prévia abre": "e2e site-shell",
+    "fechar a folha não é erro": "e2e site-shell",
+    "uma tela nova fecha a prévia; o endereço local é solto no botão, no Esc e na tela nova": "e2e site-shell (contagem de endereços criados e soltos)",
+    "uma finalista que não carrega fica de fora": "e2e site-shell",
+    "texto que não cabe encolhe e é cortado": "share-choice.test.js (fitLine)",
+    "sem showModal a prévia abre, recebe o foco e o Esc fecha": "e2e site-shell",
+    "a prévia cabe sem rolar em 390x844 e 360x640": "e2e site-shell",
+    "os cenários dos estágios 68 a 70 passam": "photo-survey 34; site-shell 36"
+  },
+  "notVerified": [
+    "navigator.share num aparelho de verdade: nos testes é simulado; a troca para só o arquivo vem de um defeito conhecido do iPhone, não de teste",
+    "navegadores dentro de aplicativos (Instagram, WhatsApp)",
+    "leitor de tela de verdade",
+    "produção: nada deste estágio foi publicado"
+  ],
+  "independentReview": {
+    "who": "agente à parte, somente leitura, num clone próprio, sobre fb3bf7a",
+    "verdict": "sem regressão; recomendou segurar o merge pelo ponto do iPhone (imagem com texto e endereço na mesma chamada)",
+    "ran": "app 202/202; site-shell 35 e photo-survey 34 em WebKit; seis roteiros próprios; 21 mutações, 5 pegas pelos testes de então",
+    "fixedBeforeMerge": [
+      "com arquivo, vai só o arquivo",
+      "a imagem usa a carta de 530 px, já carregada",
+      "sem imagem, o toque abre a prévia, que espera ou tenta de novo; cada carta tem prazo de 6 s",
+      "o prazo e o resultado de uma preparação antiga não mexem na tela nova",
+      "a trava do toque repetido se solta em 10 s",
+      "a imagem da prévia tem altura mínima; texto longo encolhe e é cortado",
+      "Esc sem showModal, aria-busy no botão, finalistas na descrição da imagem",
+      "contexto, HANDOFF, plano e contexto raiz reescritos com a regra como ela é",
+      "testes para as mutações que escapavam"
+    ],
+    "notedOnly": [
+      "celular deitado: na resposta registrada, as finalistas ficam atrás dos botões (já era assim na main)",
+      "Baixar imagem com endereço local provavelmente não funciona em navegadores dentro de aplicativos"
+    ],
+    "notDoneByReviewer": "aparelho de verdade, Chromium, navegadores dentro de aplicativos, leitor de tela, produção"
+  },
+  "humanGate": "72a, 72b e a publicação (72c): aprovadas pelo Stefan em 16/11/2026 (\"Sim, os dois\"); transcrita no HANDOFF",
+  "pr": 339,
+  "ci": {
+    "pr": 339,
+    "commit cf680b8": "ci-gate verde, antes de a branch ser refeita: unidade do app, imagem do app e os dois roteiros em Chromium e em WebKit no Linux",
+    "automatedReview": "Codex deixou um apontamento (a preparação antiga apagava o prazo da tela nova), corrigido em cf680b8; respondido e encerrado",
+    "finalCommit": "o commit refeito sobre a main passa pelo CI antes do merge"
+  }
+}

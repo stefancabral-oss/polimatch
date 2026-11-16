@@ -49,9 +49,14 @@
  *      ela fecha, a capa não fica presa nela.
  *  28. Uma pesquisa fechada sai do destaque e aparece como fechada.
  *  29. Com a API fora do ar, a capa avisa e tenta de novo.
- *  30. Compartilhar: a imagem com a carta, o texto e o endereço, só no toque.
- *  31. Sem compartilhamento de arquivo vai o texto; sem compartilhamento, o
- *      endereço é copiado; fechar a folha de compartilhar não é erro.
+ *  30. Compartilhar (ICM 70 e 72): só a imagem, com a escolha e as
+ *      finalistas, só no toque, com o botão esperando a imagem.
+ *  31. Sem compartilhamento de arquivo, a imagem aparece na tela para
+ *      baixar, em vez de ir só o link; o link fica por pedido da pessoa.
+ *  31b. Fechar a folha de compartilhar não é erro; se o aparelho recusa o
+ *      arquivo, a imagem aparece na tela.
+ *  31c. A imagem demora, falha ou perde uma carta: o botão não fica preso
+ *      e o toque nunca manda só o link.
  *  32. Servidor que ainda não conhece a segunda pesquisa: a capa mostra só a
  *      primeira (é o que acontece se o app for publicado antes da API).
  *  33. Uma leitura que falha não vira informação falsa: a capa pede para
@@ -1392,13 +1397,38 @@ try {
     assert.equal(await page.locator(".ps-home a.ps-survey").count(), 1);
   });
 
-  // O compartilhamento do aparelho é simulado: guarda o que a página mandou.
-  const SHARE_STUB = (mode) => {
+  // O compartilhamento do aparelho é simulado: guarda o que a página mandou e
+  // o que ela desenhou na imagem. Modos: "file" (compartilha arquivo), "text"
+  // (só texto), "none" (não compartilha; copia), "cancel" (a pessoa fecha a
+  // folha) e "refuse" (o aparelho recusa o arquivo). `blobDelay` atrasa a
+  // imagem; `blobFail` faz as primeiras montagens falharem.
+  const SHARE_STUB = ({ mode, blobDelay = 0, blobFail = 0, noModal = false }) => {
     window.__shared = [];
-    const record = (data) => window.__shared.push({
-      title: data.title, text: data.text, url: data.url,
-      files: (data.files || []).map((file) => ({ name: file.name, type: file.type, size: file.size })),
-    });
+    window.__drawn = [];
+    window.__urls = { created: 0, revoked: 0 };
+    const draw = CanvasRenderingContext2D.prototype.drawImage;
+    CanvasRenderingContext2D.prototype.drawImage = function drawImage(image, x, y, width, height) {
+      window.__drawn.push({ x: Math.round(x), y: Math.round(y), width: Math.round(width), height: Math.round(height) });
+      return draw.apply(this, arguments);
+    };
+    const toBlob = HTMLCanvasElement.prototype.toBlob;
+    let failures = blobFail;
+    HTMLCanvasElement.prototype.toBlob = function slowToBlob(callback, ...rest) {
+      if (failures > 0) {
+        failures -= 1;
+        callback(null);
+        return;
+      }
+      if (blobDelay) setTimeout(() => toBlob.call(this, callback, ...rest), blobDelay);
+      else toBlob.call(this, callback, ...rest);
+    };
+    const [create, revoke] = [URL.createObjectURL, URL.revokeObjectURL];
+    URL.createObjectURL = (value) => { window.__urls.created += 1; return create.call(URL, value); };
+    URL.revokeObjectURL = (value) => { window.__urls.revoked += 1; return revoke.call(URL, value); };
+    if (noModal) {
+      delete HTMLDialogElement.prototype.showModal;
+      delete HTMLDialogElement.prototype.close;
+    }
     const define = (name, value) => Object.defineProperty(Navigator.prototype, name, { configurable: true, writable: true, value });
     if (mode === "none") {
       define("share", undefined);
@@ -1406,19 +1436,32 @@ try {
       Object.defineProperty(Navigator.prototype, "clipboard", { configurable: true, get: () => ({ writeText: async (text) => { window.__copied = text; } }) });
       return;
     }
-    define("canShare", (data) => mode === "file" && Array.isArray(data?.files) && data.files.every((file) => file.type === "image/jpeg"));
+    define("canShare", (data) => mode !== "text" && Array.isArray(data?.files) && data.files.every((file) => file.type === "image/jpeg"));
     define("share", async (data) => {
-      record(data);
+      const files = [];
+      for (const file of data.files || []) {
+        const bitmap = await createImageBitmap(file).catch(() => null);
+        const magic = [...new Uint8Array(await file.slice(0, 2).arrayBuffer())].map((byte) => byte.toString(16)).join("");
+        files.push({ name: file.name, type: file.type, size: file.size, width: bitmap?.width || 0, height: bitmap?.height || 0, magic });
+      }
+      window.__shared.push({ keys: Object.keys(data).sort(), title: data.title, text: data.text, url: data.url, files });
       if (mode === "cancel") throw new DOMException("cancelado", "AbortError");
+      if (mode === "refuse" && files.length) throw new DOMException("recusado", "NotAllowedError");
       // A folha de compartilhar fica aberta um instante, como num aparelho de verdade.
       await new Promise((resolve) => setTimeout(resolve, 400));
     });
   };
-  async function answeredPage(mode) {
+  const ARTS = (await import("../src/political-chromas.json", { with: { type: "json" } })).default;
+  async function answeredPage(mode, { width = 390, height = 844, lostFinalist = false, ...stub } = {}) {
     const server = createServer();
     const answered = server.answered(GOOGLE_KEY);
-    const context = await newContext(server, { storedKey: GOOGLE_KEY });
-    await context.addInitScript(SHARE_STUB, mode);
+    const context = await newContext(server, { storedKey: GOOGLE_KEY, width, height });
+    await context.addInitScript(SHARE_STUB, { mode, ...stub });
+    // A carta de uma das finalistas não chega.
+    if (lostFinalist) {
+      const lost = ARTS.find((art) => art.id === answered.pickIds.find((id) => id !== answered.championId));
+      await context.route((url) => url.pathname === lost.src, (route) => route.abort("connectionrefused"));
+    }
     const images = [];
     context.on("request", (request) => { if (request.url().includes("/chromas/")) images.push(new URL(request.url()).pathname); });
     const page = await open(context, surveyUrl(SURVEY));
@@ -1428,16 +1471,35 @@ try {
     await waitStep(page, "Registrada");
     return { page, server, name: await page.locator("#ps-title").innerText(), answered };
   }
+  const shareButton = (page) => page.getByRole("button", { name: "Compartilhar minha escolha" });
+  const shareReady = (page) => page.locator('[data-action="share"][data-ready="true"]:not([disabled])').waitFor();
+  const preview = (page) => page.locator("dialog.ps-share[open]");
+  const previewClosed = (page) => page.waitForFunction(() => !document.querySelector("dialog.ps-share").hasAttribute("open"));
+  const urls = (page) => page.evaluate(() => window.__urls);
 
-  await scenario("compartilhar: a imagem com a carta, o texto e o endereço, só no toque", async () => {
-    const { page, server, name } = await answeredPage("file");
-    const button = page.getByRole("button", { name: "Compartilhar minha escolha" });
-    // A imagem fica pronta antes do toque, para o toque abrir o compartilhamento na hora.
-    await page.locator('[data-action="share"][data-ready="true"]').waitFor();
+  await scenario("compartilhar: só a imagem, com a escolha e as finalistas, só no toque", async () => {
+    const { page, server } = await answeredPage("file", { blobDelay: 1500 });
+    const button = shareButton(page);
+    // Enquanto a imagem não fica pronta, o botão espera.
+    assert.equal(await button.isDisabled(), true, "o botão só libera com a imagem pronta");
+    assert.equal(await button.getAttribute("aria-busy"), "true");
+    await page.waitForTimeout(800);
+    assert.equal(await button.isDisabled(), true, "o botão continua esperando a imagem");
+    await shareReady(page);
+    assert.equal(await button.getAttribute("aria-busy"), null);
     await page.waitForTimeout(300);
     assert.deepEqual(await page.evaluate(() => window.__shared), [], "nada é compartilhado sem o toque");
     const before = server.requests.length;
-    assert.ok(page.cardRequests.some((path) => path.endsWith("-1060.webp")), "a imagem compartilhada usa a carta no tamanho maior");
+    // A imagem usa as cartas que já estão na tela: não baixa a carta grande.
+    assert.equal(page.cardRequests.some((path) => path.endsWith("-1060.webp")), false, "a imagem não baixa a carta de 1060");
+    // A imagem leva as escolhas: a escolhida em destaque e as três finalistas numa linha.
+    const drawn = await page.evaluate(() => window.__drawn);
+    assert.equal(drawn.length, 4, "a escolhida e as três finalistas");
+    const [hero, ...finalists] = [...drawn].sort((left, right) => right.width - left.width);
+    assert.ok(hero.width >= 400 && Math.abs(hero.x + hero.width / 2 - 540) <= 1, "a escolhida fica no meio, em destaque");
+    assert.ok(finalists.every((box) => box.width === finalists[0].width && box.y === finalists[0].y && box.width < hero.width / 1.8), "as finalistas ficam numa linha, menores");
+    assert.ok(finalists[0].y > hero.y + hero.height, "as finalistas ficam abaixo da escolhida");
+    assert.ok(drawn.every((box) => box.x >= 0 && box.x + box.width <= 1080 && box.y >= 0 && box.y + box.height <= 1350), "tudo dentro da folha");
     // Dois toques seguidos abrem o compartilhamento uma vez só.
     await button.click();
     await button.click();
@@ -1445,43 +1507,168 @@ try {
     await page.waitForTimeout(700);
     assert.equal(await page.evaluate(() => window.__shared.length), 1, "um compartilhamento por toque, sem repetir");
     const [shared] = await page.evaluate(() => window.__shared);
-    assert.equal(shared.title, "PoliMatch");
-    assert.equal(shared.text, `Quem você prefere? Minha escolha no PoliMatch: ${name}. E a sua?`);
-    assert.equal(shared.url, `https://polimatch.com.br/?p=${SURVEY.id}`);
+    // Só o arquivo: texto ou endereço junto fazem o iPhone entregar só o link.
+    assert.deepEqual(shared.keys, ["files"], "a imagem vai sozinha, sem texto nem endereço");
     assert.equal(shared.files.length, 1);
     assert.equal(shared.files[0].name, "polimatch-minha-escolha.jpg");
     assert.equal(shared.files[0].type, "image/jpeg");
-    assert.ok(shared.files[0].size > 40000, `a imagem tem conteúdo (${shared.files[0].size} bytes)`);
+    assert.equal(shared.files[0].magic, "ffd8", "o arquivo é mesmo um JPEG");
+    assert.deepEqual([shared.files[0].width, shared.files[0].height], [1080, 1350]);
+    assert.ok(shared.files[0].size > 60000 && shared.files[0].size < 900000, `a imagem tem conteúdo e peso razoável (${shared.files[0].size} bytes)`);
     assert.equal(server.requests.length, before, "compartilhar não fala com a API");
     assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+    assert.equal(await preview(page).count(), 0, "com o compartilhamento do aparelho não há prévia");
+    assert.deepEqual(await urls(page), { created: 0, revoked: 0 });
     // Sem resposta carregada não há o que compartilhar: a tela de voto não tem o botão.
     const fresh = await open(await newContext(createServer()), surveyUrl(SURVEY));
     await entryReady(fresh);
     assert.equal(await fresh.locator('[data-action="share"]').count(), 0);
   });
 
-  await scenario("sem compartilhamento de arquivo vai o texto; sem compartilhamento, o endereço é copiado", async () => {
-    const text = await answeredPage("text");
-    await text.page.locator('[data-action="share"][data-ready]').waitFor();
-    await text.page.getByRole("button", { name: "Compartilhar minha escolha" }).click();
-    await text.page.waitForFunction(() => window.__shared.length === 1);
-    const [onlyText] = await text.page.evaluate(() => window.__shared);
-    assert.deepEqual(onlyText.files, []);
-    assert.match(onlyText.text, new RegExp(`Minha escolha no PoliMatch: ${text.name}\\.`));
-    assert.equal(onlyText.url, `https://polimatch.com.br/?p=${SURVEY.id}`);
+  await scenario("sem compartilhamento de arquivo, a imagem aparece na tela para baixar, em vez de ir só o link", async () => {
+    for (const [mode, width, height] of [["text", 390, 844], ["none", 360, 640]]) {
+      const { page, name } = await answeredPage(mode, { width, height });
+      await shareReady(page);
+      await shareButton(page).click();
+      await preview(page).waitFor();
+      assert.deepEqual(await page.evaluate(() => window.__shared), [], `${mode}: o toque não manda só o link`);
+      assert.equal(await page.evaluate(() => window.__copied ?? null), null, `${mode}: nada é copiado sem a pessoa pedir`);
+      assert.equal(await page.evaluate(() => document.activeElement === document.querySelector("dialog.ps-share")), true, "o foco entra na prévia");
+      assert.equal(await preview(page).getAttribute("aria-label"), "Imagem para compartilhar");
+      // A imagem é a da escolha, inteira, e dá para baixar.
+      const image = preview(page).locator("img.ps-share-img");
+      await page.waitForFunction(() => document.querySelector("dialog.ps-share img")?.naturalWidth > 0);
+      assert.deepEqual(await image.evaluate((node) => [node.naturalWidth, node.naturalHeight]), [1080, 1350]);
+      assert.match(await image.getAttribute("alt"), new RegExp(`^Imagem com a minha escolha: ${name}\\. Minhas finalistas: .+, .+ e .+\\.$`));
+      const link = preview(page).getByRole("link", { name: "Baixar imagem" });
+      assert.equal(await link.getAttribute("download"), "polimatch-minha-escolha.jpg");
+      assert.match(await link.getAttribute("href"), /^blob:/);
+      assert.equal(await link.getAttribute("href"), await image.getAttribute("src"));
+      // A prévia cabe na tela: a imagem, os dois botões e o Fechar, sem rolar.
+      const boxes = await preview(page).locator("img, .ps-btn, [data-share='close']").evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect()).map(({ left, right, top, bottom }) => ({ left, right, top, bottom })));
+      assert.ok(boxes.every((box) => box.left >= 0 && box.right <= width + 0.5 && box.top >= 0 && box.bottom <= height + 0.5), `${width}×${height}: a prévia cabe na tela sem rolar`);
+      assert.ok(boxes[0].bottom - boxes[0].top >= 200, `${width}×${height}: a imagem aparece em tamanho que dá para ver (${Math.round(boxes[0].bottom - boxes[0].top)} px)`);
+      const download = page.waitForEvent("download");
+      await link.click();
+      assert.equal((await download).suggestedFilename(), "polimatch-minha-escolha.jpg");
+      // O link continua à mão, por pedido da pessoa.
+      const second = preview(page).locator('[data-share="link"]');
+      if (mode === "text") {
+        assert.equal(await second.innerText(), "Compartilhar link");
+        await second.click();
+        await page.waitForFunction(() => window.__shared.length === 1);
+        const [onlyText] = await page.evaluate(() => window.__shared);
+        assert.deepEqual(onlyText.files, []);
+        assert.match(onlyText.text, new RegExp(`Minha escolha no PoliMatch: ${name}\\.`));
+        assert.equal(onlyText.url, `https://polimatch.com.br/?p=${SURVEY.id}`);
+        // A folha de compartilhar do aparelho (simulada) fica aberta um instante.
+        await page.waitForTimeout(500);
+      } else {
+        assert.equal(await second.innerText(), "Copiar link");
+        await second.click();
+        await preview(page).locator("#ps-share-notice:not([hidden])", { hasText: "Link copiado." }).waitFor();
+        assert.equal(await page.evaluate(() => window.__copied), `Quem você prefere? Minha escolha no PoliMatch: ${name}. E a sua? https://polimatch.com.br/?p=${SURVEY.id}`);
+      }
+      // Fechar devolve o foco ao botão, solta a imagem, e dá para abrir de novo.
+      await preview(page).locator('[data-share="close"]').click();
+      await previewClosed(page);
+      assert.equal(await page.evaluate(() => document.activeElement?.dataset?.action), "share");
+      assert.equal(await page.locator("dialog.ps-share img").count(), 0, "a imagem sai da prévia ao fechar");
+      assert.deepEqual(await urls(page), { created: 1, revoked: 1 }, "o endereço local da imagem é solto ao fechar");
+      await shareButton(page).click();
+      await preview(page).waitFor();
+      // Esc também fecha e solta a imagem.
+      await page.keyboard.press("Escape");
+      await previewClosed(page);
+      await page.waitForFunction(() => window.__urls.created === 2 && window.__urls.revoked === 2 && !document.querySelector("dialog.ps-share img"));
+      assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+    }
+  });
 
-    const none = await answeredPage("none");
-    await none.page.getByRole("button", { name: "Compartilhar minha escolha" }).click();
-    await none.page.locator("#ps-notice:not([hidden])", { hasText: "Link copiado." }).waitFor();
-    assert.equal(await none.page.evaluate(() => window.__copied), `Quem você prefere? Minha escolha no PoliMatch: ${none.name}. E a sua? https://polimatch.com.br/?p=${SURVEY.id}`);
-
-    // Fechar a folha de compartilhar não é erro: nenhum aviso.
+  await scenario("fechar a folha de compartilhar não é erro; se o aparelho recusa o arquivo, a imagem aparece na tela", async () => {
+    // Fechar a folha de compartilhar não é erro: nenhum aviso e nenhuma prévia.
     const cancel = await answeredPage("cancel");
-    await cancel.page.getByRole("button", { name: "Compartilhar minha escolha" }).click();
+    await shareReady(cancel.page);
+    await shareButton(cancel.page).click();
     await cancel.page.waitForFunction(() => window.__shared.length === 1);
     await cancel.page.waitForTimeout(300);
+    assert.equal((await cancel.page.evaluate(() => window.__shared))[0].files.length, 1, "a folha abriu com a imagem");
     assert.equal(await cancel.page.locator("#ps-notice:not([hidden])").count(), 0);
-    assert.equal(await cancel.page.getByRole("button", { name: "Compartilhar minha escolha" }).isEnabled(), true);
+    assert.equal(await preview(cancel.page).count(), 0);
+    assert.equal(await shareButton(cancel.page).isEnabled(), true);
+
+    // O aparelho diz que compartilha arquivo e recusa na hora: a imagem não se perde.
+    const refuse = await answeredPage("refuse");
+    await shareReady(refuse.page);
+    await shareButton(refuse.page).click();
+    await preview(refuse.page).waitFor();
+    await refuse.page.waitForFunction(() => document.querySelector("dialog.ps-share img")?.naturalWidth === 1080);
+    assert.equal(await refuse.page.locator("#ps-notice:not([hidden])").count(), 0, "a recusa do arquivo não vira aviso de falha");
+
+    // Uma tela nova fecha a prévia: sair da conta com ela aberta não a deixa por cima.
+    await refuse.page.evaluate((name) => {
+      localStorage.removeItem(name);
+      window.dispatchEvent(new StorageEvent("storage", { key: name }));
+    }, IDENTITY_KEY);
+    await previewClosed(refuse.page);
+    assert.deepEqual(await urls(refuse.page), { created: 1, revoked: 1 });
+  });
+
+  await scenario("a imagem demora, falha ou perde uma carta: o botão não fica preso e o toque nunca manda só o link", async () => {
+    // A imagem leva mais que o prazo: o botão libera, e o toque abre a prévia, que espera por ela.
+    const slow = await answeredPage("file", { blobDelay: 9800 });
+    const button = shareButton(slow.page);
+    await slow.page.waitForTimeout(7000);
+    assert.equal(await button.isDisabled(), true, "antes do prazo, o botão ainda espera a imagem");
+    await slow.page.locator('[data-action="share"][data-ready="text"]:not([disabled])').waitFor({ timeout: 4000 });
+    await button.click();
+    await preview(slow.page).waitFor();
+    assert.equal(await preview(slow.page).locator(".ps-share-wait").innerText(), "Preparando a imagem…");
+    assert.deepEqual(await slow.page.evaluate(() => window.__shared), [], "sem a imagem, o toque não manda o link");
+    // A imagem chega: a prévia mostra, e o botão passa a valer com ela.
+    await slow.page.waitForFunction(() => document.querySelector("dialog.ps-share img")?.naturalWidth === 1080, null, { timeout: 8000 });
+    assert.equal(await preview(slow.page).locator(".ps-share-wait").count(), 0);
+    await preview(slow.page).locator('[data-share="close"]').click();
+    await previewClosed(slow.page);
+    await shareReady(slow.page);
+    await button.click();
+    await slow.page.waitForFunction(() => window.__shared.length === 1);
+    assert.equal((await slow.page.evaluate(() => window.__shared))[0].files.length, 1, "com a imagem pronta, vai a imagem");
+
+    // A imagem não sai: o botão libera na hora, o toque oferece tentar de novo, e a nova tentativa monta.
+    const broken = await answeredPage("none", { blobFail: 1 });
+    await broken.page.locator('[data-action="share"][data-ready="text"]:not([disabled])').waitFor();
+    await shareButton(broken.page).click();
+    await preview(broken.page).waitFor();
+    // O toque já tentou de novo, e desta vez a imagem saiu.
+    await broken.page.waitForFunction(() => document.querySelector("dialog.ps-share img")?.naturalWidth === 1080);
+    assert.equal(await broken.page.evaluate(() => window.__copied ?? null), null, "nada é copiado sem a pessoa pedir");
+    const twice = await answeredPage("none", { blobFail: 2 });
+    await twice.page.locator('[data-action="share"][data-ready="text"]:not([disabled])').waitFor();
+    await shareButton(twice.page).click();
+    await preview(twice.page).locator('[role="alert"]', { hasText: "Não deu para montar a imagem agora." }).waitFor();
+    assert.equal(await preview(twice.page).locator("img").count(), 0);
+    assert.equal(await twice.page.evaluate(() => window.__copied ?? null), null);
+    await preview(twice.page).locator('[data-share="retry"]').click();
+    await twice.page.waitForFunction(() => document.querySelector("dialog.ps-share img")?.naturalWidth === 1080);
+    assert.equal(await preview(twice.page).locator('[data-share="retry"]').count(), 0);
+
+    // A carta de uma finalista não chega: ela fica de fora e a imagem sai assim mesmo.
+    const partial = await answeredPage("file", { lostFinalist: true });
+    await shareReady(partial.page);
+    assert.equal((await partial.page.evaluate(() => window.__drawn)).length, 3, "a escolhida e as duas finalistas que chegaram");
+
+    // Navegador sem showModal: a prévia abre pelo atributo, e Esc fecha.
+    const old = await answeredPage("none", { noModal: true, width: 360, height: 640 });
+    await shareReady(old.page);
+    await shareButton(old.page).click();
+    await old.page.locator(".ps-share[open] img").waitFor();
+    const box = await old.page.locator(".ps-share[open]").boundingBox();
+    assert.ok(box.width >= 359 && box.height >= 639 && box.y === 0, `sem showModal a prévia ainda cobre a tela (${box.width}×${box.height})`);
+    assert.equal(await old.page.evaluate(() => document.activeElement === document.querySelector(".ps-share")), true, "sem showModal, o foco entra na prévia mesmo assim");
+    await old.page.keyboard.press("Escape");
+    await old.page.waitForFunction(() => !document.querySelector(".ps-share").hasAttribute("open"));
+    assert.deepEqual(await urls(old.page), { created: 1, revoked: 1 });
   });
 
   await scenario("servidor que ainda não conhece a segunda pesquisa: a capa mostra só a primeira", async () => {

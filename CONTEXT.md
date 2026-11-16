@@ -232,7 +232,8 @@ Avaliação do Stefan em 14/11/2026: a capa nova estava simples demais. Estágio
 `stages/70_more_surveys/CONTEXT.md`: uma segunda pesquisa de política (outra
 pergunta sobre as mesmas 20 cartas), a capa com a pesquisa em destaque, as
 outras e as que vêm, as escolhas que a pessoa já fez e o compartilhamento da
-escolha. Sem resultado somado e sem rota nova no servidor.
+escolha. Sem resultado somado e sem rota nova no servidor. Publicado em
+16/11/2026, com API e app no commit `59ca9a1`.
 
 ## Cadastro obrigatório com CPF — issue #336
 Instrução do Stefan em 16/11/2026: "cria o login obrigatório para cpf para
@@ -247,3 +248,11 @@ capa continua aberta a qualquer visitante. Isso altera o item 3 da decisão
 delegação, à pendência "Login Google e CPF". A revisão jurídica do tratamento
 de CPF com preferência política (#283) continua aberta, e publicar com ela
 aberta é decisão do Stefan.
+
+## Compartilhar com imagem — issue #338
+Avaliação do Stefan em 16/11/2026, com o estágio 70 no ar: "Compartilhar:
+Deve gerar uma imagem com minhas escolhas, não apenas o link." Estágio
+`stages/72_share_image/CONTEXT.md`: a imagem leva a escolhida e as
+finalistas; o toque só tem dois destinos, o compartilhamento do aparelho só
+com a imagem ou a prévia na tela com "Baixar imagem"; o link só vai se a
+pessoa pedir. Só o app muda.

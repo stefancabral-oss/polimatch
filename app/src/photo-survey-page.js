@@ -37,7 +37,7 @@ import {
   registrationRefusal,
   signInMarkup,
 } from "./registration-view.js";
-import { shareChoice, shareImage } from "./share-choice.js";
+import { shareChoice, shareImage, sharePlan, sharePreviewMarkup } from "./share-choice.js";
 import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingMarkup } from "./site-menu.js";
 
 // Pesquisa por foto (ICM 68, #324), que desde a ICM 69 (#331) é a capa do
@@ -213,6 +213,8 @@ const footHint = (text) => (safeStorage.persistent ? text : "Este navegador não
 // `fit`: a tela tem a altura exata da janela e a carta escolhida ocupa o que sobra.
 function shell({ step, filled = null, mainClass = "", body, focus = false, fit = false }) {
   gridToken += 1;
+  // Uma tela nova fecha a prévia da imagem, que é da tela anterior.
+  closeSharePreview();
   const segments = screens() + 1;
   const bar = filled === null
     ? ""
@@ -371,50 +373,183 @@ function renderDone({ focus = false } = {}) {
     body: `${heading("Escolha registrada", champion ? cardName(champion) : "Sua resposta está registrada.", "Obrigado por participar. Sua resposta está registrada e não pode ser trocada nesta pesquisa.")}
       ${champion ? `<div class="ps-hero">${staticCard(champion, "176px")}</div>` : ""}
       ${others.length ? `<p class="ps-label">Suas finalistas</p><div class="ps-row">${others.map((id) => staticCard(id, "84px", cardName(id))).join("")}</div>` : ""}
-      <div class="ps-stack ps-stack--pair">${champion ? '<button class="ps-btn" data-action="share" type="button" aria-label="Compartilhar minha escolha">Compartilhar</button>' : ""}${nextLink()}</div>`,
+      <div class="ps-stack ps-stack--pair">${champion ? '<button class="ps-btn" data-action="share" type="button" aria-label="Compartilhar minha escolha" aria-busy="true" disabled>Compartilhar</button>' : ""}${nextLink()}</div>`,
   });
-  prepareShare(champion);
+  prepareShare(champion, others);
 }
 
 // Compartilhar --------------------------------------------------------------
 
-// A imagem é montada quando a tela aparece. Assim o toque chama o
-// compartilhamento do aparelho na hora, como os navegadores exigem; se a
-// imagem ainda não está pronta, vai só o texto.
+// A imagem com a escolha e as finalistas é montada quando a tela aparece, com
+// as cartas que já estão na tela, e o botão libera quando ela fica pronta.
+// Assim o toque chama o compartilhamento do aparelho na hora, como os
+// navegadores exigem, já com a imagem. O toque só tem dois destinos: o
+// compartilhamento do aparelho com a imagem, ou a prévia na tela. Se a imagem
+// não sair no prazo, o botão libera mesmo assim e o toque abre a prévia, que
+// espera a imagem ou oferece tentar de novo. O link só vai se a pessoa pedir.
+const SHARE_PREPARE_MS = 8000;
+const SHARE_LOCK_MS = 10000;
 let shareFile = null;
+// Cada preparação tem um número: o resultado de uma preparação antiga (a tela
+// mudou, ou a pessoa pediu para tentar de novo) é ignorado.
+let shareRun = 0;
+let sharePreparing = false;
+let shareChampion = "";
+let shareOthers = [];
 let sharing = false;
+let sharingTimer = 0;
+// A prévia: a imagem na tela, para baixar, onde o aparelho não compartilha arquivo.
+let sharePreview = null;
+let sharePreviewUrl = "";
 
-function prepareShare(champion) {
+function prepareShare(champion, others = shareOthers) {
+  const run = ++shareRun;
   shareFile = null;
+  shareChampion = champion;
+  shareOthers = others;
+  sharePreparing = Boolean(champion);
   if (!champion) return;
   const art = artById.get(champion);
-  const largest = art.srcset.split(",").map((candidate) => candidate.trim().split(/\s+/)[0]).pop() || art.src;
-  shareImage({ src: largest, name: art.name, question: question() }).then((file) => {
+  const current = () => run === shareRun && view === "done" && response?.championId === champion;
+  const release = () => {
     const button = root.querySelector('[data-action="share"]');
-    if (view !== "done" || response?.championId !== champion || !button) return;
+    if (!current() || !button) return;
+    button.dataset.ready = shareFile ? "true" : "text";
+    button.disabled = false;
+    button.removeAttribute("aria-busy");
+  };
+  // O prazo é desta preparação: outra tela não o apaga.
+  const timer = window.setTimeout(release, SHARE_PREPARE_MS);
+  shareImage({
+    src: art.src,
+    name: art.name,
+    question: question(),
+    others: others.map((id) => ({ src: artById.get(id).src })),
+  }).then((file) => {
+    window.clearTimeout(timer);
+    if (!current()) return;
+    sharePreparing = false;
     shareFile = file;
-    button.dataset.ready = file ? "true" : "text";
+    release();
+    // A prévia pode estar aberta à espera da imagem.
+    if (sharePreviewOpen()) renderSharePreview();
   });
 }
 
-/** Só acontece no toque. Leva a escolha da pessoa, nunca resultado somado. */
+/** Trava contra o toque repetido, com saída: um compartilhamento que nunca responde não mata o botão. */
+function lockShare() {
+  sharing = true;
+  window.clearTimeout(sharingTimer);
+  sharingTimer = window.setTimeout(() => { sharing = false; }, SHARE_LOCK_MS);
+  return () => {
+    window.clearTimeout(sharingTimer);
+    sharing = false;
+  };
+}
+
+/** Só acontece no toque. Leva as escolhas da pessoa, nunca resultado somado. */
 async function share() {
   const champion = response?.championId;
-  if (view !== "done" || sharing || !artById.has(champion)) return;
-  sharing = true;
+  if (view !== "done" || !artById.has(champion)) return;
+  if (sharePlan(navigator, shareFile) === "preview") {
+    openSharePreview();
+    return;
+  }
+  if (sharing) return;
+  const release = lockShare();
   const outcome = await shareChoice({ surveyId, name: cardName(champion), question: question(), file: shareFile });
-  sharing = false;
-  if (view !== "done") return;
+  release();
+  // O aparelho recusou o arquivo: a imagem continua sendo a entrega. Quem
+  // compartilhou ou fechou a folha não vê nada a mais.
+  if (view === "done" && outcome === "failed") openSharePreview();
+}
+
+function sharePreviewOpen() {
+  return Boolean(sharePreview?.hasAttribute("open"));
+}
+
+function releaseSharePreviewUrl() {
+  if (sharePreviewUrl) URL.revokeObjectURL(sharePreviewUrl);
+  sharePreviewUrl = "";
+}
+
+/** Desenha a prévia conforme a imagem: pronta, a caminho ou sem sair. */
+function renderSharePreview() {
+  releaseSharePreviewUrl();
+  if (shareFile) sharePreviewUrl = URL.createObjectURL(shareFile);
+  sharePreview.innerHTML = sharePreviewMarkup({
+    state: shareFile ? "ready" : sharePreparing ? "preparing" : "failed",
+    url: sharePreviewUrl,
+    name: cardName(shareChampion),
+    others: shareOthers.map(cardName),
+    canShareLink: typeof navigator.share === "function",
+  });
+  sharePreview.focus({ preventScroll: true });
+}
+
+function openSharePreview() {
+  if (!artById.has(response?.championId) || sharePreviewOpen()) return;
+  if (!sharePreview) {
+    sharePreview = document.createElement("dialog");
+    sharePreview.className = "ps-share";
+    sharePreview.setAttribute("aria-label", "Imagem para compartilhar");
+    sharePreview.tabIndex = -1;
+    document.body.append(sharePreview);
+    sharePreview.addEventListener("close", sharePreviewClosed);
+    sharePreview.addEventListener("click", (event) => {
+      const action = event.target.closest("[data-share]")?.dataset.share;
+      if (action === "close") closeSharePreview();
+      else if (action === "link") shareLink();
+      else if (action === "retry") {
+        prepareShare(shareChampion);
+        renderSharePreview();
+      }
+    });
+    // Sem `showModal` o navegador não fecha no Esc: o Esc é ouvido no documento.
+    if (typeof sharePreview.showModal !== "function") {
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeSharePreview();
+      });
+    }
+  }
+  // A imagem não saiu e ninguém está montando: o toque tenta de novo.
+  if (!shareFile && !sharePreparing) prepareShare(shareChampion);
+  // Sem `showModal` (Safari antes do 15.4) a prévia abre pelo atributo.
+  if (typeof sharePreview.showModal === "function") sharePreview.showModal();
+  else sharePreview.setAttribute("open", "");
+  renderSharePreview();
+}
+
+/** Solta a imagem da prévia. Pode rodar duas vezes: o evento de fechar do navegador chega um instante depois. */
+function sharePreviewClosed() {
+  const wasShown = Boolean(sharePreview.innerHTML);
+  releaseSharePreviewUrl();
+  sharePreview.innerHTML = "";
+  if (wasShown) root.querySelector('[data-action="share"]')?.focus({ preventScroll: true });
+}
+
+function closeSharePreview() {
+  if (!sharePreviewOpen()) return;
+  if (typeof sharePreview.close === "function") sharePreview.close();
+  else sharePreview.removeAttribute("open");
+  // O navegador avisa do fechamento num instante seguinte: a imagem sai já.
+  sharePreviewClosed();
+}
+
+/** O segundo botão da prévia: o link da pesquisa, pelo aparelho ou copiado. */
+async function shareLink() {
+  const champion = response?.championId;
+  if (sharing || !artById.has(champion)) return;
+  const release = lockShare();
+  const outcome = await shareChoice({ surveyId, name: cardName(champion), question: question(), file: null });
+  release();
   const text = {
     copied: "Link copiado. Cole onde quiser compartilhar.",
-    unavailable: "Este navegador não compartilha por aqui. O endereço é polimatch.com.br.",
-    failed: "Não deu para compartilhar agora. Tente de novo.",
+    unavailable: "Este navegador não copia por aqui. O endereço é polimatch.com.br.",
+    failed: "Não deu para compartilhar o link agora. Tente de novo.",
   }[outcome];
-  // Compartilhou ou fechou a folha: nada a dizer, e o aviso que estiver na tela fica.
-  if (!text) return;
-  notice = text;
-  const target = root.querySelector("#ps-notice");
-  if (!target) return;
+  const target = sharePreview?.querySelector("#ps-share-notice");
+  if (!text || !target) return;
   target.textContent = text;
   target.hidden = false;
 }
