@@ -52,7 +52,7 @@
     "A7 quem respondeu sem conta vê a resposta depois do cadastro": "e2e site-shell, cenário 5",
     "A8 sair no meio volta para a entrada": "e2e site-shell (entrar e sair pelo menu); e2e photo-survey (saída da conta no meio)",
     "A9 cenários dos estágios 68 a 70": "photo-survey 34 e site-shell 44, com identidade cadastrada",
-    "A10 o formulário de uma conta não aparece para a seguinte": "e2e site-shell: sessão vencida no cadastro; entrar pelo menu e sair no formulário",
+    "A10 o formulário de uma conta não aparece para a seguinte": "e2e site-shell: sessão vencida no cadastro; entrar pelo menu e sair no formulário; troca de conta sem aviso antes do envio",
     "A11 sessão vencida leva à entrada, sem a sessão morta no aparelho": "e2e site-shell: sessão vencida no cadastro; no toque em Começar e na retomada; e2e photo-survey: sessão recusada",
     "A12 foco no campo com erro e cursor no lugar": "registration-view.test.js; e2e site-shell: o formulário leva o foco ao campo com erro",
     "A13 entrada e formulário cabem na largura": "e2e site-shell: três tamanhos, também com fonte larga"
@@ -68,7 +68,9 @@
   "ci": {
     "pr": 337,
     "commit 8806a4a": "ci-gate falhou por um teste de unidade do servidor que procurava três dígitos numa resposta com requestId aleatório; no mesmo commit passaram o servidor com PostgreSQL (com o smoke do cadastro), os roteiros em Chromium e WebKit no Linux e a imagem do app",
-    "finalCommit": "o commit final passa pelo CI antes do merge"
+    "finalCommit": "o commit final passa pelo CI antes do merge",
+    "commit 19c424f": "ci-gate verde; no Linux, site-shell 44 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; unidade de shared, back e app; smokes do servidor com PostgreSQL, com o do cadastro; imagem do app e smoke-nginx",
+    "automatedReview": "Codex leu o commit 8806a4a e deixou três apontamentos (HANDOFF ausente, formulário ligado à conta, pesquisa fechada antes do formulário): os três resolvidos e respondidos"
   },
   "independentReview": {
     "who": "agente à parte, somente leitura, num clone próprio, sobre 73d6692..1186b68",

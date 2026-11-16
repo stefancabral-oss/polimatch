@@ -1193,6 +1193,13 @@ function chooseOption(chip) {
 
 async function submitRegistration() {
   if (busy || view !== "gate" || gateStep !== "form") return;
+  // A conta do aparelho pode ter mudado sem aviso (outra aba, antes de o
+  // evento chegar). O que está preenchido é de quem abriu o formulário: nada
+  // é enviado na sessão de outra conta, e a tela se acerta com a conta atual.
+  if (readStored(IDENTITY_KEY) !== formOwner) {
+    gateIdentityMoved();
+    return;
+  }
   const problem = registrationProblem(form);
   if (problem) {
     notice = problem.text;

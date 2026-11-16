@@ -706,6 +706,23 @@ try {
     await waitStep(form, "Entrar");
     assert.match(await formNotice(form).innerText(), /Você saiu da conta neste aparelho/);
 
+    // A conta do aparelho troca sem aviso (no próprio documento, sem evento de
+    // armazenamento) com o formulário preenchido. Concluir não manda o CPF de
+    // uma pessoa na sessão de outra: o formulário recomeça vazio.
+    const swapped = createServer();
+    const intruder = `pms_${"i".repeat(43)}`;
+    swapped.registered.delete(GOOGLE_KEY);
+    const third = await open(await newContext(swapped, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
+    await entryReady(third);
+    await third.locator("#ps-action").click();
+    await fillRegistration(third, "111.444.777-35");
+    await third.evaluate(([name, key]) => localStorage.setItem(name, key), [IDENTITY_KEY, intruder]);
+    await submitButton(third).click();
+    await third.waitForFunction(() => document.querySelector("#ps-cpf")?.value === "" && document.querySelector("#ps-step")?.textContent === "Cadastro");
+    assert.equal(swapped.count("POST", "/api/registration"), 0, "o CPF preenchido numa conta não é enviado na sessão de outra");
+    assert.equal(await third.locator("#ps-consent").isChecked(), false);
+    assert.equal(swapped.last("/draw").key, intruder, "a conta nova é conferida pelo sorteio");
+
     // A conta chega sem evento de armazenamento (troca no próprio documento):
     // ao voltar a aparecer, a tela confere e segue.
     unregistered.registered.add(GOOGLE_KEY);

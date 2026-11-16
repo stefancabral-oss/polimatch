@@ -52,7 +52,9 @@
 
 ## Testes executados
 
-No CI do PR #337, o commit `8806a4a` falhou num teste de unidade do servidor: o teste procurava os dígitos "529" numa resposta de erro, e o `requestId` aleatório da resposta saiu com eles. Era defeito do teste, não do código: a busca passou a ser pelo CPF inteiro. Nesse mesmo commit passaram, no Linux, o servidor com PostgreSQL (com o smoke novo do cadastro), os roteiros de navegador em Chromium e em WebKit e a imagem do app.
+No CI do PR #337, o commit `19c424f` passou inteiro (`ci-gate` verde): no Linux, `site-shell` com 44 cenários e `photo-survey` com 34, em Chromium e em WebKit; o relato de erros nos dois; os testes de unidade de `shared/`, do servidor e do app; os smokes do servidor com PostgreSQL, com o do cadastro; a imagem do app e `smoke-nginx`. O commit final, com a conferência da conta no envio, passa pelo CI de novo antes do merge.
+
+Antes, o commit `8806a4a` falhou num teste de unidade do servidor: o teste procurava os dígitos "529" numa resposta de erro, e o `requestId` aleatório da resposta saiu com eles. Era defeito do teste, não do código: a busca passou a ser pelo CPF inteiro. Nesse mesmo commit passaram, no Linux, o servidor com PostgreSQL (com o smoke novo do cadastro), os roteiros de navegador em Chromium e em WebKit e a imagem do app.
 
 Em 16/11/2026, local (macOS), no código final do PR:
 
@@ -108,6 +110,12 @@ Ficaram anotados, sem mudança:
 - "Escolha o estado" e os demais avisos ficam no topo da tela; num celular baixo o campo citado pode estar abaixo da dobra.
 
 Ele não conferiu o botão real do Google, Chromium, o CI no Linux, leitor de tela de verdade, a volta pelo histórico com a página preservada, o app contra a API real, nem produção.
+
+A revisão automática do GitHub (Codex) leu o commit `8806a4a` e deixou três apontamentos, respondidos no PR:
+
+- Faltavam `HANDOFF.md` e `verification.json` na branch: entraram no commit `19c424f`.
+- O formulário não estava ligado à conta que o abriu: resolvido com o dono do formulário. Além disso, o envio passou a conferir a conta na hora: se ela mudou sem aviso, nada é enviado e o formulário recomeça vazio.
+- Conta sem cadastro abria o formulário de uma pesquisa já fechada: resolvido com a leitura da pesquisa antes do formulário.
 
 ## Riscos conhecidos
 
