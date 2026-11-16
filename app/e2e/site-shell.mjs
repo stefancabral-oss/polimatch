@@ -4,7 +4,9 @@
  * própria. O percurso da pesquisa em si é do roteiro photo-survey.mjs.
  *
  * O servidor aqui é simulado e conta cada requisição, para provar o que a
- * página grava e quando. O script do Google também é simulado: o botão dele
+ * página grava e quando. Desde a ICM 71 só responde quem entrou com Google e
+ * tem cadastro: a conta de teste nasce cadastrada, e nenhum cenário pode
+ * terminar com pedido de jogador sem conta. O script do Google também é simulado: o botão dele
  * chama a página com uma credencial de teste.
  *
  * Cenários:
@@ -12,10 +14,14 @@
  *   2. O menu abre, prende o foco, fecha por Esc e pelo botão, e devolve o foco.
  *   3. Durante o voto não há menu: fica o indicador de etapa.
  *   4. Entrar com Google pelo menu, na entrada, não cria jogador.
- *   5. Quem respondeu sem conta e entra com Google recomeça com a conta.
+ *   5. Quem respondeu sem conta entra, faz o cadastro e vê a resposta que deu.
  *   6. Sair revoga a sessão e esquece a chave.
  *   7. Sair com a sessão vencida esquece a chave; com o servidor fora do ar, não.
- *   8. Cota de rede esgotada: o aviso aponta o menu, e entrar com Google libera.
+ *   8. Cadastro com CPF (ICM 71, #336), no lugar do antigo cenário da cota de
+ *      rede: conta sem cadastro abre o formulário e cada recusa do servidor
+ *      tem o seu texto; sessão vencida volta para a entrada; entrar e sair
+ *      pelo menu com o cadastro na tela; Google ou servidor fora do ar na
+ *      entrada; a conta que perde o cadastro espera o toque.
  *   9. A resposta registrada mostra as próximas pesquisas, sem "Ir para o início".
  *  10. "Como funciona" cabe na tela, abre o menu e leva ao início.
  *  11. As páginas antigas saíram do build e o sitemap lista as duas novas.
@@ -69,7 +75,11 @@ const ANONYMOUS_KEY = `pm2_${"a".repeat(43)}`;
 const GOOGLE_KEY = `pms_${"g".repeat(43)}`;
 const GOOGLE_SCRIPT = `window.google={accounts:{id:{initialize(options){window.__e2eGoogle=options.callback},renderButton(element){const button=document.createElement('button');button.type='button';button.id='e2e-google';button.textContent='Continuar com Google';button.addEventListener('click',()=>window.__e2eGoogle({credential:'credencial-de-teste'}));element.replaceChildren(button)}}}};`;
 
-/** API simulada: a pesquisa, o jogador, o sorteio, a entrada e a saída da conta. */
+// Os servidores do cenário em curso: no fim dele, nenhum pode ter recebido
+// pedido de jogador sem conta (ICM 71).
+const servers = [];
+
+/** API simulada: a pesquisa, o sorteio, a entrada e a saída da conta, e o cadastro. */
 function createServer() {
   const server = {
     quota: false,
@@ -91,6 +101,13 @@ function createServer() {
     revoked: new Set(),
     // Segura a próxima leitura da pesquisa até `release()` ser chamada.
     holdSurvey: null,
+    // Contas com cadastro com CPF (ICM 71). A conta de teste nasce cadastrada;
+    // os cenários do cadastro tiram ela daqui.
+    registered: new Set([GOOGLE_KEY]),
+    // A sessão que a entrada com Google devolve.
+    session: GOOGLE_KEY,
+    // Recusas programadas do cadastro: "down", ou um objeto com status e código.
+    failRegistration: [],
     requests: [],
     draws: new Map(),
     responses: new Map(),
@@ -135,9 +152,20 @@ function createServer() {
       // E a resposta de quem respondia sem conta passa a ser da conta.
       for (const item of PHOTO_SURVEYS) {
         const answer = key && server.responses.get(slot(item, key));
-        if (answer && !server.responses.has(slot(item, GOOGLE_KEY))) server.responses.set(slot(item, GOOGLE_KEY), answer);
+        if (answer && !server.responses.has(slot(item, server.session))) server.responses.set(slot(item, server.session), answer);
       }
-      return send(200, { sessionToken: GOOGLE_KEY, account: { displayName: "Bia" }, player: { version: 0 }, merge: null });
+      return send(200, { sessionToken: server.session, account: { displayName: "Bia" }, player: { version: 0 }, merge: null });
+    }
+    if (pathname === "/api/registration" && method === "POST") {
+      if (!key || server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
+      if (!key.startsWith("pms_")) return send(403, { error: "entre com Google para se cadastrar", code: "GOOGLE_ACCOUNT_REQUIRED" });
+      if (server.failRegistration.length) {
+        const failure = server.failRegistration.shift();
+        if (failure === "down") return route.abort("connectionrefused");
+        return send(failure.status, { error: "recusa do cadastro", code: failure.code, ...(failure.retryAfterSeconds ? { retryAfterSeconds: failure.retryAfterSeconds } : {}) });
+      }
+      server.registered.add(key);
+      return send(200, { registered: true, status: "created", registeredAt: new Date().toISOString() });
     }
     if (pathname === "/api/auth/logout" && method === "POST") {
       if (server.beforeLogout) await server.beforeLogout();
@@ -155,6 +183,8 @@ function createServer() {
     }
     if (method !== "POST") return send(404, { error: "rota não simulada" });
     if (!key || server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
+    // Como o servidor de verdade: sem conta com cadastro não há sorteio nem resposta.
+    if (!server.registered.has(key)) return send(403, { error: "cadastro com CPF obrigatório para responder", code: "CPF_REGISTRATION_REQUIRED" });
     const status = view(survey).status;
     const prior = server.responses.get(slot(survey, key));
     if (action === "draw") {
@@ -181,6 +211,7 @@ function createServer() {
     return response;
   };
   server.responseOf = (key, survey = SURVEY) => server.responses.get(slot(survey, key))?.response || null;
+  servers.push(server);
   return server;
 }
 
@@ -247,11 +278,28 @@ async function answer(page, position = 0) {
   return page.locator("#ps-title").innerText();
 }
 
+const VALID_CPF = "529.982.247-25";
+const formNotice = (page) => page.locator("#ps-notice:not([hidden])");
+const submitButton = (page) => page.locator('#ps-register button[type="submit"]');
+
+/** Preenche o formulário de cadastro inteiro, sem enviar. */
+async function fillRegistration(page, cpf = VALID_CPF) {
+  await waitStep(page, "Cadastro");
+  await page.locator("#ps-cpf").fill(cpf);
+  await page.getByRole("button", { name: "35 a 44" }).click();
+  await page.getByRole("button", { name: "Mulher" }).click();
+  await page.locator("#ps-state").selectOption("RJ");
+  await page.locator("#ps-consent").check();
+}
+
 const results = [];
 const only = process.env.CI ? "" : process.env.POLIMATCH_E2E_ONLY || "";
 async function scenario(name, run) {
   if (only && !name.includes(only)) return;
+  servers.length = 0;
   await run();
+  for (const server of servers) {
+  }
   results.push(name);
   console.log(`ok - ${name}`);
 }
@@ -342,7 +390,7 @@ try {
 
   await scenario("durante o voto não há menu: fica o indicador de etapa", async () => {
     const server = createServer();
-    const page = await open(await newContext(server));
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
     await entryReady(page);
     await page.locator("#ps-action").click();
     await page.locator('.ps-grid[data-ready="true"]').waitFor({ timeout: 20000 });
@@ -366,29 +414,31 @@ try {
     await entryReady(page);
     await page.locator("#ps-action").click();
     await page.locator('.ps-grid[data-ready="true"]').waitFor({ timeout: 20000 });
-    assert.equal(server.count("POST", "/api/player"), 0, "a conta dispensa o jogador anônimo");
     assert.equal(server.last("/draw").key, GOOGLE_KEY);
   });
 
-  await scenario("quem respondeu sem conta e entra com Google recomeça com a conta", async () => {
+  await scenario("quem respondeu sem conta entra, faz o cadastro e vê a resposta que deu", async () => {
     const server = createServer();
-    server.answered(ANONYMOUS_KEY);
+    server.registered.delete(GOOGLE_KEY);
+    const answered = server.answered(ANONYMOUS_KEY);
     const page = await open(await newContext(server, { storedKey: ANONYMOUS_KEY }));
     await entryReady(page);
+    await page.waitForTimeout(300);
+    assert.deepEqual(server.writes(), [], "com a chave sem conta, a capa não pede nada ao servidor");
     await page.locator("#ps-action").click();
-    await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
-    await openMenu(page);
-    await signIn(page);
-    assert.equal(server.last("/api/auth/google").key, ANONYMOUS_KEY, "a chave anônima vai junto, para o servidor reunir as escolhas");
+    await waitStep(page, "Entrar");
+    assert.deepEqual(server.writes(), [], "sem conta, o toque não emite sorteio");
+    await page.locator("#e2e-google").click();
+    assert.equal(await fillRegistration(page), undefined);
+    assert.equal(server.last("/api/auth/google").key, ANONYMOUS_KEY, "a chave sem conta vai junto, para o servidor ligar a resposta à conta");
     assert.equal(await storedKey(page), GOOGLE_KEY);
-    await page.keyboard.press("Escape");
-    await entryReady(page, "Continuar");
-    assert.match(await page.locator("#ps-notice").innerText(), /Sua conta mudou\./);
-    await page.locator("#ps-action").click();
+    await submitButton(page).click();
     // A resposta dada sem conta agora é da conta: a pessoa vê a escolha, não um voto novo.
-    await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
+    await waitStep(page, "Registrada");
     assert.equal(server.last("/draw").key, GOOGLE_KEY);
     assert.equal(await page.locator(".ps-grid, #ps-action").count(), 0, "quem já respondeu não vota de novo");
+    assert.deepEqual(server.responseOf(GOOGLE_KEY), answered);
+    assert.equal(server.count("POST", "/response"), 0);
   });
 
   await scenario("sair revoga a sessão e esquece a chave", async () => {
@@ -435,28 +485,155 @@ try {
     assert.equal(await storedKey(third), GOOGLE_KEY, "com erro do servidor, a sessão fica");
   });
 
-  await scenario("cota de rede esgotada: o aviso aponta o menu, e entrar com Google libera", async () => {
+  await scenario("conta sem cadastro: Começar abre o formulário, e cada recusa do servidor tem o seu texto", async () => {
     const server = createServer();
-    server.quota = true;
+    server.registered.delete(GOOGLE_KEY);
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    await entryReady(page);
+    await page.waitForTimeout(300);
+    assert.deepEqual(server.writes(), [], "a capa não pergunta pelo cadastro: quem decide é o toque");
+    assert.equal(await page.locator(".ps-cta-note").innerText(), "Sua escolha só é registrada quando você confirmar.");
+    await page.locator("#ps-action").click();
+    await fillRegistration(page);
+    assert.equal(await page.locator("#e2e-google").count(), 0, "com a conta no aparelho, não há tela de entrada");
+    assert.equal(server.count("POST", "/api/auth/google"), 0);
+
+    const refusals = [
+      [{ status: 409, code: "CPF_ALREADY_REGISTERED" }, /Este CPF já tem cadastro em outra conta Google\. Entre com a conta usada no cadastro\./],
+      [{ status: 429, code: "REGISTRATION_ATTEMPT_LIMIT", retryAfterSeconds: 3600 }, /Muitas tentativas de cadastro hoje\. Tente de novo amanhã\./],
+      ["down", /Não conseguimos falar com o servidor/],
+      [{ status: 500, code: "INTERNAL_ERROR" }, /Não foi possível concluir o cadastro agora\. Tente de novo\./],
+      [{ status: 400, code: "CONSENT_VERSION_MISMATCH" }, /Atualize a página para concluir o cadastro\./],
+    ];
+    for (const [failure, text] of refusals) {
+      server.failRegistration.push(failure);
+      await submitButton(page).click();
+      await formNotice(page).waitFor();
+      const shown = await formNotice(page).innerText();
+      assert.match(shown, text);
+      assert.doesNotMatch(shown, /529|recusa do cadastro/, "o aviso é da página: nem o CPF nem o texto do servidor");
+      // O que a pessoa preencheu continua na tela, e o botão volta.
+      assert.equal(await page.locator("#ps-cpf").inputValue(), VALID_CPF);
+      assert.equal(await page.locator("#ps-state").inputValue(), "RJ");
+      assert.equal(await page.locator("#ps-consent").isChecked(), true);
+      assert.equal(await page.getByRole("button", { name: "35 a 44" }).getAttribute("aria-pressed"), "true");
+      assert.equal(await submitButton(page).isEnabled(), true);
+      assert.equal(await stepText(page), "Cadastro");
+    }
+    assert.equal(server.registered.has(GOOGLE_KEY), false);
+    assert.equal(server.count("POST", "/draw"), 1, "o formulário não pede sorteio a cada recusa");
+    await submitButton(page).click();
+    await waitStep(page, "Tela 1 de 4");
+    assert.equal(server.count("POST", "/api/registration"), refusals.length + 1);
+    assert.deepEqual(server.requests.filter((request) => request.pathname === "/api/registration").map((request) => request.key), Array(refusals.length + 1).fill(GOOGLE_KEY));
+  });
+
+  await scenario("sessão vencida no cadastro volta para a entrada, e entrar de novo conclui", async () => {
+    const server = createServer();
+    const renewed = `pms_${"r".repeat(43)}`;
+    server.registered.delete(GOOGLE_KEY);
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    await entryReady(page);
+    await page.locator("#ps-action").click();
+    await fillRegistration(page);
+    server.revoked.add(GOOGLE_KEY);
+    server.session = renewed;
+    await submitButton(page).click();
+    await waitStep(page, "Entrar");
+    assert.match(await formNotice(page).innerText(), /Sua sessão venceu\. Entre de novo para concluir o cadastro\./);
+    await page.locator("#e2e-google").click();
+    await waitStep(page, "Cadastro");
+    assert.deepEqual(server.requests.filter((request) => request.pathname === "/api/auth/google").map((request) => request.key), [GOOGLE_KEY, ""], "a sessão que o servidor recusou não prende a entrada");
+    assert.equal(await storedKey(page), renewed);
+    await submitButton(page).click();
+    await waitStep(page, "Tela 1 de 4");
+    assert.equal(server.last("/api/registration").key, renewed);
+    assert.equal(server.last("/draw").key, renewed);
+  });
+
+  await scenario("com a entrada na tela, entrar pelo menu segue para o cadastro; sair no formulário volta para a entrada", async () => {
+    const server = createServer();
+    server.registered.delete(GOOGLE_KEY);
+    const page = await open(await newContext(server));
+    await entryReady(page);
+    assert.equal(await page.locator(".ps-cta-note").innerText(), "Para responder, entre com Google e cadastre o CPF.");
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Entrar");
+    assert.equal(await page.locator("#ps-title").innerText(), "Entre para responder");
+    await page.locator("#ps-google #e2e-google").waitFor();
+    await openMenu(page);
+    await signIn(page);
+    await page.keyboard.press("Escape");
+    await waitStep(page, "Cadastro");
+    assert.equal(await storedKey(page), GOOGLE_KEY);
+    assert.equal(server.count("POST", "/api/auth/google"), 1);
+    // Sair da conta com o formulário na tela: volta para a entrada, com o motivo.
+    await openMenu(page);
+    await page.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
+    await page.locator("dialog.pm-menu[open] #e2e-google").waitFor();
+    await page.keyboard.press("Escape");
+    await waitStep(page, "Entrar");
+    assert.match(await formNotice(page).innerText(), /Você saiu da conta neste aparelho\. Entre de novo para fazer o cadastro\./);
+    assert.equal(await page.locator("#ps-register").count(), 0);
+    assert.equal(await storedKey(page), null);
+    // E a entrada da própria tela continua valendo.
+    await page.locator("#ps-google #e2e-google").click();
+    await fillRegistration(page);
+    await submitButton(page).click();
+    await waitStep(page, "Tela 1 de 4");
+  });
+
+  await scenario("na entrada, o Google não carrega ou o servidor falha: a tela avisa e a nova tentativa entra", async () => {
+    const server = createServer();
+    server.googleDown = true;
     const page = await open(await newContext(server));
     await entryReady(page);
     await page.locator("#ps-action").click();
-    await page.locator("#ps-notice:not([hidden])").waitFor();
-    const notice = await page.locator("#ps-notice").innerText();
-    assert.match(notice, /Muitas participações novas nesta rede hoje\. Entre com Google no menu para responder agora\./);
-    assert.doesNotMatch(notice, /página inicial|Ir para o início/);
-    assert.equal(await page.locator('#ps-notice a[href]').count(), 0);
-    await page.locator('#ps-notice [data-action="menu"]').click();
-    await page.locator("dialog.pm-menu[open]").waitFor();
-    await signIn(page);
-    await page.keyboard.press("Escape");
-    // Com a conta, o aviso some e a entrada volta a oferecer "Começar".
-    await entryReady(page);
-    assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
-    await page.locator("#ps-action").click();
-    await page.locator('.ps-grid[data-ready="true"]').waitFor({ timeout: 20000 });
-    assert.equal(server.count("POST", "/api/player"), 1, "só a tentativa recusada pediu jogador novo");
+    await waitStep(page, "Entrar");
+    await formNotice(page).waitFor();
+    const retry = formNotice(page).locator('[data-action="gate-retry"]');
+    assert.equal(await retry.innerText(), "Tentar carregar o Google de novo");
+    assert.equal(await page.locator("#e2e-google").count(), 0);
+    server.googleDown = false;
+    await retry.click();
+    await page.locator("#ps-google #e2e-google").waitFor();
+    assert.equal(await formNotice(page).count(), 0);
+    // O Google respondeu, mas a troca pela sessão falha no servidor.
+    server.failAuth.push(503);
+    await page.locator("#e2e-google").click();
+    await formNotice(page).waitFor();
+    assert.match(await formNotice(page).innerText(), /Não foi possível entrar agora\. Tente de novo\./);
+    assert.equal(await storedKey(page), null);
+    assert.equal(await stepText(page), "Entrar");
+    // A conta já tem cadastro: entrar leva direto à pesquisa, sem formulário.
+    await page.locator("#ps-google #e2e-google").click();
+    await waitStep(page, "Tela 1 de 4");
+    assert.equal(server.count("POST", "/api/registration"), 0);
     assert.equal(server.last("/draw").key, GOOGLE_KEY);
+  });
+
+  await scenario("a conta perde o cadastro: a retomada sem toque fica na entrada e o toque abre o formulário", async () => {
+    const server = createServer();
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
+    await entryReady(page);
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Tela 1 de 4");
+    await tapCard(page, 1);
+    await waitStep(page, "Tela 2 de 4");
+    // O servidor deixa de ter o cadastro desta conta. Recarregar tenta retomar sozinho.
+    server.registered.delete(GOOGLE_KEY);
+    const drawsBefore = server.count("POST", "/draw");
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await entryReady(page);
+    await page.waitForTimeout(400);
+    assert.equal(server.count("POST", "/draw"), drawsBefore + 1, "uma tentativa de retomada, sem repetir");
+    assert.equal(await stepText(page), "Pesquisa", "sem toque, ninguém cai no formulário");
+    assert.equal(await page.locator("#ps-register, #ps-google").count(), 0);
+    await page.locator("#ps-action").click();
+    await fillRegistration(page);
+    await submitButton(page).click();
+    // Com o cadastro refeito, a pesquisa volta de onde parou.
+    await waitStep(page, "Tela 2 de 4");
   });
 
   await scenario("a resposta registrada oferece a próxima pesquisa, sem \"Ir para o início\"", async () => {
@@ -465,8 +642,8 @@ try {
     const WIDE_FONT = '.ps-shell, .ps-shell button, .ps-shell a { font-family: Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace !important; }';
     for (const [width, height, wide = false] of [[390, 844], [360, 640], [360, 640, true]]) {
       const server = createServer();
-      server.answered(ANONYMOUS_KEY);
-      const page = await open(await newContext(server, { width, height, storedKey: ANONYMOUS_KEY }));
+      server.answered(GOOGLE_KEY);
+      const page = await open(await newContext(server, { width, height, storedKey: GOOGLE_KEY }));
       await entryReady(page);
       if (wide) await page.addStyleTag({ content: WIDE_FONT });
       await page.locator("#ps-action").click();
@@ -503,8 +680,10 @@ try {
       await page.locator("h1").waitFor();
       assert.equal(await page.locator("h1").innerText(), "Como funciona");
       assert.equal(await page.title(), "Como funciona — PoliMatch");
-      assert.equal(await page.locator(".ps-list li").count(), 4);
+      assert.equal(await page.locator(".ps-list li").count(), 5);
+      assert.match(await page.locator(".ps-list li").first().innerText(), /você entra com Google e cadastra o CPF, uma vez só/);
       assert.match(await page.locator(".pm-note").innerText(), /só sai o resultado somado, nunca a escolha de uma pessoa/);
+      assert.match(await page.locator(".pm-note").innerText(), /Não guardamos o número do CPF/);
       assert.equal(await fits(page), true, `${width}×${height}: a página cabe sem rolar`);
       const action = page.locator(".ps-stack a.ps-btn");
       assert.equal(await action.innerText(), "Responder a pesquisa");
@@ -630,7 +809,6 @@ try {
     await signIn(page);
     await page.keyboard.press("Escape");
     await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
-    assert.equal(server.count("POST", "/api/player"), 0);
     // E sair, com a pesquisa fechada, volta para a tela de fechada, sem "Começar".
     await openMenu(page);
     await page.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
@@ -654,7 +832,6 @@ try {
     server.holdSurvey = null;
     release();
     await page.locator('.ps-grid[data-ready="true"]').waitFor({ timeout: 20000 });
-    assert.equal(server.count("POST", "/api/player"), 0, "a conta chegou antes: não nasce jogador anônimo");
     assert.equal(server.last("/draw").key, GOOGLE_KEY);
   });
 
@@ -768,7 +945,7 @@ try {
 
   await scenario("cada pesquisa tem endereço; um código desconhecido cai na capa", async () => {
     const server = createServer();
-    const context = await newContext(server);
+    const context = await newContext(server, { storedKey: GOOGLE_KEY });
     const second = await open(context, surveyUrl(SECOND));
     await entryReady(second);
     assert.equal(await second.locator("#ps-title").innerText(), "Em quem você confia mais?");
@@ -790,13 +967,13 @@ try {
 
   await scenario("responder a primeira: a capa mostra a escolha e destaca a segunda; uma não mexe na outra", async () => {
     const server = createServer();
-    const context = await newContext(server);
+    const context = await newContext(server, { storedKey: GOOGLE_KEY });
     const page = await open(context);
     await entryReady(page);
     await page.locator("#ps-action").click();
     const first = await answer(page, 0);
     assert.equal(new URL(page.url()).search, `?p=${SURVEY.id}`);
-    assert.equal(server.responseOf(ANONYMOUS_KEY, SECOND), null, "responder a primeira não responde a segunda");
+    assert.equal(server.responseOf(GOOGLE_KEY, SECOND), null, "responder a primeira não responde a segunda");
 
     // "Próxima pesquisa" leva à capa: a escolha aparece e a segunda vira o destaque.
     await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Próxima pesquisa" }).click()]);
@@ -816,10 +993,9 @@ try {
     await page.locator("#ps-action").click();
     await waitStep(page, "Tela 1 de 4");
     assert.equal(await page.locator('.ps-grid button[aria-pressed="true"]').count(), 0);
-    assert.equal(server.count("POST", "/api/player"), 1, "o mesmo jogador responde as duas");
     const second = await answer(page, 1);
     assert.equal(await page.getByRole("link", { name: "Ver pesquisas" }).getAttribute("href"), "./", "sem próxima, o botão leva à capa");
-    assert.notEqual(server.responseOf(ANONYMOUS_KEY, SURVEY).answerId, server.responseOf(ANONYMOUS_KEY, SECOND).answerId);
+    assert.notEqual(server.responseOf(GOOGLE_KEY, SURVEY).answerId, server.responseOf(GOOGLE_KEY, SECOND).answerId);
 
     // Respondidas as duas, a capa diz isso e mostra as duas escolhas.
     await page.getByRole("link", { name: "Ver pesquisas" }).click();
@@ -835,7 +1011,7 @@ try {
 
   await scenario("a capa destaca a pesquisa que ficou pela metade, com Continuar, e não fica presa se ela fecha", async () => {
     const server = createServer();
-    const page = await open(await newContext(server), surveyUrl(SECOND));
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SECOND));
     await entryReady(page);
     await page.locator("#ps-action").click();
     await waitStep(page, "Tela 1 de 4");
@@ -943,8 +1119,8 @@ try {
   };
   async function answeredPage(mode) {
     const server = createServer();
-    const answered = server.answered(ANONYMOUS_KEY);
-    const context = await newContext(server, { storedKey: ANONYMOUS_KEY });
+    const answered = server.answered(GOOGLE_KEY);
+    const context = await newContext(server, { storedKey: GOOGLE_KEY });
     await context.addInitScript(SHARE_STUB, mode);
     const images = [];
     context.on("request", (request) => { if (request.url().includes("/chromas/")) images.push(new URL(request.url()).pathname); });
@@ -1014,7 +1190,7 @@ try {
   await scenario("servidor que ainda não conhece a segunda pesquisa: a capa mostra só a primeira", async () => {
     const server = createServer();
     server.unknown.add(SECOND.id);
-    const context = await newContext(server);
+    const context = await newContext(server, { storedKey: GOOGLE_KEY });
     const page = await open(context);
     await entryReady(page);
     assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
@@ -1030,8 +1206,8 @@ try {
 
   await scenario("uma leitura que falha não vira informação falsa: a capa pede para tentar de novo", async () => {
     const server = createServer();
-    server.answered(ANONYMOUS_KEY);
-    const context = await newContext(server, { storedKey: ANONYMOUS_KEY });
+    server.answered(GOOGLE_KEY);
+    const context = await newContext(server, { storedKey: GOOGLE_KEY });
     // A pessoa respondeu a primeira neste aparelho.
     const first = await open(context, surveyUrl(SURVEY));
     await entryReady(first);

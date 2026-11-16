@@ -227,3 +227,9 @@ export function drawPhotoSurvey(surveyId, recoveryKey) {
 export function respondPhotoSurvey(surveyId, recoveryKey, { answerId, pickIds, championId } = {}) {
   return gameRequest(photoSurveyPath(surveyId, "/response"), recoveryKey, { answerId, pickIds, championId });
 }
+
+// Cadastro com CPF (ICM 71, #336). O CPF só viaja neste pedido, no corpo:
+// nunca no endereço e nunca para o armazenamento do aparelho.
+export function registerCpf(sessionToken, body) {
+  return gameRequest("/api/registration", sessionToken, body);
+}

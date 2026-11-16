@@ -49,7 +49,7 @@ test("o menu marca a página em que a pessoa está", () => {
 test("sem conta e com o Google configurado, o menu reserva o lugar do botão de entrada", () => {
   const markup = menuMarkup({ account: "none", googleReady: true });
   assert.match(markup, /id="pm-google"/);
-  assert.match(markup, /Para a sua resposta valer em qualquer aparelho\./);
+  assert.match(markup, /Para responder, entre e cadastre o CPF\./);
   assert.doesNotMatch(markup, /Sair da conta/);
   // Quem responde sem conta também pode entrar: a chave anônima é reunida à conta.
   assert.match(menuMarkup({ account: "anonymous", googleReady: true }), /id="pm-google"/);
