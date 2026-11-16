@@ -58,7 +58,8 @@
     "A13 entrada e formulário cabem na largura": "e2e site-shell: três tamanhos, também com fonte larga"
   },
   "notVerified": [
-    "o botão real do Google pelo agente: nos testes é simulado; o Stefan relatou que no celular funcionou",
+    "o botão real do Google pelo agente: nos testes é simulado; depois da publicação o Stefan escreveu \"No celular funcionou\" sem dizer o que testou, e não se sabe se o relato cobre a entrada com Google",
+    "um aparelho de verdade (teclado numérico no campo do CPF)",
     "produção, com pedido de escrita: o agente só faz leitura lá; a rota de cadastro e a recusa do sorteio não foram exercitadas por ele em produção",
     "leitor de tela de verdade no formulário"
   ],
@@ -67,7 +68,7 @@
   "ci": {
     "pr": 337,
     "commit 8806a4a": "ci-gate falhou por um teste de unidade do servidor que procurava três dígitos numa resposta com requestId aleatório; no mesmo commit passaram o servidor com PostgreSQL (com o smoke do cadastro), os roteiros em Chromium e WebKit no Linux e a imagem do app",
-    "finalCommit": "o commit do gate, só de documentação, passa pelo CI antes do merge",
+    "finalCommit": "a4ea0a9, o commit do gate, só de documentação: ci-gate verde antes do merge; a árvore do merge f2edbcd é a dele",
     "commit 19c424f": "ci-gate verde; no Linux, site-shell 44 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; unidade de shared, back e app; smokes do servidor com PostgreSQL, com o do cadastro; imagem do app e smoke-nginx",
     "automatedReview": "Codex leu o commit 8806a4a e deixou três apontamentos (HANDOFF ausente, formulário ligado à conta, pesquisa fechada antes do formulário): os três resolvidos e respondidos",
     "commit e6100ac": "ci-gate verde; no Linux, site-shell 44 e photo-survey 34 cenários em Chromium e em WebKit; unidade de shared, back e app; smokes do servidor com PostgreSQL; imagem do app e smoke-nginx"
@@ -96,15 +97,15 @@
   "delivery71e": {
     "date": "2026-11-16",
     "merges": {
-      "PR 337": "f2edbcd",
-      "PR 339": "28fd962"
+      "PR 337": "f2edbcd, mesma árvore de a4ea0a9 (ci-gate verde)",
+      "PR 339": "28fd962, mesma árvore de fc53b1f (ci-gate verde)"
     },
     "databaseCopy": "/tmp/pre-deploy-20261116b.dump no contêiner do banco, 609619 bytes, 29 tabelas com dados",
-    "api": "commit 28fd962, 25 s; database_ready com resetApplied false; nenhuma leitura de fora falhou",
+    "api": "commit 28fd962, 25 s; no log do boot, database_ready com resetApplied false e nenhuma linha de falha de inicialização; nenhuma leitura de fora falhou",
     "databaseAfter": "as 29 tabelas anteriores com a mesma contagem; entram cpf_registrations e cpf_registration_attempts, vazias; migração 2026-11-16-cpf-registration-v1",
     "app": "commit 28fd962, 31 s; build de 2026-11-16T23:26:07Z; nenhuma leitura de fora falhou",
-    "window": "cerca de um minuto e meio entre a API nova e o app novo, em que o app antigo não começava pesquisa",
-    "checkedByGet": "formulário, entrada, rota e recusa no app publicado; sem pedido de jogador sem conta e sem o aviso de cota; identificador do Google no build",
-    "stefanReport": "\"No celular funcionou\", depois da publicação; ele não detalhou o que testou"
+    "window": "cerca de um minuto e meio entre a API nova e o app novo; pelo desenho o app antigo não começa pesquisa nesse intervalo, o que não foi observado",
+    "checkedByGet": "presença no pacote publicado (código, não comportamento na tela): formulário, entrada, rota e recusa; sem pedido de jogador sem conta e sem o aviso de cota; identificador do Google no build",
+    "stefanReport": "\"No celular funcionou\", depois da publicação; ele não disse o que testou, e não se sabe se cobre a entrada com Google e o cadastro"
   }
 }

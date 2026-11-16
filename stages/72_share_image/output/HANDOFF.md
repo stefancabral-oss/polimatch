@@ -27,10 +27,10 @@
 
 Com a instrução do Stefan ("Sim, os dois"), transcrita em "Human gate":
 
-- PR #339 mesclado em `28fd962`, depois de refeito sobre o estágio 71. A árvore do merge é igual à do commit que passou no CI.
+- PR #339 mesclado em `28fd962`, depois de refeito sobre o estágio 71. A árvore do merge é a do commit `fc53b1f`, que tinha o `ci-gate` verde.
 - App publicado no commit `28fd962` (31 s), build de 2026-11-16T23:26:07Z, junto com o estágio 71. De fora, nenhuma leitura falhou.
-- Conferido de fora, só por leitura: o app publicado traz a imagem com as finalistas, a prévia com "Baixar imagem" e a espera pela imagem.
-- Depois da publicação, o Stefan testou e respondeu: "No celular funcionou". Ele não detalhou o que testou; o agente tinha pedido que ele entrasse com Google, fizesse o cadastro, respondesse uma pesquisa e tocasse em "Compartilhar".
+- Conferido de fora, só por leitura do pacote publicado: o código do app traz a imagem com as finalistas, a prévia com "Baixar imagem" e a espera pela imagem. Isso mostra o que está no pacote, não o comportamento na tela: o agente não exercitou o compartilhar em produção.
+- Depois da publicação, o Stefan escreveu: "No celular funcionou". Ele não disse o que testou nem em que aparelho. O agente tinha pedido quatro passos (entrar com Google, fazer o cadastro, responder uma pesquisa e tocar em "Compartilhar"); não se sabe quais deles o relato cobre, nem se cobre o compartilhar.
 
 O registro do banco e da API desta publicação está no HANDOFF do estágio 71 e na issue #336; o deste estágio, na #338.
 
@@ -43,7 +43,7 @@ O registro do banco e da API desta publicação está no HANDOFF do estágio 71 
 
 No CI do PR #339, antes de a branch ser refeita, o commit `cf680b8` passou (`ci-gate` verde): os testes de unidade do app, a imagem do app e, no Linux, os dois roteiros em Chromium e em WebKit. A revisão automática (Codex) deixou um apontamento, sobre a preparação antiga apagar o prazo da tela nova; estava corrigido nesse commit, foi respondido e a conversa encerrada.
 
-Depois de refeita sobre o estágio 71, em 16/11/2026, local (macOS): `npm test --prefix app` 213/213, `npm run test:shared` 118/118, `npm test --prefix back` 305/305; `site-shell.mjs` com 46 cenários e `photo-survey.mjs` com 34, em WebKit e em Chromium 140. Houve conflito em quatro arquivos, todos de emenda: os imports da página, o fim da folha de estilos (a emenda deixou um bloco sem fechar, que o build acusou e foi corrigido), o trecho do roteiro que prepara a tela de resposta (que passou a usar a conta cadastrada do estágio 71) e o contexto raiz. O commit refeito passa pelo CI antes do merge.
+Depois de refeita sobre o estágio 71, em 16/11/2026, local (macOS): `npm test --prefix app` 213/213, `npm run test:shared` 118/118, `npm test --prefix back` 305/305; `site-shell.mjs` com 46 cenários e `photo-survey.mjs` com 34, em WebKit e em Chromium 140. Houve conflito em quatro arquivos, todos de emenda: os imports da página, o fim da folha de estilos (a emenda deixou um bloco sem fechar, que o build acusou e foi corrigido), o trecho do roteiro que prepara a tela de resposta (que passou a usar a conta cadastrada do estágio 71) e o contexto raiz. O commit refeito, `fc53b1f`, passou inteiro no CI (`ci-gate` verde) antes do merge.
 
 Em 16/11/2026, local (macOS), no código do PR antes de ser refeito:
 
@@ -80,11 +80,11 @@ Ele não conferiu aparelho de verdade (o ponto do iPhone é leitura de um defeit
 ## Riscos conhecidos
 
 - **A imagem leva a foto de quatro pessoas reais com a marca do PoliMatch,** em vez de uma. Está na consulta jurídica sobre direito de imagem (decisão 0001, pendência de fotos).
-- **O compartilhamento real não foi exercitado.** Nos testes `navigator.share` é simulado. Num iPhone ou Android de verdade o teste é do Stefan. Não se sabe em que aparelho ele viu ir só o link. Três caminhos davam nisso e foram tratados: o toque antes de a imagem ficar pronta, o aparelho sem compartilhamento de arquivo e, no iPhone, a imagem enviada junto com texto e endereço. Este último vem de um defeito conhecido do navegador, não de teste em aparelho.
+- **O compartilhamento real não foi exercitado pelo agente.** Nos testes `navigator.share` é simulado. Depois da publicação o Stefan escreveu "No celular funcionou", sem dizer o que testou nem em que aparelho: não se sabe se o relato cobre o compartilhar. Também não se sabe em que aparelho ele viu ir só o link. Três caminhos davam nisso e foram tratados: o toque antes de a imagem ficar pronta, o aparelho sem compartilhamento de arquivo e, no iPhone, a imagem enviada junto com texto e endereço. Este último vem de um defeito conhecido do navegador, não de teste em aparelho.
 - **Sem texto junto da imagem,** quem recebe não ganha um link para tocar: o endereço está escrito na imagem.
 - **Navegadores dentro de aplicativos** (Instagram, WhatsApp) costumam não compartilhar nem baixar arquivo. Neles a saída é segurar o dedo na imagem da prévia, que o texto da prévia indica. Não foi testado.
 - **O botão espera a imagem.** Em condição normal ela fica pronta quase na hora; no pior caso o botão fica até 8 segundos desabilitado.
-- **Conflito com o estágio 71 (#336, PR #337):** os dois mexem na página da pesquisa e no roteiro `site-shell.mjs`. O que for mesclado depois é refeito sobre a `main`.
+- **Conflito com o estágio 71 (#336, PR #337):** resolvido antes do merge. Os dois mexiam na página da pesquisa e no roteiro `site-shell.mjs`; esta branch foi refeita sobre o estágio 71 (ver "Testes executados").
 - As condições de publicação dos estágios 69 e 70 seguem abertas: privacidade (#283) e backup externo (#279).
 
 ## Decisões tomadas
@@ -105,7 +105,7 @@ Nenhum neste estágio.
 
 ## Ação do Stefan
 
-- Nenhuma neste estágio. Ele relatou que no celular funcionou.
+- Confirmar se o que ele testou no celular incluiu tocar em "Compartilhar", se a imagem chegou e em que aparelho.
 
 ## Human gate
 

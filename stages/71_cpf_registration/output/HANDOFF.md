@@ -45,14 +45,14 @@
 
 Com a instrução do Stefan ("Sim, os dois"), transcrita em "Human gate":
 
-- PR #337 mesclado em `f2edbcd`; PR #339 (estágio 72) mesclado em `28fd962`. Nos dois, a árvore do merge é igual à do commit que passou no CI.
+- PR #337 mesclado em `f2edbcd`, com a mesma árvore do commit `a4ea0a9`, que tinha o `ci-gate` verde. PR #339 (estágio 72) mesclado em `28fd962`, com a mesma árvore do commit `fc53b1f`, também com o `ci-gate` verde.
 - Cópia do banco antes da API: `/tmp/pre-deploy-20261116b.dump` no contêiner do banco, 609.619 bytes, 29 tabelas com dados.
-- API publicada no commit `28fd962` (25 s). No boot, `database_ready` com `resetApplied: false`, sem erro. De fora, lendo a cada 5 s, nenhuma leitura falhou.
+- API publicada no commit `28fd962` (25 s). No log do boot, `database_ready` com `resetApplied: false` e nenhuma linha de falha de inicialização. De fora, lendo a cada 5 s, nenhuma leitura falhou.
 - Banco depois da API: as 29 tabelas que existiam ficaram com a mesma contagem. Entraram `cpf_registrations` e `cpf_registration_attempts`, vazias, e a migração `2026-11-16-cpf-registration-v1`.
 - App publicado no commit `28fd962` (31 s), build de 2026-11-16T23:26:07Z. De fora, nenhuma leitura falhou.
-- Entre a API nova e o app novo, por cerca de um minuto e meio, o app antigo não conseguia começar pesquisa, como previsto.
-- Conferido de fora, só por leitura: o app publicado traz o formulário de cadastro, a tela de entrada, a chamada da rota de cadastro e o tratamento da recusa; não traz mais o pedido de jogador sem conta nem o aviso de cota; o identificador do Google está no build.
-- Depois da publicação, o Stefan testou e respondeu: "No celular funcionou". Ele não detalhou o que testou; o agente tinha pedido que ele entrasse com Google, fizesse o cadastro, respondesse uma pesquisa e tocasse em "Compartilhar".
+- Entre a API nova e o app novo passou cerca de um minuto e meio. Pelo desenho, nesse intervalo o app antigo não começa pesquisa, porque o servidor recusa o jogador sem conta. É o esperado pelo código, não algo que o agente tenha observado.
+- Conferido de fora, só por leitura do pacote publicado: o código do app traz o formulário de cadastro, a tela de entrada, a chamada da rota de cadastro e o tratamento da recusa; não traz mais o pedido de jogador sem conta nem o aviso de cota; o identificador do Google está no build. Isso mostra o que está no pacote, não o comportamento na tela.
+- Depois da publicação, o Stefan escreveu: "No celular funcionou". Ele não disse o que testou. O agente tinha pedido quatro passos (entrar com Google, fazer o cadastro, responder uma pesquisa e tocar em "Compartilhar"); não se sabe quais deles o relato cobre, nem se cobre a entrada com Google.
 
 O agente não fez pedido de escrita em produção: a rota de cadastro e a recusa do sorteio não foram exercitadas por ele lá. O registro também está na issue #336.
 
@@ -66,7 +66,7 @@ O agente não fez pedido de escrita em produção: a rota de cadastro e a recusa
 
 ## Testes executados
 
-No CI do PR #337, o commit `19c424f` passou inteiro (`ci-gate` verde): no Linux, `site-shell` com 44 cenários e `photo-survey` com 34, em Chromium e em WebKit; o relato de erros nos dois; os testes de unidade de `shared/`, do servidor e do app; os smokes do servidor com PostgreSQL, com o do cadastro; a imagem do app e `smoke-nginx`. O commit final, com a conferência da conta no envio, passa pelo CI de novo antes do merge.
+No CI do PR #337, o commit `19c424f` passou inteiro (`ci-gate` verde): no Linux, `site-shell` com 44 cenários e `photo-survey` com 34, em Chromium e em WebKit; o relato de erros nos dois; os testes de unidade de `shared/`, do servidor e do app; os smokes do servidor com PostgreSQL, com o do cadastro; a imagem do app e `smoke-nginx`. O commit `e6100ac`, com a conferência da conta no envio, também passou inteiro (`ci-gate` verde, com os mesmos roteiros no Linux). O commit do gate, `a4ea0a9`, só mudou o HANDOFF e o `verification.json` e passou no `ci-gate` antes do merge.
 
 Antes, o commit `8806a4a` falhou num teste de unidade do servidor: o teste procurava os dígitos "529" numa resposta de erro, e o `requestId` aleatório da resposta saiu com eles. Era defeito do teste, não do código: a busca passou a ser pelo CPF inteiro. Nesse mesmo commit passaram, no Linux, o servidor com PostgreSQL (com o smoke novo do cadastro), os roteiros de navegador em Chromium e em WebKit e a imagem do app.
 
@@ -136,7 +136,7 @@ A revisão automática do GitHub (Codex) leu o commit `8806a4a` e deixou três a
 - **CPF junto com preferência política.** É a primeira pergunta para o advogado na decisão 0001 e segue sem resposta registrada no repositório (#283). Com este estágio, toda resposta nova pertence a uma pessoa identificável pela conta. O site não tem página de privacidade; o texto de consentimento do formulário descreve o tratamento, mas não é a política. Publicar assim é decisão do Stefan.
 - **O código do CPF é reversível por quem tem o banco e o segredo juntos.** Existem cerca de um bilhão de CPFs com dígitos válidos; testar todos contra os códigos é rápido. O código protege o número num vazamento só do banco; o cadastro continua sendo dado pessoal.
 - **A conferência é pelos dígitos.** Não prova que o CPF existe nem que é de quem digitou. Alguém pode usar o CPF de outra pessoa, que depois não consegue se cadastrar. O que amarra a pessoa é a conta Google; o CPF limita uma conta por número.
-- **A entrada com Google não foi exercitada pelo agente com o botão real:** nos testes ela é simulada. O Stefan relatou, depois da publicação, que no celular funcionou.
+- **A entrada com Google não foi exercitada pelo agente com o botão real:** nos testes ela é simulada. Depois da publicação o Stefan escreveu "No celular funcionou", sem dizer o que testou: não se sabe se o relato cobre a entrada com Google.
 - **Menos gente responde.** Entrar e preencher um formulário antes da primeira carta custa participação.
 - **Dependência do Google.** Com o serviço do Google fora do ar, ninguém novo responde.
 - **`VOTER_NETWORK_SECRET` não pode mais ser trocado nem perdido:** os códigos dos CPFs mudariam e a unicidade se perderia, sem volta, porque o número não é guardado. Hoje o segredo só existe no painel; precisa ir para o cofre (`docs/ops/DR.md`).
@@ -165,7 +165,9 @@ Nenhum neste estágio. O que segue aberto está em "Ação do Stefan" e nas pend
 
 ## Ação do Stefan
 
+- Confirmar se o que ele testou no celular incluiu entrar com Google e fazer o cadastro.
 - Guardar `VOTER_NETWORK_SECRET` no cofre de senhas.
+- As cópias do banco em `/tmp` no contêiner do banco (13/11, 14/11 e as duas de 16/11) têm dado pessoal: apagar ou guardar fora é decisão dele.
 - A revisão jurídica do CPF com preferência política e a página de privacidade seguem em aberto.
 - Dizer se quer a conferência do CPF na Receita (serviço pago).
 

@@ -28,9 +28,9 @@ Conteúdo sem aprovação externa e agregados sem autoridade continuam retidos.
 
 Desde 12/11/2026, por decisão do Stefan, a direção do PoliMatch é ser uma pesquisa de preferência por foto: a pessoa se diverte escolhendo fotos e disso sai a preferência do público. O registro completo está em `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md`.
 
-Essa direção ainda não está no ar. O que está em produção continua sendo o jogo casual de comparação descrito nesta página, e as decisões abaixo seguem valendo para ele até que cada etapa da direção nova passe pelo gate humano.
+Essa direção está no ar desde 14/11/2026: a pesquisa de Política por foto é a capa do site (decisão 0003) e, desde 16/11/2026, só responde quem entrou com Google e fez o cadastro com CPF (decisão 0004). As páginas do jogo casual de comparação descrito nesta página saíram do site em 14/11/2026; as rotas dele continuam na API. As decisões abaixo ficam como registro desse produto anterior e valem para o que restou dele. Cada etapa nova da direção continua passando pelo gate humano.
 
-Norte anterior, mantido como histórico: "PoliMatch é um jogo casual de comparação entre personalidades públicas. Não é pesquisa eleitoral. O produto deve ser simples de jogar, visualmente próprio, colecionável e agradável no celular." A frase "Não é pesquisa eleitoral" continua valendo, e exibida, no que está no ar. Ela deixa de valer para a direção nova: o texto que a substitui ali depende da revisão jurídica (Q5 da #277), e até lá o repositório não afirma nenhum enquadramento para a pesquisa por foto.
+Norte anterior, mantido como histórico: "PoliMatch é um jogo casual de comparação entre personalidades públicas. Não é pesquisa eleitoral. O produto deve ser simples de jogar, visualmente próprio, colecionável e agradável no celular." A frase "Não é pesquisa eleitoral" valia, e era exibida, no produto anterior. Ela saiu do site com a capa antiga em 14/11/2026 (decisão 0003): o site novo não exibe enquadramento nenhum. Ela não vale para a direção nova: o texto que a substitui ali depende da revisão jurídica (Q5 da #277), e até lá o repositório não afirma nenhum enquadramento para a pesquisa por foto.
 
 ## Direção nova: pesquisa de preferência por foto — issue #318
 
@@ -49,7 +49,7 @@ Antes de propor ou alterar tela, regra de voto ou cadastro, ler o registro de de
 
 ## Decisões atuais aprovadas
 
-As decisões desta lista descrevem o que está no ar. A referência para o que não se aplica à direção nova é a tabela do registro de decisão. A marca "Substituída para as telas da pesquisa por foto" aparece só nas principais, como atalho.
+As decisões desta lista descrevem o produto anterior, que saiu do site em 14/11/2026 (decisão 0003): valem como histórico e para o que restou dele na API. A referência para o que não se aplica à direção nova é a tabela do registro de decisão. A marca "Substituída para as telas da pesquisa por foto" aparece só nas principais, como atalho.
 
 - O frontend anterior foi rejeitado e será substituído, não remendado.
 - A direção de arte `Malaquita 2026 / Digital First` enviada em 13/09/2026 está aprovada e é a referência visual oficial. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318), com a ressalva da decisão 0002: as cartas com moldura valem nessas telas. Segue valendo para o que está no ar.

@@ -9,7 +9,7 @@
     "70b": "a página vale para qualquer pesquisa; /?p=<código>",
     "70c": "capa com destaque, Suas escolhas, Mais pesquisas e Em breve; menu com as pesquisas",
     "70d": "compartilhar a escolha: imagem, texto e endereço; saídas sem suporte",
-    "70e": "aprovada em 16/11/2026; acontece depois do merge: cópia do banco, deploy da API, deploy do app; registro na issue #334"
+    "70e": "feita em 16/11/2026: API e app no commit 59ca9a1; registro na issue #334 e no HANDOFF"
   },
   "testsFirst": {
     "regras": "shared (4 falharam), regras da capa, menu (3 falharam) e share-choice: testes escritos e vistos falhar antes do código",
@@ -43,7 +43,7 @@
   },
   "notVerified": [
     "navigator.share num aparelho de verdade: nos testes é simulado",
-    "produção: nada deste estágio foi publicado",
+    "produção, com pedido de escrita: o agente só faz leitura lá",
     "\"Entrar com Google\" pelo menu, com o botão real do Google: nos testes é simulado"
   ],
   "independentReview": {
@@ -74,6 +74,19 @@
     "commit 918f34c": "falhou: site-shell, cenário 9, nos dois navegadores (botão em três linhas com a fonte do Linux)",
     "commit 46ae6ff": "ci-gate verde; no Linux, site-shell 34 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; unidade de shared, back e app; smoke do servidor com PostgreSQL e as duas pesquisas; imagem do app e smoke-nginx 14 de 14",
     "automatedReview": "Codex deixou um apontamento (a capa se refazer quando a identidade muda), já corrigido em 70419fa; respondido e encerrado",
-    "finalCommit": "a branch refeita sobre a main e o commit do gate passam pelo CI antes do merge"
+    "finalCommit": "2cb8b0f, a branch refeita sobre a main com o commit do gate: ci-gate verde antes do merge; a árvore do merge 59ca9a1 é a dele"
+  },
+  "delivery70e": {
+    "date": "2026-11-16",
+    "merges": {
+      "PR 333": "e220a96, mesma árvore de 94b9bfb (ci-gate verde)",
+      "PR 335": "59ca9a1, mesma árvore de 2cb8b0f (ci-gate verde)"
+    },
+    "databaseCopy": "/tmp/pre-deploy-20261116.dump no contêiner do banco, 607784 bytes, 29 tabelas com dados",
+    "api": "commit 59ca9a1, 25 s; no log do boot, database_ready com resetApplied false; nenhuma leitura de fora falhou; a segunda pesquisa passou de 404 a 200",
+    "databaseAfter": "28 das 29 tabelas com a mesma contagem; abuse_quota_counters de 69 para 55, pela limpeza dos contadores com mais de 8 dias que o servidor faz ao iniciar",
+    "app": "commit 59ca9a1, 37 s; build de 2026-11-16T21:49:43Z; nenhuma leitura de fora falhou",
+    "checkedByGet": "as duas pesquisas respondem com assunto e pergunta; o pacote da capa traz Mais pesquisas, Suas escolhas, a segunda pergunta, o compartilhar e o Continuar; /?p=politica-2026-02 e Como funciona respondem 200",
+    "stefanAfter": "\"Compartilhar: Deve gerar uma imagem com minhas escolhas, não apenas o link.\"; o pedido virou o estágio 72"
   }
 }

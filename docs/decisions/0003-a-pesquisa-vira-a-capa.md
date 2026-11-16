@@ -4,7 +4,8 @@
 - Quem decidiu: Stefan
 - Registrado por: agente (Claude), a pedido dele
 - Issue: #331 ([ICM 69])
-- Estado: direção aprovada. **Nada desta decisão está em produção.**
+- Estado: em produção desde 14/11/2026 (estágio 69, #331): a pesquisa é a capa
+  do site e as páginas do produto anterior saíram.
 - Altera a [decisão 0001](0001-pesquisa-de-preferencia-por-foto.md) no item 7 e
   o contexto do estágio 68 nos pontos listados em "O que muda". A
   [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md) continua

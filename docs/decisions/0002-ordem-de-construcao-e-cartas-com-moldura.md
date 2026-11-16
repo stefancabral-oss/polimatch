@@ -4,7 +4,9 @@
 - Quem decidiu: Stefan
 - Registrado por: agente (Claude), a pedido dele
 - Issue: #324 ([ICM 68])
-- Estado: direção aprovada. **Nada desta decisão está em produção.**
+- Estado: direção aprovada. Em produção desde 14/11/2026 a primeira construção
+  da ordem, a pesquisa de Política com cartas de moldura (estágio 68, #324). As
+  construções seguintes da ordem não estão em produção.
 - Altera a [decisão 0001](0001-pesquisa-de-preferencia-por-foto.md) nos pontos
   listados em "O que muda na decisão 0001". O resto dela continua valendo.
 

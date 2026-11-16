@@ -2,8 +2,10 @@
 
 Base: `main` depois do estágio 70 (#334), publicado em 16/11/2026.
 Ler o contexto raiz, o `AGENTS.md`, as decisões 0001 a 0003 e o contexto do
-estágio 70. Este estágio não depende do estágio 71 (#336), que corre em
-paralelo em outra branch.
+estágio 70. Este estágio não depende do estágio 71 (#336), que corria em
+paralelo em outra branch. Depois: o estágio 71 foi aprovado para entrar
+antes, a branch deste foi refeita em cima dele e os dois foram publicados
+juntos em 16/11/2026.
 
 ## Objetivo
 

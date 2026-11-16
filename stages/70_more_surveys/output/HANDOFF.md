@@ -2,11 +2,11 @@
 
 ## Status
 
-- Estado: `aprovado` nas partes 70a a 70d, num PR só, e na publicação (70e), que acontece depois do merge e fica registrada na issue #334.
+- Estado: `concluído`. As partes 70a a 70d foram mescladas (PR #335, commit `59ca9a1`) e a 70e aconteceu em 16/11/2026: API e app foram publicados nesse commit. O registro também está na issue #334.
 - Issue: #334
 - Branch: `icm/70-more-surveys`. Foi feita sobre a da limpeza (PR #333); com a #333 mesclada em `e220a96`, em 16/11/2026, foi refeita sobre a `main`, sem conflito e sem mudança de conteúdo.
 - PR: #335
-- Até o merge, nada deste estágio está em produção.
+- Em produção desde 16/11/2026. O compartilhar deste estágio foi trocado no mesmo dia pelo do estágio 72 (#338).
 
 ## Entregue (70a — regras)
 
@@ -38,9 +38,23 @@
 - A imagem é montada quando a tela aparece, para o toque abrir o compartilhamento do aparelho na hora. Sem suporte a arquivo vai o texto com o endereço; sem compartilhamento, o endereço é copiado e a tela avisa. Fechar a folha de compartilhar não é erro.
 - Nada é compartilhado sem o toque, e compartilhar não fala com a API.
 
+## Publicação (70e) — 16/11/2026
+
+Com a instrução do Stefan ("Sim, mescla e publica"), transcrita em "Human gate":
+
+- PR #333 (limpeza, 69d) mesclado em `e220a96`, com a mesma árvore do commit `94b9bfb`; PR #335 (este estágio) mesclado em `59ca9a1`, com a mesma árvore do commit `2cb8b0f`. Os dois commits tinham o `ci-gate` verde.
+- Cópia do banco antes da API: `/tmp/pre-deploy-20261116.dump` no contêiner do banco, 607.784 bytes, 29 tabelas com dados.
+- API publicada no commit `59ca9a1` (25 s). No log do boot, `database_ready` com `resetApplied: false`. De fora, lendo a cada 5 s, nenhuma leitura falhou; a segunda pesquisa passou de 404 a 200.
+- Contagem das tabelas antes e depois da API: 28 das 29 idênticas (votos, jogadores, sorteios e respostas da pesquisa incluídos). A diferença é `abuse_quota_counters`, de 69 para 55: a limpeza dos contadores com mais de 8 dias que o servidor faz ao iniciar.
+- App publicado no commit `59ca9a1` (37 s), build de 2026-11-16T21:49:43Z. De fora, nenhuma leitura falhou.
+- Conferido de fora, só por leitura: as duas pesquisas respondem com assunto e pergunta; o pacote da capa nova traz "Mais pesquisas", "Suas escolhas", a segunda pergunta, o compartilhar e o "Continuar"; `/?p=politica-2026-02` e "Como funciona" respondem 200; os endereços antigos seguem redirecionando.
+
+O agente não fez pedido de escrita em produção. Não foram conferidos por ele o compartilhar num celular de verdade nem o botão real do Google. `version.json` continua com `sha: "unknown"` (#287).
+
+Depois da publicação o Stefan escreveu: "Compartilhar: Deve gerar uma imagem com minhas escolhas, não apenas o link." O pedido virou o estágio 72 (#338).
+
 ## Não entregue / pendente
 
-- **70e — publicação.** Precisa de deploy da API (a segunda pesquisa é definida em `shared/`) e do app, cada um com o sim do Stefan. A ordem é API primeiro.
 - Cartas novas e pesquisas de outros assuntos. "Famosos e influenciadores" e "Roupas" seguem como "em breve".
 - Resultado somado, top 5, comparação com a maioria (#177 e revisão jurídica).
 - Som e háptica.
@@ -115,15 +129,13 @@ Escolhas do agente, por delegação dele, que pode mudar qualquer uma:
 
 ## Próximo passo exato
 
-1. CI verde na branch refeita; merge do PR #335.
-2. Cópia do banco; deploy da API; conferência de que a segunda pesquisa responde e de que as contagens das tabelas não mudaram.
-3. Deploy do app; conferência de fora, só com leitura.
-4. Registro da publicação na issue #334.
+Nenhum neste estágio. O cadastro obrigatório (estágio 71) e o compartilhar com imagem (estágio 72) vieram em seguida.
 
 ## Ação do Stefan
 
 - Dizer se a segunda pergunta fica.
-- Testar o compartilhar no celular depois de publicado.
+- O compartilhar: a avaliação dele depois da publicação pediu imagem em vez de só o link, e virou o estágio 72.
+- As cópias do banco em `/tmp` no contêiner do banco têm dado pessoal: apagar ou guardar fora é decisão dele.
 - Para abrir "Famosos e influenciadores" e "Roupas": as cartas.
 
 ## Human gate
