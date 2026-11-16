@@ -6,11 +6,11 @@
   "decision": "docs/decisions/0003-a-pesquisa-vira-a-capa.md",
   "instruction": "Stefan, 14/11/2026, por voz: a pesquisa no lugar da capa atual, as páginas existentes substituídas, menus arrumados, no padrão novo; depois da folha com as telas: \"Pode seguir, vai pra frente. Pode ir construindo.\"",
   "deliveries": {
-    "69a": "registro: decisão 0003, contexto, plano, folha e ajustes nos documentos anteriores",
-    "69b": "menu, entrada e saída com Google no menu, página Como funciona",
-    "69c": "/ serve a pesquisa; cinco endereços aposentados com 302; sitemap e manifesto; páginas antigas fora do build; 26 passos de e2e antigos fora do CI",
-    "69d": "não começou: limpeza do código das páginas antigas, em PR próprio",
-    "69e": "autorizada com o merge; acontece depois dele; o resultado fica na issue #331"
+    "69a": "registro: decisão 0003, contexto, plano, folha e ajustes nos documentos anteriores; mesclada no PR #332 (6de6bbe)",
+    "69b": "menu, entrada e saída com Google no menu, página Como funciona; mesclada no PR #332 (6de6bbe)",
+    "69c": "/ serve a pesquisa; cinco endereços aposentados com 302; sitemap e manifesto; páginas antigas fora do build; 26 passos de e2e antigos fora do CI; mesclada no PR #332 (6de6bbe)",
+    "69d": "limpeza: 112 arquivos do produto anterior fora de app/src, app/e2e e app/scripts; testes de limpeza; pronta para gate em PR próprio",
+    "69e": "app publicado em 14/11/2026 no commit 6de6bbe; API não publicada"
   },
   "scope": {
     "backAndSharedUntouched": true,
@@ -72,9 +72,8 @@
     }
   },
   "notVerified": [
-    "o botão real do Google: nos testes o script do Google é simulado",
-    "fontes do Linux: os tamanhos foram conferidos a olho no macOS; no Linux, só pelos e2e do CI",
-    "produção: nada deste estágio foi publicado"
+    "o botão real do Google: nos testes o script do Google é simulado; em produção o teste é do Stefan",
+    "fontes do Linux: os tamanhos foram conferidos a olho no macOS; no Linux, só pelos e2e do CI"
   ],
   "independentReview": {
     "who": "agente separado, somente leitura, sobre os commits 548440a e fd22a56",
@@ -115,12 +114,86 @@
       ]
     }
   },
-  "humanGate": "instrução do Stefan em 14/11/2026 para o merge do PR #332 e para a publicação do app: \"Sim mescla e publica\"; transcrita no HANDOFF, com o que foi dito a ele antes da pergunta",
+  "humanGate": "69a, 69b, 69c e 69e: aprovadas pelo Stefan em 14/11/2026 (\"Sim mescla e publica\"); 69d: aprovada em 16/11/2026 (\"Sim, mescla e publica\"); transcritas no HANDOFF",
   "ci": {
     "pr": 332,
     "commit 8d85655": "ci-gate verde; no Linux, site-shell 20 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; design-validator com os testes de unidade, a imagem do app e smoke-nginx 14 de 14 na imagem nginx 1.27",
     "automatedReview": "Codex leu o commit 8d85655 e não deixou apontamento",
     "finalCommit": "o commit do gate, só de documentação, passa pelo CI antes do merge",
     "commit 482d1e7": "ci-gate verde; no Linux, site-shell 24 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; smoke-nginx 14 de 14"
+  },
+  "delivery69e": {
+    "date": "2026-11-14",
+    "publishedCommit": "6de6bbe",
+    "deploy": "serviço do app, pelo painel, 20 s; autorizado pelo Stefan na mesma instrução do merge",
+    "apiDeployed": false,
+    "outsideChecks": {
+      "/": "200, página da pesquisa, sem noindex, com manifesto; script com a lista da entrada e o aviso de cota apontando o menu; módulo do menu com o identificador do cliente Google",
+      "/como-funciona.html": "200, quatro linhas e a nota",
+      "endereços aposentados": "os cinco com 302 e Location /; seguem para a capa com 200",
+      "sitemap e manifesto": "duas páginas; nome PoliMatch e fundo branco",
+      "imagens das cartas": "40 de 40 com 200",
+      "arquivo ausente": ".html inexistente responde 404",
+      "api": "health 200; pesquisa politica-2026-01 aberta; pré-voos de CORS do sorteio e da entrada com Google aceitos",
+      "durante o deploy": "54 leituras de fora, a cada 5 s, todas com 200 na capa e na API"
+    },
+    "notDone": [
+      "navegador automatizado em produção",
+      "entrada com Google pelo menu em produção"
+    ],
+    "stillOpen": [
+      "privacidade (#283)",
+      "backup externo (#279)",
+      "pesquisa de lançamento com código novo: no ar está a politica-2026-01, com respostas de ensaio"
+    ]
+  },
+  "delivery69d": {
+    "checkedAt": "2026-11-14",
+    "removed": {
+      "app/src": 81,
+      "app/e2e": 30,
+      "app/scripts": 1
+    },
+    "kept": "site novo (13 arquivos), testes do que fica, piloto de arte com styles.css, photos.js (usado por um teste do servidor)",
+    "testsFirst": "repo-hygiene.test.js: três dos quatro testes falharam com o código antigo no repositório",
+    "tests": {
+      "npm test --prefix app": "185/185",
+      "npm run test:card-art-pilot-contract --prefix app": "64/64",
+      "formulário do piloto em WebKit": "aprovado",
+      "npm run test:shared": "104/104",
+      "npm test --prefix back": "293/293",
+      "checagem de planejamento do estágio 17": "aprovada",
+      "npm run build --prefix app": "sem erro",
+      "e2e site-shell": "24 cenários em WebKit e em Chromium 140",
+      "e2e photo-survey": "34 cenários em WebKit e em Chromium 140",
+      "e2e client-error-report": "aprovado nos dois",
+      "smoke-nginx contra nginx local": "14 de 14"
+    },
+    "backAndSharedUntouched": true,
+    "notInScope": [
+      "funções antigas em app/src/api.js",
+      "imagens do produto anterior em app/public (dist com 75 MB)",
+      "piloto de arte e verificadores de imagens do build"
+    ],
+    "independentReview": {
+      "who": "o mesmo agente das revisões anteriores, somente leitura, num clone à parte, sobre o commit 8774fa5",
+      "verdict": "sem bloqueio; um ponto importante",
+      "fixedBeforeMerge": [
+        "o teste das 20 cartas voltou, só com a conferência do catálogo e dos arquivos publicados; falha com uma imagem apagada ou uma carta a menos"
+      ],
+      "notedOnly": [
+        "o teste de limpeza é uma rede larga, não uma prova",
+        "restos sem uso listados no HANDOFF"
+      ],
+      "notDoneByReviewer": "produção, Chromium, CI no Linux, smokes do servidor com banco (imports lidos)"
+    },
+    "humanGate": "instrução do Stefan em 16/11/2026 para o merge dos PRs #333 e #335 e para a publicação: \"Sim, mescla e publica\"; transcrita no HANDOFF",
+    "builtOutput": "build antes e depois da limpeza: 311 arquivos, mesmo conteúdo, fora builtAt em version.json (conferido pela revisão)",
+    "ci": {
+      "pr": 333,
+      "commit 8774fa5": "ci-gate verde; 183 testes do app, 64 do piloto, site-shell 24 e photo-survey 34 cenários em Chromium e em WebKit, smoke-nginx",
+      "finalCommit": "passa pelo CI de novo antes do merge",
+      "commit db7d079": "ci-gate verde; 185 testes do app, site-shell 24 e photo-survey 34 cenários em Chromium e em WebKit"
+    }
   }
 }
