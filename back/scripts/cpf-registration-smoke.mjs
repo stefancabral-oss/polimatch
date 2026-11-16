@@ -188,6 +188,16 @@ try {
     return true;
   });
   await rejectsWith(register(dora.token, anaCpf), 429, "REGISTRATION_ATTEMPT_LIMIT");
+  // O dia do limite é o de São Paulo: à 01:00 UTC do dia 13 ainda é dia 12 lá,
+  // e a conta continua barrada até a meia-noite de São Paulo.
+  now = new Date("2034-06-13T01:00:00.000Z");
+  await assert.rejects(register(dora.token, doraCpf), (error) => {
+    assert.equal(error.code, "REGISTRATION_ATTEMPT_LIMIT");
+    assert.equal(error.retryAfterSeconds, 2 * 3600);
+    return true;
+  });
+  now = new Date("2034-06-13T02:59:59.999Z");
+  await rejectsWith(register(dora.token, doraCpf), 429, "REGISTRATION_ATTEMPT_LIMIT");
   assert.equal(await attemptsOf(dora.subject), REGISTRATION_ATTEMPTS_PER_DAY, "a recusa por limite não passa do teto");
   assert.equal(await count("cpf_registrations", "WHERE subject = $1", [dora.subject]), 0);
   // O limite é da conta: outra conta segue podendo se cadastrar.

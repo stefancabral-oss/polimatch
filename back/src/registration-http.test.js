@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
+import { createHmac } from "node:crypto";
 import test from "node:test";
 import { CONSENT_VERSION } from "../../shared/registration.js";
-import { createHttpApp, networkPseudonym } from "./http-app.js";
+import { createHttpApp } from "./http-app.js";
 import { cpfPseudonym } from "./registration-store.js";
 
 const NOW = new Date("2026-11-20T15:00:00.000Z");
@@ -55,14 +56,23 @@ const post = (url, body, headers = {}) => fetch(url, {
   body: typeof body === "string" ? body : JSON.stringify(body ?? {}),
 });
 
-test("o código do CPF depende do segredo, é estável e não é o pseudônimo de rede", () => {
+test("o código do CPF depende do segredo e é estável", () => {
   const code = cpfPseudonym(CPF, SECRET);
   assert.match(code, /^[0-9a-f]{64}$/);
   assert.equal(cpfPseudonym(CPF, SECRET), code);
   assert.notEqual(cpfPseudonym(CPF, `${SECRET}!`), code);
   assert.notEqual(cpfPseudonym("11144477735", SECRET), code);
-  assert.notEqual(networkPseudonym(CPF, SECRET), code);
   assert.ok(!code.includes(CPF));
+});
+
+test("a chave do código é derivada do segredo com rótulo próprio, não o segredo direto", () => {
+  const hmac = (key, text) => createHmac("sha256", key).update(text).digest();
+  // A conta, refeita aqui por fora: HMAC(HMAC(segredo, rótulo), dígitos).
+  const expected = hmac(hmac(SECRET, "polimatch:cpf-registration:v1"), CPF).toString("hex");
+  assert.equal(cpfPseudonym(CPF, SECRET), expected);
+  // O segredo usado direto é a conta do pseudônimo de rede: o mesmo texto
+  // não pode dar o mesmo código nos dois usos.
+  assert.notEqual(cpfPseudonym(CPF, SECRET), hmac(SECRET, CPF).toString("hex"));
 });
 
 test("o código só é calculado para onze dígitos e com segredo", () => {

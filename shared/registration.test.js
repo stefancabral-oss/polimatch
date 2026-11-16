@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import {
   AGE_RANGES,
@@ -82,6 +83,18 @@ test("as opções do cadastro são as do protótipo aprovado", () => {
     assert.ok(Object.isFrozen(list));
   }
   assert.ok(Object.isFrozen(STATES));
+});
+
+// O servidor guarda a versão aceita, não o texto. Cada versão fica presa aqui
+// ao texto exato que ela nomeia: mudar o texto pede versão nova e uma linha
+// nova nesta lista, sem apagar as antigas.
+const CONSENT_TEXT_SHA256 = Object.freeze({
+  "2026-11-16": "c8549285e0f95e4f198fd88fc114683eadd4d77342242a6a91fc83111e0c76a3",
+});
+
+test("a versão do consentimento nomeia um texto exato: mudar o texto pede versão nova", () => {
+  assert.ok(Object.hasOwn(CONSENT_TEXT_SHA256, CONSENT_VERSION), "a versão em uso precisa estar na lista");
+  assert.equal(createHash("sha256").update(CONSENT_TEXT).digest("hex"), CONSENT_TEXT_SHA256[CONSENT_VERSION]);
 });
 
 test("o consentimento tem versão e diz para que servem o CPF e o perfil", () => {
