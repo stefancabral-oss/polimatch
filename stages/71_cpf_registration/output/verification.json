@@ -9,7 +9,7 @@
     "71b": "shared/registration.js: CPF pelos dígitos, máscara, opções do perfil, consentimento com versão, validação do pedido",
     "71c": "POST /api/registration; exigência do cadastro no sorteio e na resposta; duas tabelas novas; smoke com PostgreSQL",
     "71d": "entrada com Google e formulário antes da pesquisa; a página não cria jogador sem conta; textos da capa, do menu e do Como funciona",
-    "71e": "não começou: deploy da API e do app, com o sim do Stefan"
+    "71e": "aprovada em 16/11/2026; acontece depois do merge: cópia do banco, deploy da API, deploy do app; registro na issue #336"
   },
   "testsFirst": {
     "regras": "shared/registration.test.js escrito e visto falhar (módulo inexistente) antes do código",
@@ -63,14 +63,15 @@
     "leitor de tela de verdade no formulário",
     "um aparelho de verdade (teclado numérico do celular no campo do CPF)"
   ],
-  "humanGate": "pendente",
+  "humanGate": "71a a 71d e a publicação (71e): aprovadas pelo Stefan em 16/11/2026 (\"Sim, os dois\"); transcrita no HANDOFF",
   "pr": 337,
   "ci": {
     "pr": 337,
     "commit 8806a4a": "ci-gate falhou por um teste de unidade do servidor que procurava três dígitos numa resposta com requestId aleatório; no mesmo commit passaram o servidor com PostgreSQL (com o smoke do cadastro), os roteiros em Chromium e WebKit no Linux e a imagem do app",
-    "finalCommit": "o commit final passa pelo CI antes do merge",
+    "finalCommit": "o commit do gate, só de documentação, passa pelo CI antes do merge",
     "commit 19c424f": "ci-gate verde; no Linux, site-shell 44 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; unidade de shared, back e app; smokes do servidor com PostgreSQL, com o do cadastro; imagem do app e smoke-nginx",
-    "automatedReview": "Codex leu o commit 8806a4a e deixou três apontamentos (HANDOFF ausente, formulário ligado à conta, pesquisa fechada antes do formulário): os três resolvidos e respondidos"
+    "automatedReview": "Codex leu o commit 8806a4a e deixou três apontamentos (HANDOFF ausente, formulário ligado à conta, pesquisa fechada antes do formulário): os três resolvidos e respondidos",
+    "commit e6100ac": "ci-gate verde; no Linux, site-shell 44 e photo-survey 34 cenários em Chromium e em WebKit; unidade de shared, back e app; smokes do servidor com PostgreSQL; imagem do app e smoke-nginx"
   },
   "independentReview": {
     "who": "agente à parte, somente leitura, num clone próprio, sobre 73d6692..1186b68",

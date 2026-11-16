@@ -2,11 +2,11 @@
 
 ## Status
 
-- Estado: `pronto para gate` nas partes 71a a 71d, num PR só, depois da revisão independente. A publicação (71e) não começou.
+- Estado: `aprovado` nas partes 71a a 71d, num PR só, e na publicação (71e), que acontece depois do merge e fica registrada na issue #336.
 - Issue: #336
 - Branch: `icm/71-cpf-registration`, sobre a `main` em `59ca9a1` (estágio 70 mesclado).
 - PR: #337
-- Nada deste estágio está em produção.
+- Até a publicação, nada deste estágio está em produção.
 
 ## Entregue (71a — registro)
 
@@ -147,19 +147,21 @@ Escolhas do agente, por delegação dele (decisão 0003, item 5), que pode mudar
 
 ## Próximo passo exato
 
-1. PR; CI.
-2. Gate do Stefan para o PR.
-3. Com o sim dele: cópia do banco, deploy da API, conferência, deploy do app, conferência de fora.
+1. CI verde no commit do gate; merge do PR #337.
+2. Merge do PR #339 (compartilhar com imagem), refeito sobre a `main`, para o app ir ao ar uma vez só.
+3. Cópia do banco; deploy da API; conferência do boot, das tabelas e das rotas.
+4. Deploy do app; conferência de fora, só com leitura.
+5. Registro da publicação na issue #336.
 
 ## Ação do Stefan
 
-- Testar "Entrar com Google" pelo menu do site, que já está no ar.
-- Guardar `VOTER_NETWORK_SECRET` no cofre de senhas antes de publicar este estágio.
-- Decidir o merge e a publicação, sabendo que a revisão jurídica do CPF com preferência política e a página de privacidade estão em aberto.
+- Testar "Entrar com Google" no site depois da publicação: é o único caminho para responder.
+- Guardar `VOTER_NETWORK_SECRET` no cofre de senhas.
+- A revisão jurídica do CPF com preferência política e a página de privacidade seguem em aberto.
 - Dizer se quer a conferência do CPF na Receita (serviço pago).
 
 ## Human gate
 
-- Decisão das partes 71a a 71d: `pendente`
+- Decisão das partes 71a a 71d e da publicação (71e): `aprovado`
 - Responsável: Stefan
-- Observação: a construção teve instrução direta dele em 16/11/2026, transcrita na decisão 0004. O merge e cada publicação pedem o sim dele. A regra 6 do `AGENTS.md` não muda.
+- Observação: a construção teve instrução direta dele em 16/11/2026, transcrita na decisão 0004. O merge e a publicação também tiveram instrução direta dele, no mesmo dia. Antes, ele tinha aberto o site numa janela anônima e escrito: "Eu abri em anonimo. Clico e consigo votar sem o cpf"; o agente respondeu que o cadastro obrigatório ainda não estava publicado. A mensagem do agente que antecedeu a pergunta dizia que os dois pedidos (este e o compartilhar com imagem, PR #339) estavam prontos e nenhum estava no ar; como o cadastro funciona; que o botão real do Google não foi testado e que, depois de publicado, ele é o único caminho para responder; que os dois PRs passaram por revisão independente e estavam com os testes automáticos verdes; e, sob "depende de você, antes de publicar o cadastro": tocar em "Entrar com Google" no menu do site para ver se entra; guardar no cofre o `VOTER_NETWORK_SECRET`, que só existe no painel, porque se ele se perder a regra de um CPF por conta deixa de valer para quem já se cadastrou; e que a revisão do advogado sobre CPF junto com preferência política e a página de privacidade continuam em aberto, sendo dele a decisão de publicar assim. A pergunta foi: "Mesclo e publico o cadastro com CPF e o compartilhar com imagem? Pode responder 'sim, os dois', 'só o compartilhar' ou 'só o cadastro'." Ele respondeu: "Sim, os dois". O agente não sabe se ele testou o botão do Google nem se guardou o segredo antes de responder. O merge e os deploys ficam a cargo do agente, a pedido dele, com o check verde no commit final e uma cópia do banco antes da API. Se a API não subir, o agente para e avisa. A regra 6 do `AGENTS.md` não muda.
