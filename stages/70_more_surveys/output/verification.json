@@ -1,15 +1,15 @@
 {
-  "checkedAt": "2026-11-14",
+  "checkedAt": "2026-11-16",
   "issue": 334,
   "stage": "70_more_surveys",
-  "base": "icm/69d-cleanup (PR #333), a refazer sobre a main",
+  "base": "main em e220a96 (PR #333 mesclado em 16/11/2026); a branch foi refeita sobre ela sem conflito",
   "instruction": "Stefan, 14/11/2026, com a capa nova no ar: \"Subiu. Mas está bem simples. Precisa de mais coisas.\" O pacote é escolha do agente, por delegação.",
   "parts": {
     "70a": "subject e a segunda pesquisa (politica-2026-02) em shared/; smoke do servidor com as duas",
     "70b": "a página vale para qualquer pesquisa; /?p=<código>",
     "70c": "capa com destaque, Suas escolhas, Mais pesquisas e Em breve; menu com as pesquisas",
     "70d": "compartilhar a escolha: imagem, texto e endereço; saídas sem suporte",
-    "70e": "não começou: deploy da API e do app, com o sim do Stefan"
+    "70e": "aprovada em 16/11/2026; acontece depois do merge: cópia do banco, deploy da API, deploy do app; registro na issue #334"
   },
   "testsFirst": {
     "regras": "shared (4 falharam), regras da capa, menu (3 falharam) e share-choice: testes escritos e vistos falhar antes do código",
@@ -43,8 +43,8 @@
   },
   "notVerified": [
     "navigator.share num aparelho de verdade: nos testes é simulado",
-    "fontes do Linux nas telas novas: só pelos e2e do CI",
-    "produção: nada deste estágio foi publicado"
+    "produção: nada deste estágio foi publicado",
+    "\"Entrar com Google\" pelo menu, com o botão real do Google: nos testes é simulado"
   ],
   "independentReview": {
     "who": "o mesmo agente das revisões do estágio 69, somente leitura, num clone à parte, sobre db7d079..918f34c",
@@ -68,5 +68,12 @@
     ],
     "notDoneByReviewer": "Chromium, CI no Linux, navigator.share num celular, volta pelo histórico, servidor de verdade junto com o app, produção"
   },
-  "humanGate": "pendente"
+  "humanGate": "70a a 70d e a publicação (70e): aprovadas pelo Stefan em 16/11/2026 (\"Sim, mescla e publica\"); transcrita no HANDOFF",
+  "ci": {
+    "pr": 335,
+    "commit 918f34c": "falhou: site-shell, cenário 9, nos dois navegadores (botão em três linhas com a fonte do Linux)",
+    "commit 46ae6ff": "ci-gate verde; no Linux, site-shell 34 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; unidade de shared, back e app; smoke do servidor com PostgreSQL e as duas pesquisas; imagem do app e smoke-nginx 14 de 14",
+    "automatedReview": "Codex deixou um apontamento (a capa se refazer quando a identidade muda), já corrigido em 70419fa; respondido e encerrado",
+    "finalCommit": "a branch refeita sobre a main e o commit do gate passam pelo CI antes do merge"
+  }
 }

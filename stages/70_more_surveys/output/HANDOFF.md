@@ -2,11 +2,11 @@
 
 ## Status
 
-- Estado: `pronto para gate` nas partes 70a a 70d, num PR só. A publicação (70e) não começou.
+- Estado: `aprovado` nas partes 70a a 70d, num PR só, e na publicação (70e), que acontece depois do merge e fica registrada na issue #334.
 - Issue: #334
-- Branch: `icm/70-more-surveys`, feita sobre a da limpeza (`icm/69d-cleanup`, PR #333). Depois do merge da #333 ela é refeita sobre a `main`.
+- Branch: `icm/70-more-surveys`. Foi feita sobre a da limpeza (PR #333); com a #333 mesclada em `e220a96`, em 16/11/2026, foi refeita sobre a `main`, sem conflito e sem mudança de conteúdo.
 - PR: #335
-- Nada deste estágio está em produção.
+- Até o merge, nada deste estágio está em produção.
 
 ## Entregue (70a — regras)
 
@@ -49,6 +49,8 @@
 ## Testes executados
 
 No CI do PR #335, o commit `918f34c` falhou num cenário do roteiro novo, nos dois navegadores: com a fonte do Linux, mais larga, "Compartilhar minha escolha" quebrava em três linhas em 360×640 e o botão vizinho crescia junto. A asserção que falhou era minha e media "uma linha". O texto do botão ficou mais curto, e o cenário passou a rodar também com uma fonte larga, medindo altura de toque e largura em vez de linhas. Os testes de unidade, do servidor (com PostgreSQL) e a imagem do app passaram nesse commit.
+
+Depois da correção, no commit `46ae6ff` (a ponta da branch antes de ser refeita sobre a `main`), o `ci-gate` passou: no Linux, `site-shell` com 34 cenários e `photo-survey` com 34, em Chromium e em WebKit; o relato de erros nos dois; os testes de unidade de `shared/`, do servidor e do app; o smoke do servidor com PostgreSQL, com o caso das duas pesquisas; a imagem do app e `smoke-nginx` com 14 de 14. A revisão automática (Codex) deixou um apontamento, sobre a capa se refazer quando a identidade muda; ele já estava corrigido no commit `70419fa`, foi respondido e a conversa foi encerrada. A branch refeita e o commit do gate passam pelo CI de novo antes do merge.
 
 Em 14/11/2026, local (macOS), no código do PR:
 
@@ -113,19 +115,19 @@ Escolhas do agente, por delegação dele, que pode mudar qualquer uma:
 
 ## Próximo passo exato
 
-1. Merge da #333 (limpeza); refazer esta branch sobre a `main`; PR; CI.
-2. Gate do Stefan para o PR.
-3. Com o sim dele: deploy da API, conferência de que a segunda pesquisa responde, deploy do app, conferência de fora.
+1. CI verde na branch refeita; merge do PR #335.
+2. Cópia do banco; deploy da API; conferência de que a segunda pesquisa responde e de que as contagens das tabelas não mudaram.
+3. Deploy do app; conferência de fora, só com leitura.
+4. Registro da publicação na issue #334.
 
 ## Ação do Stefan
 
-- Decidir o merge e, depois, a publicação (API e app).
 - Dizer se a segunda pergunta fica.
 - Testar o compartilhar no celular depois de publicado.
 - Para abrir "Famosos e influenciadores" e "Roupas": as cartas.
 
 ## Human gate
 
-- Decisão das partes 70a a 70d: `pendente`
+- Decisão das partes 70a a 70d e da publicação (70e): `aprovado`
 - Responsável: Stefan
-- Observação: a construção responde à avaliação dele de 14/11/2026 e à delegação registrada na decisão 0003. O merge e cada publicação pedem o sim dele. A regra 6 do `AGENTS.md` não muda.
+- Observação: a construção responde à avaliação dele de 14/11/2026 e à delegação registrada na decisão 0003. O merge e a publicação tiveram instrução direta dele em 16/11/2026. A mensagem do agente dizia que o pacote estava pronto e que nada dele estava no ar; que o CI tinha passado nos dois navegadores e no servidor com banco; que a revisão independente não achou bloqueio e que os dois pontos importantes dela foram corrigidos; que um botão quebrava em três linhas no Linux e o texto foi encurtado; as duas diferenças em relação à folha (os botões "Compartilhar" e "Próxima pesquisa", e a pesquisa pela metade em destaque com "Continuar"); que o compartilhar num celular de verdade e o "Entrar com Google" pelo menu não foram verificados; e o que a publicação envolve: o PR 333 primeiro e o 335 em seguida, a API antes do app porque a pergunta nova fica no servidor, e uma cópia do banco antes de publicar a API. A pergunta foi: "Mesclo os PRs 333 e 335 e publico a API e o app? Pode responder 'sim, mescla e publica' ou 'só mescla'." Ele respondeu: "Sim, mescla e publica". O merge e os dois deploys ficam a cargo do agente, a pedido dele, com o check verde no commit final. Se a API não subir, o agente para e avisa. As condições de privacidade (#283) e de backup externo (#279) seguem abertas e não foram tratadas na pergunta. A regra 6 do `AGENTS.md` não muda.
