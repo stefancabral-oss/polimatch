@@ -906,7 +906,8 @@ try {
     assert.equal(server.draws.size, 1);
     // O CPF não fica no aparelho nem no endereço.
     const kept = await page.evaluate(() => JSON.stringify([{ ...localStorage }, { ...sessionStorage }, location.href, document.cookie]));
-    assert.doesNotMatch(kept, /529|982247|52998224725/);
+    // O que fica guardado tem códigos aleatórios: a busca é pelo CPF inteiro.
+    assert.doesNotMatch(kept, /52998224725|529\.982\.247/);
     assert.equal(new URL(page.url()).search, `?p=${SURVEY.id}`);
 
     // Daí em diante é a pesquisa de sempre, e recarregar não pede cadastro de novo.

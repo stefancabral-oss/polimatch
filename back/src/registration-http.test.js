@@ -10,6 +10,9 @@ const CPF = "52998224725";
 const googleIdentity = { configured: false, verify: async () => ({ subject: "test" }) };
 const BODY = Object.freeze({ cpf: "529.982.247-25", ageRange: "25-34", gender: "mulher", state: "SP", consent: true, consentVersion: CONSENT_VERSION });
 const BEARER = { Authorization: "Bearer pms_sessao" };
+// Toda resposta traz um requestId aleatório: a busca é pelo CPF inteiro, com
+// ou sem pontuação, e não por um trecho de três dígitos que o acaso produz.
+const ANY_TEST_CPF = /52998224725|529\.982\.247|529 982 247|11111111111|111\.111\.111/;
 
 function harness(overrides = {}, env = {}) {
   const calls = [];
@@ -129,7 +132,7 @@ test("pedido inválido é recusado sem chegar ao store e sem devolver o CPF", as
       const body = JSON.parse(text);
       assert.equal(body.code, code);
       assert.deepEqual(body.current, { field });
-      assert.doesNotMatch(text, /529|982|247/);
+      assert.doesNotMatch(text, ANY_TEST_CPF);
     }
     const empty = await post(`${base}/api/registration`, "", BEARER);
     assert.equal(empty.status, 400);
@@ -154,7 +157,7 @@ test("as recusas do store saem com o código e o prazo, sem detalhe a mais", asy
       assert.equal(body.code, refusal.code);
       assert.equal(body.retryAfterSeconds, extra.retryAfterSeconds);
       if (extra.retryAfterSeconds) assert.equal(response.headers.get("retry-after"), "3600");
-      assert.doesNotMatch(JSON.stringify(body), /529/);
+      assert.doesNotMatch(JSON.stringify(body), ANY_TEST_CPF);
     });
   }
 });
@@ -164,12 +167,13 @@ test("nem o log de requisição nem o de falha levam o CPF", async () => {
   await withServer(app, async (base) => {
     const failed = await post(`${base}/api/registration`, BODY, BEARER);
     assert.equal(failed.status, 500);
-    assert.doesNotMatch(await failed.text(), /529/);
+    assert.doesNotMatch(await failed.text(), ANY_TEST_CPF);
     await post(`${base}/api/registration`, { ...BODY, cpf: "529.982.247-24" }, BEARER);
   });
   assert.ok(logs.length >= 2);
   const text = JSON.stringify(logs);
-  assert.doesNotMatch(text, /52998224725|529\.982|pms_sessao/);
+  assert.doesNotMatch(text, ANY_TEST_CPF);
+  assert.doesNotMatch(text, /pms_sessao/);
   assert.match(text, /\/api\/registration/);
 });
 
