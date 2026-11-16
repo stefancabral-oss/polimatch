@@ -30,6 +30,7 @@ import {
 } from "./photo-survey-flow.js";
 import {
   EMPTY_REGISTRATION_FORM,
+  caretAfterDigits,
   registrationBody,
   registrationFormMarkup,
   registrationProblem,
@@ -140,6 +141,11 @@ const savedRecord = () => readSavedProgress(readStored(PHOTO_SURVEY_STORAGE_KEY)
 
 /** Há uma conta Google neste aparelho. Se ela tem cadastro, só o servidor sabe. */
 const signedIn = () => accountKind(readStored(IDENTITY_KEY)) === "google";
+
+/** Esquece a sessão que o servidor não reconhece mais, se ela ainda é a que está guardada. */
+function forgetDeadSession(key) {
+  if (key && readStored(IDENTITY_KEY) === key) safeStorage.remove(IDENTITY_KEY);
+}
 
 function persist() {
   const text = savedProgressText(readStored(PHOTO_SURVEY_STORAGE_KEY), surveyId, {
@@ -687,10 +693,24 @@ async function start({ auto = false, retried = false, fromGate = false } = {}) {
     if (run !== epoch) return;
     busy = false;
     if (error.status === 403 && error.code === "CPF_REGISTRATION_REQUIRED") {
-      // A conta ainda não tem cadastro. Com o toque, o formulário; sem ele, a
-      // entrada da pesquisa.
+      // A conta ainda não tem cadastro. Sem toque, a entrada da pesquisa.
       identity = "";
-      if (auto) openSurvey({ resume: false });
+      if (auto) {
+        openSurvey({ resume: false });
+        return;
+      }
+      // Com o toque, o formulário, mas só se a pesquisa segue aberta: o
+      // servidor recusa pela falta do cadastro antes de olhar se ela fechou,
+      // e ninguém faz o cadastro para descobrir isso depois.
+      busy = true;
+      try {
+        survey = await loadPhotoSurvey(surveyId);
+      } catch {
+        // Sem essa leitura o formulário abre assim mesmo: o sorteio confere depois.
+      }
+      if (run !== epoch) return;
+      busy = false;
+      if (survey && survey.status !== "open") renderClosed(survey.status, { focus: true });
       else openGate("form");
       return;
     }
@@ -698,6 +718,22 @@ async function start({ auto = false, retried = false, fromGate = false } = {}) {
       // A identidade mudou no meio do pedido. Sem toque, só o aviso.
       if (auto || retried) identityChanged();
       else start({ retried: true, fromGate });
+      return;
+    }
+    if (error.status === 401 && !(survey && survey.status !== "open")) {
+      // A sessão venceu ou foi encerrada no servidor. O aparelho esquece a
+      // chave morta e a pessoa entra de novo: repetir o pedido com ela daria
+      // sempre a mesma recusa. As escolhas guardadas neste aparelho ficam, e
+      // voltam se o sorteio da conta for o mesmo.
+      forgetDeadSession(key);
+      identity = "";
+      if (auto) {
+        view = "entry";
+        notice = "Sua sessão venceu. Toque em Começar para entrar de novo.";
+        renderEntry({ focus: true });
+      } else {
+        openGate("signin", "Sua sessão venceu. Entre de novo para continuar.");
+      }
       return;
     }
     failStart(error);
@@ -728,13 +764,9 @@ function failStart(error) {
     return;
   }
   if (error.status === 401) {
-    // Com a pesquisa fechada não há o que recuperar: vale a tela de fechada.
-    if (survey && survey.status !== "open") {
-      renderClosed(survey.status, { focus: true });
-      return;
-    }
-    notice = sessionNotice();
-    renderEntry({ label: "Tentar de novo", focus: true });
+    // Só chega aqui com a pesquisa parada (a sessão vencida de uma pesquisa
+    // aberta é tratada em start): não há o que recuperar, vale a tela de fechada.
+    renderClosed(survey?.status, { focus: true });
     return;
   }
   const busyServer = error.status === 429 ? "Muitas tentativas agora. Espere um pouco e tente de novo." : "";
@@ -923,10 +955,14 @@ async function openHome() {
   survey = null;
   identity = "";
   const key = readStored(IDENTITY_KEY);
+  // Só uma conta Google responde. O que este aparelho guardou de uma chave
+  // sem conta não vale como "respondida" nem como "pela metade": a capa
+  // convida a entrar, em vez de dizer que não há o que responder.
+  const account = accountKind(key) === "google";
   const tag = identityTag(key);
   const saved = readStored(PHOTO_SURVEY_STORAGE_KEY);
-  const answered = answeredSurveyIds(saved, tag);
-  const pending = inProgressSurveyId(saved, tag);
+  const answered = account ? answeredSurveyIds(saved, tag) : [];
+  const pending = account ? inProgressSurveyId(saved, tag) : "";
   homeKey = key;
   homeResume = false;
   homeViews = [];
@@ -1036,16 +1072,36 @@ async function openSurvey({ resume = true } = {}) {
 // O que a pessoa preenche fica só na memória desta página.
 let gateStep = "signin";
 let form = { ...EMPTY_REGISTRATION_FORM };
+// A sessão para a qual o formulário foi aberto. Quando a conta do aparelho
+// deixa de ser essa, o que estava preenchido é apagado: o CPF de uma pessoa
+// não aparece para a próxima conta que entra nesta aba.
+let formOwner = "";
+// O campo da última recusa: fica marcado e recebe o foco.
+let invalidField = "";
+
+const FIELD_TARGETS = Object.freeze({
+  cpf: "#ps-cpf",
+  ageRange: 'button[data-field="ageRange"]',
+  gender: 'button[data-field="gender"]',
+  state: "#ps-state",
+  consent: "#ps-consent",
+});
 
 function renderGate({ focus = false, mount = true } = {}) {
   view = "gate";
   if (gateStep === "form") {
+    const target = focus && Object.hasOwn(FIELD_TARGETS, invalidField) ? FIELD_TARGETS[invalidField] : "";
     shell({
       step: "Cadastro",
       mainClass: "ps-main--entry",
-      focus,
-      body: `${heading("Cadastro", "Faça seu voto contar", "Um CPF, um voto. Só o resultado somado aparece, nunca o seu nome.")}${registrationFormMarkup({ form, busy })}`,
+      focus: focus && !target,
+      body: `${heading("Cadastro", "Faça seu voto contar", "Um CPF, um voto. Só o resultado somado aparece, nunca o seu nome.")}${registrationFormMarkup({ form, busy, invalid: invalidField })}`,
     });
+    if (target) {
+      // O aviso fica no topo, à vista; o foco vai para o campo que ele cita.
+      window.scrollTo(0, 0);
+      root.querySelector(target)?.focus({ preventScroll: true });
+    }
     return;
   }
   const googleReady = Boolean(googleClientId());
@@ -1065,6 +1121,12 @@ function openGate(step, text = "") {
   uncertain = false;
   window.clearTimeout(advanceTimer);
   identity = "";
+  // O formulário é de uma sessão. Voltar para a entrada, ou abrir o
+  // formulário para outra sessão, apaga o que estava preenchido.
+  const key = readStored(IDENTITY_KEY);
+  if (step !== "form" || formOwner !== key) form = { ...EMPTY_REGISTRATION_FORM };
+  formOwner = step === "form" ? key : "";
+  invalidField = "";
   gateStep = step;
   notice = text;
   renderGate({ focus: true });
@@ -1101,16 +1163,24 @@ async function gateSignIn(response) {
   }
   if (run !== epoch) return;
   busy = false;
+  // O Google só guarda um destino para a credencial por página. Se o botão
+  // tocado foi o do menu, ele ficaria aberto e desatualizado por cima da tela.
+  siteMenu.close();
   // Com a conta no aparelho, o pedido de sorteio diz se falta o cadastro.
   start({ fromGate: true });
 }
 
 /** A pessoa voltou a mexer no formulário: o aviso da tentativa anterior sai da tela. */
 function clearFormNotice() {
-  if (view !== "gate" || !notice) return;
+  if (view !== "gate" || (!notice && !invalidField)) return;
   notice = "";
+  invalidField = "";
   const target = root.querySelector("#ps-notice");
   if (target) target.hidden = true;
+  for (const marked of root.querySelectorAll('#ps-register [aria-describedby="ps-notice"]')) {
+    marked.removeAttribute("aria-invalid");
+    marked.removeAttribute("aria-describedby");
+  }
 }
 
 function chooseOption(chip) {
@@ -1125,26 +1195,34 @@ async function submitRegistration() {
   if (busy || view !== "gate" || gateStep !== "form") return;
   const problem = registrationProblem(form);
   if (problem) {
-    notice = problem;
+    notice = problem.text;
+    invalidField = problem.field;
     renderGate({ focus: true });
     return;
   }
+  const key = readStored(IDENTITY_KEY);
   busy = true;
   notice = "";
+  invalidField = "";
   const run = ++epoch;
   renderGate();
   try {
-    await registerCpf(readStored(IDENTITY_KEY), registrationBody(form));
+    await registerCpf(key, registrationBody(form));
   } catch (error) {
     if (run !== epoch) return;
     busy = false;
     const refusal = registrationRefusal(error);
     if (refusal.next === "signin") {
+      // Uma sessão que o servidor não reconhece mais sai do aparelho: senão,
+      // qualquer volta a esta aba tentaria seguir com ela. A entrada abre com
+      // o formulário vazio, porque a próxima conta pode ser de outra pessoa.
+      if (error.status === 401) forgetDeadSession(key);
       openGate("signin", refusal.text);
       return;
     }
     if (refusal.next === "form") {
       notice = refusal.text;
+      invalidField = refusal.field;
       renderGate({ focus: true });
       return;
     }
@@ -1163,17 +1241,38 @@ async function submitRegistration() {
  */
 function gateIdentityMoved() {
   if (busy) return;
-  if (signedIn()) {
-    if (gateStep === "signin") start({ fromGate: true });
-  } else if (gateStep === "form") {
-    openGate("signin", "Você saiu da conta neste aparelho. Entre de novo para fazer o cadastro.");
+  const key = readStored(IDENTITY_KEY);
+  if (accountKind(key) !== "google") {
+    if (gateStep === "form") openGate("signin", "Você saiu da conta neste aparelho. Entre de novo para fazer o cadastro.");
+    return;
   }
+  if (gateStep === "form" && key === formOwner) return;
+  // Entrou uma conta (ou outra conta, com o formulário na tela): o que estava
+  // preenchido não é dela, e o sorteio diz se ela já tem cadastro.
+  form = { ...EMPTY_REGISTRATION_FORM };
+  formOwner = "";
+  invalidField = "";
+  gateStep = "signin";
+  start({ fromGate: true });
 }
 
 root.addEventListener("input", (event) => {
-  if (event.target.id !== "ps-cpf") return;
-  const masked = formatCpf(event.target.value);
-  if (event.target.value !== masked) event.target.value = masked;
+  const input = event.target;
+  if (input.id !== "ps-cpf") return;
+  const end = typeof input.selectionStart === "number" ? input.selectionStart : input.value.length;
+  const digitsBefore = input.value.slice(0, end).replace(/\D/g, "").length;
+  const masked = formatCpf(input.value);
+  if (input.value !== masked) {
+    input.value = masked;
+    // Reescrever o campo levaria o cursor para o fim: ele volta para depois
+    // dos mesmos dígitos, para dar para corrigir um número no meio.
+    const caret = caretAfterDigits(masked, digitsBefore);
+    try {
+      input.setSelectionRange(caret, caret);
+    } catch {
+      // Sem controle do cursor, ele fica onde o navegador puser.
+    }
+  }
   form = { ...form, cpf: masked };
   clearFormNotice();
 });

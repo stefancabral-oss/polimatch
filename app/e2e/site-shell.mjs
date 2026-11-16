@@ -21,7 +21,9 @@
  *      rede: conta sem cadastro abre o formulário e cada recusa do servidor
  *      tem o seu texto; sessão vencida volta para a entrada; entrar e sair
  *      pelo menu com o cadastro na tela; Google ou servidor fora do ar na
- *      entrada; a conta que perde o cadastro espera o toque.
+ *      entrada; a conta que perde o cadastro espera o toque; o formulário
+ *      não passa de uma conta para a outra; outra aba; foco no campo com
+ *      erro; tamanhos de tela.
  *   9. A resposta registrada mostra as próximas pesquisas, sem "Ir para o início".
  *  10. "Como funciona" cabe na tela, abre o menu e leva ao início.
  *  11. As páginas antigas saíram do build e o sitemap lista as duas novas.
@@ -60,6 +62,7 @@ import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
 import { chromium, webkit } from "playwright";
 import { PHOTO_SURVEYS, drawCards, drawGroups, photoSurveyById, publicPhotoSurvey, validateBracket } from "../../shared/photo-survey.js";
+import { PHOTO_SURVEY_STORAGE_KEY, identityTag, savedProgressText } from "../src/photo-survey-flow.js";
 
 const browserName = process.env.POLIMATCH_E2E_BROWSER || "chromium";
 const appUrl = process.env.POLIMATCH_E2E_URL || "http://127.0.0.1:4173/";
@@ -126,10 +129,10 @@ function createServer() {
   const slot = (survey, key) => `${survey.id}:${key}`;
   server.handler = async (route) => {
     const request = route.request();
-    const { pathname } = new URL(request.url());
+    const { pathname, search } = new URL(request.url());
     const method = request.method();
     const key = (request.headers().authorization || "").replace(/^Bearer /, "");
-    server.requests.push({ method, pathname, key });
+    server.requests.push({ method, pathname, search, key });
     const send = (status, json) => route.fulfill({ status, json, headers: status === 429 ? { "Retry-After": String(json.retryAfterSeconds) } : {} });
 
     if (pathname === "/api/player" && method === "POST") {
@@ -219,9 +222,17 @@ const browser = await browserType.launch();
 const contexts = [];
 const pageErrors = [];
 
-async function newContext(server, { width = 390, height = 844, storedKey = "" } = {}) {
+async function newContext(server, { width = 390, height = 844, storedKey = "", storedProgress = "" } = {}) {
   const context = await browser.newContext({ viewport: { width, height }, serviceWorkers: "block" });
   contexts.push(context);
+  if (storedProgress) {
+    await context.addInitScript(([name, text]) => {
+      if (!sessionStorage.getItem("e2e-progresso")) {
+        localStorage.setItem(name, text);
+        sessionStorage.setItem("e2e-progresso", "1");
+      }
+    }, [PHOTO_SURVEY_STORAGE_KEY, storedProgress]);
+  }
   if (storedKey) {
     await context.addInitScript(([name, key]) => {
       if (!sessionStorage.getItem("e2e-semeado")) {
@@ -299,6 +310,9 @@ async function scenario(name, run) {
   servers.length = 0;
   await run();
   for (const server of servers) {
+    // Conta por método e caminho inteiros, sem depender de sufixo.
+    const players = server.requests.filter((request) => request.method === "POST" && request.pathname === "/api/player").length;
+    assert.equal(players, 0, `${name}: a página não cria jogador sem conta`);
   }
   results.push(name);
   console.log(`ok - ${name}`);
@@ -421,10 +435,19 @@ try {
     const server = createServer();
     server.registered.delete(GOOGLE_KEY);
     const answered = server.answered(ANONYMOUS_KEY);
-    const page = await open(await newContext(server, { storedKey: ANONYMOUS_KEY }));
+    // O aparelho guarda que essa chave sem conta respondeu as duas pesquisas.
+    const tag = identityTag(ANONYMOUS_KEY);
+    const storedProgress = PHOTO_SURVEYS.reduce((text, survey) => savedProgressText(text, survey.id, { identity: tag, answered: true }), "");
+    const page = await open(await newContext(server, { storedKey: ANONYMOUS_KEY, storedProgress }));
     await entryReady(page);
     await page.waitForTimeout(300);
     assert.deepEqual(server.writes(), [], "com a chave sem conta, a capa não pede nada ao servidor");
+    // Sem conta ninguém respondeu, para efeito da capa: ela convida a entrar,
+    // em vez de dizer que não há o que responder.
+    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
+    assert.equal(await page.locator(".ps-cta-note").innerText(), "Para responder, entre com Google e cadastre o CPF.");
+    assert.equal(await page.locator(".ps-home .ps-pick").count(), 0);
+    assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Você respondeu todas/);
     await page.locator("#ps-action").click();
     await waitStep(page, "Entrar");
     assert.deepEqual(server.writes(), [], "sem conta, o toque não emite sorteio");
@@ -528,7 +551,7 @@ try {
     assert.deepEqual(server.requests.filter((request) => request.pathname === "/api/registration").map((request) => request.key), Array(refusals.length + 1).fill(GOOGLE_KEY));
   });
 
-  await scenario("sessão vencida no cadastro volta para a entrada, e entrar de novo conclui", async () => {
+  await scenario("sessão vencida no cadastro volta para a entrada, com o formulário vazio, e entrar de novo conclui", async () => {
     const server = createServer();
     const renewed = `pms_${"r".repeat(43)}`;
     server.registered.delete(GOOGLE_KEY);
@@ -541,14 +564,74 @@ try {
     await submitButton(page).click();
     await waitStep(page, "Entrar");
     assert.match(await formNotice(page).innerText(), /Sua sessão venceu\. Entre de novo para concluir o cadastro\./);
-    await page.locator("#e2e-google").click();
+    assert.equal(await storedKey(page), null, "a sessão que o servidor não reconhece sai do aparelho");
+    // Voltar a esta aba (o Google abre em outra) não tira a pessoa da entrada.
+    const drawsBefore = server.count("POST", "/draw");
+    await page.evaluate(() => {
+      document.dispatchEvent(new Event("visibilitychange"));
+      window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+    });
+    await page.waitForTimeout(300);
+    assert.equal(await stepText(page), "Entrar");
+    assert.equal(server.count("POST", "/draw"), drawsBefore, "a sessão morta não é usada de novo");
+    await page.locator("#ps-google #e2e-google").click();
     await waitStep(page, "Cadastro");
-    assert.deepEqual(server.requests.filter((request) => request.pathname === "/api/auth/google").map((request) => request.key), [GOOGLE_KEY, ""], "a sessão que o servidor recusou não prende a entrada");
+    assert.equal(server.last("/api/auth/google").key, "", "a entrada vai sem a sessão morta");
     assert.equal(await storedKey(page), renewed);
+    // Quem entra agora pode ser outra pessoa: o formulário recomeça vazio.
+    assert.equal(await page.locator("#ps-cpf").inputValue(), "");
+    assert.equal(await page.locator("#ps-state").inputValue(), "");
+    assert.equal(await page.locator("#ps-consent").isChecked(), false);
+    assert.equal(await page.locator('#ps-register [aria-pressed="true"]').count(), 0);
+    await fillRegistration(page);
     await submitButton(page).click();
     await waitStep(page, "Tela 1 de 4");
     assert.equal(server.last("/api/registration").key, renewed);
     assert.equal(server.last("/draw").key, renewed);
+  });
+
+  await scenario("sessão vencida no toque em Começar e na retomada: a página esquece a sessão e leva à entrada", async () => {
+    const server = createServer();
+    const renewed = `pms_${"r".repeat(43)}`;
+    server.registered.add(renewed);
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
+    await entryReady(page);
+    server.revoked.add(GOOGLE_KEY);
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Entrar");
+    assert.match(await formNotice(page).innerText(), /Sua sessão venceu\. Entre de novo para continuar\./);
+    assert.equal(await storedKey(page), null);
+    assert.equal(server.count("POST", "/draw"), 1, "um pedido recusado, sem repetição");
+    server.session = renewed;
+    await page.locator("#ps-google #e2e-google").click();
+    await waitStep(page, "Tela 1 de 4");
+    await tapCard(page, 0);
+    await waitStep(page, "Tela 2 de 4");
+    // A sessão vence com a pesquisa pela metade. Recarregar tenta retomar sozinho.
+    server.revoked.add(renewed);
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await entryReady(page);
+    assert.match(await formNotice(page).innerText(), /Sua sessão venceu\. Toque em Começar para entrar de novo\./);
+    assert.equal(await storedKey(page), null);
+    assert.equal(await page.locator("#ps-google, #ps-register").count(), 0, "sem toque, ninguém cai na entrada com Google");
+    server.revoked.delete(renewed);
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Entrar");
+    await page.locator("#ps-google #e2e-google").click();
+    // A mesma conta, o mesmo sorteio: a escolha da primeira tela continua.
+    await waitStep(page, "Tela 2 de 4");
+  });
+
+  await scenario("conta sem cadastro e pesquisa que fechou: Começar mostra a pesquisa fechada, sem formulário", async () => {
+    const server = createServer();
+    server.registered.delete(GOOGLE_KEY);
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
+    await entryReady(page);
+    server.status = "closed";
+    await page.locator("#ps-action").click();
+    await page.locator("#ps-title", { hasText: "Esta pesquisa está fechada." }).waitFor();
+    assert.equal(await page.locator("#ps-register, #ps-google").count(), 0, "ninguém faz cadastro para uma pesquisa que fechou");
+    assert.equal(server.count("POST", "/api/registration"), 0);
   });
 
   await scenario("com a entrada na tela, entrar pelo menu segue para o cadastro; sair no formulário volta para a entrada", async () => {
@@ -567,20 +650,216 @@ try {
     await waitStep(page, "Cadastro");
     assert.equal(await storedKey(page), GOOGLE_KEY);
     assert.equal(server.count("POST", "/api/auth/google"), 1);
-    // Sair da conta com o formulário na tela: volta para a entrada, com o motivo.
+    // A pessoa preenche o formulário e sai da conta: volta para a entrada, com o motivo.
+    await fillRegistration(page, "111.444.777-35");
     await openMenu(page);
     await page.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
     await page.locator("dialog.pm-menu[open] #e2e-google").waitFor();
-    await page.keyboard.press("Escape");
     await waitStep(page, "Entrar");
     assert.match(await formNotice(page).innerText(), /Você saiu da conta neste aparelho\. Entre de novo para fazer o cadastro\./);
     assert.equal(await page.locator("#ps-register").count(), 0);
     assert.equal(await storedKey(page), null);
-    // E a entrada da própria tela continua valendo.
-    await page.locator("#ps-google #e2e-google").click();
+    // Outra conta entra, pelo botão do menu que ficou aberto. O Google só
+    // guarda um destino para a credencial: quem recebe é a tela, que fecha o
+    // menu em vez de deixá-lo aberto e desatualizado por cima.
+    const other = `pms_${"b".repeat(43)}`;
+    server.session = other;
+    await page.locator("dialog.pm-menu[open] #e2e-google").click();
+    await waitStep(page, "Cadastro");
+    await page.waitForFunction(() => !document.querySelector("dialog.pm-menu").open);
+    assert.equal(await storedKey(page), other);
+    // O que a conta anterior preencheu não aparece para esta.
+    assert.equal(await page.locator("#ps-cpf").inputValue(), "", "o CPF de uma conta não aparece para a seguinte");
+    assert.equal(await page.locator("#ps-state").inputValue(), "");
+    assert.equal(await page.locator("#ps-consent").isChecked(), false);
+    assert.equal(await page.locator('#ps-register [aria-pressed="true"]').count(), 0);
     await fillRegistration(page);
     await submitButton(page).click();
     await waitStep(page, "Tela 1 de 4");
+    assert.equal(server.last("/api/registration").key, other);
+  });
+
+  await scenario("outra aba entra ou sai com o cadastro na tela, e a volta à aba confere a conta", async () => {
+    const server = createServer();
+    const context = await newContext(server);
+    const page = await open(context, surveyUrl(SURVEY));
+    await entryReady(page);
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Entrar");
+    const helper = await context.newPage();
+    await helper.goto(new URL("robots.txt", appUrl).href);
+    // Outra aba entra numa conta com cadastro: esta segue para a pesquisa.
+    await helper.evaluate(([name, key]) => localStorage.setItem(name, key), [IDENTITY_KEY, GOOGLE_KEY]);
+    await waitStep(page, "Tela 1 de 4");
+
+    // Com o formulário na tela, outra aba sai da conta: esta volta para a entrada.
+    const unregistered = createServer();
+    unregistered.registered.delete(GOOGLE_KEY);
+    const second = await newContext(unregistered, { storedKey: GOOGLE_KEY });
+    const form = await open(second, surveyUrl(SURVEY));
+    await entryReady(form);
+    await form.locator("#ps-action").click();
+    await fillRegistration(form);
+    const other = await second.newPage();
+    await other.goto(new URL("robots.txt", appUrl).href);
+    await other.evaluate((name) => localStorage.removeItem(name), IDENTITY_KEY);
+    await waitStep(form, "Entrar");
+    assert.match(await formNotice(form).innerText(), /Você saiu da conta neste aparelho/);
+
+    // A conta chega sem evento de armazenamento (troca no próprio documento):
+    // ao voltar a aparecer, a tela confere e segue.
+    unregistered.registered.add(GOOGLE_KEY);
+    await form.evaluate(([name, key]) => {
+      localStorage.setItem(name, key);
+      document.dispatchEvent(new Event("visibilitychange"));
+    }, [IDENTITY_KEY, GOOGLE_KEY]);
+    await waitStep(form, "Tela 1 de 4");
+  });
+
+  await scenario("o formulário leva o foco ao campo com erro, e corrigir um dígito no meio do CPF não perde o lugar", async () => {
+    const server = createServer();
+    server.registered.delete(GOOGLE_KEY);
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
+    await entryReady(page);
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Cadastro");
+    const focused = () => page.evaluate(() => {
+      const element = document.activeElement;
+      return { id: element.id, field: element.dataset?.field || "", invalid: element.getAttribute("aria-invalid"), described: (element.closest("[aria-describedby]") || element).getAttribute("aria-describedby") };
+    });
+    // Vazio: o foco vai para o CPF, marcado e ligado ao aviso, que fica à vista.
+    await submitButton(page).click();
+    assert.deepEqual(await focused(), { id: "ps-cpf", field: "", invalid: "true", described: "ps-notice" });
+    assert.equal(await formNotice(page).innerText(), "Confira o CPF: os números não fecham.");
+    const noticeBox = await formNotice(page).boundingBox();
+    assert.ok(noticeBox.y >= 0 && noticeBox.y + noticeBox.height <= 844, "o aviso aparece sem rolar");
+    // Digitar tira a marca de erro.
+    await page.locator("#ps-cpf").pressSequentially("52998224725");
+    assert.equal(await page.locator("#ps-cpf").getAttribute("aria-invalid"), null);
+    assert.equal(await page.locator("#ps-cpf").inputValue(), "529.982.247-25");
+    // Corrigir o segundo dígito: apagar e digitar outro, com o cursor no meio.
+    await page.locator("#ps-cpf").evaluate((input) => input.setSelectionRange(2, 2));
+    await page.keyboard.press("Backspace");
+    assert.equal(await page.locator("#ps-cpf").inputValue(), "599.822.472-5");
+    assert.equal(await page.locator("#ps-cpf").evaluate((input) => input.selectionStart), 1, "o cursor continua depois do primeiro dígito");
+    await page.keyboard.type("2");
+    assert.equal(await page.locator("#ps-cpf").inputValue(), "529.982.247-25");
+    assert.equal(await page.locator("#ps-cpf").evaluate((input) => input.selectionStart), 2);
+    // Cada campo que falta recebe o foco e o texto dele.
+    await submitButton(page).click();
+    assert.equal(await formNotice(page).innerText(), "Escolha a sua faixa de idade.");
+    assert.deepEqual(await focused(), { id: "", field: "ageRange", invalid: null, described: "ps-notice" });
+    await page.getByRole("button", { name: "45 a 59" }).click();
+    await submitButton(page).click();
+    assert.equal(await formNotice(page).innerText(), "Escolha o gênero.");
+    assert.deepEqual(await focused(), { id: "", field: "gender", invalid: null, described: "ps-notice" });
+    await page.getByRole("button", { name: "Outro" }).click();
+    await submitButton(page).click();
+    assert.equal(await formNotice(page).innerText(), "Escolha o estado.");
+    assert.deepEqual(await focused(), { id: "ps-state", field: "", invalid: "true", described: "ps-notice" });
+    await page.locator("#ps-state").selectOption("PE");
+    await submitButton(page).click();
+    assert.equal(await formNotice(page).innerText(), "Marque a autorização para concluir.");
+    assert.deepEqual(await focused(), { id: "ps-consent", field: "", invalid: "true", described: "ps-notice" });
+    await page.locator("#ps-consent").check();
+    assert.equal(await page.locator('#ps-register [aria-describedby="ps-notice"]').count(), 0);
+    // A recusa do servidor sobre o CPF também leva o foco ao campo.
+    server.failRegistration.push({ status: 409, code: "CPF_ALREADY_REGISTERED" });
+    await submitButton(page).click();
+    await formNotice(page).waitFor();
+    await page.waitForFunction(() => document.activeElement?.id === "ps-cpf");
+    assert.equal(await page.locator("#ps-cpf").getAttribute("aria-invalid"), "true");
+    // Dois envios seguidos viram um pedido só.
+    const before = server.count("POST", "/api/registration");
+    await page.evaluate(() => {
+      document.querySelector("#ps-register").requestSubmit();
+      document.querySelector("#ps-register").requestSubmit();
+    });
+    await waitStep(page, "Tela 1 de 4");
+    assert.equal(server.count("POST", "/api/registration"), before + 1);
+  });
+
+  await scenario("a conta perde o cadastro na hora de confirmar: o formulário abre vazio e a escolha continua", async () => {
+    const server = createServer();
+    server.registered.delete(GOOGLE_KEY);
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
+    await entryReady(page);
+    await page.locator("#ps-action").click();
+    await fillRegistration(page);
+    // Enquanto o CPF está só digitado, ele não vai para o aparelho.
+    const typed = await page.evaluate(() => JSON.stringify([{ ...localStorage }, { ...sessionStorage }, location.href, document.cookie]));
+    assert.doesNotMatch(typed, /52998224725|529\.982\.247/, "o CPF digitado não é guardado no aparelho");
+    await submitButton(page).click();
+    for (let screen = 1; screen <= 4; screen += 1) {
+      await waitStep(page, `Tela ${screen} de 4`);
+      await tapCard(page, 1);
+    }
+    await waitStep(page, "Final");
+    await tapCard(page, 1);
+    await waitStep(page, "Confirmar");
+    const choice = await page.locator("#ps-title").innerText();
+    server.registered.delete(GOOGLE_KEY);
+    await page.locator('[data-action="confirm"]:not([disabled])').click();
+    await waitStep(page, "Cadastro");
+    assert.match(await formNotice(page).innerText(), /Falta o cadastro para registrar a sua escolha\. As suas escolhas continuam neste aparelho\./);
+    assert.equal(server.count("POST", "/response"), 1);
+    // O CPF enviado no primeiro cadastro saiu da memória da página.
+    assert.equal(await page.locator("#ps-cpf").inputValue(), "", "depois de enviado, o CPF não volta ao formulário");
+    assert.equal(await page.locator("#ps-consent").isChecked(), false);
+    await fillRegistration(page);
+    await submitButton(page).click();
+    await waitStep(page, "Confirmar");
+    assert.equal(await page.locator("#ps-title").innerText(), choice, "a escolha feita antes continua na tela");
+    await page.locator('[data-action="confirm"]:not([disabled])').click();
+    await waitStep(page, "Registrada");
+    // O CPF só viaja no corpo do pedido de cadastro: nunca num endereço.
+    assert.ok(server.requests.every((request) => request.search === "" && !/529|982|247/.test(request.pathname)), "nenhum pedido leva dado no endereço");
+    assert.equal(server.count("POST", "/api/registration"), 2);
+  });
+
+  await scenario("a entrada e o cadastro cabem na largura da tela em três tamanhos, também com fonte larga", async () => {
+    const WIDE_FONT = '.ps-shell, .ps-shell button, .ps-shell a, .ps-shell input, .ps-shell select { font-family: Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace !important; }';
+    for (const [width, height, wide = false] of [[390, 844], [360, 640], [320, 568], [360, 640, true], [320, 568, true]]) {
+      const label = `${width}×${height}${wide ? " com fonte larga" : ""}`;
+      const server = createServer();
+      server.registered.delete(GOOGLE_KEY);
+      const page = await open(await newContext(server, { width, height }), surveyUrl(SURVEY));
+      await entryReady(page);
+      if (wide) await page.addStyleTag({ content: WIDE_FONT });
+      await page.locator("#ps-action").click();
+      await waitStep(page, "Entrar");
+      if (wide) await page.addStyleTag({ content: WIDE_FONT });
+      await page.locator("#ps-google #e2e-google").waitFor();
+      const inside = async (selector) => {
+        for (const box of await page.locator(selector).evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect()).map(({ left, right, height: tall }) => ({ left, right, tall })))) {
+          assert.ok(box.left >= -0.5 && box.right <= width + 0.5, `${label}: ${selector} sai da tela (${Math.round(box.left)} a ${Math.round(box.right)})`);
+        }
+      };
+      const noSideScroll = () => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+      // Entrada: o botão do Google e o Voltar aparecem sem rolar.
+      assert.equal(await noSideScroll(), true, `${label}: a entrada rola para o lado`);
+      await inside("#ps-google, .ps-stack .ps-btn, #ps-title");
+      const back = await page.getByRole("link", { name: "Voltar" }).boundingBox();
+      assert.ok(back.y + back.height <= height + 1, `${label}: o Voltar da entrada aparece sem rolar`);
+      await page.locator("#ps-google #e2e-google").click();
+      await waitStep(page, "Cadastro");
+      if (wide) await page.addStyleTag({ content: WIDE_FONT });
+      assert.equal(await noSideScroll(), true, `${label}: o formulário rola para o lado`);
+      await inside("#ps-cpf, .ps-chip, #ps-state, .ps-consent, .ps-form-note, #ps-register .ps-btn, #ps-title");
+      const chips = await page.locator(".ps-chip").evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
+      assert.ok(chips.every((tall) => tall >= 44), `${label}: opção com menos de 44 px de altura`);
+      const fonts = await page.locator("#ps-cpf, #ps-state").evaluateAll((nodes) => nodes.map((node) => parseFloat(getComputedStyle(node).fontSize)));
+      assert.ok(fonts.every((size) => size >= 16), `${label}: campo com fonte menor que 16 px faz o iPhone aproximar a tela`);
+      // O botão de concluir e o Voltar ficam inteiros na tela ao chegar ao fim.
+      await page.getByRole("link", { name: "Voltar" }).scrollIntoViewIfNeeded();
+      const [submitBox, backBox] = [await submitButton(page).boundingBox(), await page.getByRole("link", { name: "Voltar" }).boundingBox()];
+      assert.ok(backBox.y + backBox.height <= height + 1 && submitBox.y + submitBox.height <= backBox.y + 1, `${label}: Concluir e Voltar não cabem juntos no fim do formulário`);
+      // Com um aviso de erro, o topo continua legível e nada sai para o lado.
+      await submitButton(page).click();
+      await formNotice(page).waitFor();
+      assert.equal(await noSideScroll(), true, `${label}: o aviso faz o formulário rolar para o lado`);
+      await inside("#ps-notice");
+    }
   });
 
   await scenario("na entrada, o Google não carrega ou o servidor falha: a tela avisa e a nova tentativa entra", async () => {
@@ -1001,7 +1280,8 @@ try {
     await page.getByRole("link", { name: "Ver pesquisas" }).click();
     await page.locator("#ps-title", { hasText: "Você respondeu todas as pesquisas abertas." }).waitFor();
     assert.equal(await page.locator("#ps-action").count(), 0);
-    await page.locator(".ps-home .ps-pick b", { hasText: second }).waitFor();
+    // As duas pesquisas sorteiam das mesmas cartas: a escolha pode ser a mesma pessoa nas duas.
+    await page.locator(".ps-home .ps-pick").nth(1).locator("b", { hasText: second }).waitFor();
     assert.deepEqual(await page.locator(".ps-home .ps-pick b").allInnerTexts(), [first, second]);
     // Tocar numa escolha abre a tela da resposta daquela pesquisa.
     await page.locator(".ps-home .ps-pick").first().click();

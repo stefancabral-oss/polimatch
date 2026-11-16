@@ -825,3 +825,15 @@ select.ps-input {
   outline: 3px solid var(--ps-ink);
   outline-offset: 2px;
 }
+
+/* O campo que a última recusa cita: quem rola até ele o reconhece. */
+.ps-input[aria-invalid="true"],
+.ps-chips[aria-describedby] .ps-chip:not([aria-pressed="true"]) {
+  border-color: #b42318;
+  box-shadow: 0 0 0 1px #b42318;
+}
+
+.ps-consent input[aria-invalid="true"] {
+  outline: 2px solid #b42318;
+  outline-offset: 2px;
+}

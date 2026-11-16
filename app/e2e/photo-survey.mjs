@@ -115,7 +115,7 @@ function createServer() {
   };
   server.handler = async (route) => {
     const request = route.request();
-    const { pathname } = new URL(request.url());
+    const { pathname, search } = new URL(request.url());
     const method = request.method();
     const key = (request.headers().authorization || "").replace(/^Bearer /, "");
     let body = null;
@@ -124,7 +124,7 @@ function createServer() {
     } catch {
       body = null;
     }
-    server.requests.push({ method, pathname, key, body });
+    server.requests.push({ method, pathname, search, key, body });
     if (server.down) return route.abort("connectionrefused");
     const send = (status, json) => route.fulfill({ status, json, headers: status === 429 ? { "Retry-After": String(json.retryAfterSeconds) } : {} });
 
@@ -880,8 +880,11 @@ try {
     await submit.click();
     assert.equal(await notice.innerText(), "Confira o CPF: os números não fecham.");
     await page.locator("#ps-cpf").fill("529.982.247-25");
+    // Digitado, e ainda não enviado: o CPF não foi para o aparelho.
+    const typed = await page.evaluate(() => JSON.stringify([{ ...localStorage }, { ...sessionStorage }, location.href, document.cookie]));
+    assert.doesNotMatch(typed, /52998224725|529\.982\.247/);
     await submit.click();
-    assert.equal(await notice.innerText(), "Escolha idade, gênero e estado.");
+    assert.equal(await notice.innerText(), "Escolha a sua faixa de idade.");
     await page.getByRole("button", { name: "25 a 34" }).click();
     await page.getByRole("button", { name: "Prefiro não dizer" }).click();
     await page.locator("#ps-state").selectOption("MG");
@@ -902,7 +905,10 @@ try {
     assert.deepEqual(server.bodies("/api/registration"), [{
       cpf: "529.982.247-25", ageRange: "25-34", gender: "nao-informado", state: "MG", consent: true, consentVersion: "2026-11-16",
     }]);
-    assert.equal(server.requests.find((request) => request.pathname === "/api/registration").key, account);
+    const sent = server.requests.find((request) => request.pathname === "/api/registration");
+    assert.equal(sent.key, account);
+    assert.equal(sent.search, "", "o CPF vai no corpo do pedido, nunca no endereço");
+    assert.ok(server.requests.every((request) => request.search === ""), "nenhum pedido leva dado no endereço");
     assert.equal(server.draws.size, 1);
     // O CPF não fica no aparelho nem no endereço.
     const kept = await page.evaluate(() => JSON.stringify([{ ...localStorage }, { ...sessionStorage }, location.href, document.cookie]));
@@ -1135,13 +1141,17 @@ try {
     await confirm(page);
     await step(page, "Registrada");
 
-    // Sessão recusada já no começo.
+    // Sessão recusada já no começo: não há escolha na tela a preservar. A
+    // página esquece a sessão morta e leva à entrada, em vez de repetir o
+    // mesmo pedido recusado.
     const blocked = createServer();
     const dead = keyFor("morta");
     blocked.revoked.add(dead);
     const start = await openSurvey(await newContext(blocked, { storedKey: dead }));
     await begin(start);
-    await start.locator("#ps-notice:not([hidden])", { hasText: "Sua sessão precisa ser recuperada" }).waitFor();
+    await step(start, "Entrar");
+    assert.match(await start.locator("#ps-notice:not([hidden])").innerText(), /Sua sessão venceu\. Entre de novo para continuar\./);
+    assert.equal(blocked.count("POST", "/draw"), 1);
   });
 
   await scenario("carta que não carrega trava a tela inteira até carregar", async () => {
