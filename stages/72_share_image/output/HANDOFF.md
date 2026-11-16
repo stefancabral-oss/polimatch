@@ -2,11 +2,11 @@
 
 ## Status
 
-- Estado: `aprovado` nas partes 72a e 72b, num PR só, e na publicação (72c), que acontece depois do merge e fica registrada na issue #338.
+- Estado: `concluído`. As partes 72a e 72b foram mescladas (PR #339, commit `28fd962`) e a 72c aconteceu em 16/11/2026: o app está publicado nesse commit.
 - Issue: #338
 - Branch: `icm/72-share-image`. Foi feita sobre a `main` em `59ca9a1`; com o estágio 71 (PR #337) aprovado para entrar antes, foi refeita em cima dele. Os dois mexiam em quatro arquivos; os conflitos estão descritos em "Testes executados".
 - PR: #339
-- Até a publicação, nada deste estágio está em produção.
+- Em produção desde 16/11/2026.
 
 ## Entregue (72a — imagem)
 
@@ -23,9 +23,19 @@
 - Se o aparelho diz que compartilha arquivo e recusa na hora, a prévia abre, em vez do aviso de falha.
 - Uma tela nova fecha a prévia. O endereço local da imagem é solto em todo fechamento.
 
+## Publicação (72c) — 16/11/2026
+
+Com a instrução do Stefan ("Sim, os dois"), transcrita em "Human gate":
+
+- PR #339 mesclado em `28fd962`, depois de refeito sobre o estágio 71. A árvore do merge é igual à do commit que passou no CI.
+- App publicado no commit `28fd962` (31 s), build de 2026-11-16T23:26:07Z, junto com o estágio 71. De fora, nenhuma leitura falhou.
+- Conferido de fora, só por leitura: o app publicado traz a imagem com as finalistas, a prévia com "Baixar imagem" e a espera pela imagem.
+- Depois da publicação, o Stefan testou e respondeu: "No celular funcionou". Ele não detalhou o que testou; o agente tinha pedido que ele entrasse com Google, fizesse o cadastro, respondesse uma pesquisa e tocasse em "Compartilhar".
+
+O registro do banco e da API desta publicação está no HANDOFF do estágio 71 e na issue #336; o deste estágio, na #338.
+
 ## Não entregue / pendente
 
-- **72c — publicação.** Só o app, com o sim do Stefan.
 - Imagem com as escolhas de várias pesquisas numa folha só; formato para stories.
 - Som e háptica.
 
@@ -91,13 +101,11 @@ Escolhas do agente, por delegação dele (decisão 0003, item 5), que pode mudar
 
 ## Próximo passo exato
 
-1. Merge do PR #337 (estágio 71); esta branch refeita sobre a `main`; CI; merge do PR #339.
-2. Deploy da API (pelo estágio 71) e do app, uma vez só, com os dois estágios.
-3. Conferência de fora, só com leitura; registro na issue #338.
+Nenhum neste estágio.
 
 ## Ação do Stefan
 
-- Testar o compartilhar no celular depois de publicado.
+- Nenhuma neste estágio. Ele relatou que no celular funcionou.
 
 ## Human gate
 

@@ -7,7 +7,7 @@
   "parts": {
     "72a": "a imagem traz a escolhida e as finalistas; shareImageLayout com teste",
     "72b": "sharePlan, a prévia com Baixar imagem, o botão que espera a imagem, a recusa do arquivo abrindo a prévia",
-    "72c": "aprovada em 16/11/2026; acontece depois do merge: deploy do app, junto com o estágio 71; registro na issue #338"
+    "72c": "feita em 16/11/2026: app no commit 28fd962; registro na issue #338 e no HANDOFF"
   },
   "testsFirst": {
     "unidade": "share-choice.test.js: plano de entrega, conta do desenho, marcação da prévia e, depois da revisão, a chamada só com o arquivo, a linha que encolhe e os estados da prévia, escritos e vistos falhar antes do código",
@@ -38,10 +38,9 @@
     "os cenários dos estágios 68 a 70 passam": "photo-survey 34; site-shell 36"
   },
   "notVerified": [
-    "navigator.share num aparelho de verdade: nos testes é simulado; a troca para só o arquivo vem de um defeito conhecido do iPhone, não de teste",
+    "navigator.share num aparelho de verdade pelo agente: nos testes é simulado; o Stefan relatou que no celular funcionou, sem detalhar",
     "navegadores dentro de aplicativos (Instagram, WhatsApp)",
-    "leitor de tela de verdade",
-    "produção: nada deste estágio foi publicado"
+    "leitor de tela de verdade"
   ],
   "independentReview": {
     "who": "agente à parte, somente leitura, num clone próprio, sobre fb3bf7a",
@@ -71,5 +70,14 @@
     "commit cf680b8": "ci-gate verde, antes de a branch ser refeita: unidade do app, imagem do app e os dois roteiros em Chromium e em WebKit no Linux",
     "automatedReview": "Codex deixou um apontamento (a preparação antiga apagava o prazo da tela nova), corrigido em cf680b8; respondido e encerrado",
     "finalCommit": "o commit refeito sobre a main passa pelo CI antes do merge"
+  },
+  "delivery72c": {
+    "date": "2026-11-16",
+    "merge": {
+      "PR 339": "28fd962"
+    },
+    "app": "commit 28fd962, 31 s; build de 2026-11-16T23:26:07Z; nenhuma leitura de fora falhou",
+    "checkedByGet": "a imagem com as finalistas, a prévia com Baixar imagem e a espera pela imagem no app publicado",
+    "stefanReport": "\"No celular funcionou\", depois da publicação; ele não detalhou o que testou"
   }
 }

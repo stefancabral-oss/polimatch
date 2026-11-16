@@ -4,7 +4,8 @@
 - Quem decidiu: Stefan
 - Registrado por: agente (Claude), a pedido dele
 - Issue: #336 ([ICM 71])
-- Estado: direção aprovada. **Nada desta decisão está em produção.**
+- Estado: em produção desde 16/11/2026, com API e app no commit `28fd962`
+  (publicação registrada na issue #336).
 - Altera a [decisão 0001](0001-pesquisa-de-preferencia-por-foto.md) no item 3 e
   em "O que continua valendo", e a
   [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md) no ponto
@@ -86,7 +87,9 @@ item 5). Estas escolhas respondem à pendência "Login Google e CPF" da decisão
 
 ## Pendências
 
-Nada abaixo fica liberado por esta decisão.
+Nada abaixo fica liberado por esta decisão. A publicação de 16/11/2026 foi
+feita com estas pendências abertas, por decisão do Stefan (o gate está no
+HANDOFF do estágio 71).
 
 - **Jurídico (#283).** Tratar CPF junto com preferência política é a primeira
   pergunta da lista para o advogado na decisão 0001, e segue sem resposta

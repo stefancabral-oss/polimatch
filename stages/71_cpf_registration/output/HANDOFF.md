@@ -2,11 +2,11 @@
 
 ## Status
 
-- Estado: `aprovado` nas partes 71a a 71d, num PR só, e na publicação (71e), que acontece depois do merge e fica registrada na issue #336.
+- Estado: `concluído`. As partes 71a a 71d foram mescladas (PR #337, commit `f2edbcd`) e a 71e aconteceu em 16/11/2026: API e app estão publicados no commit `28fd962`.
 - Issue: #336
 - Branch: `icm/71-cpf-registration`, sobre a `main` em `59ca9a1` (estágio 70 mesclado).
 - PR: #337
-- Até a publicação, nada deste estágio está em produção.
+- Em produção desde 16/11/2026.
 
 ## Entregue (71a — registro)
 
@@ -41,9 +41,23 @@
 - A capa diz o que é preciso para responder. O menu e "Como funciona" também.
 - `app/src/account-session.js`: a entrada com Google virou um módulo que o menu e o cadastro usam.
 
+## Publicação (71e) — 16/11/2026
+
+Com a instrução do Stefan ("Sim, os dois"), transcrita em "Human gate":
+
+- PR #337 mesclado em `f2edbcd`; PR #339 (estágio 72) mesclado em `28fd962`. Nos dois, a árvore do merge é igual à do commit que passou no CI.
+- Cópia do banco antes da API: `/tmp/pre-deploy-20261116b.dump` no contêiner do banco, 609.619 bytes, 29 tabelas com dados.
+- API publicada no commit `28fd962` (25 s). No boot, `database_ready` com `resetApplied: false`, sem erro. De fora, lendo a cada 5 s, nenhuma leitura falhou.
+- Banco depois da API: as 29 tabelas que existiam ficaram com a mesma contagem. Entraram `cpf_registrations` e `cpf_registration_attempts`, vazias, e a migração `2026-11-16-cpf-registration-v1`.
+- App publicado no commit `28fd962` (31 s), build de 2026-11-16T23:26:07Z. De fora, nenhuma leitura falhou.
+- Entre a API nova e o app novo, por cerca de um minuto e meio, o app antigo não conseguia começar pesquisa, como previsto.
+- Conferido de fora, só por leitura: o app publicado traz o formulário de cadastro, a tela de entrada, a chamada da rota de cadastro e o tratamento da recusa; não traz mais o pedido de jogador sem conta nem o aviso de cota; o identificador do Google está no build.
+- Depois da publicação, o Stefan testou e respondeu: "No celular funcionou". Ele não detalhou o que testou; o agente tinha pedido que ele entrasse com Google, fizesse o cadastro, respondesse uma pesquisa e tocasse em "Compartilhar".
+
+O agente não fez pedido de escrita em produção: a rota de cadastro e a recusa do sorteio não foram exercitadas por ele lá. O registro também está na issue #336.
+
 ## Não entregue / pendente
 
-- **71e — publicação.** Deploy da API e do app, cada um com o sim do Stefan. A ordem é API primeiro. Entre um e outro, o app antigo não começa pesquisa: o servidor recusa e ele mostra o aviso de falha.
 - Conferência do CPF na Receita Federal.
 - Página de política de privacidade (#283) e tela para apagar o cadastro.
 - Editar o cadastro depois de feito.
@@ -122,7 +136,7 @@ A revisão automática do GitHub (Codex) leu o commit `8806a4a` e deixou três a
 - **CPF junto com preferência política.** É a primeira pergunta para o advogado na decisão 0001 e segue sem resposta registrada no repositório (#283). Com este estágio, toda resposta nova pertence a uma pessoa identificável pela conta. O site não tem página de privacidade; o texto de consentimento do formulário descreve o tratamento, mas não é a política. Publicar assim é decisão do Stefan.
 - **O código do CPF é reversível por quem tem o banco e o segredo juntos.** Existem cerca de um bilhão de CPFs com dígitos válidos; testar todos contra os códigos é rápido. O código protege o número num vazamento só do banco; o cadastro continua sendo dado pessoal.
 - **A conferência é pelos dígitos.** Não prova que o CPF existe nem que é de quem digitou. Alguém pode usar o CPF de outra pessoa, que depois não consegue se cadastrar. O que amarra a pessoa é a conta Google; o CPF limita uma conta por número.
-- **A entrada com Google nunca foi exercitada com o botão real.** Está no menu, em produção, desde 14/11/2026, e nos testes é simulada. Com este estágio ela vira o único caminho para responder. Testar no site, pelo menu, antes de publicar.
+- **A entrada com Google não foi exercitada pelo agente com o botão real:** nos testes ela é simulada. O Stefan relatou, depois da publicação, que no celular funcionou.
 - **Menos gente responde.** Entrar e preencher um formulário antes da primeira carta custa participação.
 - **Dependência do Google.** Com o serviço do Google fora do ar, ninguém novo responde.
 - **`VOTER_NETWORK_SECRET` não pode mais ser trocado nem perdido:** os códigos dos CPFs mudariam e a unicidade se perderia, sem volta, porque o número não é guardado. Hoje o segredo só existe no painel; precisa ir para o cofre (`docs/ops/DR.md`).
@@ -147,15 +161,10 @@ Escolhas do agente, por delegação dele (decisão 0003, item 5), que pode mudar
 
 ## Próximo passo exato
 
-1. CI verde no commit do gate; merge do PR #337.
-2. Merge do PR #339 (compartilhar com imagem), refeito sobre a `main`, para o app ir ao ar uma vez só.
-3. Cópia do banco; deploy da API; conferência do boot, das tabelas e das rotas.
-4. Deploy do app; conferência de fora, só com leitura.
-5. Registro da publicação na issue #336.
+Nenhum neste estágio. O que segue aberto está em "Ação do Stefan" e nas pendências da decisão 0004.
 
 ## Ação do Stefan
 
-- Testar "Entrar com Google" no site depois da publicação: é o único caminho para responder.
 - Guardar `VOTER_NETWORK_SECRET` no cofre de senhas.
 - A revisão jurídica do CPF com preferência política e a página de privacidade seguem em aberto.
 - Dizer se quer a conferência do CPF na Receita (serviço pago).

@@ -247,7 +247,8 @@ capa continua aberta a qualquer visitante. Isso altera o item 3 da decisão
 0001 ("a pessoa joga primeiro e se cadastra depois") e responde, por
 delegação, à pendência "Login Google e CPF". A revisão jurídica do tratamento
 de CPF com preferência política (#283) continua aberta, e publicar com ela
-aberta é decisão do Stefan.
+aberta é decisão do Stefan. Publicado em 16/11/2026, com API e app no commit
+`28fd962`, por instrução dele ("Sim, os dois").
 
 ## Compartilhar com imagem — issue #338
 Avaliação do Stefan em 16/11/2026, com o estágio 70 no ar: "Compartilhar:
@@ -255,4 +256,5 @@ Deve gerar uma imagem com minhas escolhas, não apenas o link." Estágio
 `stages/72_share_image/CONTEXT.md`: a imagem leva a escolhida e as
 finalistas; o toque só tem dois destinos, o compartilhamento do aparelho só
 com a imagem ou a prévia na tela com "Baixar imagem"; o link só vai se a
-pessoa pedir. Só o app muda.
+pessoa pedir. Só o app muda. Publicado em 16/11/2026, com o app no commit
+`28fd962`.
