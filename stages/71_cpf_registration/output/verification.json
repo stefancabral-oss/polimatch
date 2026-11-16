@@ -1,0 +1,94 @@
+{
+  "checkedAt": "2026-11-16",
+  "issue": 336,
+  "stage": "71_cpf_registration",
+  "base": "main em 59ca9a1 (estágio 70 mesclado)",
+  "instruction": "Stefan, 16/11/2026: \"cria o login obrigatório para cpf para poder entrar e jogar. sem esse cadastro a pessoa não pode entrar e dar voto.\" Transcrita na decisão 0004. As escolhas de desenho são do agente, por delegação.",
+  "parts": {
+    "71a": "decisão 0004, contexto e plano do estágio, marcações nas decisões 0001 e 0002, contexto raiz, README, AGENTS e política de integridade do voto na versão 5",
+    "71b": "shared/registration.js: CPF pelos dígitos, máscara, opções do perfil, consentimento com versão, validação do pedido",
+    "71c": "POST /api/registration; exigência do cadastro no sorteio e na resposta; duas tabelas novas; smoke com PostgreSQL",
+    "71d": "entrada com Google e formulário antes da pesquisa; a página não cria jogador sem conta; textos da capa, do menu e do Como funciona",
+    "71e": "não começou: deploy da API e do app, com o sim do Stefan"
+  },
+  "testsFirst": {
+    "regras": "shared/registration.test.js escrito e visto falhar (módulo inexistente) antes do código",
+    "rota": "back/src/registration-http.test.js: 7 dos 9 testes falharam antes de a rota existir",
+    "tela": "app/src/registration-view.test.js escrito e visto falhar antes do módulo; o Voltar do formulário e os ajustes da revisão (campo com erro, cursor, textos por campo) entraram pelo teste",
+    "exceções": [
+      "back/src/registration-store.js foi escrito antes do smoke dele; o smoke passou na primeira execução e foi conferido desfazendo o código de oito formas, todas pegas",
+      "a mudança em app/src/photo-survey-page.js veio antes dos cenários de navegador do cadastro; os cenários antigos falharam com a mudança e foram ajustados, e os novos passaram na primeira execução",
+      "os consertos da revisão na página vieram antes dos cenários deles; depois, doze desfazimentos, um por conserto, foram todos pegos"
+    ]
+  },
+  "tests": {
+    "environment": "macOS, local, 16/11/2026, no código final do PR",
+    "npm run test:shared": "118/118",
+    "npm test --prefix back": "305/305",
+    "npm test --prefix app": "203/203",
+    "back/scripts/cpf-registration-smoke.mjs em PostgreSQL 16 local": "aprovado",
+    "back/scripts/photo-survey-smoke.mjs": "aprovado, com a exigência desligada por opção de teste",
+    "demais smokes de integração do CI no mesmo banco": "topic-store, ordered-choices, presidential-duels, vote-abuse, game-progress e api-resilience: aprovados",
+    "e2e site-shell": "44 cenários em WebKit e em Chromium 140",
+    "e2e photo-survey": "34 cenários em WebKit e em Chromium 140",
+    "e2e client-error-report": "aprovado nos dois",
+    "capturas conferidas": "capa, entrada, formulário vazio, com erro, preenchido e com CPF recusado, e a pesquisa depois do cadastro, em 390x844"
+  },
+  "acceptance": {
+    "S1 sem cadastro, sorteio e resposta recusam e nada é gravado": "cpf-registration-smoke.mjs; photo-survey-http.test.js",
+    "S2 cadastro só com sessão Google": "cpf-registration-smoke.mjs; registration-http.test.js (401 sem sessão)",
+    "S3 CPF, perfil e consentimento inválidos": "shared/registration.test.js; registration-http.test.js",
+    "S4 um CPF por conta e uma conta por CPF, também em pedidos simultâneos": "cpf-registration-smoke.mjs",
+    "S5 o número do CPF não fica no banco, em log nem em resposta": "cpf-registration-smoke.mjs (linhas das duas tabelas); registration-http.test.js (store, log, respostas e a derivação da chave refeita por fora)",
+    "S6 limite de tentativas": "cpf-registration-smoke.mjs, inclusive a virada do dia no fuso de São Paulo",
+    "S7 com cadastro o percurso passa; resposta antiga preservada": "cpf-registration-smoke.mjs",
+    "S8 migração só cria tabelas": "cpf-registration-smoke.mjs (segundo boot); os demais smokes passam no mesmo banco",
+    "A1 capa sem gravação nem pedido de cadastro": "e2e site-shell, cenário 1 e o da conta sem cadastro",
+    "A2 Começar sem conta mostra a entrada; nenhum POST /api/player": "e2e photo-survey, caminho sem conta; conferência no fim de cada um dos 78 cenários, nos dois roteiros",
+    "A3 entrar: com cadastro a pesquisa, sem cadastro o formulário": "e2e site-shell (Google fora do ar e conta cadastrada); e2e photo-survey (caminho sem conta)",
+    "A4 recusas no aparelho e textos das recusas do servidor": "registration-view.test.js; e2e photo-survey (caminho sem conta); e2e site-shell (cada recusa tem o seu texto; sessão vencida)",
+    "A5 concluir abre a pesquisa": "e2e photo-survey e site-shell",
+    "A6 o CPF não fica no aparelho nem no endereço": "e2e photo-survey (antes e depois do envio; nenhum pedido com dado no endereço); e2e site-shell (a conta perde o cadastro na hora de confirmar)",
+    "A7 quem respondeu sem conta vê a resposta depois do cadastro": "e2e site-shell, cenário 5",
+    "A8 sair no meio volta para a entrada": "e2e site-shell (entrar e sair pelo menu); e2e photo-survey (saída da conta no meio)",
+    "A9 cenários dos estágios 68 a 70": "photo-survey 34 e site-shell 44, com identidade cadastrada",
+    "A10 o formulário de uma conta não aparece para a seguinte": "e2e site-shell: sessão vencida no cadastro; entrar pelo menu e sair no formulário",
+    "A11 sessão vencida leva à entrada, sem a sessão morta no aparelho": "e2e site-shell: sessão vencida no cadastro; no toque em Começar e na retomada; e2e photo-survey: sessão recusada",
+    "A12 foco no campo com erro e cursor no lugar": "registration-view.test.js; e2e site-shell: o formulário leva o foco ao campo com erro",
+    "A13 entrada e formulário cabem na largura": "e2e site-shell: três tamanhos, também com fonte larga"
+  },
+  "notVerified": [
+    "o botão real do Google: nos testes é simulado",
+    "produção: nada deste estágio foi publicado",
+    "leitor de tela de verdade no formulário",
+    "um aparelho de verdade (teclado numérico do celular no campo do CPF)"
+  ],
+  "humanGate": "pendente",
+  "pr": 337,
+  "ci": {
+    "pr": 337,
+    "commit 8806a4a": "ci-gate falhou por um teste de unidade do servidor que procurava três dígitos numa resposta com requestId aleatório; no mesmo commit passaram o servidor com PostgreSQL (com o smoke do cadastro), os roteiros em Chromium e WebKit no Linux e a imagem do app",
+    "finalCommit": "o commit final passa pelo CI antes do merge"
+  },
+  "independentReview": {
+    "who": "agente à parte, somente leitura, num clone próprio, sobre 73d6692..1186b68",
+    "verdict": "bloqueava até corrigir dois pontos; no servidor, nenhum caminho para sortear, responder ou ler resposta sem conta com cadastro, e o número do CPF só no corpo do pedido",
+    "ran": "shared 117/117, back 304/304, app 201/201; os dois smokes num banco dele; site-shell 38/38 e photo-survey 34/34 em WebKit; sonda HTTP com o store real; 14 sondas de comportamento; telas em 4 tamanhos e 2 fontes; 25 mutações, 15 pegas",
+    "fixedBeforeMerge": [
+      "o formulário de uma conta não aparece para a seguinte",
+      "a conferência de POST /api/player voltou ao roteiro site-shell",
+      "sessão vencida sai do aparelho e leva à entrada, no toque, na retomada e no cadastro",
+      "conta sem cadastro não faz o cadastro para uma pesquisa que fechou",
+      "o cursor do CPF fica no lugar; o foco vai ao campo com erro, com texto por campo",
+      "a tela fecha o menu quando a credencial entra por ela",
+      "chave sem conta guardada no aparelho não conta como respondida na capa",
+      "decisão 0004, DR.md, README, política e contexto do estágio 68 dizem o que o código faz",
+      "testes novos para nove das dez mutações que escapavam, e um cenário de dois envios para a décima"
+    ],
+    "notedOnly": [
+      "POST /api/auth/google com a sessão viva de outra conta dá 500: anterior à branch, sem caminho normal do app",
+      "o aviso do formulário fica no topo; num celular baixo o campo citado pode estar abaixo da dobra"
+    ],
+    "notDoneByReviewer": "botão real do Google, Chromium, CI no Linux, leitor de tela de verdade, volta pelo histórico com a página preservada, app contra a API real, produção"
+  }
+}

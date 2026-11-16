@@ -137,7 +137,8 @@ API:
 - variável obrigatória: `DATABASE_URL`;
 - segredo obrigatório de produção: `VOTER_NETWORK_SECRET=<valor aleatório com ao menos 32 caracteres>`;
 - topologia obrigatória de produção: `TRUST_PROXY_HOPS=<quantidade exata de proxies confiáveis até a API>`;
-- para ativar o login: `GOOGLE_CLIENT_ID=<OAuth Web Client ID>`;
+- para o login: `GOOGLE_CLIENT_ID=<OAuth Web Client ID>`. Desde o cadastro obrigatório ([ICM 71] #336) ele é necessário para a pesquisa por foto: sem ele ninguém entra e, portanto, ninguém responde. O boot não falha sem a variável;
+- `VOTER_NETWORK_SECRET` também gera o código de cada CPF cadastrado: trocar ou perder o valor desfaz a regra de uma conta por CPF para os cadastros antigos (`docs/ops/DR.md`);
 - enquanto o ledger editorial estiver vazio, a autoridade editorial externa permanece ausente e o catálogo fica fechado;
 - antes de publicar qualquer decisão editorial, injetar `EDITORIAL_AUTHORITY_PUBLIC_JWK`, `EDITORIAL_AUTHORITY_ISSUER`, `EDITORIAL_AUTHORITY_KEY_ID` e `EDITORIAL_AUTHORITY_RECEIPTS`; recibos inválidos ou ausentes mantêm default-deny;
 - origem padrão de produção: somente `https://polimatch.com.br`; ambientes adicionais exigem `APP_ORIGINS=https://polimatch.com.br,https://staging.exemplo`;
@@ -152,10 +153,10 @@ App:
 - Dockerfile: `app/Dockerfile`;
 - porta: `80`;
 - build arg: `VITE_API_URL=https://api.polimatch.com.br`;
-- para ativar o botão oficial: `VITE_GOOGLE_CLIENT_ID=<mesmo OAuth Web Client ID>`;
+- para o botão oficial do Google: `VITE_GOOGLE_CLIENT_ID=<mesmo OAuth Web Client ID>`. Desde o [ICM 71] ele é necessário para responder: sem ele a entrada da pesquisa diz que não dá para entrar agora, e o build não falha;
 - revisão do release: `--build-arg SOURCE_COMMIT=<mesmo SHA completo da API>`; o build grava `/version.json` e a meta `polimatch-release`. Sem ele, o app sai com `sha: "unknown"`. O Dokploy não preenche esse valor sozinho; veja [Release e CI](docs/ops/RELEASE.md).
 
-No Google Cloud, o cliente OAuth deve ser do tipo aplicação Web e autorizar a origem JavaScript `https://polimatch.com.br`. Se as duas variáveis de Google estiverem ausentes, o jogo anônimo continua funcionando e nenhuma entrada quebrada é exibida.
+No Google Cloud, o cliente OAuth deve ser do tipo aplicação Web e autorizar a origem JavaScript `https://polimatch.com.br`. Se as duas variáveis de Google estiverem ausentes, nenhuma entrada quebrada é exibida, mas ninguém consegue responder a pesquisa por foto: a capa continua aberta e a entrada avisa que não dá para entrar agora.
 
 O contrato de voto V2 é incompatível com frontend/backend antigos em rolling mix. Faça deploy coordenado do par construído do mesmo commit e rollback também coordenado; a ordem, os smokes e a proibição de fallback V1 estão documentados no [gate de publicação agregada](docs/legal/AGGREGATE_PUBLICATION_GATE.md#deploy-coordenado-do-contrato-v2).
 

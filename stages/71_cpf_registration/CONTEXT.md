@@ -76,6 +76,18 @@ cadastro com CPF. Sem o cadastro não há sorteio nem resposta.
   conta mudar (união de históricos), o cadastro acompanha.
 - **Abrir não grava.** A capa não pergunta ao servidor se há cadastro: quem
   decide é o pedido de sorteio, no toque.
+- **O formulário é de uma sessão.** O que foi preenchido fica só na memória
+  da página e é apagado quando a pessoa sai da conta, quando a sessão vence
+  e quando outra conta entra: o CPF de uma pessoa não aparece para a próxima
+  conta que entra na mesma aba.
+- **Sessão vencida não prende.** Recusada no começo, na retomada ou no
+  cadastro, a sessão sai do aparelho e a pessoa é levada a entrar de novo.
+  Na confirmação da resposta continua valendo a regra do estágio 68: a
+  escolha fica na tela, com o aviso.
+- **Ninguém se cadastra para uma pesquisa fechada.** Antes de abrir a entrada
+  ou o formulário, a página confere se a pesquisa segue aberta.
+- **Chave sem conta guardada no aparelho** não vale como "respondida" na
+  capa: a capa convida a entrar.
 - **As regras dos estágios 68 a 70 valem** para quem tem cadastro, sem
   mudança.
 - **Sem resultado público** (#177).
@@ -143,6 +155,14 @@ App:
   sem conta.
 - A9. Os cenários dos estágios 68 a 70 passam, com identidade cadastrada,
   ajustados onde a tela mudou de propósito.
+- A10. O formulário preenchido por uma conta não aparece para a seguinte
+  (saída da conta, sessão vencida, outra conta em outra aba).
+- A11. Sessão vencida no toque em "Começar", na retomada e no cadastro leva
+  à entrada, sem repetir o pedido recusado e sem a sessão morta no aparelho.
+- A12. O erro do formulário leva o foco ao campo, com o motivo ligado a ele;
+  corrigir um dígito no meio do CPF não perde o lugar.
+- A13. A entrada e o formulário cabem na largura em 390×844, 360×640 e
+  320×568, também com fonte larga.
 
 ## Condições de publicação
 

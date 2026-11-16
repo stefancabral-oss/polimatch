@@ -49,11 +49,17 @@ item 5). Estas escolhas respondem à pendência "Login Google e CPF" da decisão
    consulta e pede contrato: decisão do Stefan.
 5. **O número do CPF não é guardado.** O servidor guarda um código gerado a
    partir dele com um segredo do servidor, que basta para reconhecer um CPF
-   repetido. Consequência: não dá para listar os CPFs cadastrados nem conferir
-   depois na Receita os cadastros já feitos.
-6. **Consentimento na tela do cadastro,** com o texto e a versão guardados
-   junto com a data. O texto diz o que o sistema faz. Ele não substitui a
-   política de privacidade nem a revisão jurídica (#283).
+   repetido. Isso protege o número num vazamento só do banco. Não é
+   anonimização: quem tem o banco e o segredo juntos, como o operador do
+   servidor, consegue testar os CPFs possíveis contra os códigos e descobrir
+   quais estão cadastrados. Para a revisão jurídica, o dado continua sendo
+   pessoal. O PoliMatch não guarda lista de CPFs, e não dá para conferir
+   depois na Receita os cadastros já feitos sem pedir o número de novo.
+6. **Consentimento na tela do cadastro.** O servidor guarda a versão do texto
+   aceito e a data. O texto de cada versão fica no repositório
+   (`shared/registration.js`), e um teste impede mudar o texto sem mudar a
+   versão. O texto diz o que o sistema faz. Ele não substitui a política de
+   privacidade nem a revisão jurídica (#283).
 7. **Limite de tentativas de cadastro por conta,** para que uma conta não sirva
    para descobrir quais CPFs já estão cadastrados.
 
@@ -94,7 +100,10 @@ Nada abaixo fica liberado por esta decisão.
 - **Pedido de exclusão.** Não há tela para a pessoa apagar o cadastro. Até
   existir, o pedido é atendido à mão.
 - **Conferência do CPF na Receita.** Não contratada.
-- **Backup externo (#279).** Segue aberto.
+- **Backup externo (#279).** Segue aberto. Com este estágio, o backup do banco
+  só é completo junto com `VOTER_NETWORK_SECRET`: sem o segredo, os códigos
+  dos CPFs cadastrados não servem mais para reconhecer um CPF repetido
+  (`docs/ops/DR.md`).
 
 ## Referências
 

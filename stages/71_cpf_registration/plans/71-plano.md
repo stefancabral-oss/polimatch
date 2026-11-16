@@ -72,3 +72,25 @@ aconteceu, o HANDOFF diz.
   cadastro (recusas do servidor, sessão vencida, entrar e sair pelo menu,
   Google e servidor fora do ar, conta que perde o cadastro) e o de quem
   respondeu sem conta.
+
+## Depois da revisão independente
+
+- O formulário ganha dono (`formOwner`, a sessão para a qual foi aberto) e é
+  apagado em `openGate` ao voltar para a entrada ou ao abrir para outra
+  sessão, e em `gateIdentityMoved` quando outra conta entra.
+- `forgetDeadSession(key)`: a sessão que o servidor recusa com 401 sai do
+  aparelho. Vale no cadastro e em `start()` (com toque, a entrada; sem toque,
+  a entrada da pesquisa com o aviso). Na confirmação da resposta continua a
+  regra do estágio 68.
+- Em `start()`, o 403 de cadastro com toque lê a pesquisa antes de abrir o
+  formulário.
+- `registrationProblem` devolve o campo e o texto dele; `registrationRefusal`
+  devolve o campo das recusas sobre o CPF; a marcação recebe `invalid` e
+  marca o campo (`aria-invalid`, `aria-describedby`). `renderGate` leva o foco
+  ao campo.
+- `caretAfterDigits(masked, digits)`: onde o cursor fica depois da máscara.
+- `gateSignIn` fecha o menu ao concluir a entrada.
+- `openHome` ignora o que o aparelho guardou de uma chave sem conta.
+- Testes: a derivação da chave refeita por fora; o dia do limite no fuso de
+  São Paulo; o texto do consentimento preso à versão por hash; a conferência
+  de `POST /api/player` por caminho inteiro nos dois roteiros.

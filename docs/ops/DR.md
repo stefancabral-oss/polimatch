@@ -33,9 +33,14 @@ API:
 
 - `DATABASE_URL`
 - `VOTER_NETWORK_SECRET` (só existe no painel hoje; copiar para o cofre). Se
-  for perdido, um valor novo só reinicia os pseudônimos de rede das cotas de
+  for perdido, um valor novo reinicia os pseudônimos de rede das cotas de
   abuso; chaves de recuperação e sessões usam sha256 sem esse segredo e
-  continuam valendo.
+  continuam valendo. **Desde o cadastro com CPF ([ICM 71] #336) a perda deste
+  segredo não tem volta:** o código de cada CPF cadastrado é calculado com ele
+  e o número do CPF não é guardado. Com outro valor, nenhum CPF já cadastrado
+  é reconhecido, e a regra de uma conta por CPF deixa de valer para os
+  cadastros antigos. Depois da publicação do estágio 71, o backup do banco só
+  é completo junto com este segredo.
 - `TRUST_PROXY_HOPS`
 - `GOOGLE_CLIENT_ID`
 - `APP_ORIGINS` (só se houver origem além de `https://polimatch.com.br`)

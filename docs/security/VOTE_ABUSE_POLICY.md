@@ -67,6 +67,7 @@ A versão 5 acrescenta o cadastro obrigatório ([ICM 71] #336, decisão 0004). E
 - Um CPF por conta e uma conta por CPF. Um CPF já cadastrado em outra conta é recusado com HTTP 409, `CPF_ALREADY_REGISTERED`, também em pedidos simultâneos. A mesma conta repetindo o próprio CPF recebe o cadastro existente; com outro CPF, HTTP 409, `REGISTRATION_EXISTS`.
 - O CPF é conferido pelos dois dígitos verificadores (HTTP 400, `CPF_INVALID`). Isso não prova que o CPF existe na Receita Federal nem que pertence a quem digitou: a identidade continua sendo a da conta Google, e o CPF limita uma conta por número.
 - O número do CPF não é persistido nem entra em log ou em resposta. O banco guarda `HMAC-SHA-256(CPF em onze dígitos, chave)`, em que a chave é `HMAC-SHA-256(VOTER_NETWORK_SECRET, "polimatch:cpf-registration:v1")`. O mesmo texto não produz o mesmo código que o pseudônimo de rede.
+- O código protege o número num vazamento só do banco. Ele não é anonimização: existem cerca de um bilhão de CPFs com dígitos válidos, e quem tem o banco e o segredo juntos consegue testar todos contra os códigos. O cadastro continua sendo dado pessoal.
 - Trocar `VOTER_NETWORK_SECRET` muda todos os códigos e desfaz a unicidade do CPF. A troca passa a exigir migração dos cadastros e nova decisão versionada.
 - Cada conta pode fazer 5 pedidos de cadastro por dia editorial de São Paulo. O sexto é recusado com HTTP 429, `REGISTRATION_ATTEMPT_LIMIT`, com `Retry-After` até a meia-noite de São Paulo. O limite existe para que uma conta não sirva para descobrir quais CPFs já estão cadastrados. Pedido malformado e repetição do próprio cadastro não consomem tentativa.
 - O cadastro pertence à conta (`provider + subject`), não ao jogador ativo: quando dois históricos são reunidos e o jogador ativo muda, o cadastro acompanha a conta.
@@ -94,7 +95,7 @@ A versão 5 acrescenta o cadastro obrigatório ([ICM 71] #336, decisão 0004). E
 ## Contrato de confirmação no aplicativo
 
 - Abrir a capa, navegar e entrar nos quizzes não escreve nada na API. O jogador anônimo só é criado na primeira ação que precisa de identidade (jogar a rodada, entrar no duelo ou na arena da corrida); uma chave já salva é apenas lida.
-- HTTP 429 com `PLAYER_ISSUANCE_LIMIT` na criação do jogador mostra mensagem própria na capa, com `Entrar com Google` e o horário de liberação, sem o texto de falha de conexão.
+- HTTP 429 com `PLAYER_ISSUANCE_LIMIT` na criação do jogador mostrava mensagem própria na capa do jogo anterior, com `Entrar com Google` e o horário de liberação. A capa atual não cria jogador sem conta ([ICM 71] #336): esse aviso saiu do app, e a recusa continua valendo na API para o jogo anterior.
 
 - `ready`: as quatro cartas estão ativas e nenhuma tentativa está pendente.
 - `sending`: rodada, vencedor e quatro IDs ficam congelados; cartas e troca são bloqueadas, sem avanço de contador.
