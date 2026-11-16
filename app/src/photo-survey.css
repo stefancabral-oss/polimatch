@@ -361,6 +361,11 @@ button.ps-card[aria-pressed="true"]::after {
     grid-template-columns: 1fr 1fr;
   }
 
+  /* Um botão só ocupa a largura toda. */
+  .ps-stack--pair > :only-child {
+    grid-column: 1 / -1;
+  }
+
   .ps-stack--pair .ps-btn--ghost {
     order: -1;
   }
@@ -598,4 +603,109 @@ button.ps-card[aria-pressed="true"]::after {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Capa com várias pesquisas (ICM 70, #334) --------------------------------- */
+
+.ps-main--entry {
+  padding-bottom: max(22px, env(safe-area-inset-bottom));
+}
+
+.ps-cta {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.ps-cta-note {
+  margin: 0;
+  text-align: center;
+}
+
+.ps-more {
+  margin: 14px 0 0;
+  text-align: center;
+}
+
+.ps-more .ps-link {
+  padding-right: 12px;
+}
+
+/* Na capa o leque é menor, para as listas aparecerem sem rolar muito. */
+.ps-main--home .ps-fan {
+  --ps-fan-w: clamp(104px, calc((var(--ps-view) - 540px) / 1.4), 148px);
+  margin-top: 22px;
+}
+
+.ps-home {
+  margin-top: 28px;
+}
+
+.ps-home-label {
+  margin: 24px 0 2px;
+}
+
+.ps-home-label:first-child {
+  margin-top: 0;
+}
+
+.ps-survey,
+.ps-pick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ps-line);
+  color: var(--ps-ink);
+  text-decoration: none;
+}
+
+.ps-survey:focus-visible,
+.ps-pick:focus-visible {
+  outline: 3px solid var(--ps-ink);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+.ps-survey-text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.ps-survey-text b {
+  font-size: 16px;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.ps-survey-text small {
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--ps-muted);
+}
+
+.ps-pick .ps-card {
+  flex: none;
+  width: 44px;
+  border-radius: 6px;
+}
+
+.ps-pick i {
+  font-style: normal;
+  color: #9ca3af;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.ps-home .pm-item {
+  --ps-line: #e5e7eb;
+  min-height: 52px;
+  font-size: 16px;
+}
+
+.ps-home .pm-item:last-child {
+  border-bottom: 0;
 }

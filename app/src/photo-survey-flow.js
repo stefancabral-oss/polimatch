@@ -1,8 +1,10 @@
 // Pesquisa por foto (ICM 68, #324): o caminho da pessoa dentro da pesquisa.
 // Funções puras. A página (photo-survey-page.js) cuida da tela, da rede e do
-// armazenamento; aqui ficam as regras de escolher, voltar, trocar e retomar.
+// armazenamento; aqui ficam as regras de escolher, voltar, trocar e retomar,
+// e, desde a ICM 70 (#334), as da capa com várias pesquisas.
 
-export const PHOTO_SURVEY_ID = "politica-2026-01";
+import { PHOTO_SURVEYS } from "../../shared/photo-survey.js";
+
 export const PHOTO_SURVEY_STORAGE_KEY = "polimatch:photo-survey:v1";
 
 // Cartas que podem ilustrar a entrada da pesquisa de política, a pedido do
@@ -168,4 +170,47 @@ export function readSavedProgress(text, surveyId) {
 /** O texto a gravar, preservando o que estiver salvo de outras pesquisas. */
 export function savedProgressText(text, surveyId, { identity = "", progress = null, answered = false }) {
   return JSON.stringify({ ...parseSaved(text), [surveyId]: { identity, progress, answered: answered === true } });
+}
+
+// Capa com várias pesquisas -------------------------------------------------
+
+/** A pesquisa pedida no endereço (`?p=<código>`), ou "" quando não há uma válida. */
+export function surveyIdFromSearch(search, surveys = PHOTO_SURVEYS) {
+  const requested = new URLSearchParams(typeof search === "string" ? search : "").get("p") || "";
+  return surveys.some((survey) => survey.id === requested) ? requested : "";
+}
+
+function savedRecords(text, tag, surveys) {
+  if (!tag) return [];
+  return surveys
+    .map((survey) => ({ id: survey.id, record: readSavedProgress(text, survey.id) }))
+    .filter(({ record }) => record && record.identity === tag);
+}
+
+/** As pesquisas que este aparelho sabe respondidas pela identidade `tag`, na ordem da capa. */
+export function answeredSurveyIds(text, tag, surveys = PHOTO_SURVEYS) {
+  return savedRecords(text, tag, surveys).filter(({ record }) => record.answered).map(({ id }) => id);
+}
+
+/**
+ * A pesquisa que esta identidade deixou pela metade neste aparelho, ou "".
+ * Só conta quem já escolheu ao menos uma carta: um sorteio emitido e não
+ * tocado não tira a pessoa da capa.
+ */
+export function inProgressSurveyId(text, tag, surveys = PHOTO_SURVEYS) {
+  const pending = savedRecords(text, tag, surveys).find(({ record }) => !record.answered
+    && Array.isArray(record.progress?.picks) && record.progress.picks.some(Boolean));
+  return pending ? pending.id : "";
+}
+
+/** O destaque da capa: a primeira pesquisa aberta que a pessoa ainda não respondeu. */
+export function featuredSurveyId(views, answeredIds) {
+  const featured = views.find((view) => view.status === "open" && !answeredIds.includes(view.id));
+  return featured ? featured.id : "";
+}
+
+/** Depois de responder `currentId`: a primeira pesquisa sem resposta, fora ela. */
+export function nextSurveyId(currentId, answeredIds, surveys = PHOTO_SURVEYS) {
+  const next = surveys.find((survey) => survey.id !== currentId && !answeredIds.includes(survey.id));
+  return next ? next.id : "";
 }

@@ -226,3 +226,10 @@ saem do site. Estágio `stages/69_survey_home/CONTEXT.md`. Nada muda no
 servidor nem no banco. A troca foi publicada em 14/11/2026: as seções acima
 sobre a capa, a rodada diária, os quizzes e o visual do jogo passam a ser
 histórico. O código dessas páginas saiu de `app/` na entrega 69d.
+
+## Capa com várias pesquisas — issue #334
+Avaliação do Stefan em 14/11/2026: a capa nova estava simples demais. Estágio
+`stages/70_more_surveys/CONTEXT.md`: uma segunda pesquisa de política (outra
+pergunta sobre as mesmas 20 cartas), a capa com a pesquisa em destaque, as
+outras e as que vêm, as escolhas que a pessoa já fez e o compartilhamento da
+escolha. Sem resultado somado e sem rota nova no servidor.

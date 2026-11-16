@@ -1,0 +1,79 @@
+{
+  "checkedAt": "2026-11-16",
+  "issue": 334,
+  "stage": "70_more_surveys",
+  "base": "main em e220a96 (PR #333 mesclado em 16/11/2026); a branch foi refeita sobre ela sem conflito",
+  "instruction": "Stefan, 14/11/2026, com a capa nova no ar: \"Subiu. Mas está bem simples. Precisa de mais coisas.\" O pacote é escolha do agente, por delegação.",
+  "parts": {
+    "70a": "subject e a segunda pesquisa (politica-2026-02) em shared/; smoke do servidor com as duas",
+    "70b": "a página vale para qualquer pesquisa; /?p=<código>",
+    "70c": "capa com destaque, Suas escolhas, Mais pesquisas e Em breve; menu com as pesquisas",
+    "70d": "compartilhar a escolha: imagem, texto e endereço; saídas sem suporte",
+    "70e": "aprovada em 16/11/2026; acontece depois do merge: cópia do banco, deploy da API, deploy do app; registro na issue #334"
+  },
+  "testsFirst": {
+    "regras": "shared (4 falharam), regras da capa, menu (3 falharam) e share-choice: testes escritos e vistos falhar antes do código",
+    "navegador, compartilhar": "3 cenários falharam antes de o botão existir",
+    "exceção": "os cenários de navegador da capa (25 a 29 e 32) foram escritos depois da mudança da página e passaram de primeira"
+  },
+  "tests": {
+    "environment": "macOS, local, 14/11/2026",
+    "npm run test:shared": "106/106",
+    "npm test --prefix back": "293/293",
+    "back/scripts/photo-survey-smoke.mjs em PostgreSQL 16 local": "aprovado, com as duas pesquisas independentes",
+    "npm test --prefix app": "195/195",
+    "e2e site-shell em WebKit": "34 cenários aprovados",
+    "e2e site-shell em Chromium 140": "34 cenários aprovados",
+    "e2e photo-survey": "34 cenários em WebKit e em Chromium 140",
+    "e2e client-error-report": "aprovado nos dois",
+    "capturas conferidas": "capa em dois tamanhos, capa de quem respondeu uma e as duas, resposta registrada com dois botões, entrada da segunda pesquisa, menu e a imagem compartilhada (1080x1350, 362 KB)"
+  },
+  "acceptance": {
+    "duas pesquisas com assunto, 20 cartas, 16 e 4; ids únicos": "shared/photo-survey.test.js",
+    "o mesmo jogador responde as duas, uma vez cada": "back/scripts/photo-survey-smoke.mjs; e2e site-shell, cenário 26",
+    "capa sem identidade: uma leitura por pesquisa, nenhuma gravação": "e2e site-shell, cenário 1",
+    "?p= abre a pesquisa; código desconhecido cai na capa": "photo-survey-flow.test.js; e2e site-shell, cenário 25",
+    "responder a primeira: escolha na capa e a segunda em destaque; respondidas as duas, a capa diz": "e2e site-shell, cenário 26",
+    "escolhas de uma não aparecem na outra; a capa retoma a pesquisa pela metade": "e2e site-shell, cenários 26 e 27",
+    "compartilhar só no toque, com imagem e texto; sem arquivo, texto; sem compartilhamento, copia": "share-choice.test.js; e2e site-shell, cenários 30 e 31",
+    "os cenários dos estágios 68 e 69 passam": "photo-survey 34; site-shell 1 a 24",
+    "app novo com API antiga mostra só a primeira pesquisa": "e2e site-shell, cenário 32",
+    "uma pesquisa pela metade que fecha não prende a pessoa; a capa a destaca com Continuar enquanto aberta": "e2e site-shell, cenário 27",
+    "uma leitura que falha mostra aviso com tentar de novo": "e2e site-shell, cenários 29 e 33"
+  },
+  "notVerified": [
+    "navigator.share num aparelho de verdade: nos testes é simulado",
+    "produção: nada deste estágio foi publicado",
+    "\"Entrar com Google\" pelo menu, com o botão real do Google: nos testes é simulado"
+  ],
+  "independentReview": {
+    "who": "o mesmo agente das revisões do estágio 69, somente leitura, num clone à parte, sobre db7d079..918f34c",
+    "verdict": "sem bloqueio; dois pontos importantes",
+    "ran": "shared 106/106, back 293/293, app 195/195; site-shell 32/32 e photo-survey 34/34 em WebKit; smoke do servidor num banco próprio; 47 mutações do código",
+    "fixedBeforeMerge": [
+      "a capa não redireciona para a pesquisa pela metade: ela vira o destaque com Continuar, se aberta",
+      "falha em qualquer leitura (fora 404) mostra aviso com tentar de novo",
+      "a capa se refaz quando outra aba entra ou sai da conta e ao voltar do histórico; resposta atrasada não vale para outra identidade",
+      "Próxima pesquisa leva à capa",
+      "compartilhar não apaga aviso que já estava na tela",
+      "estado desconhecido do servidor vale como fechada",
+      "testes novos: resposta em pesquisa fechada, dois toques no compartilhar, imagem no tamanho maior, duas mutações de unidade"
+    ],
+    "scenariosWrittenAfterCode": "25 mutações do código, todas pegas pelo cenário correspondente",
+    "notedOnly": [
+      "título fixo na prévia do endereço compartilhado",
+      "celular deitado e 320x480: itens abaixo da dobra",
+      "a imagem é montada em toda tela de resposta registrada",
+      "o menu ainda lista uma pesquisa que o servidor não conhece"
+    ],
+    "notDoneByReviewer": "Chromium, CI no Linux, navigator.share num celular, volta pelo histórico, servidor de verdade junto com o app, produção"
+  },
+  "humanGate": "70a a 70d e a publicação (70e): aprovadas pelo Stefan em 16/11/2026 (\"Sim, mescla e publica\"); transcrita no HANDOFF",
+  "ci": {
+    "pr": 335,
+    "commit 918f34c": "falhou: site-shell, cenário 9, nos dois navegadores (botão em três linhas com a fonte do Linux)",
+    "commit 46ae6ff": "ci-gate verde; no Linux, site-shell 34 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; unidade de shared, back e app; smoke do servidor com PostgreSQL e as duas pesquisas; imagem do app e smoke-nginx 14 de 14",
+    "automatedReview": "Codex deixou um apontamento (a capa se refazer quando a identidade muda), já corrigido em 70419fa; respondido e encerrado",
+    "finalCommit": "a branch refeita sobre a main e o commit do gate passam pelo CI antes do merge"
+  }
+}
