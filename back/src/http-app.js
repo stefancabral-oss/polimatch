@@ -12,6 +12,8 @@ import { PRODUCTION_CANDIDATE_REGISTRY } from "./candidates.js";
 import { candidatePublicPayload } from "./editorial-gate.js";
 import { EMBEDDED_RELEASE_REVISION } from "./release-identity.js";
 import { DAILY_SESSION_RULESET } from "./daily-session.js";
+import { cpfPseudonym } from "./registration-store.js";
+import { validateRegistration } from "../../shared/registration.js";
 import { isTransientDatabaseError } from "./database-resilience.js";
 import { CLIENT_ERROR_MAX_BYTES, createClientErrorLimiter, normalizeClientErrorReport } from "./client-error-report.js";
 import { createLogger } from "./logger.js";
@@ -588,6 +590,44 @@ export function createHttpApp({
         championId,
         now: clock(),
       }));
+    } catch (error) {
+      sendError(req, res, error);
+    }
+  });
+
+  // Cadastro com CPF (ICM 71, #336). O número do CPF não passa desta rota:
+  // ela confere o pedido com as regras de shared/ e entrega ao store só o
+  // código. As recusas dizem o campo, nunca o que foi digitado.
+  const REGISTRATION_REFUSALS = Object.freeze({
+    CPF_INVALID: "CPF inválido",
+    REGISTRATION_INVALID: "cadastro inválido",
+    CONSENT_REQUIRED: "consentimento obrigatório",
+    CONSENT_VERSION_MISMATCH: "texto de consentimento desatualizado",
+  });
+
+  app.post("/api/registration", async (req, res) => {
+    if (!requirePhotoSurveys(req, res)) return;
+    try {
+      const recoveryKey = requiredRecoveryKey(req);
+      const checked = validateRegistration(req.body);
+      if (!checked.ok) {
+        throw Object.assign(new Error(REGISTRATION_REFUSALS[checked.code]), {
+          status: 400,
+          code: checked.code,
+          current: { field: checked.field },
+        });
+      }
+      const { cpf, ageRange, gender, state, consentVersion } = checked.value;
+      const result = await store.registerCpf({
+        recoveryKey,
+        cpfHash: cpfPseudonym(cpf, voterNetworkSecret),
+        ageRange,
+        gender,
+        state,
+        consentVersion,
+        now: clock(),
+      });
+      noStore(res).json({ registered: true, ...result });
     } catch (error) {
       sendError(req, res, error);
     }

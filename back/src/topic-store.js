@@ -4,6 +4,7 @@ import { isRoundZebra } from "../../shared/player-feedback.js";
 import { sessionMirror, compareSessionWithCut } from "../../shared/session-mirror.js";
 import { gameProgressStore, installGameSchema } from "./game-progress.js";
 import { installPhotoSurveySchema, photoSurveyParticipation, photoSurveyStore } from "./photo-survey-store.js";
+import { installRegistrationSchema, registrationStore } from "./registration-store.js";
 import { AGGREGATE_PUBLIC_COPY_POLICY } from "../../shared/aggregate-publication-copy.js";
 import { eloTier, isZebra, ratingDeltas } from "../../shared/elo.js";
 import {
@@ -1931,6 +1932,9 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
   logger = createLogger(),
   allowSchemaReset = schemaResetAllowedFromEnvironment(),
   photoSurveys,
+  // Só os smokes de integração trocam isto, para montar respostas de antes
+  // do cadastro obrigatório. O servidor não passa nada: vale a exigência real.
+  requirePhotoSurveyRegistration,
 } = {}) {
   if (!connectionString) throw new Error("DATABASE_URL é obrigatória");
   if (!candidateRegistry?.topicsById || typeof candidateRegistry.candidatesForTopic !== "function") {
@@ -1954,6 +1958,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
         });
         await installGameSchema(client);
         await installPhotoSurveySchema(client);
+        await installRegistrationSchema(client);
         await client.query("COMMIT");
         return migration;
       } catch (error) {
@@ -2903,7 +2908,8 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
     applyRound: applyFourCardRound, collectionEnabled,
     quotaWindow: () => editionWindow(editorialDateKey(clockInstant(clock))),
   }));
-  Object.assign(store, photoSurveyStore({ pool, findPlayer, clock, surveys: photoSurveys }));
+  Object.assign(store, photoSurveyStore({ pool, findPlayer, clock, surveys: photoSurveys, requireRegistration: requirePhotoSurveyRegistration }));
+  Object.assign(store, registrationStore({ pool, findPlayer, clock }));
   return store;
 }
 
