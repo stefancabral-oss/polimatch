@@ -114,7 +114,7 @@
       ]
     }
   },
-  "humanGate": "69a, 69b, 69c e 69e: aprovadas pelo Stefan em 14/11/2026 (\"Sim mescla e publica\"), transcritas no HANDOFF; 69d: pendente",
+  "humanGate": "69a, 69b, 69c e 69e: aprovadas pelo Stefan em 14/11/2026 (\"Sim mescla e publica\"); 69d: aprovada em 16/11/2026 (\"Sim, mescla e publica\"); transcritas no HANDOFF",
   "ci": {
     "pr": 332,
     "commit 8d85655": "ci-gate verde; no Linux, site-shell 20 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; design-validator com os testes de unidade, a imagem do app e smoke-nginx 14 de 14 na imagem nginx 1.27",
@@ -187,12 +187,13 @@
       ],
       "notDoneByReviewer": "produção, Chromium, CI no Linux, smokes do servidor com banco (imports lidos)"
     },
-    "humanGate": "pendente",
+    "humanGate": "instrução do Stefan em 16/11/2026 para o merge dos PRs #333 e #335 e para a publicação: \"Sim, mescla e publica\"; transcrita no HANDOFF",
     "builtOutput": "build antes e depois da limpeza: 311 arquivos, mesmo conteúdo, fora builtAt em version.json (conferido pela revisão)",
     "ci": {
       "pr": 333,
       "commit 8774fa5": "ci-gate verde; 183 testes do app, 64 do piloto, site-shell 24 e photo-survey 34 cenários em Chromium e em WebKit, smoke-nginx",
-      "finalCommit": "passa pelo CI de novo antes do merge"
+      "finalCommit": "passa pelo CI de novo antes do merge",
+      "commit db7d079": "ci-gate verde; 185 testes do app, site-shell 24 e photo-survey 34 cenários em Chromium e em WebKit"
     }
   }
 }

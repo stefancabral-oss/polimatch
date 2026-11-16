@@ -2,7 +2,7 @@
 
 ## Status
 
-- Estado: `em andamento`. As entregas 69a, 69b e 69c foram aprovadas e mescladas (PR #332, commit `6de6bbe`). A 69e aconteceu em 14/11/2026: o app está publicado nesse commit e a pesquisa é a capa do site. A 69d (limpeza do código antigo) está `pronta para gate`, em PR próprio.
+- Estado: `em andamento`. As entregas 69a, 69b e 69c foram aprovadas e mescladas (PR #332, commit `6de6bbe`). A 69e aconteceu em 14/11/2026: o app está publicado nesse commit e a pesquisa é a capa do site. A 69d (limpeza do código antigo) foi aprovada pelo Stefan em 16/11/2026, em PR próprio (#333).
 - Issue: #331
 - 69a, 69b e 69c: PR #332, mesclado em `6de6bbe`.
 - 69e: publicação de 14/11/2026 no commit `6de6bbe`; registro na issue #331 e neste documento.
@@ -176,7 +176,7 @@ Escolhas do agente, por delegação dele, que pode mudar qualquer uma:
 
 ## Próximo passo exato
 
-1. Gate do Stefan para o PR da 69d. O merge não precisa de deploy: o que saiu já não entrava no build.
+1. Merge do PR #333, já autorizado, com o `ci-gate` verde no commit final. Não precisa de deploy: o que saiu já não entrava no build.
 2. O Stefan testa a entrada com Google pelo menu, no celular.
 3. Depois: decidir o destino das imagens do produto anterior em `app/public` e do piloto de arte; a página de Privacidade quando houver texto (#283); a próxima pesquisa.
 
@@ -188,9 +188,9 @@ Escolhas do agente, por delegação dele, que pode mudar qualquer uma:
 
 ## Human gate
 
-- Decisão da entrega 69d: `pendente`
+- Decisão da entrega 69d: `aprovado`
 - Responsável: Stefan
-- Observação: a limpeza é parte do pedido dele de 14/11/2026 ("tira o que é velho, deixa novo"), transcrito na decisão 0003. O merge pede o sim dele.
+- Observação: a limpeza é parte do pedido dele de 14/11/2026 ("tira o que é velho, deixa novo"), transcrito na decisão 0003. O merge teve instrução direta dele em 16/11/2026. A mensagem do agente dizia que a limpeza estava no PR 333, com CI verde e revisão feita, que ela não muda nada do que está no ar e não precisa de publicação, e que o pacote do estágio 70 (PR 335) tinha sido feito em cima dela; a pergunta foi: "Mesclo os PRs 333 e 335 e publico a API e o app? Pode responder 'sim, mescla e publica' ou 'só mescla'." Ele respondeu: "Sim, mescla e publica". O `ci-gate` estava verde no commit `db7d079`. O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O gate do estágio 70 está no HANDOFF dele.
 - Decisão das entregas 69a, 69b e 69c e da publicação (69e): `aprovado`
 - Responsável: Stefan
 - Observação: a construção teve instrução direta dele em 14/11/2026 ("Pode seguir, vai pra frente. Pode ir construindo."), transcrita na decisão 0003. O merge do PR #332 e a publicação do app também tiveram instrução direta dele, no mesmo dia. A mensagem do agente dizia o que ficou pronto, que o CI estava verde no commit final e que a revisão independente não achou bloqueio; que o botão real do Google não foi testado; que a página de Privacidade e a limpeza do código antigo não entraram; e, antes da pergunta, que ao publicar a pesquisa fica à vista de qualquer visitante, com a política de privacidade e o backup externo ainda em aberto, e que o site novo deixa de mostrar a frase "Não é pesquisa eleitoral". A pergunta foi: "Mesclo o PR 332 e publico o app em seguida? Pode responder 'sim, mescla e publica' ou 'só mescla'." Ele respondeu: "Sim mescla e publica". O merge e o deploy ficaram a cargo do agente, a pedido dele, com o check verde no commit final: o PR foi mesclado em `6de6bbe` e o app publicado nesse commit no mesmo dia. A pesquisa de lançamento com código novo não foi tratada na pergunta: vai ao ar a `politica-2026-01`. A limpeza (69d) tem gate próprio. A regra 6 do `AGENTS.md` não muda.
