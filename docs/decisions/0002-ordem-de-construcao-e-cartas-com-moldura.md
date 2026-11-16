@@ -61,6 +61,8 @@ pesquisa têm a mesma moldura.
   entra na pesquisa com cadastro por CPF. A etapa 1 não tem cadastro por CPF;
   ela grava a escolha ligada à identidade que o jogo já usa, e se essas
   escolhas contam no resultado fica para a etapa do cadastro.
+  (Decisão 0004, de 16/11/2026: conta a resposta de quem tem cadastro. O
+  cadastro passa a ser exigido antes de responder.)
 - Tudo o que a seção "O que continua valendo" da 0001 lista: app online-only,
   mesma exposição para todas as opções de uma tela, nenhum resultado
   manipulado, compartilhamento por iniciativa da pessoa, jogar sem cadastro, o

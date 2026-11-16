@@ -1,6 +1,6 @@
 # Política de integridade do voto público
 
-Status: política normativa da API do PoliMatch, versão 4, vinculada às issues #170, #179, #282 e #324.
+Status: política normativa da API do PoliMatch, versão 5, vinculada às issues #170, #179, #282, #324 e #336.
 
 Esta política existe para que o placar público seja um painel de preferências declaradas com limites conhecidos. Ela não transforma o resultado em pesquisa eleitoral nem prova que cada jogador corresponde a uma pessoa única.
 
@@ -51,11 +51,29 @@ A versão 4 acrescenta a pesquisa por foto ([ICM 68] #324). Ela não muda nenhum
 - Sorteio e resposta são gravados em tabelas próprias, imutáveis como os votos. Não há troca depois de confirmar.
 - A resposta não consome a cota de 30 escolhas, não entra no limite de 8 escolhas por minuto e não altera o ranking nem o Elo. A emissão do sorteio também não consome cota.
 - Fora da janela da pesquisa, sorteio novo e resposta são recusados com HTTP 409, `PHOTO_SURVEY_CLOSED`.
-- Quem apaga os dados do aparelho vira outro jogador e pode responder de novo. O que limita isso é a cota de 3 jogos novos por rede descrita acima. O cadastro por CPF, previsto na decisão 0001, é o que fecha essa porta, e não faz parte desta versão.
+- Quem apaga os dados do aparelho vira outro jogador e pode responder de novo. O que limita isso é a cota de 3 jogos novos por rede descrita acima. O cadastro por CPF, previsto na decisão 0001, é o que fecha essa porta, e não faz parte desta versão. (Versão 5: essa porta fecha na pesquisa por foto. Ver "Cadastro com CPF", abaixo.)
 - Um jogador anônimo que recebeu o sorteio de uma pesquisa, com ou sem resposta, e depois entra numa conta Google já existente é ligado à conta mesmo sem ter escolhas no jogo. A chave anônima deixa de valer, então uma aba aberta com ela não grava outra resposta. Nesse caso nada do jogo é somado: ranking, versão e Chromas da conta ficam como estavam.
 - O recibo (`answerId`) é único entre todas as respostas. Um recibo já usado por outra pessoa é recusado com HTTP 400, mesmo em requisições simultâneas.
 - Nenhuma rota devolve soma de respostas. O [gate de publicação agregada](../legal/AGGREGATE_PUBLICATION_GATE.md) continua valendo.
 - As rotas da pesquisa nascem desligadas. Só `PHOTO_SURVEYS_ENABLED=true` no ambiente da API as liga; sem isso respondem HTTP 404, `PHOTO_SURVEYS_DISABLED`, e nada é gravado.
+
+## Cadastro com CPF
+
+A versão 5 acrescenta o cadastro obrigatório ([ICM 71] #336, decisão 0004). Ela não muda nenhum número das seções acima.
+
+- O sorteio e a resposta de uma pesquisa por foto só valem para a sessão de uma conta Google que tenha cadastro com CPF. Sem sessão: HTTP 401. Com chave de visitante anônimo, ou com conta sem cadastro: HTTP 403, `CPF_REGISTRATION_REQUIRED`, e nada é emitido nem gravado. A recusa vale também para ler a resposta já dada.
+- A definição pública de cada pesquisa continua aberta a qualquer visitante.
+- O cadastro (`POST /api/registration`) só é aceito com sessão de conta Google. Com chave de visitante anônimo: HTTP 403, `GOOGLE_ACCOUNT_REQUIRED`.
+- Um CPF por conta e uma conta por CPF. Um CPF já cadastrado em outra conta é recusado com HTTP 409, `CPF_ALREADY_REGISTERED`, também em pedidos simultâneos. A mesma conta repetindo o próprio CPF recebe o cadastro existente; com outro CPF, HTTP 409, `REGISTRATION_EXISTS`.
+- O CPF é conferido pelos dois dígitos verificadores (HTTP 400, `CPF_INVALID`). Isso não prova que o CPF existe na Receita Federal nem que pertence a quem digitou: a identidade continua sendo a da conta Google, e o CPF limita uma conta por número.
+- O número do CPF não é persistido nem entra em log ou em resposta. O banco guarda `HMAC-SHA-256(CPF em onze dígitos, chave)`, em que a chave é `HMAC-SHA-256(VOTER_NETWORK_SECRET, "polimatch:cpf-registration:v1")`. O mesmo texto não produz o mesmo código que o pseudônimo de rede.
+- Trocar `VOTER_NETWORK_SECRET` muda todos os códigos e desfaz a unicidade do CPF. A troca passa a exigir migração dos cadastros e nova decisão versionada.
+- Cada conta pode fazer 5 pedidos de cadastro por dia editorial de São Paulo. O sexto é recusado com HTTP 429, `REGISTRATION_ATTEMPT_LIMIT`, com `Retry-After` até a meia-noite de São Paulo. O limite existe para que uma conta não sirva para descobrir quais CPFs já estão cadastrados. Pedido malformado e repetição do próprio cadastro não consomem tentativa.
+- O cadastro pertence à conta (`provider + subject`), não ao jogador ativo: quando dois históricos são reunidos e o jogador ativo muda, o cadastro acompanha a conta.
+- O cadastro guarda faixa de idade, gênero, estado, a versão do texto de consentimento aceito e o instante do aceite. O consentimento é obrigatório (HTTP 400, `CONSENT_REQUIRED`), e um texto desatualizado é recusado (HTTP 400, `CONSENT_VERSION_MISMATCH`).
+- As respostas dadas por visitantes anônimos antes desta versão continuam no banco, imutáveis. Só voltam a ser lidas quando a pessoa entra com Google a partir do mesmo aparelho, o que liga o histórico à conta, e faz o cadastro.
+- O login Google não consome a cota de jogos novos por rede (versão 3). Com o cadastro obrigatório, o que limita a multiplicação de respostas na pesquisa por foto é um CPF por conta; a cota de rede segue valendo para o jogo anterior.
+- O smoke `back/scripts/cpf-registration-smoke.mjs` prova estas regras num PostgreSQL de verdade.
 
 ## Origem e proxy
 
