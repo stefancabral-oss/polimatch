@@ -61,7 +61,9 @@ etapa estar testada e o Stefan autorizar a publicação.
 
 - **Sorteio emitido pelo servidor.** No toque em "Começar", o jogador é criado,
   se ainda não existe, e o servidor sorteia as 16 cartas e os grupos e guarda
-  o sorteio ligado a ele. Recarregar ou abrir outra aba retoma o mesmo
+  o sorteio ligado a ele. (Alterado pelo estágio 71, #336: a página não cria
+  mais jogador; o sorteio só é emitido para a conta Google com cadastro com
+  CPF.) Recarregar ou abrir outra aba retoma o mesmo
   sorteio. Cada uma das 20 cartas tem a mesma chance de entrar e de ocupar
   cada posição.
 - **Escolhas parciais ficam no aparelho.** Até a confirmação, só o aparelho

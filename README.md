@@ -2,7 +2,7 @@
 
 PoliMatch é um jogo web casual de comparação entre personalidades públicas. A pessoa escolhe sua preferida entre quatro cartas, recebe uma nova rodada imediatamente e acompanha seu ranking pessoal. Superfícies agregadas permanecem retidas por padrão enquanto a decisão humana da issue #177 estiver pendente.
 
-**Direção desde 12/11/2026:** o PoliMatch caminha para ser uma pesquisa de preferência por foto (issue #318, [registro de decisão](docs/decisions/0001-pesquisa-de-preferencia-por-foto.md)). A primeira etapa de produto é a #324 ([decisão 0002](docs/decisions/0002-ordem-de-construcao-e-cartas-com-moldura.md)): desde 14/11/2026 a pesquisa de Política está publicada em endereço próprio, fora do menu. A [decisão 0003](docs/decisions/0003-a-pesquisa-vira-a-capa.md) fez dela a capa do site e tirou as páginas do produto anterior (#331): a troca está no ar desde 14/11/2026, e o código dessas páginas saiu de `app/` em seguida (as imagens delas e alguns restos ficaram; ver o HANDOFF do estágio 69). As rotas do jogo anterior continuam na API. Cadastro por CPF, exibição dos cinco primeiros e entrega de resultado somado dependem de etapas e decisões ainda abertas. A seção abaixo descreve o produto anterior, que saiu do site em 14/11/2026; a correção dos números dela é da [ICM 61] #303.
+**Direção desde 12/11/2026:** o PoliMatch caminha para ser uma pesquisa de preferência por foto (issue #318, [registro de decisão](docs/decisions/0001-pesquisa-de-preferencia-por-foto.md)). A primeira etapa de produto é a #324 ([decisão 0002](docs/decisions/0002-ordem-de-construcao-e-cartas-com-moldura.md)): desde 14/11/2026 a pesquisa de Política está publicada em endereço próprio, fora do menu. A [decisão 0003](docs/decisions/0003-a-pesquisa-vira-a-capa.md) fez dela a capa do site e tirou as páginas do produto anterior (#331): a troca está no ar desde 14/11/2026, e o código dessas páginas saiu de `app/` em seguida (as imagens delas e alguns restos ficaram; ver o HANDOFF do estágio 69). As rotas do jogo anterior continuam na API. Cadastro por CPF, exibição dos cinco primeiros e entrega de resultado somado dependem de etapas e decisões ainda abertas. A seção abaixo descreve o produto anterior, que saiu do site em 14/11/2026; a correção dos números dela é da [ICM 61] #303. Desde a [decisão 0004](docs/decisions/0004-cadastro-obrigatorio-com-cpf.md), de 16/11/2026 ([ICM 71] #336), só responde uma pesquisa quem entrou com Google e fez o cadastro com CPF; isso ainda não está em produção.
 
 ## Produto atual
 
@@ -105,8 +105,9 @@ O contrato de `role`, `party`, `primaryArea`, `contextAffiliation` e da proveni�
 | `POST` | `/api/daily-vote` | confirma o próximo slot diário por `editionId`, `slot`, `winnerId` e `answerId`; a ordem das cartas nunca vem do cliente |
 | `POST` | `/api/round-vote` | confirma uma escolha entre quatro pessoas numa transação; exige `roundId`, `winnerId`, quatro `candidateIds` únicos e `playerVersion` |
 | `GET` | `/api/photo-surveys/:surveyId` | definição pública de uma pesquisa por foto e se ela está aberta; as três rotas de pesquisa respondem 404 `PHOTO_SURVEYS_DISABLED` enquanto `PHOTO_SURVEYS_ENABLED` não for `true` ([ICM 68] #324) |
-| `POST` | `/api/photo-surveys/:surveyId/draw` | emite ou devolve o sorteio de cartas do jogador e a resposta dele, se já houver; exige chave Bearer |
-| `POST` | `/api/photo-surveys/:surveyId/response` | grava uma única vez a resposta, por `answerId`, `pickIds` e `championId`, conferida contra o sorteio; exige chave Bearer |
+| `POST` | `/api/photo-surveys/:surveyId/draw` | emite ou devolve o sorteio de cartas do jogador e a resposta dele, se já houver; exige sessão de conta Google com cadastro com CPF, senão 403 `CPF_REGISTRATION_REQUIRED` ([ICM 71] #336) |
+| `POST` | `/api/photo-surveys/:surveyId/response` | grava uma única vez a resposta, por `answerId`, `pickIds` e `championId`, conferida contra o sorteio; mesma exigência do sorteio |
+| `POST` | `/api/registration` | cadastro com CPF da conta Google da sessão: `cpf`, `ageRange`, `gender`, `state`, `consent` e `consentVersion`; um CPF por conta e uma conta por CPF; o número do CPF não é guardado, só um código; cinco tentativas por conta por dia ([ICM 71] #336) |
 
 Exemplo do corpo atual:
 
@@ -136,7 +137,8 @@ API:
 - variável obrigatória: `DATABASE_URL`;
 - segredo obrigatório de produção: `VOTER_NETWORK_SECRET=<valor aleatório com ao menos 32 caracteres>`;
 - topologia obrigatória de produção: `TRUST_PROXY_HOPS=<quantidade exata de proxies confiáveis até a API>`;
-- para ativar o login: `GOOGLE_CLIENT_ID=<OAuth Web Client ID>`;
+- para o login: `GOOGLE_CLIENT_ID=<OAuth Web Client ID>`. Desde o cadastro obrigatório ([ICM 71] #336) ele é necessário para a pesquisa por foto: sem ele ninguém entra e, portanto, ninguém responde. O boot não falha sem a variável;
+- `VOTER_NETWORK_SECRET` também gera o código de cada CPF cadastrado: trocar ou perder o valor desfaz a regra de uma conta por CPF para os cadastros antigos (`docs/ops/DR.md`);
 - enquanto o ledger editorial estiver vazio, a autoridade editorial externa permanece ausente e o catálogo fica fechado;
 - antes de publicar qualquer decisão editorial, injetar `EDITORIAL_AUTHORITY_PUBLIC_JWK`, `EDITORIAL_AUTHORITY_ISSUER`, `EDITORIAL_AUTHORITY_KEY_ID` e `EDITORIAL_AUTHORITY_RECEIPTS`; recibos inválidos ou ausentes mantêm default-deny;
 - origem padrão de produção: somente `https://polimatch.com.br`; ambientes adicionais exigem `APP_ORIGINS=https://polimatch.com.br,https://staging.exemplo`;
@@ -151,10 +153,10 @@ App:
 - Dockerfile: `app/Dockerfile`;
 - porta: `80`;
 - build arg: `VITE_API_URL=https://api.polimatch.com.br`;
-- para ativar o botão oficial: `VITE_GOOGLE_CLIENT_ID=<mesmo OAuth Web Client ID>`;
+- para o botão oficial do Google: `VITE_GOOGLE_CLIENT_ID=<mesmo OAuth Web Client ID>`. Desde o [ICM 71] ele é necessário para responder: sem ele a entrada da pesquisa diz que não dá para entrar agora, e o build não falha;
 - revisão do release: `--build-arg SOURCE_COMMIT=<mesmo SHA completo da API>`; o build grava `/version.json` e a meta `polimatch-release`. Sem ele, o app sai com `sha: "unknown"`. O Dokploy não preenche esse valor sozinho; veja [Release e CI](docs/ops/RELEASE.md).
 
-No Google Cloud, o cliente OAuth deve ser do tipo aplicação Web e autorizar a origem JavaScript `https://polimatch.com.br`. Se as duas variáveis de Google estiverem ausentes, o jogo anônimo continua funcionando e nenhuma entrada quebrada é exibida.
+No Google Cloud, o cliente OAuth deve ser do tipo aplicação Web e autorizar a origem JavaScript `https://polimatch.com.br`. Se as duas variáveis de Google estiverem ausentes, nenhuma entrada quebrada é exibida, mas ninguém consegue responder a pesquisa por foto: a capa continua aberta e a entrada avisa que não dá para entrar agora.
 
 O contrato de voto V2 é incompatível com frontend/backend antigos em rolling mix. Faça deploy coordenado do par construído do mesmo commit e rollback também coordenado; a ordem, os smokes e a proibição de fallback V1 estão documentados no [gate de publicação agregada](docs/legal/AGGREGATE_PUBLICATION_GATE.md#deploy-coordenado-do-contrato-v2).
 

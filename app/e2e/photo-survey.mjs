@@ -6,6 +6,9 @@
  * O servidor aqui é simulado, com as mesmas regras de shared/photo-survey.js
  * que a API usa: sorteio por jogador, resposta única e validação da chave.
  * Ele conta cada requisição, para provar o que a página grava e quando.
+ * Desde a ICM 71 (#336) só responde quem entrou com Google e tem cadastro:
+ * os cenários nascem com a sessão de uma conta cadastrada, e nenhum deles
+ * pode terminar com pedido de jogador sem conta.
  *
  * Cenários:
  *   1. Abrir a página da pesquisa não cria jogador nem sorteio.
@@ -21,7 +24,8 @@
  *   9. Confirmação sem resposta do servidor: a nova tentativa não duplica.
  *  10. Pesquisa fechada na abertura e fechada no meio.
  *  11. Rotas desligadas e API fora do ar.
- *  12. Cota de jogos novos da rede esgotada.
+ *  12. Sem conta: Começar leva à entrada e ao cadastro, e o cadastro leva à
+ *      pesquisa (ICM 71). O CPF não fica no aparelho.
  *  13. Troca de identidade no meio.
  *  14. Sorteio da conta mudou: a página busca de novo e recomeça.
  *  15. Sessão recusada: saída clara, sem perder as escolhas.
@@ -56,13 +60,22 @@ const IDENTITY_KEY = "polimatch:v3:recovery-key";
 const PROGRESS_KEY = "polimatch:photo-survey:v1";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const nameOf = new Map(ARTS.map((art) => [art.id, art.name]));
-const keyFor = (label) => `pm2_${label.padEnd(43, "x").slice(0, 43)}`;
+// Só responde quem entrou com Google e tem cadastro com CPF (ICM 71, #336):
+// as identidades deste roteiro são sessões de conta. O servidor simulado dá
+// por cadastrada toda sessão que não esteja em `unregistered`.
+const keyFor = (label) => `pms_${label.padEnd(43, "x").slice(0, 43)}`;
+const ANONYMOUS_KEY = `pm2_${"a".repeat(43)}`;
+const GOOGLE_SCRIPT = `window.google={accounts:{id:{initialize(options){window.__e2eGoogle=options.callback},renderButton(element){const button=document.createElement('button');button.type='button';button.id='e2e-google';button.textContent='Continuar com Google';button.addEventListener('click',()=>window.__e2eGoogle({credential:'credencial-de-teste'}));element.replaceChildren(button)}}}};`;
 // A entrada ilustra com três cartas de uma lista fixa (ENTRY_CARD_IDS). Estas
 // dez seguem na pesquisa e no sorteio, mas não aparecem na entrada.
 const OFF_ENTRY_CARD_IDS = [
   "andre-janones", "erika-hilton", "fernando-haddad", "geraldo-alckmin", "guilherme-boulos",
   "joao-campos", "lindbergh-farias", "marina-silva", "samia-bonfim", "simone-tebet",
 ];
+
+// Os servidores criados pelo cenário em curso: no fim dele, nenhum pode ter
+// recebido pedido de jogador sem conta (ICM 71).
+const servers = [];
 
 /** API simulada. As regras de sorteio e validação são as do módulo compartilhado. */
 function createServer() {
@@ -79,6 +92,10 @@ function createServer() {
     beforeDraw: null,
     beforeResponse: null,
     revoked: new Set(),
+    // Sessões de conta que ainda não fizeram o cadastro.
+    unregistered: new Set(),
+    // A conta que a próxima entrada com Google devolve.
+    nextAccount: "",
     requests: [],
     draws: new Map(),
     responses: new Map(),
@@ -98,7 +115,7 @@ function createServer() {
   };
   server.handler = async (route) => {
     const request = route.request();
-    const { pathname } = new URL(request.url());
+    const { pathname, search } = new URL(request.url());
     const method = request.method();
     const key = (request.headers().authorization || "").replace(/^Bearer /, "");
     let body = null;
@@ -107,7 +124,7 @@ function createServer() {
     } catch {
       body = null;
     }
-    server.requests.push({ method, pathname, key, body });
+    server.requests.push({ method, pathname, search, key, body });
     if (server.down) return route.abort("connectionrefused");
     const send = (status, json) => route.fulfill({ status, json, headers: status === 429 ? { "Retry-After": String(json.retryAfterSeconds) } : {} });
 
@@ -118,6 +135,16 @@ function createServer() {
       server.issued += 1;
       return send(201, { recoveryKey: keyFor(`novo${server.issued}`) });
     }
+    if (pathname === "/api/auth/google" && method === "POST") {
+      const session = server.nextAccount || keyFor(`conta${server.requests.filter((item) => item.pathname === pathname).length}`);
+      return send(200, { sessionToken: session, account: { displayName: "Bia" }, player: { version: 0 }, merge: null });
+    }
+    if (pathname === "/api/registration" && method === "POST") {
+      if (!key || server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
+      if (!key.startsWith("pms_")) return send(403, { error: "entre com Google para se cadastrar", code: "GOOGLE_ACCOUNT_REQUIRED" });
+      server.unregistered.delete(key);
+      return send(200, { registered: true, status: "created", registeredAt: new Date().toISOString() });
+    }
     if (!pathname.startsWith("/api/photo-surveys/")) return send(404, { error: "rota não simulada" });
     if (server.disabled) return send(404, { error: "pesquisa por foto indisponível", code: "PHOTO_SURVEYS_DISABLED" });
     const [surveyId, action] = pathname.slice("/api/photo-surveys/".length).split("/");
@@ -126,6 +153,9 @@ function createServer() {
     if (action === "draw" && server.beforeDraw) await server.beforeDraw(key);
     if (action === "response" && server.beforeResponse) await server.beforeResponse(key);
     if (!key || server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
+    if (!key.startsWith("pms_") || server.unregistered.has(key)) {
+      return send(403, { error: "cadastro com CPF obrigatório para responder", code: "CPF_REGISTRATION_REQUIRED" });
+    }
 
     const prior = server.responses.get(key);
     const failure = (status) => send(status, status === 429
@@ -169,6 +199,7 @@ function createServer() {
     }
     return send(404, { error: "rota não simulada" });
   };
+  servers.push(server);
   return server;
 }
 
@@ -176,9 +207,19 @@ const browser = await browserType.launch();
 const contexts = [];
 const pageErrors = [];
 
-async function newContext(server, { width = 390, height = 844, storedKey = "", blockStorage = false } = {}) {
+/**
+ * Cada contexto nasce com a sessão de uma conta cadastrada (`novo1`, `novo2`…),
+ * como quem já entrou e fez o cadastro. `signedOut` é para o visitante sem
+ * conta; com o armazenamento bloqueado também não há o que semear.
+ */
+async function newContext(server, { width = 390, height = 844, storedKey = "", signedOut = false, blockStorage = false } = {}) {
   const context = await browser.newContext({ viewport: { width, height }, serviceWorkers: "block" });
   contexts.push(context);
+  if (!storedKey && !signedOut && !blockStorage) {
+    server.issued += 1;
+    storedKey = keyFor(`novo${server.issued}`);
+  }
+  await context.route("https://accounts.google.com/gsi/client", (route) => route.fulfill({ contentType: "application/javascript", body: GOOGLE_SCRIPT }));
   if (blockStorage) {
     await context.addInitScript(() => {
       Object.defineProperty(window, "localStorage", {
@@ -262,7 +303,11 @@ const results = [];
 const only = process.env.CI ? "" : process.env.POLIMATCH_E2E_ONLY || "";
 async function scenario(name, run) {
   if (only && !name.includes(only)) return;
+  servers.length = 0;
   await run();
+  for (const server of servers) {
+    assert.equal(server.count("POST", "/api/player"), 0, `${name}: a página não cria jogador sem conta`);
+  }
   results.push(name);
   console.log(`ok - ${name}`);
 }
@@ -270,11 +315,12 @@ async function scenario(name, run) {
 try {
   await scenario("abrir a página da pesquisa não grava nada", async () => {
     const server = createServer();
-    const context = await newContext(server);
+    const context = await newContext(server, { signedOut: true });
     const page = await openSurvey(context);
     await actionButton(page).and(page.locator(":not([disabled])")).waitFor();
     assert.equal(await title(page), "Quem você prefere?");
     assert.equal(await actionButton(page).innerText(), "Começar");
+    assert.equal(await page.locator(".ps-cta-note").innerText(), "Para responder, entre com Google e cadastre o CPF.");
     const fan = await page.locator(".ps-fan img").evaluateAll((images) => images.map((image) => image.getAttribute("src")));
     assert.equal(fan.length, 3);
     assert.equal(new Set(fan).size, 3, "as cartas da entrada são distintas");
@@ -293,7 +339,7 @@ try {
 
   await scenario("a entrada só ilustra com as cartas da lista da entrada", async () => {
     const server = createServer();
-    const context = await newContext(server);
+    const context = await newContext(server, { signedOut: true });
     const page = await openSurvey(context);
     assert.deepEqual([...ENTRY_CARD_IDS, ...OFF_ENTRY_CARD_IDS].sort(), [...SURVEY.cardIds], "as duas listas somam as vinte cartas, sem sobra");
     const namesBySrc = (ids) => new Map(ARTS.filter((art) => ids.includes(art.id)).map((art) => [art.src, art.name]));
@@ -314,7 +360,6 @@ try {
       }
     }
     assert.ok(seen.size > 3, "as cartas da entrada continuam sorteadas a cada visita");
-    assert.equal(server.count("POST", "/api/player"), 0);
     assert.equal(server.count("POST", "/draw"), 0);
   });
 
@@ -326,7 +371,6 @@ try {
     await step(page, "Tela 1 de 4");
     const key = await storedKey(page);
     assert.equal(key, keyFor("novo1"));
-    assert.equal(server.count("POST", "/api/player"), 1);
     assert.equal(server.count("POST", "/draw"), 1);
     const groups = server.groupsFor(key);
 
@@ -486,7 +530,6 @@ try {
     await step(page, "Tela 3 de 4");
     assert.equal(server.count("GET", `/api/photo-surveys/${SURVEY.id}`), definitionReads, "quem retoma vai direto ao sorteio");
     assert.equal(await storedKey(page), key);
-    assert.equal(server.count("POST", "/api/player"), 1, "a recarga não cria outro jogador");
     assert.deepEqual(server.groupsFor(key), groups, "o sorteio é o mesmo");
     assert.deepEqual((await grid(page)).map((card) => card.id), groups[2]);
     await page.locator('[data-action="back"]').click();
@@ -523,7 +566,6 @@ try {
     const second = await openSurvey(context);
     await step(second, "Tela 2 de 4");
     assert.deepEqual((await grid(second)).map((card) => card.id), groups[1], "a segunda aba recebe o mesmo sorteio");
-    assert.equal(server.count("POST", "/api/player"), 1);
 
     // A aba parada acompanha a outra: não fica numa tela antiga, pronta para trocar a escolha em silêncio.
     await tap(second, groups[1][2]);
@@ -593,7 +635,6 @@ try {
     await step(one, "Tela 1 de 4");
     await begin(two);
     await step(two, "Tela 1 de 4");
-    assert.equal(server.count("POST", "/api/player"), 0, "quem já tem identidade não cria outra");
     const groups = server.groupsFor(key);
     const picksOne = await playScreens(one, groups, [0, 0, 0, 0]);
     const picksTwo = await playScreens(two, groups, [1, 1, 1, 1]);
@@ -681,7 +722,7 @@ try {
   await scenario("pesquisa fechada na abertura e fechada no meio", async () => {
     const closed = createServer();
     closed.status = "closed";
-    const page = await openSurvey(await newContext(closed));
+    const page = await openSurvey(await newContext(closed, { signedOut: true }));
     await step(page, "Fechada");
     assert.equal(await title(page), "Esta pesquisa está fechada.");
     assert.equal(await page.locator("#ps-action, .ps-grid").count(), 0);
@@ -689,7 +730,7 @@ try {
 
     const scheduled = createServer();
     scheduled.status = "scheduled";
-    const soon = await openSurvey(await newContext(scheduled));
+    const soon = await openSurvey(await newContext(scheduled, { signedOut: true }));
     await step(soon, "Em breve");
     assert.equal(await title(soon), "Esta pesquisa ainda não abriu.");
 
@@ -714,13 +755,13 @@ try {
 
     // A2: a entrada estava aberta, a pesquisa fechou e só então veio o toque em Começar.
     const late = createServer();
-    const idle = await openSurvey(await newContext(late));
+    const idle = await openSurvey(await newContext(late, { signedOut: true }));
     await actionButton(idle).and(idle.locator(":not([disabled])")).waitFor();
     late.status = "closed";
     await begin(idle);
     await step(idle, "Fechada");
-    assert.equal(late.count("POST", "/api/player"), 0, "o toque depois do fechamento não cria jogador nem gasta a cota da rede");
     assert.equal(await storedKey(idle), null);
+    assert.equal(await idle.locator("#ps-google, #ps-register").count(), 0, "ninguém é chamado a entrar numa pesquisa que fechou");
 
     // M1: quem já respondeu e perdeu o registro da pesquisa neste aparelho vê a própria resposta, mesmo fechada.
     const kept = createServer();
@@ -737,7 +778,6 @@ try {
     const returning = await openSurvey(await newContext(kept, { storedKey: keptKey }));
     await step(returning, "Registrada");
     assert.equal(await title(returning), nameOf.get(keptPicks[2]));
-    assert.equal(kept.count("POST", "/api/player"), 1);
     assert.equal(kept.responses.size, 1);
 
     // Fechada, e a conferência da resposta falha: a pessoa continua na tela de
@@ -799,44 +839,93 @@ try {
     server.down = true;
     await begin(offline);
     await offline.locator("#ps-notice:not([hidden])", { hasText: "Nenhuma escolha foi registrada" }).waitFor();
-    assert.equal(await storedKey(offline), null);
+    assert.equal(await storedKey(offline), keyFor("novo1"), "a conta do aparelho continua a mesma");
     server.down = false;
     await begin(offline, "Tentar de novo");
     await step(offline, "Tela 1 de 4");
   });
 
-  await scenario("cota de jogos novos da rede esgotada", async () => {
+  await scenario("sem conta, Começar leva à entrada e ao cadastro, e o cadastro leva à pesquisa", async () => {
     const server = createServer();
-    server.quota = true;
-    const page = await openSurvey(await newContext(server, { width: 375, height: 667 }));
+    const account = keyFor("recente");
+    server.nextAccount = account;
+    server.unregistered.add(account);
+    const page = await openSurvey(await newContext(server, { signedOut: true, width: 375, height: 667 }));
     await begin(page);
-    const notice = page.locator("#ps-notice:not([hidden])");
-    await notice.waitFor();
-    const text = await notice.innerText();
-    const box = await notice.boundingBox();
-    const button = await actionButton(page).boundingBox();
-    assert.ok(box.y >= 0 && box.y + box.height <= button.y, "o aviso aparece inteiro, sem rolar e sem ficar atrás do botão");
-    assert.match(text, /Muitas participações novas nesta rede hoje\./);
-    assert.match(text, /Entre com Google no menu para responder agora\./);
-    assert.match(text, /voltam a ser liberadas às \d{2}:\d{2}/);
-    assert.doesNotMatch(text, /jogos/, "na pesquisa, o aviso não fala em jogos");
-    assert.equal(await notice.getByRole("button", { name: "Abrir o menu" }).count(), 1);
-    assert.equal(await notice.getByRole("link").count(), 0, "o aviso não manda para outra página");
-    assert.equal(server.count("POST", "/draw"), 0);
+    await step(page, "Entrar");
+    assert.equal(await title(page), "Entre para responder");
+    assert.equal(await page.locator("#ps-action, .ps-grid").count(), 0);
+    assert.equal(await page.locator('.ps-top [data-action="menu"]').count(), 1, "o menu continua à mão");
+    assert.equal(await page.getByRole("link", { name: "Voltar" }).getAttribute("href"), "./");
+    assert.deepEqual(server.requests.filter((request) => request.method === "POST"), [], "até aqui nada foi gravado");
     assert.equal(await storedKey(page), null);
-    assert.doesNotMatch(text, /servidor|conexão/i, "cota não é falha de conexão");
 
-    // Em tela baixa, com o aviso na entrada, o botão continua à vista, abaixo do aviso.
-    const small = createServer();
-    small.quota = true;
-    const narrow = await openSurvey(await newContext(small, { width: 360, height: 640 }));
-    await begin(narrow);
-    await narrow.locator("#ps-notice:not([hidden])").waitFor();
-    const warning = await narrow.locator("#ps-notice").boundingBox();
-    const start = await actionButton(narrow).boundingBox();
-    assert.ok(warning.y + warning.height <= start.y + 1, `o aviso não cobre o botão (${warning.y + warning.height} > ${start.y})`);
-    assert.ok(start.y + start.height <= 640 + 1, `o botão aparece sem rolar (${start.y + start.height})`);
-    assert.equal(await narrow.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1), true, "a entrada com aviso cabe sem rolar em 360×640");
+    // Entrar com Google: a conta ainda não tem cadastro, então vem o formulário.
+    await page.locator("#e2e-google").click();
+    await step(page, "Cadastro");
+    assert.equal(await title(page), "Faça seu voto contar");
+    assert.equal(await storedKey(page), account);
+    assert.equal(server.count("POST", "/draw"), 1, "o pedido de sorteio é quem diz que falta o cadastro");
+    assert.equal(server.draws.size, 0, "sem cadastro, nenhum sorteio nasce");
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "o formulário não rola para o lado");
+
+    // Vazio, e depois com um CPF que não fecha: a recusa é no aparelho, sem pedido ao servidor.
+    const submit = page.locator('#ps-register button[type="submit"]');
+    const notice = page.locator("#ps-notice:not([hidden])");
+    await submit.click();
+    assert.equal(await notice.innerText(), "Confira o CPF: os números não fecham.");
+    await page.locator("#ps-cpf").pressSequentially("52998224724");
+    assert.equal(await page.locator("#ps-cpf").inputValue(), "529.982.247-24", "a máscara acompanha a digitação");
+    assert.equal(await notice.count(), 0, "mexer no formulário tira o aviso da tentativa anterior");
+    await submit.click();
+    assert.equal(await notice.innerText(), "Confira o CPF: os números não fecham.");
+    await page.locator("#ps-cpf").fill("529.982.247-25");
+    // Digitado, e ainda não enviado: o CPF não foi para o aparelho.
+    const typed = await page.evaluate(() => JSON.stringify([{ ...localStorage }, { ...sessionStorage }, location.href, document.cookie]));
+    assert.doesNotMatch(typed, /52998224725|529\.982\.247/);
+    await submit.click();
+    assert.equal(await notice.innerText(), "Escolha a sua faixa de idade.");
+    await page.getByRole("button", { name: "25 a 34" }).click();
+    await page.getByRole("button", { name: "Prefiro não dizer" }).click();
+    await page.locator("#ps-state").selectOption("MG");
+    await submit.click();
+    assert.equal(await notice.innerText(), "Marque a autorização para concluir.");
+    assert.equal(server.count("POST", "/api/registration"), 0, "nada incompleto vai ao servidor");
+    // O que já foi preenchido continua na tela depois de cada recusa.
+    assert.equal(await page.locator("#ps-cpf").inputValue(), "529.982.247-25");
+    assert.equal(await page.getByRole("button", { name: "25 a 34" }).getAttribute("aria-pressed"), "true");
+    assert.equal(await page.locator("#ps-state").inputValue(), "MG");
+
+    await page.locator("#ps-consent").check();
+    await submit.scrollIntoViewIfNeeded();
+    const button = await submit.boundingBox();
+    assert.ok(button.y >= 0 && button.y + button.height <= 667 + 1, "o botão de concluir fica inteiro na tela ao chegar ao fim do formulário");
+    await submit.click();
+    await step(page, "Tela 1 de 4");
+    assert.deepEqual(server.bodies("/api/registration"), [{
+      cpf: "529.982.247-25", ageRange: "25-34", gender: "nao-informado", state: "MG", consent: true, consentVersion: "2026-11-16",
+    }]);
+    const sent = server.requests.find((request) => request.pathname === "/api/registration");
+    assert.equal(sent.key, account);
+    assert.equal(sent.search, "", "o CPF vai no corpo do pedido, nunca no endereço");
+    assert.ok(server.requests.every((request) => request.search === ""), "nenhum pedido leva dado no endereço");
+    assert.equal(server.draws.size, 1);
+    // O CPF não fica no aparelho nem no endereço.
+    const kept = await page.evaluate(() => JSON.stringify([{ ...localStorage }, { ...sessionStorage }, location.href, document.cookie]));
+    // O que fica guardado tem códigos aleatórios: a busca é pelo CPF inteiro.
+    assert.doesNotMatch(kept, /52998224725|529\.982\.247/);
+    assert.equal(new URL(page.url()).search, `?p=${SURVEY.id}`);
+
+    // Daí em diante é a pesquisa de sempre, e recarregar não pede cadastro de novo.
+    const picks = await playScreens(page, server.groupsFor(account), [0, 0, 0, 0]);
+    await tap(page, picks[1]);
+    await step(page, "Confirmar");
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await step(page, "Confirmar");
+    await confirm(page);
+    await step(page, "Registrada");
+    assert.equal(server.count("POST", "/api/registration"), 1);
+    assert.equal(server.count("POST", "/api/auth/google"), 1);
   });
 
   await scenario("troca de identidade no meio recomeça com o sorteio da identidade atual", async () => {
@@ -861,7 +950,6 @@ try {
     const cards = await grid(page);
     assert.deepEqual(cards.map((card) => card.id), server.groupsFor(other)[0]);
     assert.ok(cards.every((card) => !card.pressed), "com outro sorteio, as escolhas anteriores não vêm junto");
-    assert.equal(server.count("POST", "/api/player"), 1);
 
     // Troca feita na mesma aba, sem evento de armazenamento: a página confere ao voltar do histórico.
     await tap(page, server.groupsFor(other)[0][1]);
@@ -938,7 +1026,6 @@ try {
     assert.match(text, /foi registrada/);
     assert.equal(await page.locator("#ps-action, .ps-grid, [data-action=confirm]").count(), 0, "sem convite para responder de novo");
     assert.equal(server.responses.get(mine).response.championId, picks[1]);
-    assert.equal(server.count("POST", "/api/player"), 1);
 
     // A conta mudou e a confirmação falhou no caminho: o aviso não diz que registrou, e o aparelho não marca como respondida.
     const failing = createServer();
@@ -1047,21 +1134,24 @@ try {
     await confirm(page);
     const notice = page.locator("#ps-notice:not([hidden])", { hasText: "Sua sessão precisa ser recuperada" });
     await notice.waitFor();
-    assert.match(await notice.innerText(), /Abra o menu e entre com Google\./);
+    assert.match(await notice.innerText(), /Abra o menu, saia da conta e entre de novo\./);
     assert.equal(await notice.getByRole("button", { name: "Abrir o menu" }).count(), 1);
     assert.equal(await title(page), nameOf.get(picks[3]), "a escolha continua na tela");
     server.revoked.delete(key);
     await confirm(page);
     await step(page, "Registrada");
 
-    // Sessão recusada já no começo.
+    // Sessão recusada já no começo: não há escolha na tela a preservar. A
+    // página esquece a sessão morta e leva à entrada, em vez de repetir o
+    // mesmo pedido recusado.
     const blocked = createServer();
     const dead = keyFor("morta");
     blocked.revoked.add(dead);
     const start = await openSurvey(await newContext(blocked, { storedKey: dead }));
     await begin(start);
-    await start.locator("#ps-notice:not([hidden])", { hasText: "Sua sessão precisa ser recuperada" }).waitFor();
-    assert.equal(blocked.count("POST", "/api/player"), 0, "a página não troca a identidade por conta própria");
+    await step(start, "Entrar");
+    assert.match(await start.locator("#ps-notice:not([hidden])").innerText(), /Sua sessão venceu\. Entre de novo para continuar\./);
+    assert.equal(blocked.count("POST", "/draw"), 1);
   });
 
   await scenario("carta que não carrega trava a tela inteira até carregar", async () => {
@@ -1115,16 +1205,28 @@ try {
 
   await scenario("armazenamento bloqueado: dá para responder na mesma aba", async () => {
     const server = createServer();
+    // Sem armazenamento não há conta guardada: a pessoa entra e faz o cadastro
+    // nesta aba, e a sessão vale enquanto a aba estiver aberta.
+    const key = keyFor("memoria");
+    server.nextAccount = key;
+    server.unregistered.add(key);
     const page = await openSurvey(await newContext(server, { blockStorage: true }));
     await begin(page);
+    await step(page, "Entrar");
+    await page.locator("#e2e-google").click();
+    await step(page, "Cadastro");
+    await page.locator("#ps-cpf").fill("111.444.777-35");
+    await page.getByRole("button", { name: "60 ou mais" }).click();
+    await page.getByRole("button", { name: "Homem" }).click();
+    await page.locator("#ps-state").selectOption("BA");
+    await page.locator("#ps-consent").check();
+    await page.locator('#ps-register button[type="submit"]').click();
     await step(page, "Tela 1 de 4");
-    const key = keyFor("novo1");
     const picks = await playScreens(page, server.groupsFor(key), [0, 3, 0, 3]);
     await tap(page, picks[1]);
     await step(page, "Confirmar");
     await confirm(page);
     await step(page, "Registrada");
-    assert.equal(server.count("POST", "/api/player"), 1);
     assert.equal(server.responses.get(key).response.championId, picks[1]);
   });
 
@@ -1177,7 +1279,6 @@ try {
     await begin(page, "Tentar de novo");
     await step(page, "Tela 1 de 4");
     const key = await storedKey(page);
-    assert.equal(server.count("POST", "/api/player"), 1, "as novas tentativas usam o mesmo jogador");
     const picks = await playScreens(page, server.groupsFor(key), [1, 2, 3, 0]);
     await tap(page, picks[3]);
     await step(page, "Confirmar");
@@ -1278,7 +1379,7 @@ try {
   });
 
   await scenario("saída da conta no meio, mesmo sorteio na conta nova e retomada com chave trocada", async () => {
-    // Sair da conta em outra aba: a página pede um toque, e só o toque cria o jogador novo.
+    // Sair da conta em outra aba: a página pede um toque, e o toque leva à entrada com Google.
     const server = createServer();
     const context = await newContext(server);
     const page = await openSurvey(context);
@@ -1293,11 +1394,19 @@ try {
     const signedOut = page.locator("#ps-notice:not([hidden])", { hasText: "Você saiu da conta" });
     await signedOut.waitFor();
     assert.doesNotMatch(await signedOut.innerText(), /conta atual/, "sem conta, o aviso não fala em conta atual");
-    assert.equal(server.count("POST", "/api/player"), 1, "sem toque, nenhum jogador novo");
+    assert.match(await signedOut.innerText(), /Toque em Começar para entrar de novo\./);
+    assert.doesNotMatch(await signedOut.innerText(), /sem conta/, "não há mais resposta sem conta");
     await begin(page, "Começar");
+    await step(page, "Entrar");
+    assert.equal(await storedKey(page), null, "o toque não cria identidade");
+    // Entra com outra conta, já cadastrada: a pesquisa abre com o sorteio dela.
+    const returning = keyFor("volta");
+    server.nextAccount = returning;
+    await page.locator("#e2e-google").click();
     await step(page, "Tela 1 de 4");
-    assert.equal(server.count("POST", "/api/player"), 2);
-    assert.notEqual(await storedKey(page), first);
+    assert.equal(await storedKey(page), returning);
+    assert.notEqual(returning, first);
+    assert.equal(server.count("POST", "/api/registration"), 0, "quem já tem cadastro não vê o formulário");
 
     // Entrar com Google mantendo o mesmo jogador: o sorteio é o mesmo e as escolhas continuam.
     const linked = createServer();

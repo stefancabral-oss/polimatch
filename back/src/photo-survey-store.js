@@ -7,10 +7,15 @@ import {
   publicPhotoSurvey,
   validateBracket,
 } from "../../shared/photo-survey.js";
+import { requireCpfRegistration } from "./registration-store.js";
 
 // Pesquisa por foto (ICM 68, #324): o servidor emite o sorteio de cada
 // jogador e grava a resposta dele uma única vez. Nada aqui toca votos, Elo
 // nem cotas do jogo atual.
+//
+// Desde a ICM 71 (#336) o sorteio e a resposta só valem para a conta com
+// cadastro com CPF. A conferência acontece antes de qualquer leitura ou
+// gravação: sem cadastro, nem a resposta já dada é devolvida.
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -99,6 +104,7 @@ export function photoSurveyStore({
   clock = () => new Date(),
   surveys = PHOTO_SURVEYS,
   randomInt = cryptoRandomInt,
+  requireRegistration = requireCpfRegistration,
 }) {
   function requiredSurvey(surveyId) {
     const survey = photoSurveyById(typeof surveyId === "string" ? surveyId : "", surveys);
@@ -117,6 +123,7 @@ export function photoSurveyStore({
     try {
       await client.query("BEGIN");
       const player = await findPlayer(client, recoveryKey);
+      await requireRegistration(client, player.id);
       const result = await fn(client, player);
       await client.query("COMMIT");
       return result;

@@ -22,10 +22,14 @@ const WINDOWED = Object.freeze({
 // mesmo quando este script roda depois dos outros no mesmo banco.
 const OPEN_INSTANT = new Date("2034-05-10T15:00:00.000Z");
 let now = OPEN_INSTANT;
+// Este smoke prova o sorteio e a resposta em si, com jogadores sem conta,
+// como eles existiam antes do cadastro obrigatório (ICM 71). A exigência do
+// cadastro fica desligada aqui e é provada no cpf-registration-smoke.mjs.
 const options = {
   candidateRegistry: createApprovedTestRegistry(CATALOG.map((person) => person.id)),
   clock: () => now,
   photoSurveys: [SURVEY, SECOND, WINDOWED],
+  requirePhotoSurveyRegistration: async () => {},
 };
 const store = createTopicStore(connection, options);
 const audit = new pg.Pool({ connectionString: connection });

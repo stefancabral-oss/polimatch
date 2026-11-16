@@ -3,9 +3,11 @@ import "./photo-survey.css";
 import "./site-menu.css";
 import ARTS from "./political-chromas.json" with { type: "json" };
 import { PHOTO_SURVEYS, photoSurveyById } from "../../shared/photo-survey.js";
-import { createPlayer, drawPhotoSurvey, loadPhotoSurvey, respondPhotoSurvey } from "./api.js";
+import { formatCpf } from "../../shared/registration.js";
+import { signInWithGoogleCredential } from "./account-session.js";
+import { drawPhotoSurvey, loadPhotoSurvey, registerCpf, respondPhotoSurvey } from "./api.js";
+import { googleClientId, mountGoogleButton } from "./google-login.js";
 import { safeStorage } from "./safe-storage.js";
-import { identityNoticeFromError, isPlayerIssuanceLimit, quotaResetLabel } from "./identity-notice.js";
 import {
   ENTRY_CARD_IDS,
   PHOTO_SURVEY_STORAGE_KEY,
@@ -26,15 +28,28 @@ import {
   savedProgressText,
   surveyIdFromSearch,
 } from "./photo-survey-flow.js";
+import {
+  EMPTY_REGISTRATION_FORM,
+  caretAfterDigits,
+  registrationBody,
+  registrationFormMarkup,
+  registrationProblem,
+  registrationRefusal,
+  signInMarkup,
+} from "./registration-view.js";
 import { shareChoice, shareImage } from "./share-choice.js";
 import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingMarkup } from "./site-menu.js";
 
 // Pesquisa por foto (ICM 68, #324), que desde a ICM 69 (#331) é a capa do
-// site. Abrir esta página não grava nada: o
-// jogador e o sorteio nascem no toque em "Começar", e a resposta só vai para o
-// servidor na confirmação. Até lá as escolhas ficam neste aparelho. Depois de
-// registrada, o aparelho guarda só que a pessoa respondeu: a escolha vem
-// sempre do servidor.
+// site. Abrir esta página não grava nada: o sorteio nasce no toque em
+// "Começar", e a resposta só vai para o servidor na confirmação. Até lá as
+// escolhas ficam neste aparelho. Depois de registrada, o aparelho guarda só
+// que a pessoa respondeu: a escolha vem sempre do servidor.
+//
+// Desde a ICM 71 (#336) só responde quem entrou com Google e tem cadastro com
+// CPF. Esta página não cria mais jogador sem conta: sem a conta, "Começar"
+// leva à entrada; com a conta e sem cadastro, ao formulário. Quem decide se
+// falta o cadastro é o servidor, no pedido de sorteio.
 //
 // Desde a ICM 70 (#334) há mais de uma pesquisa. `/` é a capa: a entrada da
 // pesquisa em destaque e, abaixo, as outras. `/?p=<código>` abre uma pesquisa.
@@ -123,6 +138,14 @@ function readStored(key) {
 }
 
 const savedRecord = () => readSavedProgress(readStored(PHOTO_SURVEY_STORAGE_KEY), surveyId);
+
+/** Há uma conta Google neste aparelho. Se ela tem cadastro, só o servidor sabe. */
+const signedIn = () => accountKind(readStored(IDENTITY_KEY)) === "google";
+
+/** Esquece a sessão que o servidor não reconhece mais, se ela ainda é a que está guardada. */
+function forgetDeadSession(key) {
+  if (key && readStored(IDENTITY_KEY) === key) safeStorage.remove(IDENTITY_KEY);
+}
 
 function persist() {
   const text = savedProgressText(readStored(PHOTO_SURVEY_STORAGE_KEY), surveyId, {
@@ -267,7 +290,7 @@ function renderEntry({ pending = "", action = "start", label = atHome && homeRes
     ? `${heading(kicker(), question(), atHome && homeResume ? "Você parou no meio. Continue de onde parou." : "Leva menos de um minuto.")}
       <div class="ps-fan" aria-hidden="true">${entryCards().map((id) => staticCard(id, "176px")).join("")}</div>
       <div class="ps-cta"><button class="ps-btn" id="ps-action" data-action="${action}" type="button"${pending ? " disabled" : ""}>${escapeText(pending || label)}</button>
-        <p class="ps-muted ps-cta-note">Sua escolha só é registrada quando você confirmar.</p></div>`
+        <p class="ps-muted ps-cta-note">${signedIn() ? "Sua escolha só é registrada quando você confirmar." : "Para responder, entre com Google e cadastre o CPF."}</p></div>`
     : heading("Pesquisas", homeViews.some((view) => view.status === "open") ? "Você respondeu todas as pesquisas abertas." : "Nenhuma pesquisa aberta agora.", "Quando abrir outra, ela aparece aqui.");
   shell({
     step: "Pesquisa",
@@ -507,7 +530,7 @@ function sessionNotice() {
 
 /**
  * A entrada com o aviso de conta trocada. Sem conta nenhuma no aparelho, o
- * toque cria um jogador novo, e o texto diz isso. `recorded`: a confirmação
+ * toque leva à entrada com Google, e o texto diz isso. `recorded`: a confirmação
  * que viajava quando a conta mudou chegou e foi registrada na conta de antes;
  * se a pessoa saiu da conta, vê a tela de registrada.
  */
@@ -525,7 +548,7 @@ function renderSwitched({ recorded = false } = {}) {
   notice = [
     signedOut ? "Você saiu da conta neste aparelho." : "Sua conta mudou.",
     recorded ? "A resposta que você confirmou foi registrada na conta anterior." : "",
-    signedOut ? "Toque em Começar para responder sem conta." : "Toque em Continuar para seguir com a conta atual.",
+    signedOut ? "Toque em Começar para entrar de novo." : "Toque em Continuar para seguir com a conta atual.",
   ].filter(Boolean).join(" ");
   renderEntry({ label: signedOut ? "Começar" : "Continuar", focus: true });
 }
@@ -611,7 +634,7 @@ function leaveHome() {
   }
 }
 
-async function start({ auto = false, retried = false } = {}) {
+async function start({ auto = false, retried = false, fromGate = false } = {}) {
   if (busy || !surveyId) return;
   leaveHome();
   busy = true;
@@ -619,47 +642,98 @@ async function start({ auto = false, retried = false } = {}) {
   uncertain = false;
   switched = false;
   const run = ++epoch;
-  view = "entry";
-  if (resumable()) renderOpening();
-  else renderEntry({ pending: "Abrindo…" });
-  let key = readStored(IDENTITY_KEY);
+  const key = readStored(IDENTITY_KEY);
   if (!key && auto) {
     busy = false;
     init();
     return;
   }
+  // Sem conta Google não há sorteio. A retomada sem toque fica na entrada da
+  // pesquisa, à espera do toque. Quem tocou vai para a entrada com Google,
+  // mas só se a pesquisa segue aberta: a tela pode estar parada há muito
+  // tempo, e ninguém faz cadastro para descobrir depois que ela fechou.
+  if (accountKind(key) !== "google") {
+    if (auto) {
+      busy = false;
+      openSurvey({ resume: false });
+      return;
+    }
+    view = "entry";
+    renderEntry({ pending: "Abrindo…" });
+    try {
+      survey = await loadPhotoSurvey(surveyId);
+    } catch (error) {
+      if (run !== epoch) return;
+      busy = false;
+      failStart(error);
+      return;
+    }
+    if (run !== epoch) return;
+    busy = false;
+    if (survey?.status !== "open") {
+      renderClosed(survey?.status, { focus: true });
+      return;
+    }
+    // A pessoa pode ter entrado pelo menu enquanto a pesquisa era lida.
+    if (signedIn()) start();
+    else openGate("signin");
+    return;
+  }
+  if (fromGate) renderGate();
+  else {
+    view = "entry";
+    if (resumable()) renderOpening();
+    else renderEntry({ pending: "Abrindo…" });
+  }
+  identity = key;
   let result;
   try {
-    if (!key) {
-      // A entrada pode estar aberta há muito tempo. Antes de criar o jogador,
-      // que gasta a cota de jogos novos da rede, confere se a pesquisa segue aberta.
-      survey = await loadPhotoSurvey(surveyId);
-      if (run !== epoch) return;
-      if (survey?.status !== "open") {
-        busy = false;
-        renderClosed(survey?.status, { focus: true });
-        return;
-      }
-      // A pessoa pode ter entrado com Google pelo menu enquanto a pesquisa
-      // era lida: com a conta no aparelho não nasce jogador anônimo.
-      key = readStored(IDENTITY_KEY);
-      if (!key) {
-        const player = await createPlayer();
-        if (run !== epoch) return;
-        // Outra aba pode ter criado o jogador enquanto esta esperava: vale o que já está salvo.
-        key = readStored(IDENTITY_KEY) || player.recoveryKey;
-        if (key === player.recoveryKey) safeStorage.set(IDENTITY_KEY, key);
-      }
-    }
-    identity = key;
     result = await drawPhotoSurvey(surveyId, key);
   } catch (error) {
     if (run !== epoch) return;
     busy = false;
+    if (error.status === 403 && error.code === "CPF_REGISTRATION_REQUIRED") {
+      // A conta ainda não tem cadastro. Sem toque, a entrada da pesquisa.
+      identity = "";
+      if (auto) {
+        openSurvey({ resume: false });
+        return;
+      }
+      // Com o toque, o formulário, mas só se a pesquisa segue aberta: o
+      // servidor recusa pela falta do cadastro antes de olhar se ela fechou,
+      // e ninguém faz o cadastro para descobrir isso depois.
+      busy = true;
+      try {
+        survey = await loadPhotoSurvey(surveyId);
+      } catch {
+        // Sem essa leitura o formulário abre assim mesmo: o sorteio confere depois.
+      }
+      if (run !== epoch) return;
+      busy = false;
+      if (survey && survey.status !== "open") renderClosed(survey.status, { focus: true });
+      else openGate("form");
+      return;
+    }
     if (error.status === 401 && readStored(IDENTITY_KEY) !== key) {
       // A identidade mudou no meio do pedido. Sem toque, só o aviso.
       if (auto || retried) identityChanged();
-      else start({ retried: true });
+      else start({ retried: true, fromGate });
+      return;
+    }
+    if (error.status === 401 && !(survey && survey.status !== "open")) {
+      // A sessão venceu ou foi encerrada no servidor. O aparelho esquece a
+      // chave morta e a pessoa entra de novo: repetir o pedido com ela daria
+      // sempre a mesma recusa. As escolhas guardadas neste aparelho ficam, e
+      // voltam se o sorteio da conta for o mesmo.
+      forgetDeadSession(key);
+      identity = "";
+      if (auto) {
+        view = "entry";
+        notice = "Sua sessão venceu. Toque em Começar para entrar de novo.";
+        renderEntry({ focus: true });
+      } else {
+        openGate("signin", "Sua sessão venceu. Entre de novo para continuar.");
+      }
       return;
     }
     failStart(error);
@@ -689,19 +763,10 @@ function failStart(error) {
     renderClosed(error.body?.current?.status, { focus: true });
     return;
   }
-  if (isPlayerIssuanceLimit(error)) {
-    notice = `Muitas participações novas nesta rede hoje. Entre com Google no menu para responder agora. Novas participações nesta rede voltam a ser liberadas ${escapeText(quotaResetLabel(identityNoticeFromError(error).retryAt))}. ${MENU_LINK}`;
-    renderEntry({ focus: true });
-    return;
-  }
   if (error.status === 401) {
-    // Com a pesquisa fechada não há o que recuperar: vale a tela de fechada.
-    if (survey && survey.status !== "open") {
-      renderClosed(survey.status, { focus: true });
-      return;
-    }
-    notice = sessionNotice();
-    renderEntry({ label: "Tentar de novo", focus: true });
+    // Só chega aqui com a pesquisa parada (a sessão vencida de uma pesquisa
+    // aberta é tratada em start): não há o que recuperar, vale a tela de fechada.
+    renderClosed(survey?.status, { focus: true });
     return;
   }
   const busyServer = error.status === 429 ? "Muitas tentativas agora. Espere um pouco e tente de novo." : "";
@@ -758,6 +823,13 @@ async function submit() {
 }
 
 function failSubmit(error, key) {
+  if (error.status === 403 && error.code === "CPF_REGISTRATION_REQUIRED") {
+    // A conta ficou sem cadastro no meio do caminho. As escolhas continuam
+    // neste aparelho e voltam depois do cadastro, se o sorteio for o mesmo.
+    uncertain = false;
+    openGate("form", "Falta o cadastro para registrar a sua escolha. As suas escolhas continuam neste aparelho.");
+    return;
+  }
   if (error.status === 409 && error.code === "PHOTO_SURVEY_ALREADY_ANSWERED" && error.body?.current) {
     uncertain = false;
     response = error.body.current;
@@ -883,10 +955,14 @@ async function openHome() {
   survey = null;
   identity = "";
   const key = readStored(IDENTITY_KEY);
+  // Só uma conta Google responde. O que este aparelho guardou de uma chave
+  // sem conta não vale como "respondida" nem como "pela metade": a capa
+  // convida a entrar, em vez de dizer que não há o que responder.
+  const account = accountKind(key) === "google";
   const tag = identityTag(key);
   const saved = readStored(PHOTO_SURVEY_STORAGE_KEY);
-  const answered = answeredSurveyIds(saved, tag);
-  const pending = inProgressSurveyId(saved, tag);
+  const answered = account ? answeredSurveyIds(saved, tag) : [];
+  const pending = account ? inProgressSurveyId(saved, tag) : "";
   homeKey = key;
   homeResume = false;
   homeViews = [];
@@ -920,7 +996,8 @@ async function openHome() {
   survey = homeViews.find((item) => item.id === featured) || null;
   view = "entry";
   renderEntry();
-  if (!key) return;
+  // Só uma conta Google pode ter resposta para mostrar: sem ela o servidor recusa.
+  if (accountKind(key) !== "google") return;
   const wanted = homeViews.filter((item) => homeChoices.has(item.id) || item.status === "closed").map((item) => item.id);
   await Promise.all(wanted.map(async (id) => {
     try {
@@ -943,12 +1020,18 @@ function refreshHome() {
   return true;
 }
 
-async function openSurvey() {
+/**
+ * A página de uma pesquisa. `resume: false` é para quem não pode retomar sem
+ * toque (sem conta, ou com conta sem cadastro): só lê a pesquisa e mostra a
+ * entrada, ou a tela de parada.
+ */
+async function openSurvey({ resume = true } = {}) {
   view = "loading";
   notice = "";
-  // Quem já começou nesta identidade vai direto ao sorteio, que também diz se
-  // a pesquisa continua aberta.
-  if (resumable()) {
+  const account = signedIn();
+  // Quem já começou nesta conta vai direto ao sorteio, que também diz se a
+  // pesquisa continua aberta.
+  if (resume && account && resumable()) {
     start({ auto: true });
     return;
   }
@@ -969,9 +1052,9 @@ async function openSurvey() {
   }
   if (run !== epoch) return;
   if (survey?.status !== "open") {
-    // Fechada: quem já respondeu com a identidade deste aparelho ainda vê a
+    // Fechada: quem já respondeu com a conta deste aparelho ainda vê a
     // própria resposta. Com a pesquisa fechada o sorteio não grava nada.
-    if (survey?.status === "closed" && readStored(IDENTITY_KEY)) {
+    if (resume && account && survey?.status === "closed") {
       start({ auto: true });
       return;
     }
@@ -982,14 +1065,255 @@ async function openSurvey() {
   renderEntry();
 }
 
+// Cadastro ------------------------------------------------------------------
+
+// A entrada com Google e o formulário de cadastro (ICM 71, #336) ficam entre
+// o toque em "Começar" e o sorteio. `gateStep` diz qual das duas telas vale.
+// O que a pessoa preenche fica só na memória desta página.
+let gateStep = "signin";
+let form = { ...EMPTY_REGISTRATION_FORM };
+// A sessão para a qual o formulário foi aberto. Quando a conta do aparelho
+// deixa de ser essa, o que estava preenchido é apagado: o CPF de uma pessoa
+// não aparece para a próxima conta que entra nesta aba.
+let formOwner = "";
+// O campo da última recusa: fica marcado e recebe o foco.
+let invalidField = "";
+
+const FIELD_TARGETS = Object.freeze({
+  cpf: "#ps-cpf",
+  ageRange: 'button[data-field="ageRange"]',
+  gender: 'button[data-field="gender"]',
+  state: "#ps-state",
+  consent: "#ps-consent",
+});
+
+function renderGate({ focus = false, mount = true } = {}) {
+  view = "gate";
+  if (gateStep === "form") {
+    const target = focus && Object.hasOwn(FIELD_TARGETS, invalidField) ? FIELD_TARGETS[invalidField] : "";
+    shell({
+      step: "Cadastro",
+      mainClass: "ps-main--entry",
+      focus: focus && !target,
+      body: `${heading("Cadastro", "Faça seu voto contar", "Um CPF, um voto. Só o resultado somado aparece, nunca o seu nome.")}${registrationFormMarkup({ form, busy, invalid: invalidField })}`,
+    });
+    if (target) {
+      // O aviso fica no topo, à vista; o foco vai para o campo que ele cita.
+      window.scrollTo(0, 0);
+      root.querySelector(target)?.focus({ preventScroll: true });
+    }
+    return;
+  }
+  const googleReady = Boolean(googleClientId());
+  shell({
+    step: "Entrar",
+    mainClass: "ps-main--entry",
+    focus,
+    body: `${heading("Para responder", "Entre para responder", "Um CPF, um voto. Entre com Google e faça o seu cadastro.")}${signInMarkup({ googleReady, busy })}`,
+  });
+  if (mount && googleReady && !busy) mountGateGoogle();
+}
+
+/** Abre a entrada ou o formulário. Nada aqui fala com o servidor. */
+function openGate(step, text = "") {
+  epoch += 1;
+  busy = false;
+  uncertain = false;
+  window.clearTimeout(advanceTimer);
+  identity = "";
+  // O formulário é de uma sessão. Voltar para a entrada, ou abrir o
+  // formulário para outra sessão, apaga o que estava preenchido.
+  const key = readStored(IDENTITY_KEY);
+  if (step !== "form" || formOwner !== key) form = { ...EMPTY_REGISTRATION_FORM };
+  formOwner = step === "form" ? key : "";
+  invalidField = "";
+  gateStep = step;
+  notice = text;
+  renderGate({ focus: true });
+}
+
+async function mountGateGoogle() {
+  const slot = root.querySelector("#ps-google");
+  if (!slot) return;
+  try {
+    await mountGoogleButton(slot, { callback: gateSignIn });
+  } catch (error) {
+    if (view !== "gate" || gateStep !== "signin" || !slot.isConnected) return;
+    notice = `${escapeText(error.message || "Não foi possível abrir o Google agora.")} ${retryButton("gate-retry", "Tentar carregar o Google de novo")}`;
+    renderGate({ mount: false });
+    root.querySelector("#ps-google")?.replaceChildren();
+  }
+}
+
+/** O botão do Google devolveu a credencial: troca pela sessão e segue para o sorteio. */
+async function gateSignIn(response) {
+  if (!response?.credential || busy || view !== "gate") return;
+  busy = true;
+  notice = "";
+  const run = ++epoch;
+  renderGate();
+  try {
+    await signInWithGoogleCredential(response.credential);
+  } catch (error) {
+    if (run !== epoch) return;
+    busy = false;
+    notice = error.status === 0 ? "Não conseguimos falar com o servidor. Tente de novo." : "Não foi possível entrar agora. Tente de novo.";
+    renderGate({ focus: true });
+    return;
+  }
+  if (run !== epoch) return;
+  busy = false;
+  // O Google só guarda um destino para a credencial por página. Se o botão
+  // tocado foi o do menu, ele ficaria aberto e desatualizado por cima da tela.
+  siteMenu.close();
+  // Com a conta no aparelho, o pedido de sorteio diz se falta o cadastro.
+  start({ fromGate: true });
+}
+
+/** A pessoa voltou a mexer no formulário: o aviso da tentativa anterior sai da tela. */
+function clearFormNotice() {
+  if (view !== "gate" || (!notice && !invalidField)) return;
+  notice = "";
+  invalidField = "";
+  const target = root.querySelector("#ps-notice");
+  if (target) target.hidden = true;
+  for (const marked of root.querySelectorAll('#ps-register [aria-describedby="ps-notice"]')) {
+    marked.removeAttribute("aria-invalid");
+    marked.removeAttribute("aria-describedby");
+  }
+}
+
+function chooseOption(chip) {
+  const { field, value } = chip.dataset;
+  if (busy || view !== "gate" || !["ageRange", "gender"].includes(field)) return;
+  clearFormNotice();
+  form = { ...form, [field]: value };
+  for (const other of chip.parentElement.querySelectorAll("button[data-field]")) other.setAttribute("aria-pressed", String(other === chip));
+}
+
+async function submitRegistration() {
+  if (busy || view !== "gate" || gateStep !== "form") return;
+  // A conta do aparelho pode ter mudado sem aviso (outra aba, antes de o
+  // evento chegar). O que está preenchido é de quem abriu o formulário: nada
+  // é enviado na sessão de outra conta, e a tela se acerta com a conta atual.
+  if (readStored(IDENTITY_KEY) !== formOwner) {
+    gateIdentityMoved();
+    return;
+  }
+  const problem = registrationProblem(form);
+  if (problem) {
+    notice = problem.text;
+    invalidField = problem.field;
+    renderGate({ focus: true });
+    return;
+  }
+  const key = readStored(IDENTITY_KEY);
+  busy = true;
+  notice = "";
+  invalidField = "";
+  const run = ++epoch;
+  renderGate();
+  try {
+    await registerCpf(key, registrationBody(form));
+  } catch (error) {
+    if (run !== epoch) return;
+    busy = false;
+    const refusal = registrationRefusal(error);
+    if (refusal.next === "signin") {
+      // Uma sessão que o servidor não reconhece mais sai do aparelho: senão,
+      // qualquer volta a esta aba tentaria seguir com ela. A entrada abre com
+      // o formulário vazio, porque a próxima conta pode ser de outra pessoa.
+      if (error.status === 401) forgetDeadSession(key);
+      openGate("signin", refusal.text);
+      return;
+    }
+    if (refusal.next === "form") {
+      notice = refusal.text;
+      invalidField = refusal.field;
+      renderGate({ focus: true });
+      return;
+    }
+  }
+  if (run !== epoch) return;
+  busy = false;
+  // Enviado, o CPF sai da memória da página.
+  form = { ...EMPTY_REGISTRATION_FORM };
+  start({ fromGate: true });
+}
+
+/**
+ * A conta do aparelho mudou com a entrada ou o formulário na tela (pelo menu,
+ * ou em outra aba). Entrou: o sorteio diz se falta o cadastro. Saiu: volta
+ * para a entrada.
+ */
+function gateIdentityMoved() {
+  if (busy) return;
+  const key = readStored(IDENTITY_KEY);
+  if (accountKind(key) !== "google") {
+    if (gateStep === "form") openGate("signin", "Você saiu da conta neste aparelho. Entre de novo para fazer o cadastro.");
+    return;
+  }
+  if (gateStep === "form" && key === formOwner) return;
+  // Entrou uma conta (ou outra conta, com o formulário na tela): o que estava
+  // preenchido não é dela, e o sorteio diz se ela já tem cadastro.
+  form = { ...EMPTY_REGISTRATION_FORM };
+  formOwner = "";
+  invalidField = "";
+  gateStep = "signin";
+  start({ fromGate: true });
+}
+
+root.addEventListener("input", (event) => {
+  const input = event.target;
+  if (input.id !== "ps-cpf") return;
+  const end = typeof input.selectionStart === "number" ? input.selectionStart : input.value.length;
+  const digitsBefore = input.value.slice(0, end).replace(/\D/g, "").length;
+  const masked = formatCpf(input.value);
+  if (input.value !== masked) {
+    input.value = masked;
+    // Reescrever o campo levaria o cursor para o fim: ele volta para depois
+    // dos mesmos dígitos, para dar para corrigir um número no meio.
+    const caret = caretAfterDigits(masked, digitsBefore);
+    try {
+      input.setSelectionRange(caret, caret);
+    } catch {
+      // Sem controle do cursor, ele fica onde o navegador puser.
+    }
+  }
+  form = { ...form, cpf: masked };
+  clearFormNotice();
+});
+
+root.addEventListener("change", (event) => {
+  if (event.target.id === "ps-state") form = { ...form, state: event.target.value };
+  else if (event.target.id === "ps-consent") form = { ...form, consent: event.target.checked };
+  else return;
+  clearFormNotice();
+});
+
+root.addEventListener("submit", (event) => {
+  if (event.target.id !== "ps-register") return;
+  event.preventDefault();
+  submitRegistration();
+});
+
 root.addEventListener("click", (event) => {
   const card = event.target.closest("button[data-card]");
   if (card) {
     choose(card.dataset.card, card);
     return;
   }
+  const chip = event.target.closest("button[data-field]");
+  if (chip) {
+    chooseOption(chip);
+    return;
+  }
   const action = event.target.closest("[data-action]")?.dataset.action;
   if (action === "start") start();
+  else if (action === "gate-retry" && view === "gate" && !busy) {
+    notice = "";
+    renderGate();
+  }
   else if (action === "init") init();
   else if (action === "back") back();
   else if (action === "confirm") submit();
@@ -1033,7 +1357,8 @@ function followOtherTab() {
 
 window.addEventListener("storage", (event) => {
   if (event.key === IDENTITY_KEY || event.key === null) {
-    if (identity && readStored(IDENTITY_KEY) !== identity && view !== "unavailable") identityChanged();
+    if (view === "gate") gateIdentityMoved();
+    else if (identity && readStored(IDENTITY_KEY) !== identity && view !== "unavailable") identityChanged();
     else refreshHome();
     return;
   }
@@ -1047,6 +1372,10 @@ window.addEventListener("storage", (event) => {
  * sai e o próximo toque já vale para a conta.
  */
 function identityUpdated() {
+  if (view === "gate") {
+    gateIdentityMoved();
+    return;
+  }
   if (identity && view !== "unavailable" && readStored(IDENTITY_KEY) !== identity) {
     identityChanged();
     return;
@@ -1060,6 +1389,10 @@ const siteMenu = mountSiteMenu({ current: () => (atHome ? "home" : surveyId), on
 // conta já trocada) não gera evento de armazenamento: confere ao voltar a aparecer.
 // Uma aba congelada também não recebe o que a outra guardou: confere junto.
 function recheckIdentity() {
+  if (view === "gate") {
+    gateIdentityMoved();
+    return;
+  }
   if (identity && view !== "unavailable" && readStored(IDENTITY_KEY) !== identity) {
     identityChanged();
     return;

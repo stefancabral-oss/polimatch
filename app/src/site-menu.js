@@ -1,5 +1,6 @@
 import { PHOTO_SURVEYS } from "../../shared/photo-survey.js";
-import { endSession, exchangeGoogleCredential } from "./api.js";
+import { IDENTITY_KEY, readIdentityKey as readKey, signInWithGoogleCredential } from "./account-session.js";
+import { endSession } from "./api.js";
 import { googleClientId, mountGoogleButton } from "./google-login.js";
 import { safeStorage } from "./safe-storage.js";
 
@@ -7,9 +8,7 @@ import { safeStorage } from "./safe-storage.js";
 // do aparelho para saber se há uma conta Google. Entrar e sair usam as rotas
 // que a capa antiga já usava.
 
-const IDENTITY_KEY = "polimatch:v3:recovery-key";
 const GOOGLE_SESSION_PREFIX = "pms_";
-const GOOGLE_CREDENTIAL_REJECTED = "INVALID_GOOGLE_CREDENTIAL";
 
 /** Próximas pesquisas, na ordem da decisão 0002. São só anúncio: sem página, data nem cartas. */
 export const UPCOMING_SURVEYS = Object.freeze(["Famosos e influenciadores", "Roupas"]);
@@ -46,7 +45,7 @@ function accountMarkup({ account, googleReady, busy, error }) {
   }
   if (!googleReady) return "";
   return `<div class="pm-account">${alert}<div class="pm-google${busy ? " is-busy" : ""}" id="pm-google"><span>${busy ? "Confirmando…" : "Carregando Google…"}</span></div>
-    <p class="pm-account-hint">Para a sua resposta valer em qualquer aparelho.</p></div>`;
+    <p class="pm-account-hint">Para responder, entre e cadastre o CPF.</p></div>`;
 }
 
 /**
@@ -67,21 +66,6 @@ export function menuMarkup({ account = "none", googleReady = false, busy = false
     <a class="pm-item" href="./"${here("home")}><span>Início</span><i aria-hidden="true">›</i></a>
     <a class="pm-item" href="./como-funciona.html"${here("how")}><span>Como funciona</span><i aria-hidden="true">›</i></a>
     ${accountMarkup({ account, googleReady, busy, error })}`;
-}
-
-/**
- * Lê direto do navegador, como a página da pesquisa: vale o que está no
- * aparelho agora, inclusive o que outra aba mudou. A cópia em memória só
- * serve quando o navegador não deixa guardar nada.
- */
-function readKey() {
-  try {
-    const value = window.localStorage.getItem(IDENTITY_KEY);
-    if (value) return value;
-    return safeStorage.persistent ? "" : safeStorage.get(IDENTITY_KEY) || "";
-  } catch {
-    return safeStorage.get(IDENTITY_KEY) || "";
-  }
 }
 
 /**
@@ -138,9 +122,7 @@ export function mountSiteMenu({ host = document.body, current = "", onIdentityCh
     state.error = "";
     render();
     try {
-      const result = await exchange(response.credential);
-      if (typeof result?.sessionToken !== "string" || !result.sessionToken) throw new Error("resposta sem sessão");
-      safeStorage.set(IDENTITY_KEY, result.sessionToken);
+      await signInWithGoogleCredential(response.credential);
     } catch (error) {
       state.busy = false;
       state.error = error.status === 0 ? "Não conseguimos falar com o servidor. Tente de novo." : "Não foi possível entrar agora. Tente de novo.";
@@ -150,24 +132,6 @@ export function mountSiteMenu({ host = document.body, current = "", onIdentityCh
     state.busy = false;
     render();
     onIdentityChange();
-  }
-
-  /**
-   * A chave de quem respondia sem conta vai junto, para o servidor ligar as
-   * escolhas dela à conta. Se o servidor não reconhece mais essa chave, a
-   * entrada é refeita sem ela: senão a pessoa nunca conseguiria entrar. Uma
-   * recusa da credencial do Google também chega como 401, com código próprio:
-   * nela a chave continua valendo e não há nova tentativa, para as escolhas
-   * dadas sem conta não ficarem para trás.
-   */
-  async function exchange(credential) {
-    const key = readKey();
-    try {
-      return await exchangeGoogleCredential(credential, key);
-    } catch (error) {
-      if (error.status === 401 && key && error.code !== GOOGLE_CREDENTIAL_REJECTED) return exchangeGoogleCredential(credential, "");
-      throw error;
-    }
   }
 
   async function signOut() {

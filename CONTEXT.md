@@ -37,7 +37,7 @@ Norte anterior, mantido como histórico: "PoliMatch é um jogo casual de compara
 Em 12/11/2026 Stefan respondeu à Q1 da #277 com um caminho fora das três opções. Estágio `stages/67_photo_survey_direction/CONTEXT.md`. Resumo da decisão:
 
 - Cada pesquisa é um conjunto de fotos e uma pergunta curta, com começo e fim. Só foto e nome, sem texto para ler.
-- Qualquer pessoa joga. A escolha só entra na pesquisa com cadastro por CPF.
+- Qualquer pessoa joga. A escolha só entra na pesquisa com cadastro por CPF. (Alterado pela decisão 0004, de 16/11/2026: só responde quem entrou com Google e tem cadastro com CPF; o cadastro vem antes.)
 - Quem jogou vê os cinco primeiros. Só a resposta somada sai do PoliMatch, nunca o dado de uma pessoa.
 - Abre com Política, Famosos e influenciadores, e Futebol. A decisão 0002 fixou a ordem das três primeiras construções: política, celebridades e influenciadores, roupas.
 - Os jogos de leitura e a parte cívica e de notícias ficam no ar sem trabalho novo. (Alterado pela decisão 0003, de 14/11/2026: saem do site quando a pesquisa virar a capa.)
@@ -233,3 +233,17 @@ Avaliação do Stefan em 14/11/2026: a capa nova estava simples demais. Estágio
 pergunta sobre as mesmas 20 cartas), a capa com a pesquisa em destaque, as
 outras e as que vêm, as escolhas que a pessoa já fez e o compartilhamento da
 escolha. Sem resultado somado e sem rota nova no servidor.
+
+## Cadastro obrigatório com CPF — issue #336
+Instrução do Stefan em 16/11/2026: "cria o login obrigatório para cpf para
+poder entrar e jogar. sem esse cadastro a pessoa não pode entrar e dar voto."
+Registro em `docs/decisions/0004-cadastro-obrigatorio-com-cpf.md`; estágio
+`stages/71_cpf_registration/CONTEXT.md`. Só responde uma pesquisa quem entrou
+com Google e fez o cadastro (CPF, faixa de idade, gênero, estado e
+consentimento), uma vez por conta. O servidor recusa sorteio e resposta sem o
+cadastro e não guarda o número do CPF, só um código gerado a partir dele. A
+capa continua aberta a qualquer visitante. Isso altera o item 3 da decisão
+0001 ("a pessoa joga primeiro e se cadastra depois") e responde, por
+delegação, à pendência "Login Google e CPF". A revisão jurídica do tratamento
+de CPF com preferência política (#283) continua aberta, e publicar com ela
+aberta é decisão do Stefan.

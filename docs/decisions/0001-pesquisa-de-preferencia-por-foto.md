@@ -7,6 +7,7 @@
 - Estado: direção aprovada. **Nada desta decisão está em produção.**
 - Alterada em quatro pontos pela [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md), de 13/11/2026. Cada ponto está marcado abaixo.
 - Alterada no item 7 pela [decisão 0003](0003-a-pesquisa-vira-a-capa.md), de 14/11/2026: os jogos de leitura e a capa do jogo saem do site.
+- Alterada no item 3 pela [decisão 0004](0004-cadastro-obrigatorio-com-cpf.md), de 16/11/2026: só responde quem entrou com Google e tem cadastro com CPF.
 
 ## Contexto
 
@@ -25,6 +26,8 @@ o arquivo, ou pausa. O Stefan respondeu com um quarto caminho.
    cadastro por CPF, que passa a ser o único identificador que faz a escolha
    contar. O cadastro pede faixa de idade, gênero e estado. A pessoa joga
    primeiro e se cadastra depois.
+   (Alterado pela decisão 0004: o cadastro vem antes. Sem entrar com Google e
+   sem o cadastro com CPF a pessoa não começa nem responde uma pesquisa.)
 4. **O que aparece.** Quem jogou vê os cinco primeiros. Resultado completo e
    recortes ficam com quem encomendou a pesquisa.
 5. **O que sai do PoliMatch.** Só a resposta somada. Nunca o dado de uma pessoa.
@@ -68,7 +71,8 @@ protótipo aprovado e serão detalhados nessas etapas.
 - Todas as opções de uma tela aparecem com a mesma exposição.
 - Nenhum resultado é manipulado para favorecer alguém.
 - Compartilhamento é sempre iniciado pela pessoa.
-- Jogar sem cadastro continua permitido.
+- Jogar sem cadastro continua permitido. (Deixa de valer para a pesquisa por
+  foto pela decisão 0004.)
 - O [gate de publicação agregada](../legal/AGGREGATE_PUBLICATION_GATE.md) (#177)
   continua em vigor.
 - A [política de integridade do voto](../security/VOTE_ABUSE_POLICY.md) continua
@@ -101,6 +105,8 @@ Nada abaixo fica liberado por esta decisão. As respostas marcadas como
   versionada da política, dentro da [ICM 40] #282.
 - **Login Google e CPF.** Sem resposta. Como o acesso opcional com Google
   convive com o cadastro por CPF fica para a etapa do cadastro.
+  (Respondida por delegação na decisão 0004: a conta Google é a entrada e o
+  CPF é o cadastro, um por conta.)
 - **Visibilidade do repositório.** Sem resposta.
 - **Ordem do trabalho (#309).** Respondida: maturidade primeiro. Os bloqueios de
   [ICM 36] a [ICM 44] vêm antes de qualquer etapa de produto da pesquisa, com

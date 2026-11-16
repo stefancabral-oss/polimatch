@@ -123,6 +123,22 @@ test("erros da pesquisa chegam com status, código e a resposta já gravada", as
   });
 });
 
+test("sem cadastro com CPF, sorteio e resposta saem como 403 com o código da recusa", async () => {
+  const refusal = () => { throw Object.assign(new Error("cadastro com CPF obrigatório para responder"), { status: 403, code: "CPF_REGISTRATION_REQUIRED" }); };
+  const { app } = harness({ photoSurveyDraw: refusal, photoSurveyRespond: refusal });
+  await withServer(app, async (base) => {
+    for (const route of ["draw", "response"]) {
+      const response = await post(`${base}/api/photo-surveys/politica-2026-01/${route}`, {}, BEARER);
+      assert.equal(response.status, 403, route);
+      const body = await response.json();
+      assert.equal(body.code, "CPF_REGISTRATION_REQUIRED", route);
+      assert.equal(Object.hasOwn(body, "current"), false, route);
+    }
+    // A definição da pesquisa continua pública.
+    assert.equal((await fetch(`${base}/api/photo-surveys/politica-2026-01`)).status, 200);
+  });
+});
+
 test("corpo malformado é recusado antes do store", async () => {
   const { app, calls } = harness();
   await withServer(app, async (base) => {
