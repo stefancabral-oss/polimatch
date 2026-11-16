@@ -837,3 +837,95 @@ select.ps-input {
   outline: 2px solid #b42318;
   outline-offset: 2px;
 }
+
+/* Prévia da imagem para compartilhar (ICM 72) ------------------------------ */
+
+/* Fica fora de .ps-shell, como o menu: as cores são repetidas aqui. */
+.ps-share {
+  --ps-green: #08805a;
+  --ps-ink: #111418;
+  --ps-muted: #6b7280;
+  --ps-line: #e5e7eb;
+  --ps-soft: #f3f4f6;
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  max-height: none;
+  margin: 0 auto;
+  padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  border: 0;
+  background: #fff;
+  color: var(--ps-ink);
+  overflow-y: auto;
+}
+
+.ps-share * {
+  box-sizing: border-box;
+}
+
+.ps-share:not([open]) {
+  display: none;
+}
+
+.ps-share[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ps-share:focus {
+  outline: none;
+}
+
+.ps-share::backdrop {
+  background: #fff;
+}
+
+/* A imagem encolhe para os botões ficarem à vista; segurar o dedo nela salva. */
+.ps-share-img {
+  display: block;
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  min-height: 0;
+  /* Em tela baixa (celular deitado) a imagem não vira um selo: a prévia rola. */
+  max-height: max(260px, calc(100vh - 290px));
+  margin: 0 auto;
+  border: 1px solid var(--ps-line);
+  border-radius: 16px;
+  object-fit: contain;
+  -webkit-touch-callout: default;
+}
+
+.ps-share-hint {
+  margin: 0;
+  text-align: center;
+}
+
+.ps-share-wait {
+  margin: auto 0;
+  padding: 48px 0;
+  text-align: center;
+  font-size: 15px;
+  color: var(--ps-muted);
+}
+
+.ps-share .ps-notice {
+  margin: 0;
+}
+
+.ps-share-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.ps-share-actions .ps-link {
+  justify-self: center;
+  padding-right: 12px;
+}
