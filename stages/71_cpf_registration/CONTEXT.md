@@ -102,7 +102,7 @@ Um PR, com commits por parte:
 | 71b — Regras | `shared/registration.js`: CPF, opções do perfil, consentimento; testes |
 | 71c — Servidor | Tabelas, rota de cadastro, exigência no sorteio e na resposta; testes e smoke com PostgreSQL |
 | 71d — App | Entrada, formulário, travas na página e textos; testes e roteiros de navegador |
-| 71e — Publicação | API e app, com o sim do Stefan para cada um |
+| 71e — Publicação | API e app, com o sim do Stefan. Feita em 16/11/2026, com um sim para os dois (ver o HANDOFF) |
 
 ## Fora de escopo
 
@@ -173,6 +173,10 @@ App:
 - A entrada com Google pelo menu está no ar desde 14/11/2026 e não foi
   exercitada com o botão real. Com o cadastro obrigatório ela vira o único
   caminho para responder: testar antes de publicar.
+
+A publicação aconteceu em 16/11/2026, por instrução do Stefan, com estas
+condições abertas e sem registro de teste do botão real do Google antes dela.
+O que se sabe e o que não se sabe está no HANDOFF.
 
 ## Dependências e riscos
 

@@ -4,7 +4,9 @@
 - Quem decidiu: Stefan
 - Registrado por: agente (Claude), a pedido dele
 - Issue: #324 ([ICM 68])
-- Estado: direção aprovada. **Nada desta decisão está em produção.**
+- Estado: direção aprovada. Em produção desde 14/11/2026 a primeira construção
+  da ordem, a pesquisa de Política com cartas de moldura (estágio 68, #324). As
+  construções seguintes da ordem não estão em produção.
 - Altera a [decisão 0001](0001-pesquisa-de-preferencia-por-foto.md) nos pontos
   listados em "O que muda na decisão 0001". O resto dela continua valendo.
 
@@ -49,7 +51,8 @@ Palavras dele, transcritas de conversa por voz:
 
 A regra do jogo atual "carta padrão neutra para todos; Chroma como
 personalização pessoal" (`CONTEXT.md`, "Decisões atuais aprovadas";
-`README.md`, "Produto atual") continua valendo para o que está no ar. Na
+`README.md`, "Produto atual") continua valendo para o que está no ar.
+(Desde 14/11/2026, decisão 0003: o jogo saiu do site.) Na
 pesquisa por foto a ideia é a mesma por outro caminho: todas as cartas de uma
 pesquisa têm a mesma moldura.
 

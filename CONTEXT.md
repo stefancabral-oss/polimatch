@@ -28,9 +28,9 @@ Conteúdo sem aprovação externa e agregados sem autoridade continuam retidos.
 
 Desde 12/11/2026, por decisão do Stefan, a direção do PoliMatch é ser uma pesquisa de preferência por foto: a pessoa se diverte escolhendo fotos e disso sai a preferência do público. O registro completo está em `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md`.
 
-Essa direção ainda não está no ar. O que está em produção continua sendo o jogo casual de comparação descrito nesta página, e as decisões abaixo seguem valendo para ele até que cada etapa da direção nova passe pelo gate humano.
+Essa direção está no ar desde 14/11/2026: a pesquisa de Política por foto é a capa do site (decisão 0003) e, desde 16/11/2026, está publicado o código que exige entrar com Google e ter o cadastro com CPF para responder (decisão 0004; a recusa não foi exercitada em produção pelo agente, ver o HANDOFF do estágio 71). As páginas do jogo casual de comparação descrito nesta página saíram do site em 14/11/2026; as rotas dele continuam na API. As decisões abaixo ficam como registro desse produto anterior e valem para o que restou dele. Cada etapa nova da direção continua passando pelo gate humano.
 
-Norte anterior, mantido como histórico: "PoliMatch é um jogo casual de comparação entre personalidades públicas. Não é pesquisa eleitoral. O produto deve ser simples de jogar, visualmente próprio, colecionável e agradável no celular." A frase "Não é pesquisa eleitoral" continua valendo, e exibida, no que está no ar. Ela deixa de valer para a direção nova: o texto que a substitui ali depende da revisão jurídica (Q5 da #277), e até lá o repositório não afirma nenhum enquadramento para a pesquisa por foto.
+Norte anterior, mantido como histórico: "PoliMatch é um jogo casual de comparação entre personalidades públicas. Não é pesquisa eleitoral. O produto deve ser simples de jogar, visualmente próprio, colecionável e agradável no celular." A frase "Não é pesquisa eleitoral" valia, e era exibida, no produto anterior. Ela saiu do site com a capa antiga em 14/11/2026 (decisão 0003): o site novo não exibe enquadramento nenhum. Ela não vale para a direção nova: o texto que a substitui ali depende da revisão jurídica (Q5 da #277), e até lá o repositório não afirma nenhum enquadramento para a pesquisa por foto.
 
 ## Direção nova: pesquisa de preferência por foto — issue #318
 
@@ -43,16 +43,16 @@ Em 12/11/2026 Stefan respondeu à Q1 da #277 com um caminho fora das três opç�
 - Os jogos de leitura e a parte cívica e de notícias ficam no ar sem trabalho novo. (Alterado pela decisão 0003, de 14/11/2026: saem do site quando a pesquisa virar a capa.)
 - Telas novas minimalistas: fundo neutro e um único verde. Na hora do voto vale a carta com moldura, no mesmo padrão para todas as cartas da pesquisa (decisão 0002, de 13/11/2026, que alterou o "foto sem moldura" da 0001).
 
-Nada disso está liberado para produção por este registro. A ordem do trabalho era maturidade primeiro (#309); desde a decisão 0002 a etapa 1 da pesquisa ([ICM 68] #324) corre em paralelo, sem dispensar nenhum bloqueio de maturidade. As respostas às Q2, Q3 e Q4, com a proposta para a Q6, estão na #277; nenhuma delas libera produção. Continuam sem resposta a Q5 (controlador de dados e revisão jurídica), a visibilidade do repositório e a convivência entre o login Google e o CPF. O gate de publicação agregada (#177) e a política de integridade do voto continuam em vigor.
+Nada disso está liberado para produção por este registro. A ordem do trabalho era maturidade primeiro (#309); desde a decisão 0002 a etapa 1 da pesquisa ([ICM 68] #324) corre em paralelo, sem dispensar nenhum bloqueio de maturidade. As respostas às Q2, Q3 e Q4, com a proposta para a Q6, estão na #277; nenhuma delas libera produção. Continuam sem resposta a Q5 (controlador de dados e revisão jurídica) e a visibilidade do repositório. A convivência entre o login Google e o CPF foi respondida pela decisão 0004, por delegação. O gate de publicação agregada (#177) e a política de integridade do voto continuam em vigor.
 
 Antes de propor ou alterar tela, regra de voto ou cadastro, ler o registro de decisão: ele lista o que continua valendo e o que deixa de valer para as telas novas.
 
 ## Decisões atuais aprovadas
 
-As decisões desta lista descrevem o que está no ar. A referência para o que não se aplica à direção nova é a tabela do registro de decisão. A marca "Substituída para as telas da pesquisa por foto" aparece só nas principais, como atalho.
+As decisões desta lista descrevem o produto anterior, que saiu do site em 14/11/2026 (decisão 0003): valem como histórico e para o que restou dele na API. A referência para o que não se aplica à direção nova é a tabela do registro de decisão. A marca "Substituída para as telas da pesquisa por foto" aparece só nas principais, como atalho.
 
 - O frontend anterior foi rejeitado e será substituído, não remendado.
-- A direção de arte `Malaquita 2026 / Digital First` enviada em 13/09/2026 está aprovada e é a referência visual oficial. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318), com a ressalva da decisão 0002: as cartas com moldura valem nessas telas. Segue valendo para o que está no ar.
+- A direção de arte `Malaquita 2026 / Digital First` enviada em 13/09/2026 está aprovada e é a referência visual oficial. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318), com a ressalva da decisão 0002: as cartas com moldura valem nessas telas. Valia para o produto anterior.
 - O shell usa malaquita escura; porcelana aparece em placas de nome e superfícies editoriais; ouro indica progresso e raridade.
 - Cards têm moldura facetada, fotografia dominante, marca pequena, raridade no canto e placa inferior clara.
 - Chromas ampliam luz, cor e materialidade progressivamente; o efeito prismático máximo é reservado à Chroma comemorativa.
@@ -62,8 +62,8 @@ As decisões desta lista descrevem o que está no ar. A referência para o que n
 - O menu de assuntos nasce pronto para expansão, mas somente `Eleições 2026` estará ativo na primeira edição; ela reúne todos os perfis com fotografia aprovada.
 - `Influenciadores` poderá ser uma edição independente futura, sem retirar essas personalidades da edição principal atual.
 - Escândalos e acontecimentos serão curadorias independentes, começando posteriormente por casos como Banco Master, Mensalão, INSS e 8 de Janeiro.
-- Cada pessoa terá perfil educativo, fontes e contexto suficientes para uma escolha informada. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.
-- Existirão ranking da edição e ranking pessoal. Ranking geral entre assuntos só será exibido quando houver mais de um assunto ativo. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.
+- Cada pessoa terá perfil educativo, fontes e contexto suficientes para uma escolha informada. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); valia para o produto anterior.
+- Existirão ranking da edição e ranking pessoal. Ranking geral entre assuntos só será exibido quando houver mais de um assunto ativo. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); valia para o produto anterior.
 - Cards e Chromas são colecionáveis; Chromas são obtidas por sorte e não determinam o ranking.
 - Duelos usam carta padrão por default. Apenas o próprio jogador pode aplicar uma Chroma possuída àquela pessoa.
 - Novos debates e discussões podem lançar novas Chromas versionadas sem alterar votos ou rankings anteriores.
@@ -72,9 +72,9 @@ As decisões desta lista descrevem o que está no ar. A referência para o que n
 - A aprovação visual dos retratos começa por um lote de dez pessoas antes da escala fotográfica completa.
 - O app continua online-only: nenhuma escolha é confirmada antes do servidor.
 - A identidade sonora usa impactos graves, atrito curto e brilho metálico discreto, sintetizados localmente após interação do usuário; nunca varia por pessoa e oferece controle persistente para desligar.
-- O resultado da rodada permanece por um instante nas quatro cartas: a escolhida sobe e acende, as outras três descem e perdem saturação, sempre com os deltas reais de Elo e sem cobrir os rostos. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.
+- O resultado da rodada permanece por um instante nas quatro cartas: a escolhida sobe e acende, as outras três descem e perdem saturação, sempre com os deltas reais de Elo e sem cobrir os rostos. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); valia para o produto anterior.
 - Faixas de Elo e eventos de ultrapassagem, subida, queda e baixa pontuação recebem respostas visuais, sonoras e hápticas próprias. O texto pode provocar com humor leve, mas nunca julga ideologia ou dignidade da pessoa.
-- Por decisão do usuário em 15/09/2026, o acesso com Google entra como opção simples para salvar e recuperar progresso; jogar anonimamente continua permitido. Publicação automática permanece fora do primeiro corte e compartilhamento será iniciado pelo usuário.
+- Por decisão do usuário em 15/09/2026, o acesso com Google entra como opção simples para salvar e recuperar progresso; jogar anonimamente continua permitido. (Para a pesquisa por foto, alterado pela decisão 0004, de 16/11/2026: só responde quem entrou com Google e tem cadastro com CPF.) Publicação automática permanece fora do primeiro corte e compartilhamento será iniciado pelo usuário.
 
 ## Referências visuais aprovadas
 
@@ -121,7 +121,7 @@ O programa só é considerado concluído quando:
 8. Testes críticos, build, deploy e QA pós-deploy são confirmados.
 
 ## Duas escolhas ordenadas — issue #239
-A decisão posterior de Stefan substitui a escolha única no núcleo de quatro cartas: primeira preferência recebe mais pontos que segunda; as duas restantes recebem a mesma penalização. O estágio ativo é stages/19_ordered_two_choices/CONTEXT.md. Histórico e modos binários permanecem compatíveis. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue valendo para o que está no ar.
+A decisão posterior de Stefan substitui a escolha única no núcleo de quatro cartas: primeira preferência recebe mais pontos que segunda; as duas restantes recebem a mesma penalização. O estágio ativo é stages/19_ordered_two_choices/CONTEXT.md. Histórico e modos binários permanecem compatíveis. Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); valia para o produto anterior.
 
 ## Quem disse isso? — issue #244
 Novo modo de conhecimento aprovado por Stefan, independente do ranking político. Estágio stages/20_quote_quiz/CONTEXT.md. Layout: duas cartas clicáveis, nome uma vez, frase real e revelação com fonte.
@@ -151,8 +151,8 @@ Duelo, Coleção e Ranking, preservando navegação cívica e controles existent
 Em 23/10/2026 Stefan pediu Flávio, Lula, Nikolas e Janja na capa principal.
 Estágio 28 usa as artes especiais existentes Flávio azul/22 e Lula vermelha/13
 somente na capa, preservando jogos, inventário e as Malaquitas de Nikolas/Janja.
-Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue
-valendo para o que está no ar.
+Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); valia
+para o produto anterior.
 
 ## Vinte Chromas Políticos — issue #263
 Em 23/10/2026 Stefan solicitou refinar todas as Chromas da seção política.
@@ -165,8 +165,8 @@ pediu reduzir a escala no iPhone 17 Pro Max. Estágio 30 aplica as edições
 existentes aos slots persistentes diários/livres/pares, mantendo a foto documental
 como reserva. A grade móvel usa o espaço restante real do shell. Sem mudar
 sessão diária, escolhas, ranking ou propriedade de itens da Coleção.
-Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); segue
-valendo para o que está no ar.
+Substituída para as telas da pesquisa por foto pela decisão 0001 (#318); valia
+para o produto anterior.
 
 ## Fato ou fake — issue #267
 Em 24/10/2026 Stefan solicitou jogo com falas pragmáticas do debate da Globo
@@ -247,7 +247,8 @@ capa continua aberta a qualquer visitante. Isso altera o item 3 da decisão
 0001 ("a pessoa joga primeiro e se cadastra depois") e responde, por
 delegação, à pendência "Login Google e CPF". A revisão jurídica do tratamento
 de CPF com preferência política (#283) continua aberta, e publicar com ela
-aberta é decisão do Stefan.
+aberta é decisão do Stefan. Publicado em 16/11/2026, com API e app no commit
+`28fd962`, por instrução dele ("Sim, os dois").
 
 ## Compartilhar com imagem — issue #338
 Avaliação do Stefan em 16/11/2026, com o estágio 70 no ar: "Compartilhar:
@@ -255,4 +256,5 @@ Deve gerar uma imagem com minhas escolhas, não apenas o link." Estágio
 `stages/72_share_image/CONTEXT.md`: a imagem leva a escolhida e as
 finalistas; o toque só tem dois destinos, o compartilhamento do aparelho só
 com a imagem ou a prévia na tela com "Baixar imagem"; o link só vai se a
-pessoa pedir. Só o app muda.
+pessoa pedir. Só o app muda. Publicado em 16/11/2026, com o app no commit
+`28fd962`.

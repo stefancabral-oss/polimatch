@@ -2,11 +2,11 @@
 
 ## Status
 
-- Estado: `aprovado` nas partes 72a e 72b, num PR só, e na publicação (72c), que acontece depois do merge e fica registrada na issue #338.
+- Estado: `concluído`. As partes 72a e 72b foram mescladas (PR #339, commit `28fd962`) e a 72c aconteceu em 16/11/2026: o app está publicado nesse commit.
 - Issue: #338
 - Branch: `icm/72-share-image`. Foi feita sobre a `main` em `59ca9a1`; com o estágio 71 (PR #337) aprovado para entrar antes, foi refeita em cima dele. Os dois mexiam em quatro arquivos; os conflitos estão descritos em "Testes executados".
 - PR: #339
-- Até a publicação, nada deste estágio está em produção.
+- Em produção desde 16/11/2026.
 
 ## Entregue (72a — imagem)
 
@@ -23,9 +23,19 @@
 - Se o aparelho diz que compartilha arquivo e recusa na hora, a prévia abre, em vez do aviso de falha.
 - Uma tela nova fecha a prévia. O endereço local da imagem é solto em todo fechamento.
 
+## Publicação (72c) — 16/11/2026
+
+Com a instrução do Stefan ("Sim, os dois"), transcrita em "Human gate":
+
+- PR #339 mesclado em `28fd962`, depois de refeito sobre o estágio 71. A árvore do merge é a do commit `fc53b1f`, que tinha o `ci-gate` verde.
+- App publicado no commit `28fd962` (31 s), build de 2026-11-16T23:26:07Z, junto com o estágio 71. De fora, nenhuma leitura falhou. O commit é o que o painel de deploy registrou; `version.json` segue com `sha: "unknown"` (#287).
+- Conferido de fora, só por leitura do pacote publicado: o código do app traz a imagem com as finalistas, a prévia com "Baixar imagem" e a espera pela imagem. Isso mostra o que está no pacote, não o comportamento na tela: o agente não exercitou o compartilhar em produção.
+- Depois da publicação, o Stefan escreveu: "No celular funcionou". Ele não disse o que testou nem em que aparelho. O agente tinha pedido quatro passos (entrar com Google, fazer o cadastro, responder uma pesquisa e tocar em "Compartilhar"); não se sabe quais deles o relato cobre, nem se cobre o compartilhar.
+
+O registro do banco e da API desta publicação está no HANDOFF do estágio 71 e na issue #336; o deste estágio, na #338.
+
 ## Não entregue / pendente
 
-- **72c — publicação.** Só o app, com o sim do Stefan.
 - Imagem com as escolhas de várias pesquisas numa folha só; formato para stories.
 - Som e háptica.
 
@@ -33,7 +43,7 @@
 
 No CI do PR #339, antes de a branch ser refeita, o commit `cf680b8` passou (`ci-gate` verde): os testes de unidade do app, a imagem do app e, no Linux, os dois roteiros em Chromium e em WebKit. A revisão automática (Codex) deixou um apontamento, sobre a preparação antiga apagar o prazo da tela nova; estava corrigido nesse commit, foi respondido e a conversa encerrada.
 
-Depois de refeita sobre o estágio 71, em 16/11/2026, local (macOS): `npm test --prefix app` 213/213, `npm run test:shared` 118/118, `npm test --prefix back` 305/305; `site-shell.mjs` com 46 cenários e `photo-survey.mjs` com 34, em WebKit e em Chromium 140. Houve conflito em quatro arquivos, todos de emenda: os imports da página, o fim da folha de estilos (a emenda deixou um bloco sem fechar, que o build acusou e foi corrigido), o trecho do roteiro que prepara a tela de resposta (que passou a usar a conta cadastrada do estágio 71) e o contexto raiz. O commit refeito passa pelo CI antes do merge.
+Depois de refeita sobre o estágio 71, em 16/11/2026, local (macOS): `npm test --prefix app` 213/213, `npm run test:shared` 118/118, `npm test --prefix back` 305/305; `site-shell.mjs` com 46 cenários e `photo-survey.mjs` com 34, em WebKit e em Chromium 140. Houve conflito em quatro arquivos, todos de emenda: os imports da página, o fim da folha de estilos (a emenda deixou um bloco sem fechar, que o build acusou e foi corrigido), o trecho do roteiro que prepara a tela de resposta (que passou a usar a conta cadastrada do estágio 71) e o contexto raiz. O commit refeito, `fc53b1f`, passou no `ci-gate` antes do merge (o PR só mexe no app, e os testes do servidor não rodam nele).
 
 Em 16/11/2026, local (macOS), no código do PR antes de ser refeito:
 
@@ -70,11 +80,11 @@ Ele não conferiu aparelho de verdade (o ponto do iPhone é leitura de um defeit
 ## Riscos conhecidos
 
 - **A imagem leva a foto de quatro pessoas reais com a marca do PoliMatch,** em vez de uma. Está na consulta jurídica sobre direito de imagem (decisão 0001, pendência de fotos).
-- **O compartilhamento real não foi exercitado.** Nos testes `navigator.share` é simulado. Num iPhone ou Android de verdade o teste é do Stefan. Não se sabe em que aparelho ele viu ir só o link. Três caminhos davam nisso e foram tratados: o toque antes de a imagem ficar pronta, o aparelho sem compartilhamento de arquivo e, no iPhone, a imagem enviada junto com texto e endereço. Este último vem de um defeito conhecido do navegador, não de teste em aparelho.
+- **O compartilhamento real não foi exercitado pelo agente.** Nos testes `navigator.share` é simulado. Depois da publicação o Stefan escreveu "No celular funcionou", sem dizer o que testou nem em que aparelho: não se sabe se o relato cobre o compartilhar. Também não se sabe em que aparelho ele viu ir só o link. Três caminhos davam nisso e foram tratados: o toque antes de a imagem ficar pronta, o aparelho sem compartilhamento de arquivo e, no iPhone, a imagem enviada junto com texto e endereço. Este último vem de um defeito conhecido do navegador, não de teste em aparelho.
 - **Sem texto junto da imagem,** quem recebe não ganha um link para tocar: o endereço está escrito na imagem.
 - **Navegadores dentro de aplicativos** (Instagram, WhatsApp) costumam não compartilhar nem baixar arquivo. Neles a saída é segurar o dedo na imagem da prévia, que o texto da prévia indica. Não foi testado.
 - **O botão espera a imagem.** Em condição normal ela fica pronta quase na hora; no pior caso o botão fica até 8 segundos desabilitado.
-- **Conflito com o estágio 71 (#336, PR #337):** os dois mexem na página da pesquisa e no roteiro `site-shell.mjs`. O que for mesclado depois é refeito sobre a `main`.
+- **Conflito com o estágio 71 (#336, PR #337):** resolvido antes do merge. Os dois mexiam na página da pesquisa e no roteiro `site-shell.mjs`; esta branch foi refeita sobre o estágio 71 (ver "Testes executados").
 - As condições de publicação dos estágios 69 e 70 seguem abertas: privacidade (#283) e backup externo (#279).
 
 ## Decisões tomadas
@@ -91,16 +101,14 @@ Escolhas do agente, por delegação dele (decisão 0003, item 5), que pode mudar
 
 ## Próximo passo exato
 
-1. Merge do PR #337 (estágio 71); esta branch refeita sobre a `main`; CI; merge do PR #339.
-2. Deploy da API (pelo estágio 71) e do app, uma vez só, com os dois estágios.
-3. Conferência de fora, só com leitura; registro na issue #338.
+Nenhum neste estágio.
 
 ## Ação do Stefan
 
-- Testar o compartilhar no celular depois de publicado.
+- Confirmar se o que ele testou no celular incluiu tocar em "Compartilhar", se a imagem chegou e em que aparelho.
 
 ## Human gate
 
 - Decisão das partes 72a e 72b e da publicação (72c): `aprovado`
 - Responsável: Stefan
-- Observação: a construção responde à avaliação dele de 16/11/2026 e à delegação registrada na decisão 0003. O merge e a publicação tiveram instrução direta dele no mesmo dia. A mensagem do agente que antecedeu a pergunta dizia que os dois pedidos (este e o cadastro com CPF, PR #337) estavam prontos e nenhum estava no ar; que a imagem traz a escolhida, as três finalistas, a pergunta e o endereço; que a causa provável do "só o link" é o iPhone descartar a imagem quando ela vai com texto e link, e que agora vai só a imagem; que onde não dá para compartilhar arquivo a imagem aparece na tela com "Baixar imagem"; que nada disso foi testado num celular de verdade e que a correção do iPhone vem de um defeito conhecido do navegador; e que os dois PRs passaram por revisão independente e estavam com os testes automáticos verdes. A pergunta foi: "Mesclo e publico o cadastro com CPF e o compartilhar com imagem? Pode responder 'sim, os dois', 'só o compartilhar' ou 'só o cadastro'." Ele respondeu: "Sim, os dois". O merge e o deploy ficam a cargo do agente, a pedido dele, com o check verde no commit final. A regra 6 do `AGENTS.md` não muda.
+- Observação: a construção responde à avaliação dele de 16/11/2026 e à delegação registrada na decisão 0003. O merge e a publicação tiveram instrução direta dele no mesmo dia. A mensagem do agente que antecedeu a pergunta dizia que os dois pedidos (este e o cadastro com CPF, PR #337) estavam prontos e nenhum estava no ar; que a imagem traz a escolhida, as três finalistas, a pergunta e o endereço; que a causa provável do "só o link" é o iPhone descartar a imagem quando ela vai com texto e link, e que agora vai só a imagem; que onde não dá para compartilhar arquivo a imagem aparece na tela com "Baixar imagem"; que nada disso foi testado num celular de verdade e que a correção do iPhone vem de um defeito conhecido do navegador; e que os dois PRs passaram por revisão independente e estavam com os testes automáticos verdes. A pergunta foi: "Mesclo e publico o cadastro com CPF e o compartilhar com imagem? Pode responder 'sim, os dois', 'só o compartilhar' ou 'só o cadastro'." Ele respondeu: "Sim, os dois". O merge e o deploy ficaram a cargo do agente, a pedido dele, com o check verde no commit final, e foram feitos em 16/11/2026 (ver "Publicação"). A regra 6 do `AGENTS.md` não muda.

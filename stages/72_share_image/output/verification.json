@@ -7,19 +7,19 @@
   "parts": {
     "72a": "a imagem traz a escolhida e as finalistas; shareImageLayout com teste",
     "72b": "sharePlan, a prévia com Baixar imagem, o botão que espera a imagem, a recusa do arquivo abrindo a prévia",
-    "72c": "aprovada em 16/11/2026; acontece depois do merge: deploy do app, junto com o estágio 71; registro na issue #338"
+    "72c": "feita em 16/11/2026: app no commit 28fd962; registro na issue #338 e no HANDOFF"
   },
   "testsFirst": {
     "unidade": "share-choice.test.js: plano de entrega, conta do desenho, marcação da prévia e, depois da revisão, a chamada só com o arquivo, a linha que encolhe e os estados da prévia, escritos e vistos falhar antes do código",
     "exceção": "os cenários de navegador vieram depois da mudança da página, nas duas rodadas; depois dos consertos da revisão, catorze desfazimentos do código foram todos pegos"
   },
   "tests": {
-    "environment": "macOS, local, 16/11/2026, no código final do PR",
+    "environment": "macOS, local, 16/11/2026; os três números abaixo são do código do PR antes de ser refeito sobre o estágio 71, e a última linha é do código final",
     "npm test --prefix app": "205/205",
     "e2e site-shell": "36 cenários em WebKit e em Chromium 140",
     "e2e photo-survey": "34 cenários em WebKit e em Chromium 140",
     "capturas conferidas": "a imagem gerada (1080x1350, cerca de 400 KB), a resposta registrada e a prévia em 390x844 e 360x640",
-    "depois de refeita sobre o estágio 71": "app 213/213, shared 118/118, back 305/305; site-shell 46 e photo-survey 34 cenários em WebKit e em Chromium 140"
+    "código final do PR, depois de refeita sobre o estágio 71": "app 213/213, shared 118/118, back 305/305; site-shell 46 e photo-survey 34 cenários em WebKit e em Chromium 140"
   },
   "acceptance": {
     "imagem 1080x1350 com a escolhida e até três finalistas, dentro da folha": "share-choice.test.js (conta do desenho); e2e site-shell (quatro cartas desenhadas; medidas e primeiros bytes do arquivo)",
@@ -35,13 +35,14 @@
     "texto que não cabe encolhe e é cortado": "share-choice.test.js (fitLine)",
     "sem showModal a prévia abre, recebe o foco e o Esc fecha": "e2e site-shell",
     "a prévia cabe sem rolar em 390x844 e 360x640": "e2e site-shell",
-    "os cenários dos estágios 68 a 70 passam": "photo-survey 34; site-shell 36"
+    "os cenários dos estágios 68 a 70 passam": "photo-survey 34; site-shell 36 antes de refeita e 46 no código final"
   },
   "notVerified": [
-    "navigator.share num aparelho de verdade: nos testes é simulado; a troca para só o arquivo vem de um defeito conhecido do iPhone, não de teste",
+    "navigator.share num aparelho de verdade pelo agente: nos testes é simulado; depois da publicação o Stefan escreveu \"No celular funcionou\" sem dizer o que testou nem em que aparelho, e não se sabe se o relato cobre o compartilhar",
+    "a troca para só o arquivo vem de defeito conhecido do iPhone, não de teste",
+    "o compartilhar em produção pelo agente: lá ele só faz leitura",
     "navegadores dentro de aplicativos (Instagram, WhatsApp)",
-    "leitor de tela de verdade",
-    "produção: nada deste estágio foi publicado"
+    "leitor de tela de verdade"
   ],
   "independentReview": {
     "who": "agente à parte, somente leitura, num clone próprio, sobre fb3bf7a",
@@ -70,6 +71,15 @@
     "pr": 339,
     "commit cf680b8": "ci-gate verde, antes de a branch ser refeita: unidade do app, imagem do app e os dois roteiros em Chromium e em WebKit no Linux",
     "automatedReview": "Codex deixou um apontamento (a preparação antiga apagava o prazo da tela nova), corrigido em cf680b8; respondido e encerrado",
-    "finalCommit": "o commit refeito sobre a main passa pelo CI antes do merge"
+    "finalCommit": "fc53b1f, refeito sobre a main: ci-gate verde antes do merge; a árvore do merge 28fd962 é a dele"
+  },
+  "delivery72c": {
+    "date": "2026-11-16",
+    "merge": {
+      "PR 339": "28fd962, mesma árvore de fc53b1f (ci-gate verde)"
+    },
+    "app": "commit 28fd962, 31 s; build de 2026-11-16T23:26:07Z; nenhuma leitura de fora falhou",
+    "checkedByGet": "presença no pacote publicado (código, não comportamento na tela): a imagem com as finalistas, a prévia com Baixar imagem e a espera pela imagem",
+    "stefanReport": "\"No celular funcionou\", depois da publicação; ele não disse o que testou nem em que aparelho, e não se sabe se cobre o compartilhar"
   }
 }

@@ -4,7 +4,8 @@
 - Quem decidiu: Stefan
 - Registrado por: agente (Claude), a pedido dele
 - Issue: #331 ([ICM 69])
-- Estado: direção aprovada. **Nada desta decisão está em produção.**
+- Estado: em produção desde 14/11/2026 (estágio 69, #331): a pesquisa é a capa
+  do site e as páginas do produto anterior saíram.
 - Altera a [decisão 0001](0001-pesquisa-de-preferencia-por-foto.md) no item 7 e
   o contexto do estágio 68 nos pontos listados em "O que muda". A
   [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md) continua
@@ -44,7 +45,10 @@ Depois de receber a folha com as telas desenhadas
    decisão 0002) passa a valer para o site inteiro.
 5. **Detalhes de desenho por delegação.** O Stefan pediu para não ser parado
    por eles: o agente escolhe, mostra pronto, e ele pode mudar qualquer um
-   depois. Merge e publicação continuam pedindo o sim dele, um a um.
+   depois. Merge e publicação continuam pedindo o sim dele, um a um. (Em
+   16/11/2026 cada pergunta listou os merges e os deploys de uma vez e teve
+   um sim para o conjunto; as perguntas e as respostas estão nos HANDOFF dos
+   estágios 70, 71 e 72.)
 
 ## O que muda
 

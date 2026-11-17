@@ -92,7 +92,7 @@ Um PR, com commits por parte:
 | 70b — Página por pesquisa | A página passa a valer para qualquer pesquisa, com `?p=` |
 | 70c — Capa | Destaque, "Suas escolhas", "Mais pesquisas", "Em breve"; menu com as pesquisas |
 | 70d — Compartilhar | Botão, imagem e as saídas para quem não tem compartilhamento |
-| 70e — Publicação | API e app, com o sim do Stefan para cada um |
+| 70e — Publicação | API e app, com o sim do Stefan. Feita em 16/11/2026, com um sim para os dois (ver o HANDOFF) |
 
 ## Fora de escopo
 

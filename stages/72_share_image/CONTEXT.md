@@ -2,8 +2,10 @@
 
 Base: `main` depois do estágio 70 (#334), publicado em 16/11/2026.
 Ler o contexto raiz, o `AGENTS.md`, as decisões 0001 a 0003 e o contexto do
-estágio 70. Este estágio não depende do estágio 71 (#336), que corre em
-paralelo em outra branch.
+estágio 70. Este estágio não depende do estágio 71 (#336), que corria em
+paralelo em outra branch. Depois: o estágio 71 foi aprovado para entrar
+antes, a branch deste foi refeita em cima dele e os dois foram publicados
+juntos em 16/11/2026.
 
 ## Objetivo
 
@@ -63,7 +65,7 @@ Um PR:
 |---|---|
 | 72a — Imagem | `shareImageLayout` e `shareImage` com as finalistas; testes |
 | 72b — Entrega | `sharePlan`, a prévia com "Baixar imagem", o botão que espera a imagem; testes e roteiros de navegador |
-| 72c — Publicação | Só o app, com o sim do Stefan |
+| 72c — Publicação | Só o app, com o sim do Stefan. Feita em 16/11/2026, junto com o estágio 71 |
 
 ## Fora de escopo
 
@@ -114,4 +116,6 @@ Um PR:
   endereço está escrito na imagem.
 - **Conflito com o estágio 71:** os dois mexem em
   `app/src/photo-survey-page.js` e em `app/e2e/site-shell.mjs`, em trechos
-  diferentes. O que for mesclado depois é refeito sobre a `main`.
+  diferentes. O que for mesclado depois é refeito sobre a `main`. (Foi este:
+  refeito sobre o estágio 71, com conflito de emenda em quatro arquivos; ver
+  o HANDOFF.)
