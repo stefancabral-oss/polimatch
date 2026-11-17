@@ -45,7 +45,10 @@ Depois de receber a folha com as telas desenhadas
    decisão 0002) passa a valer para o site inteiro.
 5. **Detalhes de desenho por delegação.** O Stefan pediu para não ser parado
    por eles: o agente escolhe, mostra pronto, e ele pode mudar qualquer um
-   depois. Merge e publicação continuam pedindo o sim dele, um a um.
+   depois. Merge e publicação continuam pedindo o sim dele, um a um. (Em
+   16/11/2026 cada pergunta listou os merges e os deploys de uma vez e teve
+   um sim para o conjunto; as perguntas e as respostas estão nos HANDOFF dos
+   estágios 70, 71 e 72.)
 
 ## O que muda
 

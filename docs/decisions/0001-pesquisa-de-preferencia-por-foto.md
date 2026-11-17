@@ -7,9 +7,9 @@
 - Estado: direção aprovada, em produção em parte. Desde 14/11/2026, a pesquisa
   de Política por foto (estágios 68 e 69; o 70 desde 16/11/2026); desde
   16/11/2026, o cadastro com CPF para responder, na forma da decisão 0004
-  (estágio 71). Não estão em produção:
-  os cinco primeiros e o resultado somado (itens 4 e 5) e os outros assuntos
-  (item 6).
+  (estágio 71). Não estão em produção,
+  entre outros pontos: os cinco primeiros e o resultado somado (itens 4 e 5),
+  os outros assuntos (item 6) e o som.
 - Alterada em quatro pontos pela [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md), de 13/11/2026. Cada ponto está marcado abaixo.
 - Alterada no item 7 pela [decisão 0003](0003-a-pesquisa-vira-a-capa.md), de 14/11/2026: os jogos de leitura e a capa do jogo saem do site.
 - Alterada no item 3 pela [decisão 0004](0004-cadastro-obrigatorio-com-cpf.md), de 16/11/2026: só responde quem entrou com Google e tem cadastro com CPF.
@@ -50,7 +50,10 @@ o arquivo, ou pausa. O Stefan respondeu com um quarto caminho.
 
 ## O que muda em relação às decisões aprovadas
 
-As decisões da coluna da esquerda continuam descrevendo o que está no ar. Elas
+As decisões da coluna da esquerda continuam descrevendo o que está no ar.
+(Escrito em 12/11/2026. Desde 14/11/2026, pela decisão 0003, o produto
+anterior saiu do site: onde esta seção e a seguinte dizem "o que está no ar",
+leia-se o produto anterior.) Elas
 deixam de valer para as telas e regras da pesquisa por foto, que só entram em
 produção por etapas próprias, cada uma com Issue e gate humano. Os detalhes de
 formato da coluna da direita (eliminatória, janela de dias, coleção) vêm do
@@ -58,7 +61,7 @@ protótipo aprovado e serão detalhados nessas etapas.
 
 | Decisão anterior | Onde está | O que vale na direção nova |
 |---|---|---|
-| "Não é pesquisa eleitoral" | `CONTEXT.md`, "Norte do produto" | Continua valendo, e exibida, no que está no ar. Deixa de valer para a direção nova: o texto que a substitui ali depende da revisão jurídica (Q5 da #277). Até lá o repositório não afirma enquadramento para a pesquisa por foto. |
+| "Não é pesquisa eleitoral" | `CONTEXT.md`, "Norte do produto" | Continua valendo, e exibida, no que está no ar. Deixa de valer para a direção nova: o texto que a substitui ali depende da revisão jurídica (Q5 da #277). Até lá o repositório não afirma enquadramento para a pesquisa por foto. (Desde 14/11/2026, decisão 0003: o produto anterior saiu do site e a frase não é mais exibida.) |
 | Produto definido como jogo casual de comparação | `CONTEXT.md`, "Norte do produto"; `README.md`, abertura | Pesquisa de preferência por foto, em formato de jogo. |
 | Duas escolhas em ordem por tela | `CONTEXT.md`, "Duas escolhas ordenadas" (#239) | Um toque por tela, em eliminatória com final. |
 | Resultado da rodada com variação de pontos nas cartas | `CONTEXT.md`, "Decisões atuais aprovadas" | Sem placar entre telas. O desfecho é a escolha final da pessoa. |

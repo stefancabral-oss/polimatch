@@ -83,7 +83,9 @@ item 5). Estas escolhas respondem à pendência "Login Google e CPF" da decisão
   resultado manipulado, compartilhamento por iniciativa da pessoa.
 - Uma resposta por pessoa em cada pesquisa, sem troca depois de confirmar.
 - O fluxo ICM e o gate humano do `AGENTS.md`. Merge e publicação pedem o sim
-  do Stefan, um a um.
+  do Stefan, um a um. (Em 16/11/2026 a pergunta listou os dois merges e os
+  deploys de uma vez e teve um sim para o conjunto; está no HANDOFF do
+  estágio 71.)
 
 ## Pendências
 

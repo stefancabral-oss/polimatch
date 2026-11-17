@@ -51,7 +51,8 @@ Palavras dele, transcritas de conversa por voz:
 
 A regra do jogo atual "carta padrão neutra para todos; Chroma como
 personalização pessoal" (`CONTEXT.md`, "Decisões atuais aprovadas";
-`README.md`, "Produto atual") continua valendo para o que está no ar. Na
+`README.md`, "Produto atual") continua valendo para o que está no ar.
+(Desde 14/11/2026, decisão 0003: o jogo saiu do site.) Na
 pesquisa por foto a ideia é a mesma por outro caminho: todas as cartas de uma
 pesquisa têm a mesma moldura.
 

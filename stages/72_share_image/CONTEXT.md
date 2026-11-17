@@ -65,7 +65,7 @@ Um PR:
 |---|---|
 | 72a — Imagem | `shareImageLayout` e `shareImage` com as finalistas; testes |
 | 72b — Entrega | `sharePlan`, a prévia com "Baixar imagem", o botão que espera a imagem; testes e roteiros de navegador |
-| 72c — Publicação | Só o app, com o sim do Stefan |
+| 72c — Publicação | Só o app, com o sim do Stefan. Feita em 16/11/2026, junto com o estágio 71 |
 
 ## Fora de escopo
 
@@ -116,4 +116,6 @@ Um PR:
   endereço está escrito na imagem.
 - **Conflito com o estágio 71:** os dois mexem em
   `app/src/photo-survey-page.js` e em `app/e2e/site-shell.mjs`, em trechos
-  diferentes. O que for mesclado depois é refeito sobre a `main`.
+  diferentes. O que for mesclado depois é refeito sobre a `main`. (Foi este:
+  refeito sobre o estágio 71, com conflito de emenda em quatro arquivos; ver
+  o HANDOFF.)
