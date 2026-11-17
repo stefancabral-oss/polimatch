@@ -2,11 +2,11 @@
 
 ## Status
 
-- Estado: `em andamento`. As entregas 69a, 69b e 69c foram aprovadas e mescladas (PR #332, commit `6de6bbe`). A 69e aconteceu em 14/11/2026: o app está publicado nesse commit e a pesquisa é a capa do site. A 69d (limpeza do código antigo) foi aprovada pelo Stefan em 16/11/2026, em PR próprio (#333).
+- Estado: `concluído`. As entregas 69a, 69b e 69c foram aprovadas e mescladas (PR #332, commit `6de6bbe`). A 69e aconteceu em 14/11/2026: o app foi publicado nesse commit e a pesquisa virou a capa do site. A 69d (limpeza do código antigo) foi aprovada pelo Stefan em 16/11/2026 e mesclada no mesmo dia (PR #333, commit `e220a96`).
 - Issue: #331
 - 69a, 69b e 69c: PR #332, mesclado em `6de6bbe`.
 - 69e: publicação de 14/11/2026 no commit `6de6bbe`; registro na issue #331 e neste documento.
-- 69d: branch `icm/69d-cleanup`, PR #333.
+- 69d: PR #333, mesclado em `e220a96` em 16/11/2026, com a mesma árvore do commit `94b9bfb`, que tinha o `ci-gate` verde.
 
 ## Entregue (69a — registro)
 
@@ -34,7 +34,7 @@
 - Em 14/11/2026 o app foi publicado pelo painel, no commit `6de6bbe` (20 s). A API não foi publicada: nada mudou em `back/` nem em `shared/`.
 - `polimatch.com.br` abre na pesquisa, sem `noindex`; "Como funciona" responde; os cinco endereços aposentados respondem 302 para `/`; o sitemap lista as duas páginas.
 - Durante o deploy a capa e a API foram lidas de fora a cada 5 s, por pouco mais de quatro minutos: 54 leituras, todas com resposta 200. A capa trocou de uma leitura para a outra.
-- A pesquisa no ar é a `politica-2026-01`, com as respostas de ensaio. Privacidade (#283) e backup externo (#279) seguem abertos.
+- A pesquisa que foi ao ar na capa em 14/11/2026 é a `politica-2026-01`, com as respostas de ensaio. Privacidade (#283) e backup externo (#279) seguem abertos.
 
 ## Entregue (69d — limpeza)
 
@@ -45,17 +45,18 @@
   - `photos.js`, que um teste do servidor (`back/src/photo-recovery.test.js`) confere contra a API.
 - `app/src/political-chromas.test.js` voltou, só com a conferência das 20 cartas contra o elenco, as artes de origem e os arquivos publicados, e com a conferência de que a pesquisa usa exatamente essas cartas. O arquivo antigo tinha saído porque também testava módulos do jogo.
 - Nada em `back/` nem em `shared/`. O build publicado não muda: um build antes e outro depois da limpeza dão os mesmos 311 arquivos, com o mesmo conteúdo, fora a data em `version.json`.
+- Mesclada em 16/11/2026. Não teve deploy próprio: o app publicado no mesmo dia pelo estágio 70 foi montado, pelo commit que o painel registrou (`59ca9a1`; `version.json` segue com `sha: "unknown"`, #287), a partir da `main` já sem esses arquivos.
 
 ## Não entregue / pendente
 
 - **`app/src/api.js`.** O módulo fica, com funções das rotas do jogo anterior que nenhuma página chama mais; elas não entram no arquivo publicado. Enxugar é mexer nos testes do cliente da API, e ficou fora.
 - **O piloto de arte e os três verificadores de imagens do build** (`editorial-assets`, `portraits`, `presidential-assets`) continuam: validam imagens que ainda estão em `app/public`.
-- **Outros restos, sem uso pelo site.** Em `identity-notice.js`, os textos do jogo e duas funções que só os testes chamam. O build ainda calcula o resumo das imagens de `portraits/` e `chromas/approved` para `photos.js`, que só um teste do servidor lê. No `ci.yml`, dois filtros de caminho de artes antigas e um comentário que cita um módulo apagado. `docs/design/APPROVED_CHROMA_BATCH.md` aponta para um módulo apagado.
+- **Outros restos, sem uso pelo site.** Em `identity-notice.js`, os textos do jogo e duas funções que só os testes chamam (o arquivo saiu no estágio 71). O build ainda calcula o resumo das imagens de `portraits/` e `chromas/approved` para `photos.js`, que só um teste do servidor lê. No `ci.yml`, dois filtros de caminho de artes antigas e um comentário que cita um módulo apagado. `docs/design/APPROVED_CHROMA_BATCH.md` aponta para um módulo apagado.
 - **README.** Ainda abre descrevendo o jogo e traz o produto anterior em "Produto atual", com um aviso em cima. A correção é da [ICM 61] #303.
 - **Privacidade.** A folha traz a página; ela não foi construída. Entra no menu quando houver texto aprovado (#283).
 - **Imagens do produto anterior.** Continuam em `app/public` e seguem servidas pelos endereços diretos (`/portraits/`, `/chromas/`, `/candidates/`): o `dist` tem 75 MB, quase tudo delas. Nenhuma página aponta para elas, fora as 20 cartas da pesquisa. Tirar pede cuidado com os testes do servidor, que leem algumas, e conversa com a #284.
 - **Rotas do jogo anterior.** Continuam respondendo na API. Este estágio não toca no servidor.
-- **Pesquisa de lançamento.** `politica-2026-01` segue com as respostas de ensaio. Abrir uma pesquisa nova, zerada, é proposta para o passo de publicação.
+- **Pesquisa de lançamento.** `politica-2026-01` segue com as respostas de ensaio; desde o estágio 70 (16/11/2026) há também a `politica-2026-02` no ar. A proposta de abrir uma pesquisa de lançamento com código novo, zerada, segue sem decisão.
 
 ## Testes executados
 
@@ -70,7 +71,7 @@ Em 14/11/2026, local (macOS), no código final do PR:
 - `app/scripts/smoke-nginx.mjs` contra um nginx 1.31 local com o `nginx.conf` do app e o `dist` do build: 14 de 14. Os cinco endereços aposentados respondem 302 com `Location: /`; um `.html` que não existe continua respondendo 404.
 - Capturas conferidas a olho: início, menu sem conta, menu com conta, resposta registrada em 390×844, 360×640 e 320×480, pesquisa fechada, "Como funciona" em 390×844 e 360×640, e a tela de voto, sem menu.
 
-No CI do PR #332, no commit `8d85655` (antes da segunda passada da revisão): `ci-gate` verde. No Linux, `site-shell` com 20 cenários e `photo-survey` com 34, em Chromium e em WebKit; relato de erros nos dois; os testes de unidade, a imagem do app e o `smoke-nginx` com 14 de 14 na imagem nginx 1.27, incluídos os cinco redirecionamentos. A revisão automática do Codex leu esse commit e não deixou apontamento. No commit `482d1e7`, com as correções da segunda passada: `ci-gate` verde de novo, com `site-shell` em 24 cenários e `photo-survey` em 34, em Chromium e em WebKit, e o `smoke-nginx` com 14 de 14. O commit que registra o gate, só de documentação, passa pelo CI antes do merge.
+No CI do PR #332, no commit `8d85655` (antes da segunda passada da revisão): `ci-gate` verde. No Linux, `site-shell` com 20 cenários e `photo-survey` com 34, em Chromium e em WebKit; relato de erros nos dois; os testes de unidade, a imagem do app e o `smoke-nginx` com 14 de 14 na imagem nginx 1.27, incluídos os cinco redirecionamentos. A revisão automática do Codex leu esse commit e não deixou apontamento. No commit `482d1e7`, com as correções da segunda passada: `ci-gate` verde de novo, com `site-shell` em 24 cenários e `photo-survey` em 34, em Chromium e em WebKit, e o `smoke-nginx` com 14 de 14. O commit que registra o gate, `05f3cff`, passou no `ci-gate` antes do merge.
 
 O que veio antes do código, e falhou primeiro pelo motivo esperado:
 
@@ -149,7 +150,7 @@ Da segunda passada ficaram anotados, sem mudança:
 
 ## Riscos conhecidos
 
-- **O botão real do Google não foi exercitado.** Nos testes o script do Google é simulado. Em produção o menu usa o mesmo identificador de cliente e a mesma origem da capa atual, mas a primeira entrada real pelo menu é o teste que vale.
+- **O botão real do Google não foi exercitado.** Nos testes o script do Google é simulado. Em produção o menu usa o mesmo identificador de cliente e a mesma origem da capa antiga, mas a primeira entrada real pelo menu é o teste que vale. (Até 16/11/2026 o agente não a exercitou; o relato do Stefan desse dia, "No celular funcionou", não diz o que ele testou.)
 - **`<dialog>` em navegador antigo.** Antes do Safari 15.4 o menu abre pelo atributo, sem prender o foco. O e2e simula isso; um aparelho de verdade com esse navegador não foi usado.
 - **Abrir o menu fala com o Google.** O script de entrada vem de `accounts.google.com`, como já vinha na capa antiga. Pesa na política de privacidade (#283).
 - **Redirecionamento só existe no nginx.** O `vite preview` dos e2e não o reproduz. Foi conferido num nginx local e é conferido pelo smoke da imagem, no CI.
@@ -176,21 +177,19 @@ Escolhas do agente, por delegação dele, que pode mudar qualquer uma:
 
 ## Próximo passo exato
 
-1. Merge do PR #333, já autorizado, com o `ci-gate` verde no commit final. Não precisa de deploy: o que saiu já não entrava no build.
-2. O Stefan testa a entrada com Google pelo menu, no celular.
-3. Depois: decidir o destino das imagens do produto anterior em `app/public` e do piloto de arte; a página de Privacidade quando houver texto (#283); a próxima pesquisa.
+Nenhum neste estágio: o PR #333 foi mesclado em 16/11/2026. Seguem abertos, fora dele: o destino das imagens do produto anterior em `app/public` e do piloto de arte, e a página de Privacidade quando houver texto (#283). A segunda pesquisa está no estágio 70.
 
 ## Ação do Stefan
 
-- Entrar com Google pelo menu no celular depois de publicado: é o teste que os roteiros não fazem.
+- Dizer se entrou com Google pelo menu no celular: é o teste que os roteiros não fazem, e o relato dele de 16/11/2026 não diz se cobre isso (ver o HANDOFF do estágio 71).
 - Texto da página de Privacidade, com o advogado (#283), e o backup externo (#279): seguem abertos com a pesquisa à vista.
-- Dizer se quer a pesquisa de lançamento com código novo, zerada. A que vai ao ar é a `politica-2026-01`, com as respostas de ensaio.
+- Dizer se quer a pesquisa de lançamento com código novo, zerada. Desde o estágio 70 (16/11/2026) estão no ar a `politica-2026-01`, com as respostas de ensaio, e a `politica-2026-02`.
 
 ## Human gate
 
 - Decisão da entrega 69d: `aprovado`
 - Responsável: Stefan
-- Observação: a limpeza é parte do pedido dele de 14/11/2026 ("tira o que é velho, deixa novo"), transcrito na decisão 0003. O merge teve instrução direta dele em 16/11/2026. A mensagem do agente dizia que a limpeza estava no PR 333, com CI verde e revisão feita, que ela não muda nada do que está no ar e não precisa de publicação, e que o pacote do estágio 70 (PR 335) tinha sido feito em cima dela; a pergunta foi: "Mesclo os PRs 333 e 335 e publico a API e o app? Pode responder 'sim, mescla e publica' ou 'só mescla'." Ele respondeu: "Sim, mescla e publica". O `ci-gate` estava verde no commit `db7d079`. O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O gate do estágio 70 está no HANDOFF dele.
+- Observação: a limpeza é parte do pedido dele de 14/11/2026 ("tira o que é velho, deixa novo"), transcrito na decisão 0003. O merge teve instrução direta dele em 16/11/2026. A mensagem do agente dizia que a limpeza estava no PR 333, com CI verde e revisão feita, que ela não muda nada do que está no ar e não precisa de publicação, e que o pacote do estágio 70 (PR 335) tinha sido feito em cima dela; a pergunta foi: "Mesclo os PRs 333 e 335 e publico a API e o app? Pode responder 'sim, mescla e publica' ou 'só mescla'." Ele respondeu: "Sim, mescla e publica". O `ci-gate` estava verde no commit `db7d079`. O merge ficou a cargo do agente, a pedido dele: o PR foi mesclado em `e220a96`, com a mesma árvore do commit final `94b9bfb`, que tinha o `ci-gate` verde. O gate do estágio 70 está no HANDOFF dele.
 - Decisão das entregas 69a, 69b e 69c e da publicação (69e): `aprovado`
 - Responsável: Stefan
 - Observação: a construção teve instrução direta dele em 14/11/2026 ("Pode seguir, vai pra frente. Pode ir construindo."), transcrita na decisão 0003. O merge do PR #332 e a publicação do app também tiveram instrução direta dele, no mesmo dia. A mensagem do agente dizia o que ficou pronto, que o CI estava verde no commit final e que a revisão independente não achou bloqueio; que o botão real do Google não foi testado; que a página de Privacidade e a limpeza do código antigo não entraram; e, antes da pergunta, que ao publicar a pesquisa fica à vista de qualquer visitante, com a política de privacidade e o backup externo ainda em aberto, e que o site novo deixa de mostrar a frase "Não é pesquisa eleitoral". A pergunta foi: "Mesclo o PR 332 e publico o app em seguida? Pode responder 'sim, mescla e publica' ou 'só mescla'." Ele respondeu: "Sim mescla e publica". O merge e o deploy ficaram a cargo do agente, a pedido dele, com o check verde no commit final: o PR foi mesclado em `6de6bbe` e o app publicado nesse commit no mesmo dia. A pesquisa de lançamento com código novo não foi tratada na pergunta: vai ao ar a `politica-2026-01`. A limpeza (69d) tem gate próprio. A regra 6 do `AGENTS.md` não muda.
