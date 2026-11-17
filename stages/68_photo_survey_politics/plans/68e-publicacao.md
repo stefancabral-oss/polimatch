@@ -71,12 +71,14 @@ as dez e aprovou sem cortar nomes.
 O cenário de e2e foi escrito antes do código e falhou primeiro pelo motivo
 esperado (uma carta de fora da lista apareceu na entrada). A mudança é só do
 app: chega à produção com um deploy do app. No mesmo dia ele aprovou o merge
-(PR #330) e esse deploy, na mesma instrução; o resultado do deploy fica na
-issue #324.
+(PR #330) e esse deploy, na mesma instrução. O PR foi mesclado em `2080596` e o
+app publicado nesse commit em 14/11/2026; o resultado está na issue #324 e no
+HANDOFF.
 
 ## Fica para depois, com outro sim
 
-- A entrada na capa e a página no sitemap.
+- A entrada na capa e a página no sitemap. (Feitas no estágio 69, #331, em
+  14/11/2026, com gate próprio.)
 - Antes de chamar gente de fora: política de privacidade (#283), backup
   externo (#279), o destino da edição Eleições 2026 (#285) e a decisão sobre
   a cota de três por rede.
@@ -91,7 +93,7 @@ Cada passo teve o sim do Stefan em conversa, transcrito no HANDOFF do estágio.
 | 2 | `PHOTO_SURVEYS_ENABLED=true` | O Stefan pediu que o agente abrisse a aba Environment da API. A linha foi acrescentada e salva; as quatro variáveis que já existiam ficaram idênticas, conferidas por tamanho e por resumo de cada linha, antes e depois de salvar, sem ler os valores |
 | 3 | Deploy da API | Commit `eb729ed`, 35 s. De fora, a cada 5 s por 6 min: 72 respostas 200 em `/api/health`, nenhuma queda; a rota da pesquisa passou de 404 para 200, com `status: open`, 20 cartas e sorteio de 16. Log: `database_ready` com `resetApplied: false`, sem linha de erro. Banco: 24 tabelas com a mesma contagem; `photo_survey_draws` e `photo_survey_responses` criadas e vazias; migração `2026-11-13-photo-survey-v1` registrada; `abuse_quota_counters` de 66 para 61, a poda que a API faz ao subir |
 | 4 | Deploy do app | O Stefan confirmou o uso das 20 cartas atuais. Commit `eb729ed`, 27 s. De fora, a cada 5 s: a capa respondeu 200 em todas as consultas; `/pesquisa.html` passou de 404 para 200 |
-| 5 | Teste do Stefan no celular | com ele |
+| 5 | Teste do Stefan no celular | Ele abriu a página em produção em 14/11/2026 e pediu a mudança da entrada (PR #330) |
 
 Conferido de fora depois do passo 4, só por GET e por um pré-voo de CORS, que
 não grava nada:

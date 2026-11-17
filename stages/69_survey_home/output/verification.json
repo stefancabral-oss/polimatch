@@ -9,7 +9,7 @@
     "69a": "registro: decisão 0003, contexto, plano, folha e ajustes nos documentos anteriores; mesclada no PR #332 (6de6bbe)",
     "69b": "menu, entrada e saída com Google no menu, página Como funciona; mesclada no PR #332 (6de6bbe)",
     "69c": "/ serve a pesquisa; cinco endereços aposentados com 302; sitemap e manifesto; páginas antigas fora do build; 26 passos de e2e antigos fora do CI; mesclada no PR #332 (6de6bbe)",
-    "69d": "limpeza: 112 arquivos do produto anterior fora de app/src, app/e2e e app/scripts; testes de limpeza; mesclada em 16/11/2026 (PR #333, commit e220a96)",
+    "69d": "limpeza: 112 arquivos do produto anterior fora de app/src, app/e2e e app/scripts, e political-chromas.test.js de volta só com a conferência das cartas (o merge apaga 111); testes de limpeza; mesclada em 16/11/2026 (PR #333, commit e220a96)",
     "69e": "app publicado em 14/11/2026 no commit 6de6bbe; API não publicada"
   },
   "scope": {
@@ -149,6 +149,7 @@
   },
   "delivery69d": {
     "checkedAt": "2026-11-14",
+    "mergedAt": "2026-11-16",
     "removed": {
       "app/src": 81,
       "app/e2e": 30,

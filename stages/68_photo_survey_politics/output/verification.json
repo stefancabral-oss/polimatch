@@ -65,7 +65,7 @@
     "delivery68b": "aprovada",
     "delivery68c": "aprovada (gate do Stefan em 14/11/2026)",
     "delivery68d": "aprovada (gate do Stefan em 14/11/2026)",
-    "delivery68e": "feita em 14/11/2026: API e app publicados com a pesquisa ligada e a página escondida, e a correção da entrada (PR #330) mesclada e publicada; a entrada na capa e o sitemap passaram para o estágio 69 (#331)"
+    "delivery68e": "aprovada e feita em 14/11/2026: API e app publicados com a pesquisa ligada e a página escondida, e a correção da entrada (PR #330) mesclada e publicada; a entrada na capa e o sitemap passaram para o estágio 69 (#331)"
   },
   "delivery68b": {
     "checkedAt": "2026-11-13",
@@ -365,7 +365,7 @@
       "2 PHOTO_SURVEYS_ENABLED=true": "linha acrescentada e salva na aba Environment da API, a pedido do Stefan; as quatro variáveis anteriores idênticas por tamanho e resumo de linha, antes e depois de salvar; valores não lidos",
       "3 deploy da API": "35 s; 72 de 72 respostas 200 em /api/health, de fora, a cada 5 s; rota da pesquisa de 404 para 200, status open, 20 cartas, sorteio de 16; log database_ready com resetApplied false, sem erro",
       "4 deploy do app": "27 s; capa 200 em todas as consultas de fora a cada 5 s; /pesquisa.html de 404 para 200",
-      "5 teste do Stefan no celular": "com ele"
+      "5 teste do Stefan no celular": "ele abriu a página em produção em 14/11/2026 e pediu a mudança da entrada (PR #330)"
     },
     "database": {
       "method": "contagem de linhas por tabela, no terminal do contêiner, antes e depois do deploy da API",
@@ -414,7 +414,7 @@
       "automatedReview": "Codex leu o commit f40854e e não deixou apontamento",
       "humanGate": "instrução do Stefan em 14/11/2026 para o merge do PR #330 e para o deploy do app: \"Sim mescla e coloca pra rodar\"; não cortou nomes; transcrita no HANDOFF",
       "merge": "PR #330 mesclado em 2080596, mesma árvore de d69a10a (ci-gate verde)",
-      "production": "app publicado pelo painel no commit 2080596 em 14/11/2026 (42 s); a API não foi publicada de novo; de fora, por GET: /pesquisa.html 200 com noindex, o script publicado traz a lista da entrada (presença no arquivo, não comportamento na tela), as imagens das dez cartas respondem 200 e nenhuma leitura falhou durante o deploy; registro na issue #324"
+      "production": "app publicado pelo painel no commit 2080596 em 14/11/2026 (42 s); a API não foi publicada de novo; de fora, por GET: /pesquisa.html 200 com noindex, o script publicado traz a lista da entrada (presença no arquivo, não comportamento na tela), as imagens das dez cartas respondem 200 e nenhuma leitura falhou durante o deploy; o commit é o que o painel registrou, com version.json em sha unknown (#287); registro na issue #324"
     }
   }
 }
