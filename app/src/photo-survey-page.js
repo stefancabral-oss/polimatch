@@ -350,7 +350,7 @@ function renderPlay({ focus = false, sending = false } = {}) {
     focus,
     body: `${heading("Sua escolha", cardName(current.championId), "Confira antes de registrar. Depois não dá para votar de novo nesta pesquisa.")}
       <div class="ps-hero">${staticCard(current.championId, "176px")}</div>
-      <p class="ps-label">Suas finalistas</p>
+      <p class="ps-label">Você também escolheu</p>
       <div class="ps-row">${current.otherIds.map((id) => staticCard(id, "84px", cardName(id))).join("")}</div>
       <div class="ps-stack ps-stack--pair">
         <button class="ps-btn" data-action="confirm" type="button"${sending ? " disabled" : ""}>${sending ? "Registrando…" : notice ? "Tentar de novo" : "Confirmar minha escolha"}</button>
@@ -372,7 +372,7 @@ function renderDone({ focus = false } = {}) {
     focus,
     body: `${heading("Escolha registrada", champion ? cardName(champion) : "Sua resposta está registrada.", "Obrigado por participar. Sua resposta está registrada e não pode ser trocada nesta pesquisa.")}
       ${champion ? `<div class="ps-hero">${staticCard(champion, "176px")}</div>` : ""}
-      ${others.length ? `<p class="ps-label">Suas finalistas</p><div class="ps-row">${others.map((id) => staticCard(id, "84px", cardName(id))).join("")}</div>` : ""}
+      ${others.length ? `<p class="ps-label">Você também escolheu</p><div class="ps-row">${others.map((id) => staticCard(id, "84px", cardName(id))).join("")}</div>` : ""}
       <div class="ps-stack ps-stack--pair">${champion ? '<button class="ps-btn" data-action="share" type="button" aria-label="Compartilhar minha escolha" aria-busy="true" disabled>Compartilhar</button>' : ""}${nextLink()}</div>`,
   });
   prepareShare(champion, others);

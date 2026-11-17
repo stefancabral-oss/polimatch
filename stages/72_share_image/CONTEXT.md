@@ -43,6 +43,10 @@ o link.
   Compartilhar não fala com a API.
 - **Só as escolhas da pessoa.** A imagem leva a escolhida e as finalistas
   dela. Nunca resultado somado (#177).
+- **O texto não diz "finalistas".** Na imagem, as outras três cartas vêm
+  sob "Também escolhi"; nas telas de confirmação e de resposta registrada,
+  sob "Você também escolheu". Pedido do Stefan de 16/11/2026, depois da
+  publicação (72d, #342). "Finalistas" segue como nome interno.
 - **A imagem não sai do aparelho por conta própria.** Ela é montada no
   navegador e fica na memória da página; a prévia usa um endereço local, que
   é solto quando a prévia fecha.
@@ -66,6 +70,7 @@ Um PR:
 | 72a — Imagem | `shareImageLayout` e `shareImage` com as finalistas; testes |
 | 72b — Entrega | `sharePlan`, a prévia com "Baixar imagem", o botão que espera a imagem; testes e roteiros de navegador |
 | 72c — Publicação | Só o app, com o sim do Stefan. Feita em 16/11/2026, junto com o estágio 71 |
+| 72d — Ajuste de texto | "Também escolhi" e "Você também escolheu" no lugar de "finalistas" (#342); publicação do app com o sim do Stefan |
 
 ## Fora de escopo
 

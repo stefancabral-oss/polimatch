@@ -7,10 +7,11 @@
 - Branch: `icm/72-share-image`. Foi feita sobre a `main` em `59ca9a1`; com o estágio 71 (PR #337) aprovado para entrar antes, foi refeita em cima dele. Os dois mexiam em quatro arquivos; os conflitos estão descritos em "Testes executados".
 - PR: #339
 - Em produção desde 16/11/2026.
+- 72d (ajuste de texto pedido depois da publicação): issue #342, branch `icm/72-share-wording`. Aguarda o gate. Até o app ser publicado de novo, o que está no ar segue com "Minhas finalistas" e "Suas finalistas".
 
 ## Entregue (72a — imagem)
 
-- `app/src/share-choice.js`: a imagem (1080×1350, JPEG) passa a trazer a escolhida em destaque e até três finalistas numa linha, com "Minha escolha", o nome, a pergunta, "Minhas finalistas" e "Responda em polimatch.com.br".
+- `app/src/share-choice.js`: a imagem (1080×1350, JPEG) passa a trazer a escolhida em destaque e até três finalistas numa linha, com "Minha escolha", o nome, a pergunta, "Minhas finalistas" e "Responda em polimatch.com.br". (O rótulo "Minhas finalistas" muda para "Também escolhi" na 72d.)
 - `shareImageLayout({ ratio, others })`: a conta de onde cada coisa fica, separada do desenho, com teste. Uma carta mais alta que o normal encolhe para caber.
 - Uma finalista cuja carta não carrega fica de fora, e a imagem sai assim mesmo.
 
@@ -34,6 +35,16 @@ Com a instrução do Stefan ("Sim, os dois"), transcrita em "Human gate":
 
 O registro do banco e da API desta publicação está no HANDOFF do estágio 71 e na issue #336; o deste estágio, na #338.
 
+## Entregue (72d — ajuste de texto)
+
+Depois da publicação, em 16/11/2026, o Stefan escreveu: "única frase que não gostei: Minhas finalistas. Ficou meio fora do portugues."
+
+- Na imagem, o rótulo acima das outras três cartas passa de "Minhas finalistas" para "Também escolhi". A descrição da imagem na prévia muda junto: "Imagem com a minha escolha: (nome). Também escolhi: (nomes)."
+- Nas telas de confirmação e de resposta registrada, o mesmo rótulo passa de "Suas finalistas" para "Você também escolheu". Ele apontou só a frase da imagem; a das telas usa a mesma palavra e foi trocada junto, por escolha do agente.
+- Só texto, em `app/src/share-choice.js` e `app/src/photo-survey-page.js`. O desenho da imagem, as cartas, as regras e o servidor não mudam. Nos documentos e no código, "finalistas" continua sendo o nome interno dessas três cartas.
+- A folha com a imagem e a tela novas, que ele recebeu, está em `references/texto-novo-telas.jpg`.
+- Não publicado: chega à produção com um deploy do app, depois do merge, cada um com o sim dele.
+
 ## Não entregue / pendente
 
 - Imagem com as escolhas de várias pesquisas numa folha só; formato para stories.
@@ -55,6 +66,12 @@ Em 16/11/2026, local (macOS), no código do PR antes de ser refeito:
 O que veio antes do código, e falhou primeiro pelo motivo esperado: os testes de `share-choice.test.js` (o plano de entrega, a conta do desenho, a marcação da prévia e, depois da revisão, a chamada só com o arquivo, a linha que encolhe e os estados da prévia).
 
 O que não seguiu essa ordem: os cenários de navegador vieram depois da mudança da página, nas duas rodadas. Na primeira, o Chromium mostrou um defeito de verdade (a imagem da prévia só era solta quando o navegador avisava do fechamento); corrigido. Depois dos consertos da revisão, o código foi desfeito de catorze formas e as catorze foram pegas, uma delas só depois de um cenário ganhar a conferência que faltava (o foco na prévia sem `showModal`).
+
+Na 72d, em 16/11/2026, local (macOS):
+
+- Os testes vieram antes do código e falharam pelo motivo esperado: o de unidade da descrição da imagem; o cenário de navegador da imagem, que passou a ler o que a imagem escreve ("a imagem diz 'Também escolhi'" falhou com "MINHAS FINALISTAS" na lista); e o das telas de resumo (esperava "Você também escolheu" e leu "Suas finalistas").
+- Depois da troca: `npm test --prefix app` 213/213; `site-shell.mjs` com 46 cenários e `photo-survey.mjs` com 34, em WebKit e em Chromium 140. Nada muda em `shared/` nem em `back/`.
+- Conferidas a olho: a imagem gerada e a tela de resposta registrada em 390×844.
 
 ## Revisão independente
 
@@ -99,9 +116,16 @@ Escolhas do agente, por delegação dele (decisão 0003, item 5), que pode mudar
 - O botão espera a imagem ficar pronta.
 - O formato continua 1080×1350.
 
+Na 72d, a partir da avaliação dele ("única frase que não gostei: Minhas finalistas"), escolhas do agente, que ele pode mudar:
+
+- "Também escolhi" na imagem, que fala na primeira pessoa como "Minha escolha".
+- "Você também escolheu" nas telas, que falam com a pessoa.
+- Trocar também o rótulo das telas, que ele não citou.
+
 ## Próximo passo exato
 
-Nenhum neste estágio.
+1. Gate do Stefan para a 72d: merge do PR e deploy do app (a API não muda).
+2. Depois do deploy: conferência de fora, só por leitura, de que o pacote publicado traz o texto novo.
 
 ## Ação do Stefan
 
@@ -109,6 +133,8 @@ Nenhum neste estágio.
 
 ## Human gate
 
+- Decisão da 72d (ajuste de texto): `pendente`
+- Responsável: Stefan
 - Decisão das partes 72a e 72b e da publicação (72c): `aprovado`
 - Responsável: Stefan
 - Observação: a construção responde à avaliação dele de 16/11/2026 e à delegação registrada na decisão 0003. O merge e a publicação tiveram instrução direta dele no mesmo dia. A mensagem do agente que antecedeu a pergunta dizia que os dois pedidos (este e o cadastro com CPF, PR #337) estavam prontos e nenhum estava no ar; que a imagem traz a escolhida, as três finalistas, a pergunta e o endereço; que a causa provável do "só o link" é o iPhone descartar a imagem quando ela vai com texto e link, e que agora vai só a imagem; que onde não dá para compartilhar arquivo a imagem aparece na tela com "Baixar imagem"; que nada disso foi testado num celular de verdade e que a correção do iPhone vem de um defeito conhecido do navegador; e que os dois PRs passaram por revisão independente e estavam com os testes automáticos verdes. A pergunta foi: "Mesclo e publico o cadastro com CPF e o compartilhar com imagem? Pode responder 'sim, os dois', 'só o compartilhar' ou 'só o cadastro'." Ele respondeu: "Sim, os dois". O merge e o deploy ficaram a cargo do agente, a pedido dele, com o check verde no commit final, e foram feitos em 16/11/2026 (ver "Publicação"). A regra 6 do `AGENTS.md` não muda.

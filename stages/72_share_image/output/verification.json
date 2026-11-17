@@ -81,5 +81,29 @@
     "app": "commit 28fd962, 31 s; build de 2026-11-16T23:26:07Z; nenhuma leitura de fora falhou",
     "checkedByGet": "presença no pacote publicado (código, não comportamento na tela): a imagem com as finalistas, a prévia com Baixar imagem e a espera pela imagem",
     "stefanReport": "\"No celular funcionou\", depois da publicação; ele não disse o que testou nem em que aparelho, e não se sabe se cobre o compartilhar"
+  },
+  "delivery72d": {
+    "checkedAt": "2026-11-16",
+    "issue": 342,
+    "request": "Stefan, 16/11/2026, depois da publicação: \"única frase que não gostei: Minhas finalistas. Ficou meio fora do portugues.\"",
+    "change": "na imagem, \"Também escolhi\" no lugar de \"Minhas finalistas\" (rótulo e descrição da imagem); nas telas de confirmação e de resposta registrada, \"Você também escolheu\" no lugar de \"Suas finalistas\"; a troca nas telas é escolha do agente",
+    "unchanged": "o desenho da imagem, as cartas, as regras e o servidor; nada em shared/ nem em back/",
+    "testsFirst": {
+      "unidade": "share-choice.test.js: a descrição da imagem falhou com o texto antigo",
+      "navegador": "site-shell: o cenário da imagem passou a ler o que a imagem escreve e falhou com MINHAS FINALISTAS; photo-survey: o rótulo das telas de resumo falhou com Suas finalistas"
+    },
+    "tests": {
+      "environment": "macOS, local, 16/11/2026",
+      "npm test --prefix app": "213/213",
+      "e2e site-shell": "46 cenários em WebKit e em Chromium 140",
+      "e2e photo-survey": "34 cenários em WebKit e em Chromium 140",
+      "capturas conferidas": "a imagem gerada e a resposta registrada em 390x844"
+    },
+    "notVerified": [
+      "a tela de confirmação a olho: só pelo cenário de navegador",
+      "um aparelho de verdade",
+      "produção: não publicado"
+    ],
+    "humanGate": "pendente"
   }
 }
