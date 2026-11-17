@@ -77,11 +77,13 @@ HANDOFF.
 
 ## Fica para depois, com outro sim
 
-- A entrada na capa e a página no sitemap. (Feitas no estágio 69, #331, em
-  14/11/2026, com gate próprio.)
+- A entrada na capa e a página no sitemap. (Substituídas no estágio 69, #331:
+  a pesquisa virou a capa em 14/11/2026, com gate próprio, e `/pesquisa.html`
+  foi aposentada.)
 - Antes de chamar gente de fora: política de privacidade (#283), backup
   externo (#279), o destino da edição Eleições 2026 (#285) e a decisão sobre
-  a cota de três por rede.
+  a cota de três por rede. (Sobre a cota depois do estágio 71, ver "Próximo
+  passo exato" no HANDOFF.)
 
 ## O que aconteceu em 14/11/2026
 

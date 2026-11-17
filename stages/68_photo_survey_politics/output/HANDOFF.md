@@ -252,14 +252,14 @@ Decidida pelo Stefan em 14/11/2026, no teste em produção:
 
 Nenhum neste estágio. O que veio depois está nos estágios seguintes: a pesquisa como capa do site (69, em 14/11/2026); a segunda pesquisa e a capa em lista (70), o cadastro obrigatório com CPF (71) e o compartilhar com imagem (72), publicados em 16/11/2026.
 
-Seguem abertos, de antes de chamar gente de fora: política de privacidade (#283), backup externo (#279), o destino da edição Eleições 2026 (#285) e a pesquisa de lançamento com código próprio. A cota de três por rede saiu desta lista porque, pelo desenho do estágio 71, quem responde não passa mais por ela; a revisão da cota na política de abuso (Q4 da #277) continua pendente.
+Seguem abertos, de antes de chamar gente de fora: política de privacidade (#283), backup externo (#279), o destino da edição Eleições 2026 (#285) e a pesquisa de lançamento com código próprio. A cota de três por rede saiu desta lista porque, pelo desenho do estágio 71, quem responde não passa mais por ela; o número novo da cota (Q4 da #277, respondida por delegação) continua pendente na política de abuso.
 
 ## Ação do Stefan
 
-- Olhar a entrada nova no celular: o pedido era testar a pesquisa com ela. A entrada segue em uso, agora como capa do site (estágio 69). Não há registro de que ele a conferiu; o que ele avaliou depois está nos HANDOFF dos estágios 70 a 72.
+- Olhar a entrada nova no celular: o pedido era testar a pesquisa com ela. A entrada segue em uso, agora como capa do site (estágio 69). Não há registro de que ele tenha conferido a ilustração da entrada; em 14/11/2026, com a capa nova no ar, ele avaliou a capa como um todo (HANDOFF do estágio 70).
 - Decidir o que fazer com as cópias provisórias do banco, que têm dado pessoal e ficam dentro do contêiner: as duas registradas aqui (`/tmp/pre-deploy-20261113.dump`, anterior a este estágio, e `/tmp/pre-deploy-20261114.dump`, da 68e) e as duas de 16/11/2026, registradas nos estágios 70 e 71.
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
-- As condições de publicação propostas no contexto do estágio: ele autorizou publicar com as 20 cartas atuais (gate da 68e) e publicar a capa com a privacidade (#283) e o backup externo (#279) em aberto (gate do estágio 69). Seguem sem decisão dele: a #283, a #279, o destino da edição Eleições 2026 (#285) e a pesquisa de lançamento com código próprio.
+- As condições de publicação propostas no contexto do estágio: ele autorizou publicar com as 20 cartas atuais (gate da 68e) e publicar a capa com a privacidade (#283) e o backup externo (#279) em aberto (gate do estágio 69). Seguem abertas a #283 e a #279; seguem sem decisão dele o destino da edição Eleições 2026 (#285) e a pesquisa de lançamento com código próprio.
 - Dizer se quer cartas de Lula e Flávio Bolsonaro no padrão comum, para entrarem numa próxima pesquisa.
 
 ## Human gate
