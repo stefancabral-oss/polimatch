@@ -9,4 +9,5 @@
   duas opções de texto da 72d na imagem, lado a lado: "Também na final"
   (recomendada) e "Também escolhi". Antes dela ele recebeu uma folha só com
   "Também escolhi", que não ficou no repositório. Mesma forma de captura:
-  build da branch, servidor simulado e resposta fixa.
+  build da branch, servidor simulado e resposta fixa. A folha diz "Nas telas,
+  o mesmo texto"; na opção B as telas diriam "Você também escolheu".

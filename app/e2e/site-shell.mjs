@@ -1509,10 +1509,10 @@ try {
     // O que a imagem escreve: a escolha, e as outras três como "Também na final".
     // O rótulo descreve a final; não diz que a pessoa "escolheu" as três.
     const texts = await page.evaluate(() => window.__texts);
-    assert.ok(texts.includes("MINHA ESCOLHA"), `a imagem diz "Minha escolha" (${texts.join(" | ")})`);
-    assert.ok(texts.includes("TAMBÉM NA FINAL"), `a imagem diz "Também na final" (${texts.join(" | ")})`);
-    assert.equal(texts.some((text) => /escolhi/i.test(text)), false, `a imagem não diz "escolhi" das outras três (${texts.join(" | ")})`);
-    assert.equal(texts.some((text) => /finalista/i.test(text)), false, `a imagem não diz "finalistas" (${texts.join(" | ")})`);
+    // Os rótulos são os textos todos em maiúsculas; o nome, a pergunta e o
+    // endereço ficam de fora, para uma pergunta futura não derrubar o cenário.
+    const labels = texts.filter((text) => /\p{L}/u.test(text) && text === text.toUpperCase());
+    assert.deepEqual(labels, ["MINHA ESCOLHA", "TAMBÉM NA FINAL"], `os rótulos da imagem (${texts.join(" | ")})`);
     // Dois toques seguidos abrem o compartilhamento uma vez só.
     await button.click();
     await button.click();
