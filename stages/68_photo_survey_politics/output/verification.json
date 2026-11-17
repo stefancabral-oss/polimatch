@@ -65,7 +65,7 @@
     "delivery68b": "aprovada",
     "delivery68c": "aprovada (gate do Stefan em 14/11/2026)",
     "delivery68d": "aprovada (gate do Stefan em 14/11/2026)",
-    "delivery68e": "em andamento: API e app publicados em 14/11/2026 com a pesquisa ligada e a página escondida; falta a entrada na capa e o sitemap"
+    "delivery68e": "feita em 14/11/2026: API e app publicados com a pesquisa ligada e a página escondida, e a correção da entrada (PR #330) mesclada e publicada; a entrada na capa e o sitemap passaram para o estágio 69 (#331)"
   },
   "delivery68b": {
     "checkedAt": "2026-11-13",
@@ -387,7 +387,7 @@
     },
     "notDone": [
       "navegador automatizado em produção: não aberto; o primeiro toque em Começar é do Stefan",
-      "entrada na capa e sitemap: segunda parte da 68e, com outro sim"
+      "entrada na capa e sitemap: não feitos neste estágio; passaram para o estágio 69 (#331), em que a pesquisa virou a capa em 14/11/2026"
     ],
     "rollback": "tirar PHOTO_SURVEYS_ENABLED e publicar a API de novo: as rotas voltam a 404 e a página diz que a pesquisa não está disponível; as respostas gravadas ficam",
     "humanGate": "cada passo com instrução do Stefan em 14/11/2026: \"Sim\" (cópia do banco), \"Liga vc\" (variável e deploy da API), \"Sim\" (deploy do app com as 20 cartas atuais); transcritas no HANDOFF",
@@ -413,7 +413,8 @@
       "ci": "ci-gate verde no commit f40854e; photo-survey com 34 cenários em Chromium e em WebKit no Linux",
       "automatedReview": "Codex leu o commit f40854e e não deixou apontamento",
       "humanGate": "instrução do Stefan em 14/11/2026 para o merge do PR #330 e para o deploy do app: \"Sim mescla e coloca pra rodar\"; não cortou nomes; transcrita no HANDOFF",
-      "production": "chega com o deploy do app, depois do merge; o resultado fica na issue #324"
+      "merge": "PR #330 mesclado em 2080596, mesma árvore de d69a10a (ci-gate verde)",
+      "production": "app publicado pelo painel no commit 2080596 em 14/11/2026 (42 s); a API não foi publicada de novo; de fora, por GET: /pesquisa.html 200 com noindex, o script publicado traz a lista da entrada (presença no arquivo, não comportamento na tela), as imagens das dez cartas respondem 200 e nenhuma leitura falhou durante o deploy; registro na issue #324"
     }
   }
 }

@@ -2,14 +2,14 @@
 
 ## Status
 
-- Estado: `em andamento`. As entregas 68a (registro), 68b (regras e servidor), 68c (tela) e 68d (teste por agentes) foram aprovadas. A 68e está pela metade: em 14/11/2026 a API e o app foram publicados com a pesquisa ligada e a página escondida. Falta a entrada na capa e o sitemap, com outro sim. No mesmo dia o Stefan testou no celular e pediu uma mudança na ilustração da entrada (PR #330); ele aprovou o merge e o deploy do app na mesma instrução. O deploy acontece depois do merge, e o resultado fica registrado na issue #324.
+- Estado: `concluído`. As entregas 68a (registro), 68b (regras e servidor), 68c (tela) e 68d (teste por agentes) foram aprovadas e mescladas. A 68e (publicação) aconteceu em 14/11/2026: a API e o app foram publicados com a pesquisa ligada e a página escondida; no mesmo dia o Stefan abriu a página em produção e pediu uma mudança na ilustração da entrada (PR #330), que foi mesclada e publicada com o sim dele. A segunda parte prevista da 68e (entrada na capa e sitemap) não foi feita neste estágio: passou para o estágio 69 (#331, decisão 0003), em que a pesquisa virou a capa do site, também em 14/11/2026.
 - Issue: #324
 - 68a: PR #325, mesclado em `3a59344`.
 - 68b: PR #326, mesclado em `3e1f771`.
 - 68c: PR #327, mesclado em `82ffed5`.
 - 68d: PR #328, mesclado em `eb729ed`.
 - 68e: publicação de 14/11/2026 no commit `eb729ed`; registro no PR #329.
-- 68e, correção da entrada: PR #330.
+- 68e, correção da entrada: PR #330, mesclado em `2080596`; app publicado nesse commit em 14/11/2026.
 
 ## Entregue (68a — registro)
 
@@ -81,16 +81,15 @@ O jogador criado pelo "Começar" é o mesmo jogador anônimo do jogo: nasce com 
 - A entrada passa a sortear as três cartas de uma lista fixa de dez das 20: `ENTRY_CARD_IDS`, em `app/src/photo-survey-flow.js`. O Stefan pediu a mudança em 14/11/2026, ao abrir a página em produção. Quais das vinte entram na lista foi classificação do agente a partir do pedido, mostrada a ele numa folha com as dez.
 - As vinte cartas seguem na pesquisa. O sorteio de 16, as telas, a confirmação e o servidor não mudam. Nada em `back/` nem em `shared/`.
 - O `CONTEXT.md` foi atualizado, como pede a regra 4 do `AGENTS.md`: o formato dizia que a entrada sorteava entre as 20, para nenhuma ficar em destaque fixo.
-- O Stefan aprovou o merge e o deploy do app em 14/11/2026, na mesma instrução, sem cortar nomes da lista. A mudança chega à produção com o deploy do app, depois do merge; o resultado fica registrado na issue #324 e entra neste documento no próximo PR do estágio.
+- O Stefan aprovou o merge e o deploy do app em 14/11/2026, na mesma instrução, sem cortar nomes da lista. O PR #330 foi mesclado em `2080596`, com a mesma árvore do commit `d69a10a`, que tinha o `ci-gate` verde, e o app foi publicado pelo painel nesse commit (42 s). A API não foi publicada de novo: nada mudou em `back/` nem em `shared/`.
+- Conferido de fora, só por GET, depois desse deploy: `/pesquisa.html` respondia 200, com `noindex`; o arquivo de script publicado trazia a lista da entrada, e o anterior não trazia; as imagens das dez cartas da lista respondiam 200; durante o deploy, a capa e a página da pesquisa foram lidas a cada 5 s e responderam 200 em todas as leituras. O sorteio da entrada acontece no aparelho: o que foi conferido é que o arquivo publicado traz a lista, não o comportamento na tela. O registro feito na hora está na issue #324.
 
 ## Não entregue / pendente
 
-- A entrada na capa e a página no sitemap (segunda parte da 68e), com outro sim.
-
-- As entregas 68d (teste por agentes) e 68e (publicação).
-- O botão voltar do navegador sai da página em vez de voltar uma tela. Ao abrir de novo, a pessoa retoma de onde parou. Fica para avaliar na 68d.
+- A entrada na capa e a página no sitemap (segunda parte da 68e) não foram feitas neste estágio: passaram para o estágio 69 (#331), em que a pesquisa virou a capa do site em 14/11/2026.
+- O botão voltar do navegador sai da página em vez de voltar uma tela. Ao abrir de novo, a pessoa retoma de onde parou. Ficou como escolha de desenho (ver "Decisões tomadas").
 - Som e háptica das telas novas, fora do escopo da etapa.
-- A pesquisa `politica-2026-01` está sem janela (`opensAt` e `closesAt` nulos), ou seja, aberta assim que as rotas forem ligadas. Definir a janela e ligar `PHOTO_SURVEYS_ENABLED` em produção são assunto da 68e.
+- A pesquisa `politica-2026-01` está sem janela (`opensAt` e `closesAt` nulos), ou seja, aberta desde que as rotas foram ligadas em produção, em 14/11/2026 (68e). A janela segue sem definição.
 - Fechar uma pesquisa exige mudar a definição no código e publicar. Não há painel para isso.
 
 ## Testes executados
@@ -212,12 +211,12 @@ Ele não rodou o e2e em navegador, nem viu CI ou produção. Anotado, sem mudan�
 - Um deploy da API com a 68b não abre a pesquisa: as rotas ficam desligadas até `PHOTO_SURVEYS_ENABLED=true`. As tabelas novas são criadas vazias no boot.
 - A decisão 0002 muda a ordem "maturidade primeiro" da 0001. Os bloqueios de maturidade continuam abertos (#278, #279, #280, #281, #283, #284, #285 e #286) e correm em paralelo.
 - A primeira pesquisa fica sem Lula e Flávio Bolsonaro, porque as cartas deles têm moldura diferente das outras 20.
-- Das 20 cartas, 8 vêm de fotos de veículos ou de sites. Sem refazer essas 8 ou sem a confirmação do Stefan, a publicação (68e) não acontece com elas, e com 12 cartas o formato de 16 não fecha.
-- A cota de jogos novos por rede é de 3 por dia. Numa casa, escola ou escritório com a mesma rede, a quarta pessoa só responde entrando com Google. A tela mostra o aviso próprio, mas isso limita a pesquisa e o teste por agentes; a decisão sobre a cota é da política de abuso e fica para antes da 68e.
+- Das 20 cartas, 8 vêm de fotos de veículos ou de sites. Sem refazer essas 8 ou sem a confirmação do Stefan, a publicação (68e) não acontece com elas, e com 12 cartas o formato de 16 não fecha. (Em 14/11/2026 ele autorizou publicar o app com as 20 cartas atuais; está no gate da 68e. Refazer as 8 segue em "Ação do Stefan".)
+- A cota de jogos novos por rede é de 3 por dia. Numa casa, escola ou escritório com a mesma rede, a quarta pessoa só responde entrando com Google. A tela mostra o aviso próprio, mas isso limita a pesquisa e o teste por agentes; a decisão sobre a cota é da política de abuso e fica para antes da 68e. (Desde o estágio 71, publicado em 16/11/2026, a página não cria jogador sem conta e só responde quem entrou com Google e tem cadastro: essa cota deixou de ser o caminho de quem responde.)
 - As escolhas parciais ficam no aparelho até a confirmação ou até outra identidade começar. Sair do Google na capa não as apaga. Entra nas condições da 68e, com a política de privacidade (#283).
 - Na máquina de desenvolvimento os e2e rodam em WebKit e num Chromium de revisão diferente da do CI, com a fonte do macOS. A fonte do Linux só aparece no CI, que já apontou uma diferença (acima).
 - Em 320×480, com aviso na tela da confirmação, a carta escolhida chega ao tamanho mínimo e as finalistas pedem rolagem. Os botões continuam à vista.
-- "Uma resposta por jogador" não é "uma por pessoa": quem apaga os dados do aparelho pode responder de novo, dentro da cota de rede. O cadastro por CPF é o que resolve.
+- "Uma resposta por jogador" não é "uma por pessoa": quem apaga os dados do aparelho pode responder de novo, dentro da cota de rede. O cadastro por CPF é o que resolve. (Entrou no estágio 71, publicado em 16/11/2026.)
 - A etapa grava escolha política ligada à identidade do jogo, como o jogo atual já faz. A [ICM 41] #283, de privacidade, continua aberta.
 - A entrada passa a ilustrar com dez das 20 cartas, e as dez são de um mesmo campo político. Quem decide tocar em "Começar" vê só essa parte do conjunto, o que pode pesar em quem responde; a pesquisa pretende vender a resposta agregada. Uma captura da entrada também pode ser lida como pesquisa de um lado só. Dentro da pesquisa nada muda: as 20 cartas, com a mesma frequência.
 
@@ -251,14 +250,14 @@ Decidida pelo Stefan em 14/11/2026, no teste em produção:
 
 ## Próximo passo exato
 
-1. Depois do merge do PR #330: deploy do app pelo painel, já autorizado, e conferência de fora, por GET, de que a página publicada traz a lista da entrada. O resultado vai para a issue #324.
-2. Ele segue o teste no celular, em `https://polimatch.com.br/pesquisa.html` (três pessoas novas por rede por dia). Com o que achar: correções, e a decisão sobre a entrada na capa e o sitemap (segunda parte da 68e).
-3. Antes de chamar gente de fora: política de privacidade (#283), backup externo (#279), o destino da edição Eleições 2026 (#285), a cota de três por rede e a pesquisa de lançamento com código próprio.
+Nenhum neste estágio. O que veio depois está nos estágios seguintes: a pesquisa como capa do site (69, em 14/11/2026); a segunda pesquisa e a capa em lista (70), o cadastro obrigatório com CPF (71) e o compartilhar com imagem (72), publicados em 16/11/2026.
+
+Seguem abertos, de antes de chamar gente de fora: política de privacidade (#283), backup externo (#279), o destino da edição Eleições 2026 (#285) e a pesquisa de lançamento com código próprio.
 
 ## Ação do Stefan
 
-- Testar a pesquisa no celular, agora com a entrada nova.
-- Decidir o que fazer com as duas cópias provisórias do banco, que têm dado pessoal e ficam dentro do contêiner (`/tmp/pre-deploy-20261113.dump` e `/tmp/pre-deploy-20261114.dump`).
+- O teste no celular pedido aqui era o da página escondida, que deixou de existir com o estágio 69. O que ele avaliou depois está nos HANDOFF dos estágios 70 a 72.
+- Decidir o que fazer com as cópias provisórias do banco, que têm dado pessoal e ficam dentro do contêiner: as duas deste estágio (`/tmp/pre-deploy-20261113.dump` e `/tmp/pre-deploy-20261114.dump`) e as duas de 16/11/2026, registradas nos estágios 70 e 71.
 - Decidir sobre as 8 cartas vindas de fotos de veículos: refazer a partir de retrato oficial ou de licença livre, ou confirmar o uso.
 - Confirmar as condições de publicação propostas no contexto do estágio.
 - Dizer se quer cartas de Lula e Flávio Bolsonaro no padrão comum, para entrarem numa próxima pesquisa.
@@ -277,6 +276,6 @@ Decidida pelo Stefan em 14/11/2026, no teste em produção:
 - Decisão da entrega 68d: `aprovado`
 - Responsável: Stefan
 - Observação: aprovado por instrução direta do Stefan para o PR #328, em conversa de 14/11/2026. À pergunta "Com o CI verde no commit final, mesclo o PR 328, sim ou não?", ele respondeu: "Mescla". Quando respondeu, o CI e a revisão automática do PR ainda rodavam, e isso estava dito na mesma mensagem; os dois fecharam sem apontamento antes do merge. O merge fica a cargo do agente, a pedido dele, com o check verde no commit final. O merge não publica nada. As correções da 68d são escolhas de tela e de texto do agente, por delegação dele, e podem ser mudadas até a publicação. A 68e tem gate próprio, com um sim para cada passo.
-- Decisão da entrega 68e: `em andamento`
+- Decisão da entrega 68e: `aprovado` no que foi feito neste estágio (a publicação com a página escondida e a correção da entrada). A entrada na capa e o sitemap passaram para o estágio 69, com gate próprio.
 - Responsável: Stefan
-- Observação: cada passo da publicação de 14/11/2026 teve instrução direta do Stefan em conversa. À pergunta "Começo a publicação agora, pela cópia do banco, sim ou não?", ele respondeu: "Sim". À pergunta sobre quem ligaria a variável `PHOTO_SURVEYS_ENABLED=true`, com as opções "Liguei, publica a API" e "Liga você" (o agente abre a aba Environment, acrescenta a linha, salva e publica a API), ele respondeu: "Liga vc". À pergunta "Publico o app agora, com as 20 cartas atuais, sim ou não?", feita depois de lembrar que 8 delas vêm de fotos de veículos ou de sites e já estão no ar no jogo atual, ele respondeu: "Sim". A entrada na capa, o sitemap e o convite a pessoas de fora não foram autorizados e dependem de outro sim. O registro da publicação (PR #329, só documentação) também teve o sim dele: à pergunta "Com o CI verde, mesclo o PR 329, que só registra a publicação, sim ou não?", ele respondeu: "Sim". A correção da entrada (PR #330) e o deploy do app que a publica tiveram instrução direta dele em 14/11/2026. A mensagem do agente dizia que eram dois passos, cada um com um sim, o merge e depois o deploy do app, trazia os dez nomes da lista e o risco anotado acima, e terminava com a pergunta "Com o CI verde, mesclo o PR 330, sim ou não?". Ele respondeu: "Sim mescla e coloca pra rodar". O agente leu a resposta como o sim para os dois passos. Quando ele respondeu, o `ci-gate` e a revisão automática já tinham fechado no commit `f40854e`, sem apontamento. Ele não cortou nomes. A entrada na capa do site, o sitemap e o convite a pessoas de fora continuam sem autorização. A regra 6 do `AGENTS.md` não muda.
+- Observação: cada passo da publicação de 14/11/2026 teve instrução direta do Stefan em conversa. À pergunta "Começo a publicação agora, pela cópia do banco, sim ou não?", ele respondeu: "Sim". À pergunta sobre quem ligaria a variável `PHOTO_SURVEYS_ENABLED=true`, com as opções "Liguei, publica a API" e "Liga você" (o agente abre a aba Environment, acrescenta a linha, salva e publica a API), ele respondeu: "Liga vc". À pergunta "Publico o app agora, com as 20 cartas atuais, sim ou não?", feita depois de lembrar que 8 delas vêm de fotos de veículos ou de sites e já estão no ar no jogo atual, ele respondeu: "Sim". A entrada na capa, o sitemap e o convite a pessoas de fora não foram autorizados e dependem de outro sim. O registro da publicação (PR #329, só documentação) também teve o sim dele: à pergunta "Com o CI verde, mesclo o PR 329, que só registra a publicação, sim ou não?", ele respondeu: "Sim". A correção da entrada (PR #330) e o deploy do app que a publica tiveram instrução direta dele em 14/11/2026. A mensagem do agente dizia que eram dois passos, cada um com um sim, o merge e depois o deploy do app, trazia os dez nomes da lista e o risco anotado acima, e terminava com a pergunta "Com o CI verde, mesclo o PR 330, sim ou não?". Ele respondeu: "Sim mescla e coloca pra rodar". O agente leu a resposta como o sim para os dois passos. Quando ele respondeu, o `ci-gate` e a revisão automática já tinham fechado no commit `f40854e`, sem apontamento. Ele não cortou nomes. O PR foi mesclado em `2080596` e o app publicado nesse commit no mesmo dia. Neste estágio, a entrada na capa do site e o sitemap ficaram sem autorização; foram autorizados depois, no estágio 69 (o gate está no HANDOFF dele). O convite a pessoas de fora continua sem autorização. A regra 6 do `AGENTS.md` não muda.

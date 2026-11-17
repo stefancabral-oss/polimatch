@@ -9,7 +9,7 @@
     "69a": "registro: decisão 0003, contexto, plano, folha e ajustes nos documentos anteriores; mesclada no PR #332 (6de6bbe)",
     "69b": "menu, entrada e saída com Google no menu, página Como funciona; mesclada no PR #332 (6de6bbe)",
     "69c": "/ serve a pesquisa; cinco endereços aposentados com 302; sitemap e manifesto; páginas antigas fora do build; 26 passos de e2e antigos fora do CI; mesclada no PR #332 (6de6bbe)",
-    "69d": "limpeza: 112 arquivos do produto anterior fora de app/src, app/e2e e app/scripts; testes de limpeza; pronta para gate em PR próprio",
+    "69d": "limpeza: 112 arquivos do produto anterior fora de app/src, app/e2e e app/scripts; testes de limpeza; mesclada em 16/11/2026 (PR #333, commit e220a96)",
     "69e": "app publicado em 14/11/2026 no commit 6de6bbe; API não publicada"
   },
   "scope": {
@@ -119,7 +119,7 @@
     "pr": 332,
     "commit 8d85655": "ci-gate verde; no Linux, site-shell 20 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; design-validator com os testes de unidade, a imagem do app e smoke-nginx 14 de 14 na imagem nginx 1.27",
     "automatedReview": "Codex leu o commit 8d85655 e não deixou apontamento",
-    "finalCommit": "o commit do gate, só de documentação, passa pelo CI antes do merge",
+    "finalCommit": "05f3cff, o commit do gate: ci-gate verde antes do merge; a árvore do merge 6de6bbe é a dele",
     "commit 482d1e7": "ci-gate verde; no Linux, site-shell 24 e photo-survey 34 cenários em Chromium e em WebKit; relato de erros nos dois; smoke-nginx 14 de 14"
   },
   "delivery69e": {
@@ -192,7 +192,7 @@
     "ci": {
       "pr": 333,
       "commit 8774fa5": "ci-gate verde; 183 testes do app, 64 do piloto, site-shell 24 e photo-survey 34 cenários em Chromium e em WebKit, smoke-nginx",
-      "finalCommit": "passa pelo CI de novo antes do merge",
+      "finalCommit": "94b9bfb: ci-gate verde antes do merge; a árvore do merge e220a96 é a dele",
       "commit db7d079": "ci-gate verde; 185 testes do app, site-shell 24 e photo-survey 34 cenários em Chromium e em WebKit"
     }
   }
