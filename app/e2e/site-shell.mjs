@@ -1506,10 +1506,12 @@ try {
     assert.ok(finalists.every((box) => box.width === finalists[0].width && box.y === finalists[0].y && box.width < hero.width / 1.8), "as finalistas ficam numa linha, menores");
     assert.ok(finalists[0].y > hero.y + hero.height, "as finalistas ficam abaixo da escolhida");
     assert.ok(drawn.every((box) => box.x >= 0 && box.x + box.width <= 1080 && box.y >= 0 && box.y + box.height <= 1350), "tudo dentro da folha");
-    // O que a imagem escreve: a escolha, e as outras três como "Também escolhi".
+    // O que a imagem escreve: a escolha, e as outras três como "Também na final".
+    // O rótulo descreve a final; não diz que a pessoa "escolheu" as três.
     const texts = await page.evaluate(() => window.__texts);
     assert.ok(texts.includes("MINHA ESCOLHA"), `a imagem diz "Minha escolha" (${texts.join(" | ")})`);
-    assert.ok(texts.includes("TAMBÉM ESCOLHI"), `a imagem diz "Também escolhi" (${texts.join(" | ")})`);
+    assert.ok(texts.includes("TAMBÉM NA FINAL"), `a imagem diz "Também na final" (${texts.join(" | ")})`);
+    assert.equal(texts.some((text) => /escolhi/i.test(text)), false, `a imagem não diz "escolhi" das outras três (${texts.join(" | ")})`);
     assert.equal(texts.some((text) => /finalista/i.test(text)), false, `a imagem não diz "finalistas" (${texts.join(" | ")})`);
     // Dois toques seguidos abrem o compartilhamento uma vez só.
     await button.click();
@@ -1550,7 +1552,7 @@ try {
       const image = preview(page).locator("img.ps-share-img");
       await page.waitForFunction(() => document.querySelector("dialog.ps-share img")?.naturalWidth > 0);
       assert.deepEqual(await image.evaluate((node) => [node.naturalWidth, node.naturalHeight]), [1080, 1350]);
-      assert.match(await image.getAttribute("alt"), new RegExp(`^Imagem com a minha escolha: ${name}\\. Também escolhi: .+, .+ e .+\\.$`));
+      assert.match(await image.getAttribute("alt"), new RegExp(`^Imagem com a minha escolha: ${name}\\. Também na final: .+, .+ e .+\\.$`));
       const link = preview(page).getByRole("link", { name: "Baixar imagem" });
       assert.equal(await link.getAttribute("download"), "polimatch-minha-escolha.jpg");
       assert.match(await link.getAttribute("href"), /^blob:/);

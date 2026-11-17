@@ -7,7 +7,8 @@
   "parts": {
     "72a": "a imagem traz a escolhida e as finalistas; shareImageLayout com teste",
     "72b": "sharePlan, a prévia com Baixar imagem, o botão que espera a imagem, a recusa do arquivo abrindo a prévia",
-    "72c": "feita em 16/11/2026: app no commit 28fd962; registro na issue #338 e no HANDOFF"
+    "72c": "feita em 16/11/2026: app no commit 28fd962; registro na issue #338 e no HANDOFF",
+    "72d": "ajuste de texto pedido depois da publicação: \"Também na final\" no lugar de \"Minhas finalistas\" (imagem) e de \"Suas finalistas\" (telas); issue #342, PR #343; pronta para gate"
   },
   "testsFirst": {
     "unidade": "share-choice.test.js: plano de entrega, conta do desenho, marcação da prévia e, depois da revisão, a chamada só com o arquivo, a linha que encolhe e os estados da prévia, escritos e vistos falhar antes do código",
@@ -86,24 +87,44 @@
     "checkedAt": "2026-11-16",
     "issue": 342,
     "request": "Stefan, 16/11/2026, depois da publicação: \"única frase que não gostei: Minhas finalistas. Ficou meio fora do portugues.\"",
-    "change": "na imagem, \"Também escolhi\" no lugar de \"Minhas finalistas\" (rótulo e descrição da imagem); nas telas de confirmação e de resposta registrada, \"Você também escolheu\" no lugar de \"Suas finalistas\"; a troca nas telas é escolha do agente",
+    "change": "na imagem, \"Também na final\" no lugar de \"Minhas finalistas\" (rótulo e descrição da imagem); nas telas de confirmação e de resposta registrada, \"Também na final\" no lugar de \"Suas finalistas\"; a troca nas telas é escolha do agente",
     "unchanged": "o desenho da imagem, as cartas, as regras e o servidor; nada em shared/ nem em back/",
     "testsFirst": {
-      "unidade": "share-choice.test.js: a descrição da imagem falhou com o texto antigo",
-      "navegador": "site-shell: o cenário da imagem passou a ler o que a imagem escreve e falhou com MINHAS FINALISTAS; photo-survey: o rótulo das telas de resumo falhou com Suas finalistas"
+      "unidade": "share-choice.test.js: a descrição da imagem falhou com o texto anterior, nas duas rodadas",
+      "navegador": "site-shell: o cenário da imagem passou a ler o que a imagem escreve e falhou com MINHAS FINALISTAS e, na segunda rodada, com TAMBÉM ESCOLHI; photo-survey: o rótulo das telas de resumo falhou com Suas finalistas e, na segunda rodada, com Você também escolheu"
     },
     "tests": {
-      "environment": "macOS, local, 16/11/2026",
+      "environment": "macOS, local, 16/11/2026, no checkout do agente, com o Playwright instalado nele (WebKit; Chromium 140 pelo executável do cache), com o texto final",
       "npm test --prefix app": "213/213",
-      "e2e site-shell": "46 cenários em WebKit e em Chromium 140",
+      "e2e site-shell": "Chromium 140: 46 cenários; WebKit: 42 num processo, que parou no cenário 43 por tempo esgotado ao abrir a página, e os cenários 43 a 46 aprovados um por processo; na rodada do primeiro texto os 46 passaram num processo só",
       "e2e photo-survey": "34 cenários em WebKit e em Chromium 140",
-      "capturas conferidas": "a imagem gerada e a resposta registrada em 390x844"
+      "capturas conferidas": "a imagem gerada com cada um dos dois textos; a resposta registrada em 390x844 com o primeiro",
+      "reprodução pelo revisor": "num clone novo, site-shell inteiro em WebKit para no cenário 43, com ou sem a mudança; em dois processos os 46 passam"
     },
     "notVerified": [
       "a tela de confirmação a olho: só pelo cenário de navegador",
+      "as telas com Também na final a olho: só pelos cenários de navegador",
       "um aparelho de verdade",
       "produção: não publicado"
     ],
-    "humanGate": "pendente"
+    "humanGate": "pendente: merge, deploy do app e a escolha entre os dois textos",
+    "pr": 343,
+    "firstVersion": "\"Também escolhi\" na imagem e \"Você também escolheu\" nas telas (commit 9530311), mostrada ao Stefan numa folha; a revisão independente apontou que afirma preferência pelas outras três quando o sorteio força a escolha; trocada por \"Também na final\"; ele recebeu a folha com as duas opções e escolhe no gate",
+    "ci": {
+      "pr": 343,
+      "commit 9530311": "ci-gate verde (a versão com Também escolhi); no Linux, site-shell 46 e photo-survey 34 cenários em Chromium e em WebKit",
+      "finalCommit": "o commit com Também na final e este registro: resultado no PR #343"
+    },
+    "independentReview": {
+      "who": "agente à parte, somente leitura, num clone próprio, sobre 9530311",
+      "verdict": "sem bloqueio; apontou que Também escolhi pode ser lido como apoio às outras três e pediu ajustes no registro",
+      "ran": "app 213/213; photo-survey 34 em WebKit e em Chromium; site-shell 46 em Chromium e, em WebKit, em dois processos; quatro mutações de texto, todas pegas (a descrição pela unidade e pelo roteiro; as outras três só pelos roteiros); o rótulo medido em 30 tamanhos de tela por navegador; a imagem gerada olhada a 3x",
+      "notedOnly": [
+        "com uma carta que não carrega, a imagem desenha duas e a descrição cita três nomes (já era assim)",
+        "com o texto do sistema ampliado em 320 de largura, a linha das três cartas vai para trás dos botões (já era assim)",
+        "a gravação do que a imagem escreve prova que o texto foi passado ao desenho, não que saiu legível"
+      ],
+      "notDoneByReviewer": "aparelho de verdade, navegador dentro de aplicativo, leitor de tela, fontes de Android, celular deitado, produção; a troca para Também na final veio depois da leitura"
+    }
   }
 }
