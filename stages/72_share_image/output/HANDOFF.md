@@ -2,15 +2,16 @@
 
 ## Status
 
-- Estado: `concluído`. As partes 72a e 72b foram mescladas (PR #339, commit `28fd962`) e a 72c aconteceu em 16/11/2026: o app está publicado nesse commit.
+- Estado: `concluído` nas partes 72a a 72c: a 72a e a 72b foram mescladas (PR #339, commit `28fd962`) e a 72c aconteceu em 16/11/2026, com o app publicado nesse commit. A 72d (ajuste de texto) está `pronta para gate`.
 - Issue: #338
 - Branch: `icm/72-share-image`. Foi feita sobre a `main` em `59ca9a1`; com o estágio 71 (PR #337) aprovado para entrar antes, foi refeita em cima dele. Os dois mexiam em quatro arquivos; os conflitos estão descritos em "Testes executados".
 - PR: #339
 - Em produção desde 16/11/2026.
+- 72d (ajuste de texto pedido depois da publicação): issue #342, branch `icm/72-share-wording`, PR #343. Até o app ser publicado de novo, o que está no ar segue com "Minhas finalistas" e "Suas finalistas".
 
 ## Entregue (72a — imagem)
 
-- `app/src/share-choice.js`: a imagem (1080×1350, JPEG) passa a trazer a escolhida em destaque e até três finalistas numa linha, com "Minha escolha", o nome, a pergunta, "Minhas finalistas" e "Responda em polimatch.com.br".
+- `app/src/share-choice.js`: a imagem (1080×1350, JPEG) passa a trazer a escolhida em destaque e até três finalistas numa linha, com "Minha escolha", o nome, a pergunta, "Minhas finalistas" e "Responda em polimatch.com.br". (O rótulo "Minhas finalistas" muda para "Também na final" na 72d.)
 - `shareImageLayout({ ratio, others })`: a conta de onde cada coisa fica, separada do desenho, com teste. Uma carta mais alta que o normal encolhe para caber.
 - Uma finalista cuja carta não carrega fica de fora, e a imagem sai assim mesmo.
 
@@ -34,6 +35,16 @@ Com a instrução do Stefan ("Sim, os dois"), transcrita em "Human gate":
 
 O registro do banco e da API desta publicação está no HANDOFF do estágio 71 e na issue #336; o deste estágio, na #338.
 
+## Entregue (72d — ajuste de texto)
+
+Depois da publicação, em 16/11/2026, o Stefan escreveu: "única frase que não gostei: Minhas finalistas. Ficou meio fora do portugues."
+
+- Na imagem, o rótulo acima das outras três cartas passa de "Minhas finalistas" para "Também na final". A descrição da imagem na prévia muda junto: "Imagem com a minha escolha: (nome). Também na final: (nomes)."
+- Nas telas de confirmação e de resposta registrada, o mesmo rótulo passa de "Suas finalistas" para "Também na final". Ele apontou só a frase da imagem; a das telas usa a mesma palavra e foi trocada junto, por escolha do agente.
+- Só texto, em `app/src/share-choice.js` e `app/src/photo-survey-page.js`. O desenho da imagem, as cartas, as regras e o servidor não mudam. Nos documentos e no código, "finalistas" continua sendo o nome interno dessas três cartas.
+- A primeira versão desta parte usava "Também escolhi" na imagem e "Você também escolheu" nas telas, e foi mostrada a ele numa folha. A revisão independente apontou que esse texto afirma preferência: como o sorteio monta as telas ao acaso, a pessoa pode ter escolhido numa tela alguém de quem não gosta, e a imagem diria que ela "também escolheu" essa pessoa. O agente trocou para "Também na final", que descreve o que aconteceu, e mandou a ele uma folha com as duas opções lado a lado, com a recomendação. A folha está em `references/texto-duas-opcoes.jpg`. A escolha entre as duas é dele, no gate.
+- Não publicado: chega à produção com um deploy do app, depois do merge, com o sim dele.
+
 ## Não entregue / pendente
 
 - Imagem com as escolhas de várias pesquisas numa folha só; formato para stories.
@@ -56,6 +67,13 @@ O que veio antes do código, e falhou primeiro pelo motivo esperado: os testes d
 
 O que não seguiu essa ordem: os cenários de navegador vieram depois da mudança da página, nas duas rodadas. Na primeira, o Chromium mostrou um defeito de verdade (a imagem da prévia só era solta quando o navegador avisava do fechamento); corrigido. Depois dos consertos da revisão, o código foi desfeito de catorze formas e as catorze foram pegas, uma delas só depois de um cenário ganhar a conferência que faltava (o foco na prévia sem `showModal`).
 
+Na 72d, em 16/11/2026:
+
+- Os testes vieram antes do código e falharam pelo motivo esperado, nas duas rodadas de texto: o de unidade da descrição da imagem; o cenário de navegador da imagem, que passou a ler o que a imagem escreve (falhou com "MINHAS FINALISTAS" e, na segunda rodada, com "TAMBÉM ESCOLHI" na lista); e o das telas de resumo (leu "Suas finalistas" e, na segunda rodada, "Você também escolheu").
+- Local (macOS), no checkout do agente, com o Playwright instalado nele (WebKit, e Chromium 140 pelo executável do cache), com o texto final: `npm test --prefix app` 213/213; em Chromium, `site-shell.mjs` com 46 cenários e `photo-survey.mjs` com 34; em WebKit, `photo-survey.mjs` com 34 e `site-shell.mjs` com 42 num processo, que parou no cenário 43 por tempo esgotado ao abrir a página, mais os cenários 43 a 46 rodados um por processo, aprovados. A parada não parece vir da mudança: o revisor viu a mesma num clone novo, com e sem a gravação do que a imagem escreve, e num script sem relação com o app (o WebKit desta máquina deixa de navegar depois de muitos contextos no mesmo processo). Ele não rodou a base sem o PR. Na rodada do primeiro texto os 46 tinham passado num processo só.
+- No CI do PR #343 (Linux), o commit `9530311` (a versão com "Também escolhi") teve o `ci-gate` verde, com `site-shell` 46 e `photo-survey` 34 em Chromium e em WebKit. O resultado do commit final, com "Também na final", está no PR. Nada muda em `shared/` nem em `back/`, e os testes do servidor não rodam.
+- Conferidas a olho: a imagem gerada com cada um dos dois textos, e a tela de resposta registrada em 390×844 com o primeiro. As telas de confirmação e de resposta registrada com o texto final foram olhadas pelo revisor, não pelo agente.
+
 ## Revisão independente
 
 Um agente à parte, somente leitura, revisou o commit `fb3bf7a` num clone próprio em 16/11/2026. Rodou os testes de unidade, os dois roteiros em WebKit, seis roteiros dele com servidor simulado (tempo, prévia, telas, imagem, promessa antiga e trava) e 21 mutações, das quais os testes de então pegavam cinco. Não achou regressão, mas recomendou segurar o merge por um ponto que a branch não tocava:
@@ -76,6 +94,10 @@ Os documentos diziam "só libera com a imagem pronta" e que o caminho do link ti
 Ficaram anotados, sem mudança: com o celular deitado, na tela de resposta registrada, a linha das finalistas fica atrás dos botões (já era assim na `main`); "Baixar imagem" com endereço local provavelmente não funciona em navegadores dentro de aplicativos, onde a saída é segurar o dedo na imagem.
 
 Ele não conferiu aparelho de verdade (o ponto do iPhone é leitura de um defeito conhecido do navegador, não teste), Chromium, navegadores dentro de aplicativos, leitor de tela, nem produção.
+
+**72d.** Um agente à parte, somente leitura, revisou o commit `9530311` (a versão com "Também escolhi") num clone próprio em 16/11/2026. Sem bloqueio. Rodou os testes de unidade e os dois roteiros nos dois navegadores, desfez cada uma das quatro trocas de texto (as quatro foram pegas: a descrição da imagem pela unidade e pelo roteiro, as outras três só pelos roteiros), mediu o rótulo em 30 casos por navegador (cinco tamanhos de tela, três condições de fonte, as duas telas; uma linha em todos) e olhou a imagem gerada (o acento do É não corta). Não achou "finalista" visível em nenhum lugar do app. Apontou a leitura de "Também escolhi" como apoio, descrita acima, e ajustes neste registro, aplicados. Anotou, fora do diff e sem mudança: com uma carta que não carrega, a imagem desenha duas e a descrição cita três nomes; com o texto ampliado por CSS (simulação) em 320 de largura, a linha das três cartas vai para trás dos botões, igual ao que era. A gravação do que a imagem escreve prova que o texto foi passado ao desenho, não que saiu legível. Ele não conferiu aparelho de verdade, leitor de tela, fontes de Android nem produção. A troca para "Também na final" veio depois dessa leitura; ele não tinha alternativa que considerasse claramente melhor, e a que pôs na mesa foi "Também chegaram à final".
+
+Numa segunda passada, sobre o commit `e2e1260`, o mesmo agente releu a troca: sem bloqueio. Considerou "Também na final" correto e fiel nas duas telas, inclusive na confirmação; mediu o rótulo de novo (uma linha nos 30 casos); olhou a confirmação e a resposta registrada em 390×844 e em 320×480 com fonte larga, e a imagem gerada nos dois navegadores. Anotou que, na imagem, "Também na final" não diz de quem é a final e pode ser lido como a final da pesquisa; achou o risco baixo, porque "Minha escolha" no topo enquadra tudo como pessoal, e deixou "Também na minha final" como opção se o Stefan quiser. Pediu três precisões neste registro e uma conferência menos frágil no cenário da imagem (comparar só os rótulos), aplicadas.
 
 ## Riscos conhecidos
 
@@ -99,16 +121,25 @@ Escolhas do agente, por delegação dele (decisão 0003, item 5), que pode mudar
 - O botão espera a imagem ficar pronta.
 - O formato continua 1080×1350.
 
+Na 72d, a partir da avaliação dele ("única frase que não gostei: Minhas finalistas"), escolhas do agente, que ele pode mudar:
+
+- "Também na final", na imagem e nas telas: descreve a final, sem afirmar que a pessoa prefere as outras três. A alternativa, "Também escolhi" (com "Você também escolheu" nas telas), é mais pessoal e ficou como segunda opção.
+- Trocar também o rótulo das telas, que ele não citou.
+
 ## Próximo passo exato
 
-Nenhum neste estágio.
+1. Gate do Stefan para a 72d: merge do PR e deploy do app (a API não muda).
+2. Depois do deploy: conferência de fora, só por leitura, de que o pacote publicado traz o texto novo.
 
 ## Ação do Stefan
 
-- Confirmar se o que ele testou no celular incluiu tocar em "Compartilhar", se a imagem chegou e em que aparelho.
+- Dizer se a 72d é mesclada e publicada (só o app), e com qual dos dois textos.
+- Confirmar se o que ele testou no celular incluiu tocar em "Compartilhar", se a imagem chegou e em que aparelho. A frase que ele citou em 16/11/2026 ("Minhas finalistas") só aparece na imagem e na descrição dela, mas ele não disse onde a viu.
 
 ## Human gate
 
+- Decisão da 72d (ajuste de texto): `pendente`
+- Responsável: Stefan
 - Decisão das partes 72a e 72b e da publicação (72c): `aprovado`
 - Responsável: Stefan
 - Observação: a construção responde à avaliação dele de 16/11/2026 e à delegação registrada na decisão 0003. O merge e a publicação tiveram instrução direta dele no mesmo dia. A mensagem do agente que antecedeu a pergunta dizia que os dois pedidos (este e o cadastro com CPF, PR #337) estavam prontos e nenhum estava no ar; que a imagem traz a escolhida, as três finalistas, a pergunta e o endereço; que a causa provável do "só o link" é o iPhone descartar a imagem quando ela vai com texto e link, e que agora vai só a imagem; que onde não dá para compartilhar arquivo a imagem aparece na tela com "Baixar imagem"; que nada disso foi testado num celular de verdade e que a correção do iPhone vem de um defeito conhecido do navegador; e que os dois PRs passaram por revisão independente e estavam com os testes automáticos verdes. A pergunta foi: "Mesclo e publico o cadastro com CPF e o compartilhar com imagem? Pode responder 'sim, os dois', 'só o compartilhar' ou 'só o cadastro'." Ele respondeu: "Sim, os dois". O merge e o deploy ficaram a cargo do agente, a pedido dele, com o check verde no commit final, e foram feitos em 16/11/2026 (ver "Publicação"). A regra 6 do `AGENTS.md` não muda.

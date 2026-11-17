@@ -1405,7 +1405,13 @@ try {
   const SHARE_STUB = ({ mode, blobDelay = 0, blobFail = 0, noModal = false }) => {
     window.__shared = [];
     window.__drawn = [];
+    window.__texts = [];
     window.__urls = { created: 0, revoked: 0 };
+    const write = CanvasRenderingContext2D.prototype.fillText;
+    CanvasRenderingContext2D.prototype.fillText = function fillText(text) {
+      window.__texts.push(String(text));
+      return write.apply(this, arguments);
+    };
     const draw = CanvasRenderingContext2D.prototype.drawImage;
     CanvasRenderingContext2D.prototype.drawImage = function drawImage(image, x, y, width, height) {
       window.__drawn.push({ x: Math.round(x), y: Math.round(y), width: Math.round(width), height: Math.round(height) });
@@ -1500,6 +1506,13 @@ try {
     assert.ok(finalists.every((box) => box.width === finalists[0].width && box.y === finalists[0].y && box.width < hero.width / 1.8), "as finalistas ficam numa linha, menores");
     assert.ok(finalists[0].y > hero.y + hero.height, "as finalistas ficam abaixo da escolhida");
     assert.ok(drawn.every((box) => box.x >= 0 && box.x + box.width <= 1080 && box.y >= 0 && box.y + box.height <= 1350), "tudo dentro da folha");
+    // O que a imagem escreve: a escolha, e as outras três como "Também na final".
+    // O rótulo descreve a final; não diz que a pessoa "escolheu" as três.
+    const texts = await page.evaluate(() => window.__texts);
+    // Os rótulos são os textos todos em maiúsculas; o nome, a pergunta e o
+    // endereço ficam de fora, para uma pergunta futura não derrubar o cenário.
+    const labels = texts.filter((text) => /\p{L}/u.test(text) && text === text.toUpperCase());
+    assert.deepEqual(labels, ["MINHA ESCOLHA", "TAMBÉM NA FINAL"], `os rótulos da imagem (${texts.join(" | ")})`);
     // Dois toques seguidos abrem o compartilhamento uma vez só.
     await button.click();
     await button.click();
@@ -1539,7 +1552,7 @@ try {
       const image = preview(page).locator("img.ps-share-img");
       await page.waitForFunction(() => document.querySelector("dialog.ps-share img")?.naturalWidth > 0);
       assert.deepEqual(await image.evaluate((node) => [node.naturalWidth, node.naturalHeight]), [1080, 1350]);
-      assert.match(await image.getAttribute("alt"), new RegExp(`^Imagem com a minha escolha: ${name}\\. Minhas finalistas: .+, .+ e .+\\.$`));
+      assert.match(await image.getAttribute("alt"), new RegExp(`^Imagem com a minha escolha: ${name}\\. Também na final: .+, .+ e .+\\.$`));
       const link = preview(page).getByRole("link", { name: "Baixar imagem" });
       assert.equal(await link.getAttribute("download"), "polimatch-minha-escolha.jpg");
       assert.match(await link.getAttribute("href"), /^blob:/);
