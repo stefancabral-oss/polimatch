@@ -8,7 +8,7 @@
     "72a": "a imagem traz a escolhida e as finalistas; shareImageLayout com teste",
     "72b": "sharePlan, a prévia com Baixar imagem, o botão que espera a imagem, a recusa do arquivo abrindo a prévia",
     "72c": "feita em 16/11/2026: app no commit 28fd962; registro na issue #338 e no HANDOFF",
-    "72d": "ajuste de texto pedido depois da publicação: \"Também na final\" no lugar de \"Minhas finalistas\" (imagem) e de \"Suas finalistas\" (telas); issue #342, PR #343; aprovada pelo Stefan em 23/11/2026 (\"Sim, na final\"); o merge e a publicação são registrados na issue #342"
+    "72d": "ajuste de texto pedido depois da publicação: \"Também na final\" no lugar de \"Minhas finalistas\" (imagem) e de \"Suas finalistas\" (telas); issue #342, PR #343; aprovada pelo Stefan em 23/11/2026 (\"Sim, na final\"); mesclada em 0e99eae e publicada em 23/11/2026 (ver delivery72d.publication); issue #342 fechada no mesmo dia"
   },
   "testsFirst": {
     "unidade": "share-choice.test.js: plano de entrega, conta do desenho, marcação da prévia e, depois da revisão, a chamada só com o arquivo, a linha que encolhe e os estados da prévia, escritos e vistos falhar antes do código",
@@ -104,9 +104,19 @@
     "notVerified": [
       "as telas com Também na final a olho pelo agente: foram olhadas pelo revisor",
       "um aparelho de verdade",
-      "produção: a publicação vem depois do merge e é registrada na issue #342, não aqui"
+      "o comportamento em produção: lá o agente só leu o pacote publicado, sem abrir navegador (ver publication)"
     ],
-    "humanGate": "aprovada pelo Stefan em 23/11/2026 (\"Sim, na final\"): merge, deploy do app e o texto \"Também na final\"; transcrita no HANDOFF",
+    "humanGate": "aprovada pelo Stefan em 23/11/2026 (\"Sim, na final\"): merge, deploy do app e o texto \"Também na final\"; o fechamento da issue #342, no mesmo dia (\"Sim, fecha\"); as duas transcritas no HANDOFF",
+    "publication": {
+      "date": "2026-11-23",
+      "merge": {
+        "PR 343": "0e99eae, mesma árvore de 09281eb (ci-gate verde)"
+      },
+      "app": "commit 0e99eae, 28 s; build de 2026-11-23T19:18:41Z; só o app, sem tocar na API nem no banco; 95 leituras de fora da capa e de /api/health em 5 minutos, começando antes do clique, e nenhuma falhou",
+      "checkedByGet": "presença no pacote publicado (código, não comportamento na tela): FINALISTAS e finalistas não aparecem mais; TAMBÉM NA FINAL uma vez (o desenho da imagem) e Também na final três vezes (as duas telas e a descrição da imagem)",
+      "notChecked": "nenhuma tela aberta em navegador contra a produção; a imagem compartilhada num aparelho de verdade",
+      "issueClosed": "#342, em 23/11/2026, com a instrução do Stefan (\"Sim, fecha\")"
+    },
     "wordingLoop": {
       "date": "2026-11-17",
       "request": "Stefan, com o PR pronto: \"Roda para descobrir a melhor frase.\"",
@@ -122,7 +132,7 @@
       "pr": 343,
       "commit 9530311": "ci-gate verde (a versão com Também escolhi); no Linux, site-shell 46 e photo-survey 34 cenários em Chromium e em WebKit",
       "commit f86a500": "ci-gate verde (o texto final, Também na final); browser-smoke (chromium) e browser-smoke (webkit) aprovados, que rodam os dois roteiros no Linux; a contagem de cenários não foi lida",
-      "finalCommit": "os commits do gate, de 23/11/2026, depois de f86a500, só de registro: resultado do último no PR #343"
+      "finalCommit": "09281eb, o último dos commits do gate, de 23/11/2026, depois de f86a500 e só de registro: ci-gate verde antes do merge, com browser-smoke (chromium) e browser-smoke (webkit) aprovados; a árvore do merge 0e99eae é a dele"
     },
     "independentReview": {
       "who": "agente à parte, somente leitura, num clone próprio, sobre 9530311",

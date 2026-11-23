@@ -2,12 +2,12 @@
 
 ## Status
 
-- Estado: `concluído` nas partes 72a a 72c: a 72a e a 72b foram mescladas (PR #339, commit `28fd962`) e a 72c aconteceu em 16/11/2026, com o app publicado nesse commit. A 72d (ajuste de texto) foi aprovada pelo Stefan em 23/11/2026 (ver "Human gate"); o merge e a publicação dela são registrados na issue #342.
+- Estado: `concluído`. A 72a e a 72b foram mescladas (PR #339, commit `28fd962`) e a 72c aconteceu em 16/11/2026, com o app publicado nesse commit. A 72d (ajuste de texto) foi mesclada (PR #343, commit `0e99eae`) e publicada em 23/11/2026 (ver "Publicação da 72d").
 - Issue: #338
 - Branch: `icm/72-share-image`. Foi feita sobre a `main` em `59ca9a1`; com o estágio 71 (PR #337) aprovado para entrar antes, foi refeita em cima dele. Os dois mexiam em quatro arquivos; os conflitos estão descritos em "Testes executados".
 - PR: #339
-- Em produção desde 16/11/2026.
-- 72d (ajuste de texto pedido depois da publicação): issue #342, branch `icm/72-share-wording`, PR #343. Até o app ser publicado de novo, o que está no ar segue com "Minhas finalistas" e "Suas finalistas".
+- Em produção desde 16/11/2026; o texto da 72d, desde 23/11/2026.
+- 72d (ajuste de texto pedido depois da publicação): issue #342, fechada em 23/11/2026; branch `icm/72-share-wording`; PR #343.
 
 ## Entregue (72a — imagem)
 
@@ -43,7 +43,7 @@ Depois da publicação, em 16/11/2026, o Stefan escreveu: "única frase que não
 - Nas telas de confirmação e de resposta registrada, o mesmo rótulo passa de "Suas finalistas" para "Também na final". Ele apontou só a frase da imagem; a das telas usa a mesma palavra e foi trocada junto, por escolha do agente.
 - Só texto, em `app/src/share-choice.js` e `app/src/photo-survey-page.js`. O desenho da imagem, as cartas, as regras e o servidor não mudam. Nos documentos e no código, "finalistas" continua sendo o nome interno dessas três cartas.
 - A primeira versão desta parte usava "Também escolhi" na imagem e "Você também escolheu" nas telas, e foi mostrada a ele numa folha. A revisão independente apontou que esse texto afirma preferência: como o sorteio monta as telas ao acaso, a pessoa pode ter escolhido numa tela alguém de quem não gosta, e a imagem diria que ela "também escolheu" essa pessoa. O agente trocou para "Também na final", que descreve o que aconteceu, e mandou a ele uma folha com as duas opções lado a lado, com a recomendação. A folha está em `references/texto-duas-opcoes.jpg`. A escolha entre as duas era dele. Antes do ciclo de crítica a pergunta oferecia as duas; depois dele, a pergunta do gate propunha só "Também na final", e em 23/11/2026 ele respondeu "Sim, na final".
-- Chega à produção com um deploy do app, depois do merge. Ele deu o sim em 23/11/2026; o registro da publicação fica na issue #342.
+- Chegou à produção em 23/11/2026, com um deploy do app depois do merge (ver "Publicação da 72d").
 
 ### A frase passou por um ciclo de crítica (17/11/2026)
 
@@ -59,6 +59,18 @@ Em 17/11/2026, com o PR pronto, o Stefan pediu um ciclo de refinamento da frase 
 - O ciclo parou pela regra dele: dois ciclos seguidos com o juiz respondendo não. Ficou "Também na final". Isso mostra que as duas reescritas testadas não foram julgadas melhores; não mostra que não existe frase melhor.
 - Fica conhecido, sem conserto de uma linha que o ciclo tenha achado: quem recebe a imagem pode entender "a final" como a final da pesquisa. O primeiro crítico anotou que a causa da queixa do Stefan não foi apurada e que a metáfora de torneio continua; o segundo, que "final" é da mesma família de "finalistas" e que só o Stefan pode dizer se o incômodo continua.
 - Os dois críticos disseram ter aberto a imagem gerada e a tela de resposta registrada com "Também na final". Aos juízes as mesmas imagens foram indicadas (ao primeiro, só a imagem gerada); eles responderam só sim ou não com uma frase e não disseram o que abriram. As duas reescritas foram julgadas pelo texto: nenhuma imagem foi gerada com elas.
+
+## Publicação da 72d — 23/11/2026
+
+Com a instrução do Stefan ("Sim, na final"), transcrita em "Human gate":
+
+- PR #343 mesclado em `0e99eae`. A árvore do merge é a do commit `09281eb`, que tinha o `ci-gate` verde, com `browser-smoke (chromium)` e `browser-smoke (webkit)` aprovados.
+- Na primeira tentativa, o painel de deploy pediu login, e o agente não digita senha. O Stefan entrou no painel e avisou ("Loguei no painel").
+- Só o app foi publicado, no commit `0e99eae` (28 s), build de 2026-11-23T19:18:41Z. A API e o banco não foram tocados, e nenhuma configuração foi alterada. De fora, nenhuma leitura falhou: 95 leituras da capa e de `/api/health` em 5 minutos, com 3 segundos de intervalo, começando antes do clique. O commit é o que o painel de deploy registrou; `version.json` segue com `sha: "unknown"` (#287).
+- Conferido de fora, só por leitura do pacote publicado: "FINALISTAS" e "finalistas" não aparecem mais; aparecem "TAMBÉM NA FINAL" (uma vez, no desenho da imagem) e "Também na final" (três vezes: as duas telas e a descrição da imagem). Isso mostra o que está no pacote, não o comportamento na tela: o agente não abriu o site em navegador nem exercitou o compartilhar em produção.
+- A issue #342 foi fechada no mesmo dia, com instrução dele ("Sim, fecha"), transcrita em "Human gate".
+
+O registro feito na hora está na issue #342.
 
 ## Não entregue / pendente
 
@@ -86,7 +98,7 @@ Na 72d, em 16/11/2026:
 
 - Os testes vieram antes do código e falharam pelo motivo esperado, nas duas rodadas de texto: o de unidade da descrição da imagem; o cenário de navegador da imagem, que passou a ler o que a imagem escreve (falhou com "MINHAS FINALISTAS" e, na segunda rodada, com "TAMBÉM ESCOLHI" na lista); e o das telas de resumo (leu "Suas finalistas" e, na segunda rodada, "Você também escolheu").
 - Local (macOS), no checkout do agente, com o Playwright instalado nele (WebKit, e Chromium 140 pelo executável do cache), com o texto final: `npm test --prefix app` 213/213; em Chromium, `site-shell.mjs` com 46 cenários e `photo-survey.mjs` com 34; em WebKit, `photo-survey.mjs` com 34 e `site-shell.mjs` com 42 num processo, que parou no cenário 43 por tempo esgotado ao abrir a página, mais os cenários 43 a 46 rodados um por processo, aprovados. A parada não parece vir da mudança: o revisor viu a mesma num clone novo, com e sem a gravação do que a imagem escreve, e num script sem relação com o app (o WebKit desta máquina deixa de navegar depois de muitos contextos no mesmo processo). Ele não rodou a base sem o PR. Na rodada do primeiro texto os 46 tinham passado num processo só.
-- No CI do PR #343 (Linux), o commit `9530311` (a versão com "Também escolhi") teve o `ci-gate` verde, com `site-shell` 46 e `photo-survey` 34 em Chromium e em WebKit. O commit `f86a500`, com "Também na final", teve o `ci-gate` verde e os checks `browser-smoke (chromium)` e `browser-smoke (webkit)` aprovados, que são os que rodam os dois roteiros; a contagem de cenários dessa rodada não foi lida. Os commits do gate, de 23/11/2026, vêm depois dele e só mexem neste registro; o resultado do último está no PR. Nada muda em `shared/` nem em `back/`, e os testes do servidor não rodam.
+- No CI do PR #343 (Linux), o commit `9530311` (a versão com "Também escolhi") teve o `ci-gate` verde, com `site-shell` 46 e `photo-survey` 34 em Chromium e em WebKit. O commit `f86a500`, com "Também na final", teve o `ci-gate` verde e os checks `browser-smoke (chromium)` e `browser-smoke (webkit)` aprovados, que são os que rodam os dois roteiros; a contagem de cenários dessa rodada não foi lida. Os commits do gate, de 23/11/2026, vêm depois dele e só mexem neste registro; o último, `09281eb`, teve o `ci-gate` verde antes do merge, com os dois `browser-smoke` aprovados. Nada muda em `shared/` nem em `back/`, e os testes do servidor não rodam.
 - Conferidas a olho: a imagem gerada com cada um dos dois textos, e a tela de resposta registrada em 390×844 com o primeiro. As telas de confirmação e de resposta registrada com o texto final foram olhadas pelo revisor, não pelo agente.
 
 ## Revisão independente
@@ -143,19 +155,18 @@ Na 72d, a partir da avaliação dele ("única frase que não gostei: Minhas fina
 
 ## Próximo passo exato
 
-1. Merge do PR #343 e deploy do app (a API não muda), com o sim do Stefan de 23/11/2026. Este arquivo não é atualizado depois: se já foram feitos, e quando, está na issue #342.
-2. Depois do deploy: conferência de fora, só por leitura, de que o pacote publicado traz o texto novo, e registro na issue #342.
+Nenhum neste estágio: o PR #343 foi mesclado e o app publicado em 23/11/2026. Segue aberto, fora dele, o teste da imagem num celular de verdade (ver "Ação do Stefan").
 
 ## Ação do Stefan
 
-- Dizer se a issue #342 pode ser fechada depois da publicação.
+- Ver, num celular, se a imagem compartilhada sai com "TAMBÉM NA FINAL": em produção o agente só leu o pacote publicado.
 - Confirmar se o que ele testou no celular incluiu tocar em "Compartilhar", se a imagem chegou e em que aparelho. A frase que ele citou em 16/11/2026 ("Minhas finalistas") só aparece na imagem e na descrição dela, mas ele não disse onde a viu.
 
 ## Human gate
 
 - Decisão da 72d (ajuste de texto): `aprovado`
 - Responsável: Stefan
-- Observação: em 17/11/2026, depois do ciclo de crítica, a mensagem do agente dizia que o ciclo tinha parado no segundo ciclo e que a melhor frase continuava sendo "Também na final"; trazia a versão final, a tabela com os dois ciclos (cada reescrita e a recusa do juiz) e as marginais rejeitadas; dizia que um terceiro pode entender "a final" como a final da pesquisa toda, que "final" é da mesma família de "finalistas" e que, se o incômodo dele fosse a palavra, o caminho seria outro; e que nada tinha sido mesclado nem publicado. A pergunta foi: "Mesclo o PR 343 e publico o app com 'Também na final'? Pode responder 'sim, na final' ou 'não agora'." Ele respondeu em 23/11/2026: "Sim, na final". O merge e o deploy do app ficam a cargo do agente, a pedido dele, com o check verde no commit final. A regra 6 do `AGENTS.md` não muda.
+- Observação: em 17/11/2026, depois do ciclo de crítica, a mensagem do agente dizia que o ciclo tinha parado no segundo ciclo e que a melhor frase continuava sendo "Também na final"; trazia a versão final, a tabela com os dois ciclos (cada reescrita e a recusa do juiz) e as marginais rejeitadas; dizia que um terceiro pode entender "a final" como a final da pesquisa toda, que "final" é da mesma família de "finalistas" e que, se o incômodo dele fosse a palavra, o caminho seria outro; e que nada tinha sido mesclado nem publicado. A pergunta foi: "Mesclo o PR 343 e publico o app com 'Também na final'? Pode responder 'sim, na final' ou 'não agora'." Ele respondeu em 23/11/2026: "Sim, na final". O merge e o deploy do app ficaram a cargo do agente, a pedido dele, com o check verde no commit final, e foram feitos em 23/11/2026 (ver "Publicação da 72d"). Depois da publicação, a mensagem do agente dizia que o app estava no ar com "Também na final", o que tinha sido lido de fora, que a issue #342 continuava aberta, que o agente não tinha aberto o site em navegador nem tocado em carta, e que ler o pacote não mostra que a imagem sai certa num aparelho. A pergunta foi: "Fecho a issue 342? Responda 'sim, fecha' ou 'ainda não'." Ele respondeu: "Sim, fecha". A regra 6 do `AGENTS.md` não muda.
 - Decisão das partes 72a e 72b e da publicação (72c): `aprovado`
 - Responsável: Stefan
 - Observação: a construção responde à avaliação dele de 16/11/2026 e à delegação registrada na decisão 0003. O merge e a publicação tiveram instrução direta dele no mesmo dia. A mensagem do agente que antecedeu a pergunta dizia que os dois pedidos (este e o cadastro com CPF, PR #337) estavam prontos e nenhum estava no ar; que a imagem traz a escolhida, as três finalistas, a pergunta e o endereço; que a causa provável do "só o link" é o iPhone descartar a imagem quando ela vai com texto e link, e que agora vai só a imagem; que onde não dá para compartilhar arquivo a imagem aparece na tela com "Baixar imagem"; que nada disso foi testado num celular de verdade e que a correção do iPhone vem de um defeito conhecido do navegador; e que os dois PRs passaram por revisão independente e estavam com os testes automáticos verdes. A pergunta foi: "Mesclo e publico o cadastro com CPF e o compartilhar com imagem? Pode responder 'sim, os dois', 'só o compartilhar' ou 'só o cadastro'." Ele respondeu: "Sim, os dois". O merge e o deploy ficaram a cargo do agente, a pedido dele, com o check verde no commit final, e foram feitos em 16/11/2026 (ver "Publicação"). A regra 6 do `AGENTS.md` não muda.
