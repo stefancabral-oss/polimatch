@@ -84,7 +84,7 @@
     "stefanReport": "\"No celular funcionou\", depois da publicação; ele não disse o que testou nem em que aparelho, e não se sabe se cobre o compartilhar"
   },
   "delivery72d": {
-    "checkedAt": "2026-11-23",
+    "checkedAt": "2026-11-16",
     "issue": 342,
     "request": "Stefan, 16/11/2026, depois da publicação: \"única frase que não gostei: Minhas finalistas. Ficou meio fora do portugues.\"",
     "change": "na imagem, \"Também na final\" no lugar de \"Minhas finalistas\" (rótulo e descrição da imagem); nas telas de confirmação e de resposta registrada, \"Também na final\" no lugar de \"Suas finalistas\"; a troca nas telas é escolha do agente",
@@ -110,19 +110,19 @@
     "wordingLoop": {
       "date": "2026-11-17",
       "request": "Stefan, com o PR pronto: \"Roda para descobrir a melhor frase.\"",
-      "method": "crítico, autor e juiz; o crítico e o juiz foram agentes à parte, um novo a cada vez, sem o raciocínio do autor; o autor foi o agente do estágio; o juiz comparou cada reescrita com \"Também na final\"",
+      "method": "crítico, autor e juiz; o crítico e o juiz foram agentes à parte, um novo a cada vez, que receberam do autor o contexto, o histórico e a versão a julgar (o segundo crítico, também o motivo da primeira reescrita; os juízes, sem a lista de falhas dos críticos); o autor foi o agente do estágio; o juiz comparou cada reescrita com \"Também na final\"",
       "cycle 1": "o crítico leu \"Também na final\": 1 alta (na imagem a final não tem dono), 1 média (sentido literal em futebol e reality), 6 marginais; reescrita: \"Também na minha final\" na imagem e na descrição; juiz: não",
-      "cycle 2": "o crítico leu \"Também na minha final\": 1 alta (possessivo mais final repete o esqueleto da frase apontada), 1 média (inclui as três na preferência da pessoa), 6 marginais; reescrita: \"Em vez de\" nos três lugares; juiz: não",
+      "cycle 2": "o crítico leu \"Também na minha final\": 1 alta, por risco e não por certeza segundo o crítico (possessivo mais final repete o esqueleto da frase apontada), 1 média (inclui as três na preferência da pessoa), 6 marginais; reescrita: \"Em vez de\" nos três lugares; juiz: não",
       "stop": "dois ciclos seguidos com o juiz respondendo não; ficou \"Também na final\"",
       "limits": "só duas reescritas foram testadas, e pelo texto, sem imagem gerada com elas; os juízes não disseram o que abriram; fica conhecido que quem recebe a imagem pode ler a final como a da pesquisa toda"
     },
     "pr": 343,
-    "firstVersion": "\"Também escolhi\" na imagem e \"Você também escolheu\" nas telas (commit 9530311), mostrada ao Stefan numa folha; a revisão independente apontou que afirma preferência pelas outras três quando o sorteio força a escolha; trocada por \"Também na final\"; ele recebeu a folha com as duas opções e, em 23/11/2026, escolheu \"Também na final\"",
+    "firstVersion": "\"Também escolhi\" na imagem e \"Você também escolheu\" nas telas (commit 9530311), mostrada ao Stefan numa folha; a revisão independente apontou que afirma preferência pelas outras três quando o sorteio força a escolha; trocada por \"Também na final\"; ele recebeu a folha com as duas opções; depois do ciclo de crítica a pergunta do gate propunha só \"Também na final\" e, em 23/11/2026, ele respondeu \"Sim, na final\"",
     "ci": {
       "pr": 343,
       "commit 9530311": "ci-gate verde (a versão com Também escolhi); no Linux, site-shell 46 e photo-survey 34 cenários em Chromium e em WebKit",
-      "commit f86a500": "ci-gate verde (o texto final, Também na final); no Linux, os dois roteiros em Chromium e em WebKit",
-      "finalCommit": "o commit do gate, depois de f86a500, só de registro: resultado no PR #343"
+      "commit f86a500": "ci-gate verde (o texto final, Também na final); browser-smoke (chromium) e browser-smoke (webkit) aprovados, que rodam os dois roteiros no Linux; a contagem de cenários não foi lida",
+      "finalCommit": "os commits do gate, de 23/11/2026, depois de f86a500, só de registro: resultado do último no PR #343"
     },
     "independentReview": {
       "who": "agente à parte, somente leitura, num clone próprio, sobre 9530311",
