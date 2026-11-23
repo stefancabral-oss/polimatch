@@ -432,6 +432,7 @@ try {
         const hero = await page.locator(".ps-hero .ps-card").boundingBox();
         const finalist = await page.locator(".ps-row .ps-card").first().boundingBox();
         assert.ok(hero.width > finalist.width, `${label}: a escolhida não é maior que uma finalista (${hero.width} e ${finalist.width})`);
+        assert.equal(await page.locator(".ps-label").textContent(), "Também na final", `${label}: o rótulo das outras três cartas`);
         assert.ok(Math.abs(hero.height / hero.width - 742 / 530) < 0.02, `${label}: a escolhida saiu da proporção (${hero.width}×${hero.height})`);
         assert.ok(hero.x >= 0 && hero.x + hero.width <= width + 0.5, `${label}: a escolhida cortada na lateral`);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, `${label}: rolagem lateral`);

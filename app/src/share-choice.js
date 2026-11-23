@@ -76,7 +76,7 @@ export function sharePreviewMarkup({ state = "ready", url = "", name, others = [
       <div class="ps-share-actions"><button class="ps-btn" type="button" data-share="retry">Tentar de novo</button>${link}${close}</div>`;
   }
   const source = escapeText(url);
-  const finalists = others.length ? ` ${others.length > 1 ? "Minhas finalistas" : "Minha finalista"}: ${listNames(others)}.` : "";
+  const finalists = others.length ? ` Também na final: ${listNames(others)}.` : "";
   return `<img class="ps-share-img" src="${source}" width="${WIDTH}" height="${HEIGHT}" alt="${escapeText(`Imagem com a minha escolha: ${name}.${finalists}`)}">
     <p class="ps-muted ps-share-hint">Baixe a imagem para postar. No celular, segure o dedo na imagem para salvar ou compartilhar.</p>
     ${linkNotice}
@@ -239,7 +239,7 @@ export async function shareImage({ src, name, question, others = [] }) {
     fitText(context, question, layout.questionY, { size: 36, weight: 600, color: "#374151" });
     drawCard(context, card, layout.hero, 26);
     if (finalists.length) {
-      fitText(context, "MINHAS FINALISTAS", layout.labelY, { size: 26, weight: 600, color: "#6b7280" });
+      fitText(context, "TAMBÉM NA FINAL", layout.labelY, { size: 26, weight: 600, color: "#6b7280" });
       finalists.forEach((image, index) => drawCard(context, image, layout.finalists[index], 14));
     }
     // "Responda em polimatch.com.br", com "match" em verde.

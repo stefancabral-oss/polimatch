@@ -43,6 +43,11 @@ o link.
   Compartilhar não fala com a API.
 - **Só as escolhas da pessoa.** A imagem leva a escolhida e as finalistas
   dela. Nunca resultado somado (#177).
+- **O texto não diz "finalistas".** Na imagem, as outras três cartas vêm
+  sob "Também na final"; nas telas de confirmação e de resposta registrada,
+  o mesmo. Pedido do Stefan de 16/11/2026, depois da publicação (72d, #342).
+  O rótulo descreve a final e não afirma que a pessoa prefere as três.
+  "Finalistas" segue como nome interno.
 - **A imagem não sai do aparelho por conta própria.** Ela é montada no
   navegador e fica na memória da página; a prévia usa um endereço local, que
   é solto quando a prévia fecha.
@@ -59,13 +64,14 @@ o link.
 
 ## Entregas
 
-Um PR:
+Um PR para as partes 72a a 72c (#339) e outro para a 72d (#343):
 
 | Parte | O que traz |
 |---|---|
 | 72a — Imagem | `shareImageLayout` e `shareImage` com as finalistas; testes |
 | 72b — Entrega | `sharePlan`, a prévia com "Baixar imagem", o botão que espera a imagem; testes e roteiros de navegador |
 | 72c — Publicação | Só o app, com o sim do Stefan. Feita em 16/11/2026, junto com o estágio 71 |
+| 72d — Ajuste de texto | "Também na final" no lugar de "Minhas finalistas" e de "Suas finalistas" (#342); publicação do app com o sim do Stefan |
 
 ## Fora de escopo
 
@@ -97,6 +103,8 @@ Um PR:
   é solto ao fechar pelo botão, por Esc e por uma tela nova. Sem `showModal`
   a prévia abre e o Esc fecha.
 - Os cenários dos estágios 68 a 70 continuam passando.
+- 72d: a imagem escreve "Minha escolha" e "Também na final"; nenhuma tela
+  nem a imagem dizem "finalistas", nem "escolhi" sobre as outras três.
 
 ## Condições de publicação
 

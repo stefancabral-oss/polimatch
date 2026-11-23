@@ -175,12 +175,12 @@ test("o endereço da prévia e o nome nunca entram como marcação", () => {
   assert.doesNotMatch(markup, /<script>|<b>A/);
 });
 
-test("a descrição da imagem cita as finalistas", () => {
+test("a descrição da imagem cita quem mais chegou à final, sem a palavra finalistas", () => {
   const alt = (others) => /alt="([^"]*)"/.exec(sharePreviewMarkup({ url: "blob:x", name: "Ana", others }))[1];
   assert.equal(alt([]), "Imagem com a minha escolha: Ana.");
-  assert.equal(alt(["Bia"]), "Imagem com a minha escolha: Ana. Minha finalista: Bia.");
-  assert.equal(alt(["Bia", "Caio"]), "Imagem com a minha escolha: Ana. Minhas finalistas: Bia e Caio.");
-  assert.equal(alt(["Bia", "Caio", "Davi"]), "Imagem com a minha escolha: Ana. Minhas finalistas: Bia, Caio e Davi.");
+  assert.equal(alt(["Bia"]), "Imagem com a minha escolha: Ana. Também na final: Bia.");
+  assert.equal(alt(["Bia", "Caio"]), "Imagem com a minha escolha: Ana. Também na final: Bia e Caio.");
+  assert.equal(alt(["Bia", "Caio", "Davi"]), "Imagem com a minha escolha: Ana. Também na final: Bia, Caio e Davi.");
 });
 
 test("enquanto a imagem é montada a prévia avisa; se não sair, oferece tentar de novo; o link só vai se a pessoa pedir", () => {
