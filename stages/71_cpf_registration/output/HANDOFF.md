@@ -2,7 +2,7 @@
 
 ## Status
 
-- Estado: `concluído`. As partes 71a a 71d foram mescladas (PR #337, commit `f2edbcd`) e a 71e aconteceu em 16/11/2026: API e app estão publicados no commit `28fd962`.
+- Estado: `concluído`. As partes 71a a 71d foram mescladas (PR #337, commit `f2edbcd`) e a 71e aconteceu em 16/11/2026: API e app foram publicados no commit `28fd962`. O app foi publicado de novo em 23/11/2026, só com o ajuste de texto da 72d (ver o HANDOFF do estágio 72).
 - Issue: #336
 - Branch: `icm/71-cpf-registration`, sobre a `main` em `59ca9a1` (estágio 70 mesclado).
 - PR: #337

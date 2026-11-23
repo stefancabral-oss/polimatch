@@ -110,10 +110,10 @@
     "publication": {
       "date": "2026-11-23",
       "merge": {
-        "PR 343": "0e99eae, mesma árvore de 09281eb (ci-gate verde)"
+        "PR 343": "0e99eae, mesma árvore de 09281eb (ci-gate verde); o CI do push do merge na main também teve o ci-gate verde, às 18:27 UTC, antes do deploy"
       },
-      "app": "commit 0e99eae, 28 s; build de 2026-11-23T19:18:41Z; só o app, sem tocar na API nem no banco; 95 leituras de fora da capa e de /api/health em 5 minutos, começando antes do clique, e nenhuma falhou",
-      "checkedByGet": "presença no pacote publicado (código, não comportamento na tela): FINALISTAS e finalistas não aparecem mais; TAMBÉM NA FINAL uma vez (o desenho da imagem) e Também na final três vezes (as duas telas e a descrição da imagem)",
+      "app": "commit 0e99eae, 28 s; build de 2026-11-23T19:18:41Z; só o app, sem tocar na API nem no banco; o commit é o que o painel de deploy registrou (version.json traz sha unknown, #287); 95 leituras de fora da capa e de /api/health em 5 minutos, começando antes do clique, e nenhuma falhou",
+      "checkedByGet": "presença nos dois arquivos JS que a capa referencia, main-Eo94IDfk.js e site-menu-2mr-GwIW.js (código, não comportamento na tela): FINALISTAS e finalistas não aparecem mais; TAMBÉM NA FINAL uma vez (o desenho da imagem) e Também na final três vezes (as duas telas e a descrição da imagem)",
       "notChecked": "nenhuma tela aberta em navegador contra a produção; a imagem compartilhada num aparelho de verdade",
       "issueClosed": "#342, em 23/11/2026, com a instrução do Stefan (\"Sim, fecha\")"
     },

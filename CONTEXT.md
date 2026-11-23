@@ -257,4 +257,6 @@ Deve gerar uma imagem com minhas escolhas, não apenas o link." Estágio
 finalistas; o toque só tem dois destinos, o compartilhamento do aparelho só
 com a imagem ou a prévia na tela com "Baixar imagem"; o link só vai se a
 pessoa pedir. Só o app muda. Publicado em 16/11/2026, com o app no commit
-`28fd962`.
+`28fd962`. O ajuste de texto pedido depois ("Também na final" no lugar de
+"Minhas finalistas", #342) foi publicado em 23/11/2026, com o app no commit
+`0e99eae`.

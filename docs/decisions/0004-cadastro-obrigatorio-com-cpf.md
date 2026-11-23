@@ -4,8 +4,8 @@
 - Quem decidiu: Stefan
 - Registrado por: agente (Claude), a pedido dele
 - Issue: #336 ([ICM 71])
-- Estado: em produção desde 16/11/2026, com API e app no commit `28fd962`
-  (publicação registrada na issue #336).
+- Estado: em produção desde 16/11/2026, quando API e app foram publicados no
+  commit `28fd962` (publicação registrada na issue #336).
 - Altera a [decisão 0001](0001-pesquisa-de-preferencia-por-foto.md) no item 3 e
   em "O que continua valendo", e a
   [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md) no ponto

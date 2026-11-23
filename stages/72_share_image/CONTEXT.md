@@ -71,7 +71,7 @@ Um PR para as partes 72a a 72c (#339) e outro para a 72d (#343):
 | 72a — Imagem | `shareImageLayout` e `shareImage` com as finalistas; testes |
 | 72b — Entrega | `sharePlan`, a prévia com "Baixar imagem", o botão que espera a imagem; testes e roteiros de navegador |
 | 72c — Publicação | Só o app, com o sim do Stefan. Feita em 16/11/2026, junto com o estágio 71 |
-| 72d — Ajuste de texto | "Também na final" no lugar de "Minhas finalistas" e de "Suas finalistas" (#342); publicação do app com o sim do Stefan |
+| 72d — Ajuste de texto | "Também na final" no lugar de "Minhas finalistas" e de "Suas finalistas" (#342); publicação do app com o sim do Stefan. Feita em 23/11/2026 |
 
 ## Fora de escopo
 
