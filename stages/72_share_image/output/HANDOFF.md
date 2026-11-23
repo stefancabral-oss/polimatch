@@ -2,7 +2,7 @@
 
 ## Status
 
-- Estado: `concluído` nas partes 72a a 72c: a 72a e a 72b foram mescladas (PR #339, commit `28fd962`) e a 72c aconteceu em 16/11/2026, com o app publicado nesse commit. A 72d (ajuste de texto) está `pronta para gate`.
+- Estado: `concluído` nas partes 72a a 72c: a 72a e a 72b foram mescladas (PR #339, commit `28fd962`) e a 72c aconteceu em 16/11/2026, com o app publicado nesse commit. A 72d (ajuste de texto) foi aprovada pelo Stefan em 23/11/2026 (ver "Human gate"); o merge e a publicação dela são registrados na issue #342.
 - Issue: #338
 - Branch: `icm/72-share-image`. Foi feita sobre a `main` em `59ca9a1`; com o estágio 71 (PR #337) aprovado para entrar antes, foi refeita em cima dele. Os dois mexiam em quatro arquivos; os conflitos estão descritos em "Testes executados".
 - PR: #339
@@ -42,8 +42,23 @@ Depois da publicação, em 16/11/2026, o Stefan escreveu: "única frase que não
 - Na imagem, o rótulo acima das outras três cartas passa de "Minhas finalistas" para "Também na final". A descrição da imagem na prévia muda junto: "Imagem com a minha escolha: (nome). Também na final: (nomes)."
 - Nas telas de confirmação e de resposta registrada, o mesmo rótulo passa de "Suas finalistas" para "Também na final". Ele apontou só a frase da imagem; a das telas usa a mesma palavra e foi trocada junto, por escolha do agente.
 - Só texto, em `app/src/share-choice.js` e `app/src/photo-survey-page.js`. O desenho da imagem, as cartas, as regras e o servidor não mudam. Nos documentos e no código, "finalistas" continua sendo o nome interno dessas três cartas.
-- A primeira versão desta parte usava "Também escolhi" na imagem e "Você também escolheu" nas telas, e foi mostrada a ele numa folha. A revisão independente apontou que esse texto afirma preferência: como o sorteio monta as telas ao acaso, a pessoa pode ter escolhido numa tela alguém de quem não gosta, e a imagem diria que ela "também escolheu" essa pessoa. O agente trocou para "Também na final", que descreve o que aconteceu, e mandou a ele uma folha com as duas opções lado a lado, com a recomendação. A folha está em `references/texto-duas-opcoes.jpg`. A escolha entre as duas é dele, no gate.
-- Não publicado: chega à produção com um deploy do app, depois do merge, com o sim dele.
+- A primeira versão desta parte usava "Também escolhi" na imagem e "Você também escolheu" nas telas, e foi mostrada a ele numa folha. A revisão independente apontou que esse texto afirma preferência: como o sorteio monta as telas ao acaso, a pessoa pode ter escolhido numa tela alguém de quem não gosta, e a imagem diria que ela "também escolheu" essa pessoa. O agente trocou para "Também na final", que descreve o que aconteceu, e mandou a ele uma folha com as duas opções lado a lado, com a recomendação. A folha está em `references/texto-duas-opcoes.jpg`. A escolha entre as duas era dele, no gate; em 23/11/2026 ele escolheu "Também na final".
+- Chega à produção com um deploy do app, depois do merge. Ele deu o sim em 23/11/2026; o registro da publicação fica na issue #342.
+
+### A frase passou por um ciclo de crítica (17/11/2026)
+
+Em 17/11/2026, com o PR pronto, o Stefan pediu um ciclo de refinamento da frase ("Roda para descobrir a melhor frase."). O ciclo tem três papéis: um crítico aponta falhas com severidade, o autor reescreve só para as altas e as médias, e um juiz diz se a versão nova é materialmente melhor. O crítico e o juiz foram agentes à parte, um novo a cada vez, que não viram o raciocínio do autor. O autor foi o agente do estágio.
+
+| Ciclo | O crítico leu | Alta | Média | Marginal | Reescrita | Juiz |
+|---|---|---|---|---|---|---|
+| 1 | "Também na final" | 1 | 1 | 6 | "Também na minha final" na imagem e na descrição dela; telas iguais | Não |
+| 2 | "Também na minha final" | 1 | 1 | 6 | "Em vez de" nos três lugares | Não |
+
+- Ciclo 1. Falha alta: na imagem, "a final" não tem dono, e quem recebe pode ler como a final da pesquisa toda ou uma seleção do site. Média: em futebol e em reality, "na final" tem sentido literal. O juiz não considerou "Também na minha final" melhor: resolve o dono, mas volta ao possessivo com uma palavra da mesma família de "Minhas finalistas" e reforça a leitura de que as outras cartas também são preferência da pessoa.
+- Ciclo 2. O crítico leu a reescrita do ciclo 1, não a frase que estava de pé; o juiz comparou, nos dois ciclos, com "Também na final". Falha alta: possessivo mais "final" repete o esqueleto da frase que o Stefan apontou. Média: "também" e "minha" incluem as três cartas na preferência da pessoa. O juiz não considerou "Em vez de" melhor: dispensa saber o que é a final, mas soa como rejeição das outras três e fica uma frase presa numa preposição.
+- O ciclo parou pela regra dele: dois ciclos seguidos com o juiz respondendo não. Ficou "Também na final". Isso mostra que as duas reescritas testadas não foram julgadas melhores; não mostra que não existe frase melhor.
+- Fica conhecido, sem conserto de uma linha que o ciclo tenha achado: quem recebe a imagem pode entender "a final" como a final da pesquisa. Os dois críticos anotaram também que "final" é da mesma família de "finalistas" e que o Stefan não disse se o incômodo era a palavra, o possessivo ou o feminino.
+- Os dois críticos disseram ter aberto a imagem gerada e a tela de resposta registrada com "Também na final". Aos juízes as mesmas imagens foram indicadas (ao primeiro, só a imagem gerada); eles responderam só sim ou não com uma frase e não disseram o que abriram. As duas reescritas foram julgadas pelo texto: nenhuma imagem foi gerada com elas.
 
 ## Não entregue / pendente
 
@@ -71,7 +86,7 @@ Na 72d, em 16/11/2026:
 
 - Os testes vieram antes do código e falharam pelo motivo esperado, nas duas rodadas de texto: o de unidade da descrição da imagem; o cenário de navegador da imagem, que passou a ler o que a imagem escreve (falhou com "MINHAS FINALISTAS" e, na segunda rodada, com "TAMBÉM ESCOLHI" na lista); e o das telas de resumo (leu "Suas finalistas" e, na segunda rodada, "Você também escolheu").
 - Local (macOS), no checkout do agente, com o Playwright instalado nele (WebKit, e Chromium 140 pelo executável do cache), com o texto final: `npm test --prefix app` 213/213; em Chromium, `site-shell.mjs` com 46 cenários e `photo-survey.mjs` com 34; em WebKit, `photo-survey.mjs` com 34 e `site-shell.mjs` com 42 num processo, que parou no cenário 43 por tempo esgotado ao abrir a página, mais os cenários 43 a 46 rodados um por processo, aprovados. A parada não parece vir da mudança: o revisor viu a mesma num clone novo, com e sem a gravação do que a imagem escreve, e num script sem relação com o app (o WebKit desta máquina deixa de navegar depois de muitos contextos no mesmo processo). Ele não rodou a base sem o PR. Na rodada do primeiro texto os 46 tinham passado num processo só.
-- No CI do PR #343 (Linux), o commit `9530311` (a versão com "Também escolhi") teve o `ci-gate` verde, com `site-shell` 46 e `photo-survey` 34 em Chromium e em WebKit. O resultado do commit final, com "Também na final", está no PR. Nada muda em `shared/` nem em `back/`, e os testes do servidor não rodam.
+- No CI do PR #343 (Linux), o commit `9530311` (a versão com "Também escolhi") teve o `ci-gate` verde, com `site-shell` 46 e `photo-survey` 34 em Chromium e em WebKit. O commit `f86a500`, com "Também na final", teve o `ci-gate` verde, com os dois roteiros em Chromium e em WebKit. O commit do gate vem depois dele e só mexe neste registro; o resultado dele está no PR. Nada muda em `shared/` nem em `back/`, e os testes do servidor não rodam.
 - Conferidas a olho: a imagem gerada com cada um dos dois textos, e a tela de resposta registrada em 390×844 com o primeiro. As telas de confirmação e de resposta registrada com o texto final foram olhadas pelo revisor, não pelo agente.
 
 ## Revisão independente
@@ -123,23 +138,24 @@ Escolhas do agente, por delegação dele (decisão 0003, item 5), que pode mudar
 
 Na 72d, a partir da avaliação dele ("única frase que não gostei: Minhas finalistas"), escolhas do agente, que ele pode mudar:
 
-- "Também na final", na imagem e nas telas: descreve a final, sem afirmar que a pessoa prefere as outras três. A alternativa, "Também escolhi" (com "Você também escolheu" nas telas), é mais pessoal e ficou como segunda opção.
+- "Também na final", na imagem e nas telas: descreve a final, sem afirmar que a pessoa prefere as outras três. A alternativa, "Também escolhi" (com "Você também escolheu" nas telas), é mais pessoal e ficou como segunda opção. Em 23/11/2026 o Stefan escolheu "Também na final".
 - Trocar também o rótulo das telas, que ele não citou.
 
 ## Próximo passo exato
 
-1. Gate do Stefan para a 72d: merge do PR e deploy do app (a API não muda).
-2. Depois do deploy: conferência de fora, só por leitura, de que o pacote publicado traz o texto novo.
+1. Merge do PR #343 e deploy do app (a API não muda), com o sim do Stefan de 23/11/2026.
+2. Depois do deploy: conferência de fora, só por leitura, de que o pacote publicado traz o texto novo, e registro na issue #342.
 
 ## Ação do Stefan
 
-- Dizer se a 72d é mesclada e publicada (só o app), e com qual dos dois textos.
+- Dizer se a issue #342 pode ser fechada depois da publicação.
 - Confirmar se o que ele testou no celular incluiu tocar em "Compartilhar", se a imagem chegou e em que aparelho. A frase que ele citou em 16/11/2026 ("Minhas finalistas") só aparece na imagem e na descrição dela, mas ele não disse onde a viu.
 
 ## Human gate
 
-- Decisão da 72d (ajuste de texto): `pendente`
+- Decisão da 72d (ajuste de texto): `aprovado`
 - Responsável: Stefan
+- Observação: em 17/11/2026, depois do ciclo de crítica, a mensagem do agente dizia que o ciclo tinha parado no segundo ciclo e que a melhor frase continuava sendo "Também na final"; trazia a tabela e as duas reescritas recusadas; dizia que um terceiro pode entender "a final" como a final da pesquisa toda, que "final" é da mesma família de "finalistas" e que, se o incômodo dele fosse a palavra, o caminho seria outro; e que nada tinha sido mesclado nem publicado. A pergunta foi: "Mesclo o PR 343 e publico o app com 'Também na final'? Pode responder 'sim, na final' ou 'não agora'." Ele respondeu em 23/11/2026: "Sim, na final". O merge e o deploy do app ficam a cargo do agente, a pedido dele, com o check verde no commit final. A regra 6 do `AGENTS.md` não muda.
 - Decisão das partes 72a e 72b e da publicação (72c): `aprovado`
 - Responsável: Stefan
 - Observação: a construção responde à avaliação dele de 16/11/2026 e à delegação registrada na decisão 0003. O merge e a publicação tiveram instrução direta dele no mesmo dia. A mensagem do agente que antecedeu a pergunta dizia que os dois pedidos (este e o cadastro com CPF, PR #337) estavam prontos e nenhum estava no ar; que a imagem traz a escolhida, as três finalistas, a pergunta e o endereço; que a causa provável do "só o link" é o iPhone descartar a imagem quando ela vai com texto e link, e que agora vai só a imagem; que onde não dá para compartilhar arquivo a imagem aparece na tela com "Baixar imagem"; que nada disso foi testado num celular de verdade e que a correção do iPhone vem de um defeito conhecido do navegador; e que os dois PRs passaram por revisão independente e estavam com os testes automáticos verdes. A pergunta foi: "Mesclo e publico o cadastro com CPF e o compartilhar com imagem? Pode responder 'sim, os dois', 'só o compartilhar' ou 'só o cadastro'." Ele respondeu: "Sim, os dois". O merge e o deploy ficaram a cargo do agente, a pedido dele, com o check verde no commit final, e foram feitos em 16/11/2026 (ver "Publicação"). A regra 6 do `AGENTS.md` não muda.

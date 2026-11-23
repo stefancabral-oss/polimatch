@@ -8,7 +8,7 @@
     "72a": "a imagem traz a escolhida e as finalistas; shareImageLayout com teste",
     "72b": "sharePlan, a prévia com Baixar imagem, o botão que espera a imagem, a recusa do arquivo abrindo a prévia",
     "72c": "feita em 16/11/2026: app no commit 28fd962; registro na issue #338 e no HANDOFF",
-    "72d": "ajuste de texto pedido depois da publicação: \"Também na final\" no lugar de \"Minhas finalistas\" (imagem) e de \"Suas finalistas\" (telas); issue #342, PR #343; pronta para gate"
+    "72d": "ajuste de texto pedido depois da publicação: \"Também na final\" no lugar de \"Minhas finalistas\" (imagem) e de \"Suas finalistas\" (telas); issue #342, PR #343; aprovada pelo Stefan em 23/11/2026 (\"Sim, na final\"); o merge e a publicação são registrados na issue #342"
   },
   "testsFirst": {
     "unidade": "share-choice.test.js: plano de entrega, conta do desenho, marcação da prévia e, depois da revisão, a chamada só com o arquivo, a linha que encolhe e os estados da prévia, escritos e vistos falhar antes do código",
@@ -84,7 +84,7 @@
     "stefanReport": "\"No celular funcionou\", depois da publicação; ele não disse o que testou nem em que aparelho, e não se sabe se cobre o compartilhar"
   },
   "delivery72d": {
-    "checkedAt": "2026-11-16",
+    "checkedAt": "2026-11-23",
     "issue": 342,
     "request": "Stefan, 16/11/2026, depois da publicação: \"única frase que não gostei: Minhas finalistas. Ficou meio fora do portugues.\"",
     "change": "na imagem, \"Também na final\" no lugar de \"Minhas finalistas\" (rótulo e descrição da imagem); nas telas de confirmação e de resposta registrada, \"Também na final\" no lugar de \"Suas finalistas\"; a troca nas telas é escolha do agente",
@@ -104,15 +104,25 @@
     "notVerified": [
       "as telas com Também na final a olho pelo agente: foram olhadas pelo revisor",
       "um aparelho de verdade",
-      "produção: não publicado"
+      "produção: a publicação vem depois do merge e é registrada na issue #342, não aqui"
     ],
-    "humanGate": "pendente: merge, deploy do app e a escolha entre os dois textos",
+    "humanGate": "aprovada pelo Stefan em 23/11/2026 (\"Sim, na final\"): merge, deploy do app e o texto \"Também na final\"; transcrita no HANDOFF",
+    "wordingLoop": {
+      "date": "2026-11-17",
+      "request": "Stefan, com o PR pronto: \"Roda para descobrir a melhor frase.\"",
+      "method": "crítico, autor e juiz; o crítico e o juiz foram agentes à parte, um novo a cada vez, sem o raciocínio do autor; o autor foi o agente do estágio; o juiz comparou cada reescrita com \"Também na final\"",
+      "cycle 1": "o crítico leu \"Também na final\": 1 alta (na imagem a final não tem dono), 1 média (sentido literal em futebol e reality), 6 marginais; reescrita: \"Também na minha final\" na imagem e na descrição; juiz: não",
+      "cycle 2": "o crítico leu \"Também na minha final\": 1 alta (possessivo mais final repete o esqueleto da frase apontada), 1 média (inclui as três na preferência da pessoa), 6 marginais; reescrita: \"Em vez de\" nos três lugares; juiz: não",
+      "stop": "dois ciclos seguidos com o juiz respondendo não; ficou \"Também na final\"",
+      "limits": "só duas reescritas foram testadas, e pelo texto, sem imagem gerada com elas; os juízes não disseram o que abriram; fica conhecido que quem recebe a imagem pode ler a final como a da pesquisa toda"
+    },
     "pr": 343,
-    "firstVersion": "\"Também escolhi\" na imagem e \"Você também escolheu\" nas telas (commit 9530311), mostrada ao Stefan numa folha; a revisão independente apontou que afirma preferência pelas outras três quando o sorteio força a escolha; trocada por \"Também na final\"; ele recebeu a folha com as duas opções e escolhe no gate",
+    "firstVersion": "\"Também escolhi\" na imagem e \"Você também escolheu\" nas telas (commit 9530311), mostrada ao Stefan numa folha; a revisão independente apontou que afirma preferência pelas outras três quando o sorteio força a escolha; trocada por \"Também na final\"; ele recebeu a folha com as duas opções e, em 23/11/2026, escolheu \"Também na final\"",
     "ci": {
       "pr": 343,
       "commit 9530311": "ci-gate verde (a versão com Também escolhi); no Linux, site-shell 46 e photo-survey 34 cenários em Chromium e em WebKit",
-      "finalCommit": "o commit com Também na final e este registro: resultado no PR #343"
+      "commit f86a500": "ci-gate verde (o texto final, Também na final); no Linux, os dois roteiros em Chromium e em WebKit",
+      "finalCommit": "o commit do gate, depois de f86a500, só de registro: resultado no PR #343"
     },
     "independentReview": {
       "who": "agente à parte, somente leitura, num clone próprio, sobre 9530311",
