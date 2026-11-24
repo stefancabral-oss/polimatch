@@ -67,7 +67,7 @@ test("as três pesquisas saem pela API como estão em shared, e a de roupas leva
     const { body: clothes } = await read("roupas-demo-01");
     assert.equal(clothes.subject, "Roupas");
     assert.equal(clothes.question, "Qual você usaria?");
-    assert.equal(clothes.note, "Peças de demonstração, criadas pelo PoliMatch.");
+    assert.equal(clothes.note, "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
     assert.deepEqual([clothes.cardIds.length, clothes.drawSize, clothes.groupSize, clothes.screens, clothes.status], [16, 16, 4, 4, "open"]);
     for (const id of ["politica-2026-01", "politica-2026-02"]) assert.equal((await read(id)).body.note, "", id);
     const missing = await read("roupas-demo-02");

@@ -5,9 +5,14 @@
 // gera os dois tamanhos publicados (WebP) e escreve o catálogo do app e o
 // manifesto do estágio, com o hash de cada arquivo.
 //
+// O roteiro foi escrito por um agente de IA: por isso cada carta, o catálogo e
+// o manifesto dizem "arte com IA" (CREDITS.md, "Chromas e artes editadas").
+//
 // Uso, a partir de app/:  node scripts/build-clothes-cards.mjs
-// Precisa do Chromium do Playwright e do `cwebp` no PATH. O texto das cartas
-// usa a fonte do sistema: o resultado é conferido pelos hashes gravados, não
+// Precisa do Chromium do Playwright e do `cwebp` no PATH. O texto das cartas é
+// desenhado com a Helvetica Neue instalada no macOS; a fonte não vai para o
+// repositório nem para o site, só a imagem pronta. Em outra máquina o texto
+// pode sair diferente: o resultado é conferido pelos hashes gravados, não
 // refeito no CI.
 
 import { execFileSync } from "node:child_process";
@@ -35,7 +40,7 @@ const CREAM = "#F1E9D8";
 const PAPER = "#FBFAF7";
 const GREEN = "#08805A";
 const PANEL = "#D6DADC";
-const FONT = "-apple-system, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif";
+const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
 // ---------------------------------------------------------------------------
 // Cor
@@ -120,9 +125,9 @@ const PRINTS = {
     </g>`,
 
   chama: () => `
-    <path d="M0,-165 C70,-95 115,-45 115,35 C115,110 62,160 0,160 C-62,160 -115,110 -115,35 C-115,-5 -92,-40 -66,-72 C-58,-36 -40,-22 -22,-30 C-34,-80 -26,-125 0,-165 Z" fill="#E8482F"/>
-    <path d="M0,150 C-42,150 -70,118 -70,75 C-70,35 -40,10 -20,-25 C-5,10 15,20 30,5 C50,35 70,55 70,85 C70,122 42,150 0,150 Z" fill="#F6B93B"/>
-    <path d="M0,150 C-22,150 -36,132 -36,112 C-36,92 -16,78 -4,58 C10,80 36,92 36,114 C36,134 22,150 0,150 Z" fill="#FBE9A6"/>`,
+    <path d="M0,-165 C82,-74 120,-12 120,46 C120,114 66,160 0,160 C-66,160 -120,114 -120,46 C-120,-12 -82,-74 0,-165 Z" fill="#E8482F"/>
+    <path d="M0,-62 C50,-6 76,34 76,74 C76,122 42,152 0,152 C-42,152 -76,122 -76,74 C-76,34 -50,-6 0,-62 Z" fill="#F6B93B"/>
+    <path d="M0,36 C24,62 38,82 38,104 C38,130 21,146 0,146 C-21,146 -38,130 -38,104 C-38,82 -24,62 0,36 Z" fill="#FBE9A6"/>`,
 
   montanha: () => `
     <circle cx="-62" cy="-74" r="46" fill="#F2A93B"/>
@@ -309,13 +314,14 @@ function cardSvg(piece) {
   <rect x="78" y="76" width="50" height="50" rx="12" fill="${GREEN}"/>
   <text x="103" y="114" font-size="36" font-weight="800" fill="#fff" text-anchor="middle">M</text>
   <text x="144" y="114" font-size="38" font-weight="700" fill="#111418" letter-spacing="-0.5">PoliMatch</text>
-  <text x="982" y="112" font-size="26" font-weight="700" fill="#5B6470" text-anchor="end" letter-spacing="7">ROUPAS</text>
+  <rect x="800" y="70" width="184" height="62" rx="31" fill="#111418"/>
+  <text x="894.5" y="114" font-size="36" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="5">DEMO</text>
   ${garment.markup}
   <g transform="translate(${centerX},${centerY}) scale(1.18)">${PRINTS[piece.print](piece.body)}</g>
   <rect x="70" y="1150" width="920" height="264" rx="28" fill="${PAPER}" stroke="rgba(17,20,24,0.10)" stroke-width="2"/>
   <text x="530" y="1222" font-size="34" font-weight="800" fill="${GREEN}" text-anchor="middle" letter-spacing="9">${escapeXml(piece.kind.toUpperCase())}</text>
   <text x="530" y="1332" font-size="112" font-weight="800" fill="#111418" text-anchor="middle" letter-spacing="-2.5">${escapeXml(piece.title)}</text>
-  <text x="530" y="1384" font-size="22" font-weight="600" fill="#6B7280" text-anchor="middle" letter-spacing="6">PEÇA DE DEMONSTRAÇÃO</text>
+  <text x="530" y="1386" font-size="26" font-weight="700" fill="#5B6470" text-anchor="middle" letter-spacing="4">PEÇA DE DEMONSTRAÇÃO · ARTE COM IA</text>
 </svg>
 `;
 }
@@ -364,10 +370,19 @@ for (const piece of PIECES) {
     width: WIDTH,
     height: HEIGHT,
     drawnByCode: true,
+    aiAssisted: true,
     edition: EDITION,
     masterSha256,
   });
-  manifest.push({ id: piece.id, name, master: `stages/73_clothes_demo/output/masters/${piece.id}.svg`, masterSha256, variants });
+  manifest.push({
+    id: piece.id,
+    name,
+    master: `stages/73_clothes_demo/output/masters/${piece.id}.svg`,
+    masterSha256,
+    aiAssisted: true,
+    tool: "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
+    variants,
+  });
 }
 
 // Folha de conferência: as 16 cartas lado a lado, como referência do estágio.

@@ -366,7 +366,7 @@ try {
   assert.equal(CLOTHES.id, "roupas-demo-01");
   const veraClothes = await store.photoSurveyDraw(vera.recoveryKey, CLOTHES.id);
   assert.equal(veraClothes.survey.subject, "Roupas");
-  assert.equal(veraClothes.survey.note, "Peças de demonstração, criadas pelo PoliMatch.");
+  assert.equal(veraClothes.survey.note, "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
   assert.equal(veraClothes.response, null, "as respostas de política não respondem a de roupas");
   assert.deepEqual(veraClothes.draw.groups.map((group) => group.length), [4, 4, 4, 4]);
   assert.deepEqual(veraClothes.draw.groups.flat().sort(), [...CLOTHES.cardIds], "todas as cartas, uma vez cada");

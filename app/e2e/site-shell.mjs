@@ -1324,7 +1324,7 @@ try {
     await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Próxima pesquisa" }).click()]);
     await entryReady(page);
     assert.equal(await page.locator("#ps-title").innerText(), "Qual você usaria?");
-    assert.equal(await page.locator(".ps-note").innerText(), "Peças de demonstração, criadas pelo PoliMatch.");
+    assert.equal(await page.locator(".ps-note").innerText(), "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
     // As duas de política sorteiam das mesmas cartas: a escolha pode ser a mesma pessoa nas duas.
     await page.locator(".ps-home .ps-pick").nth(1).locator("b", { hasText: second }).waitFor();
     assert.deepEqual(await page.locator(".ps-home .ps-pick b").allInnerTexts(), [first, second]);
@@ -1799,7 +1799,7 @@ try {
   });
 
   // Pesquisa de roupas (ICM 73, #345) -----------------------------------------
-  const CLOTHES_NOTE = "Peças de demonstração, criadas pelo PoliMatch.";
+  const CLOTHES_NOTE = "Peças de demonstração, desenhadas com IA pelo PoliMatch.";
   const clothesBySrc = new Map(CLOTHES_CARDS.map((card) => [card.src, card]));
   const clothesName = new Map(CLOTHES_CARDS.map((card) => [card.id, card.name]));
   const fanSources = (page) => page.locator(".ps-fan img").evaluateAll((images) => images.map((image) => image.getAttribute("src")));

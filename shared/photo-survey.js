@@ -53,12 +53,12 @@ export const PHOTO_SURVEYS = Object.freeze([
     groupSize: 4,
   }),
   // Demonstração de roupas (ICM 73, #345). Vem depois das de política: a capa
-  // continua abrindo nelas.
+  // só a destaca para quem já respondeu as duas.
   definePhotoSurvey({
     id: "roupas-demo-01",
     subject: "Roupas",
     question: "Qual você usaria?",
-    note: "Peças de demonstração, criadas pelo PoliMatch.",
+    note: "Peças de demonstração, desenhadas com IA pelo PoliMatch.",
     cardIds: CLOTHES_CARD_IDS,
     drawSize: 16,
     groupSize: 4,

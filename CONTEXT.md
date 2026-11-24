@@ -39,7 +39,7 @@ Em 12/11/2026 Stefan respondeu à Q1 da #277 com um caminho fora das três opç�
 - Cada pesquisa é um conjunto de fotos e uma pergunta curta, com começo e fim. Só foto e nome, sem texto para ler.
 - Qualquer pessoa joga. A escolha só entra na pesquisa com cadastro por CPF. (Alterado pela decisão 0004, de 16/11/2026: só responde quem entrou com Google e tem cadastro com CPF; o cadastro vem antes.)
 - Quem jogou vê os cinco primeiros. Só a resposta somada sai do PoliMatch, nunca o dado de uma pessoa.
-- Abre com Política, Famosos e influenciadores, e Futebol. A decisão 0002 fixou a ordem das três primeiras construções: política, celebridades e influenciadores, roupas.
+- Abre com Política, Famosos e influenciadores, e Futebol. A decisão 0002 fixou a ordem das três primeiras construções: política, celebridades e influenciadores, roupas. (Alterado pela decisão 0005, de 23/11/2026: política, roupas, celebridades e influenciadores.)
 - Os jogos de leitura e a parte cívica e de notícias ficam no ar sem trabalho novo. (Alterado pela decisão 0003, de 14/11/2026: saem do site quando a pesquisa virar a capa.)
 - Telas novas minimalistas: fundo neutro e um único verde. Na hora do voto vale a carta com moldura, no mesmo padrão para todas as cartas da pesquisa (decisão 0002, de 13/11/2026, que alterou o "foto sem moldura" da 0001).
 
@@ -268,6 +268,8 @@ frente da pesquisa de famosos, o Stefan respondeu: "Sim, roupas antes"
 `stages/73_clothes_demo/CONTEXT.md`: uma terceira pesquisa, `roupas-demo-01`,
 "Qual você usaria?", com 16 cartas de roupa desenhadas por código no próprio
 repositório, sem foto, pessoa, preço nem marca de terceiros. A entrada da
-pesquisa diz que as peças são de demonstração. As regras, o cadastro e a capa
-em Política não mudam; "Roupas" sai de "Em breve". Em 23/11/2026 o estágio
-estava construído e fora de produção: o HANDOFF dele diz o estado atual.
+pesquisa diz que as peças são de demonstração. As regras e o cadastro não
+mudam. A pesquisa de roupas vem depois das duas de Política: a capa só passa
+a destacá-la para quem já respondeu as duas. "Roupas" sai de "Em breve". Em
+23/11/2026 o estágio estava construído e fora de produção: o HANDOFF dele diz
+o estado atual.

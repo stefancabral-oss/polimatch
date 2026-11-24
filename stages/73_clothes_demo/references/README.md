@@ -8,7 +8,8 @@
 
 - `telas-roupas.jpg`: quatro capturas do aplicativo rodando localmente, com
   servidor simulado, em 23/11/2026: a entrada, uma das quatro telas, a escolha
-  registrada e a imagem do compartilhar. Não são capturas da produção.
+  registrada e a imagem do compartilhar. Não são capturas da produção. A
+  folha foi montada por um roteiro auxiliar que fica fora do repositório.
 
-As peças, os nomes e as estampas são criação do agente para esta
+As peças, os nomes e as estampas são criação de um agente de IA para esta
 demonstração. Não representam produto, marca ou coleção de ninguém.

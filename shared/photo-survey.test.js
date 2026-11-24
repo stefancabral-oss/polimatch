@@ -68,7 +68,7 @@ test("a terceira pesquisa é a demonstração de roupas, com 16 cartas que todo 
   assert.equal(PHOTO_SURVEYS[2], clothes, "depois das duas de política: a ordem é a da capa");
   assert.equal(clothes.subject, "Roupas");
   assert.equal(clothes.question, "Qual você usaria?");
-  assert.equal(clothes.note, "Peças de demonstração, criadas pelo PoliMatch.");
+  assert.equal(clothes.note, "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
   assert.deepEqual(clothes.cardIds, [
     "camiseta-cacto", "camiseta-chama", "camiseta-flor", "camiseta-montanha", "camiseta-olho", "camiseta-onda",
     "camiseta-pipa", "camiseta-planeta", "camiseta-raio", "camiseta-sem-pressa", "camiseta-sol", "camiseta-xadrez",
@@ -231,7 +231,7 @@ test("a visão pública traz só a definição e o estado, sem contagem de respo
   ]);
   assert.equal(view.subject, "Política");
   assert.equal(view.note, "");
-  assert.equal(publicPhotoSurvey(photoSurveyById("roupas-demo-01"), new Date("2026-11-23T12:00:00Z")).note, "Peças de demonstração, criadas pelo PoliMatch.");
+  assert.equal(publicPhotoSurvey(photoSurveyById("roupas-demo-01"), new Date("2026-11-23T12:00:00Z")).note, "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
   // Uma definição montada à mão, sem observação, sai com a observação vazia.
   assert.equal(publicPhotoSurvey({ ...SURVEY, note: undefined }, new Date("2026-11-13T12:00:00Z")).note, "");
   assert.equal(view.screens, 4);

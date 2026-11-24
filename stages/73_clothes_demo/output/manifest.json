@@ -3,19 +3,21 @@
     "id": "camiseta-onda",
     "name": "Camiseta Onda",
     "master": "stages/73_clothes_demo/output/masters/camiseta-onda.svg",
-    "masterSha256": "30d3d480741bae31f2b329e86f8b798b89a1af0c0ad2405dafa13df8e914a2d3",
+    "masterSha256": "86990ccd435a11edbc28df43ba2db5c0b1991ccd2bf230c59f795ed1093a9e6c",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-onda-v01-30d3d480-530.webp",
+        "src": "/chromas/roupas/camiseta-onda-v01-86990ccd-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "7f6b3b383762420dbe1d2ec5c87e04f147aaac6e9cad8183e0424edcfbce1623"
+        "sha256": "12c0576365e5e667d5b32c978be762fb962355ab97f699892ab74c55a48ae018"
       },
       {
-        "src": "/chromas/roupas/camiseta-onda-v01-30d3d480-1060.webp",
+        "src": "/chromas/roupas/camiseta-onda-v01-86990ccd-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "61c5e08aea6bfb8c72aeef47937e691bd36b8d9ec66b5911df62cd0be6ab632a"
+        "sha256": "388e58579eb4578b1d86d093946533afd573d3394d36b79e470a8e42cab51ec7"
       }
     ]
   },
@@ -23,19 +25,21 @@
     "id": "camiseta-sol",
     "name": "Camiseta Sol",
     "master": "stages/73_clothes_demo/output/masters/camiseta-sol.svg",
-    "masterSha256": "77b83f98844e85f2ccf2ec6463f1f5ff719f683121da30153108efc09d953e60",
+    "masterSha256": "fd9f454e65ed6f5b083129bbcfe984743ec1c938e4f431b4b0e0518361562e5a",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-sol-v01-77b83f98-530.webp",
+        "src": "/chromas/roupas/camiseta-sol-v01-fd9f454e-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "407ee46354bbde8b46570415acd904f85da37deac8b0590a059dd261156dbe60"
+        "sha256": "129b8207552022305dfe2f0379bc0c60ffcb2ea27ae1aa0a93f785cc285d670b"
       },
       {
-        "src": "/chromas/roupas/camiseta-sol-v01-77b83f98-1060.webp",
+        "src": "/chromas/roupas/camiseta-sol-v01-fd9f454e-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "97fe23ba9425c37404ec682116c12618590a75fa56533ab00241c92c2d00968b"
+        "sha256": "9406369fbc52faab601a701cf90d1e70d7bd8b18021b95db36b51c211d24bbe7"
       }
     ]
   },
@@ -43,19 +47,21 @@
     "id": "camiseta-raio",
     "name": "Camiseta Raio",
     "master": "stages/73_clothes_demo/output/masters/camiseta-raio.svg",
-    "masterSha256": "ebd88627c1dc4f03a6ed740b40773916d6c3a6adcdb582b2a5fc3855fbfbe6ea",
+    "masterSha256": "656ca851c0da66f1a56ba7bc867bffdde4ff6e7e92519550dd3c939878a87ab9",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-raio-v01-ebd88627-530.webp",
+        "src": "/chromas/roupas/camiseta-raio-v01-656ca851-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "30adde2d601b86cf32d34e0cd5f8745ac248a819ad2364d81487fa4a4ab89423"
+        "sha256": "5e70f57020fee5b47cca6f23f58db708febc4f211baf6cfa7609c4d3b39aa615"
       },
       {
-        "src": "/chromas/roupas/camiseta-raio-v01-ebd88627-1060.webp",
+        "src": "/chromas/roupas/camiseta-raio-v01-656ca851-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "783f5450240bf3121ea78079b785a6e091abace6954825597d7a36fb5ef36cae"
+        "sha256": "e422cbc1fe50f7bed1ec5de6154d54c1a76c176b7e9b4b91c3ee8759192a37dc"
       }
     ]
   },
@@ -63,19 +69,21 @@
     "id": "camiseta-cacto",
     "name": "Camiseta Cacto",
     "master": "stages/73_clothes_demo/output/masters/camiseta-cacto.svg",
-    "masterSha256": "ea79e4eb3202c8364a174a3a6ef966ef980ac93c0bd512171f7b9b130a87e73f",
+    "masterSha256": "bf0db0525d19a865429b6b4be56e177b57f8acf4c179a2298759193165416f9c",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-cacto-v01-ea79e4eb-530.webp",
+        "src": "/chromas/roupas/camiseta-cacto-v01-bf0db052-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "bdc47a13d3341a064e1022e98d5dc20ab26b1ad0ef58faee72cdcf6903a9b727"
+        "sha256": "0adbbd86b538b4e4e94cb7f486ad6ac5ba926f6a56a66b25bf1f137dbc7f8905"
       },
       {
-        "src": "/chromas/roupas/camiseta-cacto-v01-ea79e4eb-1060.webp",
+        "src": "/chromas/roupas/camiseta-cacto-v01-bf0db052-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "eac6ec4b5f0d87c1eaaaef31138078504ac30583dcdef121a8d4c65da174724c"
+        "sha256": "d7093f0cb6dbe0f396b3693da191d4948853be603de998f411f72defd7186149"
       }
     ]
   },
@@ -83,19 +91,21 @@
     "id": "camiseta-planeta",
     "name": "Camiseta Planeta",
     "master": "stages/73_clothes_demo/output/masters/camiseta-planeta.svg",
-    "masterSha256": "b19eee1231d3525157cb3193c37ccda1d040f4a6c4b6e495d420a052439ff1e6",
+    "masterSha256": "498509d8cdb66e8adc062d249722ca9f4c7322ad4e12728daab2fd901c0c1358",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-planeta-v01-b19eee12-530.webp",
+        "src": "/chromas/roupas/camiseta-planeta-v01-498509d8-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "8a4ba97e1c180c7167b1bae398218aaddebd33919a4d5334293dd8193c5a72c3"
+        "sha256": "0a44f5ddea39b04ed6fc5118fdd281b38b11b22b43891cd34dde13339ce405af"
       },
       {
-        "src": "/chromas/roupas/camiseta-planeta-v01-b19eee12-1060.webp",
+        "src": "/chromas/roupas/camiseta-planeta-v01-498509d8-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "ee135fe9b59cc810f3c65bae7c19649c012c36b18c258d2a2d4a76ccf04ab691"
+        "sha256": "6f5f5db6ad5d316fb5ea75afd5e8156234bdb3bcc88921f1822c29d28d38c8c0"
       }
     ]
   },
@@ -103,19 +113,21 @@
     "id": "camiseta-olho",
     "name": "Camiseta Olho",
     "master": "stages/73_clothes_demo/output/masters/camiseta-olho.svg",
-    "masterSha256": "dcf8dbd12486296b54e5305dd33cf848148e1944b9720919883a82c712a24c9f",
+    "masterSha256": "0a03937bde03c809bc6b10fb28089b1e64458147ca4a7dce6067f754e78bddc3",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-olho-v01-dcf8dbd1-530.webp",
+        "src": "/chromas/roupas/camiseta-olho-v01-0a03937b-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "ae48fe6ff46fb47d3eaa7d7102b47b40aabd6a58a19dfb142627abb42cecb7bb"
+        "sha256": "fd427d38fdc29f819c1657fcfd93510e4ba6a202e0116468d7dd0e647b734176"
       },
       {
-        "src": "/chromas/roupas/camiseta-olho-v01-dcf8dbd1-1060.webp",
+        "src": "/chromas/roupas/camiseta-olho-v01-0a03937b-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "79a5a47e97e078991cb2a5513478b3ee022442144d24d20d0a7a46fa42e48e83"
+        "sha256": "2010c082941c95007daaa9af725619cf6213e2485cf51637386d912e4ea9f8f5"
       }
     ]
   },
@@ -123,19 +135,21 @@
     "id": "camiseta-chama",
     "name": "Camiseta Chama",
     "master": "stages/73_clothes_demo/output/masters/camiseta-chama.svg",
-    "masterSha256": "f186a0029a2396b226f7fff696c361aed3d7816801e6bca03735fae56004c59e",
+    "masterSha256": "63518e10b04971976f6557888e97b89042c94e63a3e31129caff480ff3af7f9d",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-chama-v01-f186a002-530.webp",
+        "src": "/chromas/roupas/camiseta-chama-v01-63518e10-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "5b4a40ff09e05b8837c323e9a4e8e3223c4ce31c7fc5beb3e37b38d4e0d8a4e2"
+        "sha256": "f97ecd5bb1a2c28bcb81743f9345ebfe86368e93b7de1fb8440b85ab790c81d8"
       },
       {
-        "src": "/chromas/roupas/camiseta-chama-v01-f186a002-1060.webp",
+        "src": "/chromas/roupas/camiseta-chama-v01-63518e10-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "9c695e09a9b5923087bacedb1609fe2da2aa93297ad01f575f29797a59f0d5d7"
+        "sha256": "0c1f3a9774cbccb5a32643eccec4c2e5f9eaac3363894f674140bc32bfd15bbf"
       }
     ]
   },
@@ -143,19 +157,21 @@
     "id": "camiseta-montanha",
     "name": "Camiseta Montanha",
     "master": "stages/73_clothes_demo/output/masters/camiseta-montanha.svg",
-    "masterSha256": "c601e684712bb30030046f664b10fd54662071540f66defd7ca14fa83b057837",
+    "masterSha256": "e4889670123d8c89435899023b3c8432b8b0aea53b2ab32b7ff6bd8b5e7118dd",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-montanha-v01-c601e684-530.webp",
+        "src": "/chromas/roupas/camiseta-montanha-v01-e4889670-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "f2c292ec6494b397fd27fb11f57c9f2368a64445bae4a95b593f84688c164921"
+        "sha256": "f32e219831b33d4fe7730a138ad55154b7640ff8853acdd870366009bdfe0bda"
       },
       {
-        "src": "/chromas/roupas/camiseta-montanha-v01-c601e684-1060.webp",
+        "src": "/chromas/roupas/camiseta-montanha-v01-e4889670-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "d02408adaaff3856bc124270e3249eb12c47e6e91fba0c78a5f85bfa2971e671"
+        "sha256": "b296a8cc59a751a788245e46f451f7ce533ae7d60550e8a3c1f9542536f4cd9f"
       }
     ]
   },
@@ -163,19 +179,21 @@
     "id": "camiseta-pipa",
     "name": "Camiseta Pipa",
     "master": "stages/73_clothes_demo/output/masters/camiseta-pipa.svg",
-    "masterSha256": "2f1a3659c093d248255c5d86d737a98ea6bf3c8f573e4cc709d4061669b92b15",
+    "masterSha256": "db914eb20f3a2b3cf487244c11d07718f5725458b9d20b49d6ff5d1cd0eb6898",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-pipa-v01-2f1a3659-530.webp",
+        "src": "/chromas/roupas/camiseta-pipa-v01-db914eb2-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "7b59f6542ad433a9101c9f3a11d146fd092ce0cede7787909905ba1fbc218731"
+        "sha256": "0a6cdf070cf230aa7f3cd035243489177552d4ffc4f95720c789d9659c58f475"
       },
       {
-        "src": "/chromas/roupas/camiseta-pipa-v01-2f1a3659-1060.webp",
+        "src": "/chromas/roupas/camiseta-pipa-v01-db914eb2-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "028fd73161a97d81bf239d828c8159ae8b668dcb7b4c23c0ed905051b07223b7"
+        "sha256": "f60222ed56bc6bd20356b9a5643ab54315bb087a61555bc2ac98e7334503498a"
       }
     ]
   },
@@ -183,19 +201,21 @@
     "id": "camiseta-flor",
     "name": "Camiseta Flor",
     "master": "stages/73_clothes_demo/output/masters/camiseta-flor.svg",
-    "masterSha256": "ae0443f2e73bcb4b27961ccd713b96434546657946c51622a0044279f725da6b",
+    "masterSha256": "18c056c6d4bc19094324f45c132fcf4be2a35ea9bf17a5b25239b058d62ea6d4",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-flor-v01-ae0443f2-530.webp",
+        "src": "/chromas/roupas/camiseta-flor-v01-18c056c6-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "f2d4b699a6eb14c75db7885b0614c15567592e705d8c984fecd87f234533a00d"
+        "sha256": "77d5af4c7492d7c81a2b1b3b6f50a3b3c2206a3b6e87fd58b213303dc01aade5"
       },
       {
-        "src": "/chromas/roupas/camiseta-flor-v01-ae0443f2-1060.webp",
+        "src": "/chromas/roupas/camiseta-flor-v01-18c056c6-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "bf092599523921d046a3d54251b1c7b1ce5458787a4cf7074565717d9f2fb734"
+        "sha256": "712d73cefbaa14bd060a97854ddd21ded0ad7e47d68257a986aea838e70ac771"
       }
     ]
   },
@@ -203,19 +223,21 @@
     "id": "camiseta-xadrez",
     "name": "Camiseta Xadrez",
     "master": "stages/73_clothes_demo/output/masters/camiseta-xadrez.svg",
-    "masterSha256": "ada51ef3873e7fca1dba15d66bbfe6f8be5134b8e58b929d3c4fed81730da6dc",
+    "masterSha256": "3cf09869cd080892a6bd946bc5472557ea768dc8f178a42ccdbed777248ada1a",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-xadrez-v01-ada51ef3-530.webp",
+        "src": "/chromas/roupas/camiseta-xadrez-v01-3cf09869-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "2b91ed0c385ea86dbe3ddc0934d087fd0aab6dac66be668dba18a645ec7cb46d"
+        "sha256": "6e54b0b083c08d00ab936238e1111bc53987c0211200b9c4af5211a1fc470bf2"
       },
       {
-        "src": "/chromas/roupas/camiseta-xadrez-v01-ada51ef3-1060.webp",
+        "src": "/chromas/roupas/camiseta-xadrez-v01-3cf09869-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "5fd7803f683ee90fb5d53187ec8eef89354622de1e6e767a938ba73cb9d73b12"
+        "sha256": "1870ff43c97e1346629c2f7798e47422ba1f1a43d259d4c77d8af0b828893b39"
       }
     ]
   },
@@ -223,19 +245,21 @@
     "id": "camiseta-sem-pressa",
     "name": "Camiseta Sem Pressa",
     "master": "stages/73_clothes_demo/output/masters/camiseta-sem-pressa.svg",
-    "masterSha256": "f245289da93ed39d2959ecf42f65c501870327483211cfb81f24f16c733277fb",
+    "masterSha256": "05d9bc01a04b09a10baad64064bed93bfa12967d327bf9bd58fca0d0792648df",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/camiseta-sem-pressa-v01-f245289d-530.webp",
+        "src": "/chromas/roupas/camiseta-sem-pressa-v01-05d9bc01-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "5251d36d1ec4689e130f5a660fa00c5451831c3b8693b33a1b1d0d8719becb1b"
+        "sha256": "5b7902ebe2a356ab50189c8d845fe7ad55e73ca0056d890f3883d43c139e51fa"
       },
       {
-        "src": "/chromas/roupas/camiseta-sem-pressa-v01-f245289d-1060.webp",
+        "src": "/chromas/roupas/camiseta-sem-pressa-v01-05d9bc01-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "5e9508ee94b61cc47a20313b3cf477939dd17097b9dfbee322ed21d68471cc58"
+        "sha256": "0f571769b4729cfc2fb1ee55d823639256195fd142e789889d11a9c61be86207"
       }
     ]
   },
@@ -243,19 +267,21 @@
     "id": "moletom-estrela",
     "name": "Moletom Estrela",
     "master": "stages/73_clothes_demo/output/masters/moletom-estrela.svg",
-    "masterSha256": "6dbaa62a95d259577afcfe9406f285ddb8c89bc56758ab927a38171ec48cb676",
+    "masterSha256": "7107688ac400a4a1768a5f0c45f648d5e556f0b9fb526c6a2e40d48945b22c48",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/moletom-estrela-v01-6dbaa62a-530.webp",
+        "src": "/chromas/roupas/moletom-estrela-v01-7107688a-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "afb8e76d233422c428e749706f7488a96a7138da3437a00e25bd2d69ddfe57b6"
+        "sha256": "ac96cdb720a682dce4fc241ae42aa008becacb89b3df0de615bc6433e5cb017f"
       },
       {
-        "src": "/chromas/roupas/moletom-estrela-v01-6dbaa62a-1060.webp",
+        "src": "/chromas/roupas/moletom-estrela-v01-7107688a-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "9943ee00bea10a80b8540b96df726b6c2ea5c82c11e7492b64536a3a007cff30"
+        "sha256": "bf02758e2eee4d6e230aa1d616abe3fc42cb599f95b9ef0c6905daf58410b2f9"
       }
     ]
   },
@@ -263,19 +289,21 @@
     "id": "moletom-arco",
     "name": "Moletom Arco",
     "master": "stages/73_clothes_demo/output/masters/moletom-arco.svg",
-    "masterSha256": "73ea5e0fcfc7f43b0685d4408b405acf04af303623cb4be4825bdc4d3ef41713",
+    "masterSha256": "f5588734ba6485c65e07ec4bc9ee8c1bb0e71b5bb68a6645ecf8d0988fc5db8e",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/moletom-arco-v01-73ea5e0f-530.webp",
+        "src": "/chromas/roupas/moletom-arco-v01-f5588734-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "c04b3e64d3fc1fe66a882055ff5981b2e79836736e2e7dc8aecdeb76afbecff8"
+        "sha256": "631d5b6bf52d7bafab0b835c768e35bdd81b629fdb9f6ea05bce3228177985f9"
       },
       {
-        "src": "/chromas/roupas/moletom-arco-v01-73ea5e0f-1060.webp",
+        "src": "/chromas/roupas/moletom-arco-v01-f5588734-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "0347fd8f8ec55956853e1ddb147be5698f51402a2f18b995cf241c71b3632bb1"
+        "sha256": "5d8896981d7934770c4fbc6d90809a036da45fc1ace2386b7f7a0d1cc5db888a"
       }
     ]
   },
@@ -283,19 +311,21 @@
     "id": "moletom-folha",
     "name": "Moletom Folha",
     "master": "stages/73_clothes_demo/output/masters/moletom-folha.svg",
-    "masterSha256": "78f02e13580bad982fb1ca2f668cb4dc96df3588024de72c2f5df7fa0aef38d8",
+    "masterSha256": "c662de57c7680bdf5b187e03aedb19fffabac41cbaee67106a544c5baba1a174",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/moletom-folha-v01-78f02e13-530.webp",
+        "src": "/chromas/roupas/moletom-folha-v01-c662de57-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "b994376f511ed112316f52ffb4aae36cf948d8ba0e0061a4f729a0ee01cab03f"
+        "sha256": "607b871cd8f340de544a66294be47398224847296021d75bbc89931e818c5b5b"
       },
       {
-        "src": "/chromas/roupas/moletom-folha-v01-78f02e13-1060.webp",
+        "src": "/chromas/roupas/moletom-folha-v01-c662de57-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "5403f2c87d06747ec41c352b68812b6f41cfdc216fa0917ddcc77878cbdabf62"
+        "sha256": "811d36f99184e7acc7843ab11d9a44c7a00943f6fea66030190b44dd1e537105"
       }
     ]
   },
@@ -303,19 +333,21 @@
     "id": "moletom-lua",
     "name": "Moletom Lua",
     "master": "stages/73_clothes_demo/output/masters/moletom-lua.svg",
-    "masterSha256": "3f49ddd3be840f18f66a7384e8ae22d99c9dd21b188cc002088d77c0a9aac341",
+    "masterSha256": "8e8eea5f06edcfc2417e9f93bc411273adc2f1ddc56e9f3d76f0f5c44eb15498",
+    "aiAssisted": true,
+    "tool": "desenho por código (app/scripts/build-clothes-cards.mjs), escrito por agente de IA; sem foto e sem serviço de geração de imagem",
     "variants": [
       {
-        "src": "/chromas/roupas/moletom-lua-v01-3f49ddd3-530.webp",
+        "src": "/chromas/roupas/moletom-lua-v01-8e8eea5f-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "4812391dfa8cfa52399c14cd738ecccf706635efd029d5e1da9c45bcf86aa903"
+        "sha256": "c5d0d505cdc7587818a0213250a6a718a92ebd88e16aa5166537d2dfe902ac86"
       },
       {
-        "src": "/chromas/roupas/moletom-lua-v01-3f49ddd3-1060.webp",
+        "src": "/chromas/roupas/moletom-lua-v01-8e8eea5f-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "6033f3a2f577a908b5f6c7373b0263389a8f58311ef84b41c5322c639652c8ae"
+        "sha256": "aceb16a5792376f394812bf1e9a4ee5f37cc09e163e32eaf8115af123fdbc852"
       }
     ]
   }

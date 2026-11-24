@@ -14,7 +14,8 @@ qualquer pessoa ou empresa de fora (decisão 0002, item 3).
 
 - Issue #345. Em 23/11/2026, à pergunta do agente "Passo a demonstração de
   roupas na frente da pesquisa de famosos?", o Stefan respondeu: "Sim, roupas
-  antes". Registro na decisão 0005.
+  antes". Registro na decisão 0005. A resposta dele cobre a ordem; as outras
+  escolhas deste estágio são do agente e estão listadas lá.
 - Decisão 0002, item 1: roupas "com imagens criadas pelo próprio PoliMatch;
   nenhuma empresa envia foto nesta fase". Item 2: todas as cartas de uma
   pesquisa usam o mesmo padrão de moldura.
@@ -31,25 +32,27 @@ qualquer pessoa ou empresa de fora (decisão 0002, item 3).
 | Cartas | Um catálogo: as 20 de Política | Dois catálogos: as 20 de Política e as 16 de roupa |
 | Sorteio | 16 de 20 cartas por pessoa | Em roupas, as 16 entram sempre; o sorteio decide a tela e a posição |
 | Ilustração da entrada | Três cartas de uma lista fixa, para as duas pesquisas | Em Política, a mesma lista. Em roupas, três das cartas da própria pesquisa |
-| Aviso | Nenhum | A entrada da pesquisa de roupas diz: "Peças de demonstração, criadas pelo PoliMatch." |
+| Aviso | Nenhum | A entrada da pesquisa de roupas diz: "Peças de demonstração, desenhadas com IA pelo PoliMatch." |
 | Título da final | "Entre elas, quem fica?" | Igual em Política. Em roupas, "Entre elas, qual fica?" |
 | "Em breve" | "Famosos e influenciadores" e "Roupas" | Só "Famosos e influenciadores" |
-| Capa | Abre na primeira pesquisa de Política sem resposta | Igual. A de roupas vem depois das duas de Política |
+| Capa | Destaca a primeira pesquisa aberta que a pessoa não respondeu; respondidas as duas, diz que ela respondeu todas | A mesma regra. A de roupas vem depois das duas de Política: quem já respondeu as duas passa a ver a de roupas em destaque |
 
 ## O formato deste estágio
 
 1. **Cartas.** 16 peças: 12 camisetas e 4 moletons. Todas com a mesma
    moldura, a mesma silhueta por tipo, o mesmo fundo e o mesmo tamanho na
    carta. O que muda de uma para a outra é a cor e a estampa. Cada carta traz
-   o tipo, o nome da peça e "Peça de demonstração". Não há foto, pessoa,
-   preço nem marca de terceiros.
+   o selo "DEMO", o tipo, o nome da peça e "Peça de demonstração · Arte com
+   IA". Não há foto, pessoa, preço nem marca de terceiros.
 2. **Origem.** As cartas são desenhadas por `app/scripts/build-clothes-cards.mjs`.
    O roteiro grava o desenho de origem de cada carta (SVG, em
    `output/masters/`), os dois tamanhos publicados (WebP de 530 e 1060 de
    largura, em `app/public/chromas/roupas/`), o catálogo do app
    (`app/src/clothes-cards.json`) e o manifesto com o hash de cada arquivo
    (`output/manifest.json`). O nome de cada arquivo publicado leva o começo do
-   hash do desenho de origem: mudar o desenho muda o endereço.
+   hash do desenho de origem: mudar o desenho muda o endereço. O roteiro foi
+   escrito por um agente de IA; catálogo e manifesto dizem `aiAssisted`, como
+   pede o `CREDITS.md`.
 3. **Pesquisa.** `roupas-demo-01`, assunto "Roupas", pergunta "Qual você
    usaria?", 16 cartas, sorteio de 16, telas de 4. A definição ganha um campo
    opcional, `note`, que a entrada mostra abaixo da pergunta. As pesquisas de
@@ -77,7 +80,11 @@ qualquer pessoa ou empresa de fora (decisão 0002, item 3).
 - **Sem resultado público.** Nenhuma soma de respostas aparece (#177).
   Compartilhar leva só a escolha da pessoa.
 - **As pesquisas de Política não mudam:** mesmas cartas, mesma ilustração de
-  entrada, mesmo lugar na capa.
+  entrada, mesmo título da final e mesma posição na lista, à frente da de
+  roupas.
+- **O que muda para quem já respondeu as duas de Política:** a capa passa a
+  destacar a pesquisa de roupas, e a tela de resposta registrada da segunda
+  pesquisa passa a oferecer "Próxima pesquisa" no lugar de "Ver pesquisas".
 
 ## Entregas
 
@@ -122,17 +129,25 @@ Um PR, com commits por parte:
 
 As dos estágios 69 e 71 continuam abertas (privacidade, #283; backup, #279).
 A publicação é de API e app, a API primeiro: a pesquisa é definida em
-`shared/`, e com a API antiga o app novo recebe 404 para a pesquisa de roupas
-e mostra só as duas de Política.
+`shared/`. Com a API antiga, o app novo recebe 404 para a pesquisa de roupas:
+as listas da capa mostram só as duas de Política, mas o menu, que vem do
+próprio app, ainda lista a de roupas, e o endereço dela diz que a pesquisa não
+está disponível.
 
 ## Dependências e riscos
 
 - **Respostas de verdade sobre peças que não existem.** A pesquisa grava
-  respostas de pessoas cadastradas. O aviso de demonstração está na entrada e
-  em cada carta, mas o texto da carta fica pequeno no celular.
-- **O texto das cartas usa a fonte do sistema.** Gerar de novo em outra
-  máquina pode mudar os arquivos. O teste confere os arquivos gravados; não
-  gera de novo.
+  respostas de pessoas cadastradas, sem data para fechar. O aviso por extenso
+  está só na entrada. Nas outras telas e na imagem do compartilhar, o que
+  avisa é o selo "DEMO" de cada carta; a legenda da carta fica pequena no
+  celular.
+- **O texto das cartas é desenhado com a Helvetica Neue do macOS.** A fonte
+  não vai para o repositório nem para o site, só a imagem pronta. Gerar de
+  novo em outra máquina pode mudar os arquivos. O teste confere os arquivos
+  gravados; não gera de novo, e por isso não prova que cada arquivo publicado
+  é o desenho do seu SVG.
+- **Nomes e estampas.** Não foi feita busca de marca registrada para os nomes
+  das peças nem para a frase "Sem Pressa".
 - **A marca na carta é texto simples**, não o emblema das cartas de Política.
 - **Menores de 18.** O cadastro aceita a faixa "16 a 24" (pendência da
   decisão 0004).
