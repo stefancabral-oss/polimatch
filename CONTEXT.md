@@ -260,3 +260,14 @@ pessoa pedir. Só o app muda. Publicado em 16/11/2026, com o app no commit
 `28fd962`. O ajuste de texto pedido depois ("Também na final" no lugar de
 "Minhas finalistas", #342) foi publicado em 23/11/2026, com o app no commit
 `0e99eae`.
+
+## Pesquisa de roupas de demonstração — issue #345
+Em 23/11/2026, à pergunta do agente sobre passar a demonstração de roupas à
+frente da pesquisa de famosos, o Stefan respondeu: "Sim, roupas antes"
+(decisão 0005, que altera a ordem de construção da decisão 0002). Estágio
+`stages/73_clothes_demo/CONTEXT.md`: uma terceira pesquisa, `roupas-demo-01`,
+"Qual você usaria?", com 16 cartas de roupa desenhadas por código no próprio
+repositório, sem foto, pessoa, preço nem marca de terceiros. A entrada da
+pesquisa diz que as peças são de demonstração. As regras, o cadastro e a capa
+em Política não mudam; "Roupas" sai de "Em breve". Em 23/11/2026 o estágio
+estava construído e fora de produção: o HANDOFF dele diz o estado atual.
