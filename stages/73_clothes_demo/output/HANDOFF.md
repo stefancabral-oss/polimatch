@@ -34,6 +34,8 @@
   manifesto dizem "arte com IA" (`CREDITS.md`, "Chromas e artes editadas").
 - O texto das cartas é desenhado com a Helvetica Neue do macOS da máquina que
   gerou. A fonte não vai para o repositório nem para o site, só a imagem.
+- Os arquivos gravados saíram do Chromium headless shell 1187 (o que estava
+  na máquina) e do cwebp 1.6.0.
 - O roteiro grava: o desenho de origem de cada carta em `output/masters/`
   (SVG); os dois tamanhos publicados em `app/public/chromas/roupas/` (WebP de
   530 e de 1060 de largura); o catálogo `app/src/clothes-cards.json`; o
@@ -69,12 +71,13 @@ desenhadas com IA pelo PoliMatch." e "Entre elas, qual fica?".
 
 ## O que muda para quem já usa o site
 
-- Quem ainda não respondeu as duas pesquisas de Política: a capa continua
-  destacando uma delas. A de roupas aparece em "Mais pesquisas" e no menu.
+- Quem ainda não respondeu as duas pesquisas de Política e não começou a de
+  roupas: a capa continua destacando uma de Política. A de roupas aparece em
+  "Mais pesquisas" e no menu.
 - Quem já respondeu as duas: a capa passa a destacar a pesquisa de roupas,
-  onde antes dizia "Você respondeu todas as pesquisas abertas.". A tela de
-  resposta registrada da segunda pesquisa passa a oferecer "Próxima pesquisa"
-  no lugar de "Ver pesquisas".
+  onde antes dizia "Você respondeu todas as pesquisas abertas.". As telas de
+  resposta registrada das duas pesquisas de Política passam a oferecer
+  "Próxima pesquisa" no lugar de "Ver pesquisas".
 
 ## Não entregue / pendente
 
@@ -82,22 +85,27 @@ desenhadas com IA pelo PoliMatch." e "Entre elas, qual fica?".
   Stefan. O registro da 73d precisa atualizar duas frases no presente que
   ficam falsas com a publicação: na decisão 0002, "As construções seguintes
   da ordem não estão em produção"; na decisão 0001, "os outros assuntos"
-  entre o que não está em produção.
+  entre o que não está em produção. Precisa também atualizar o estado, o
+  gate e o CI neste HANDOFF e o "Estado" da decisão 0005.
 - O que recebe quem encomenda uma pesquisa (resultado, recortes): fora deste
   estágio.
 - O título e a descrição da página (`app/index.html`) dizem "Quem você
   prefere?" em qualquer endereço, inclusive no da pesquisa de roupas. Já era
   assim para a segunda pesquisa de Política. Não foi mexido.
 - O aviso por extenso só aparece na entrada da pesquisa. Nas outras telas e
-  na imagem do compartilhar, o aviso é o selo "DEMO" de cada carta.
+  na imagem do compartilhar, o aviso é o selo "DEMO" de cada carta, que é
+  pequeno: na grade de quatro cartas o texto dele fica com cerca de 5 a 6 px,
+  e na imagem do compartilhar ele se lê na carta escolhida e não nas outras
+  três. O texto da imagem não fala em demonstração. Quem usa leitor de tela
+  só ouve o aviso na entrada.
 
 ## Testes executados
 
 Todos em 23/11/2026. A parte 73c foi escrita por um agente à parte ("agente
 da ligação"); o agente principal revisou o que ele mudou.
 
-Rodados pelo agente principal, no macOS, depois dos ajustes da leitura
-independente:
+Rodados pelo agente principal, no macOS, depois dos ajustes das duas
+leituras independentes:
 
 - `npm run test:shared`: 119 de 119.
 - `npm test --prefix app`: 218 de 218.
@@ -112,10 +120,17 @@ independente:
   390×844, 375×667, 360×640 e 320×568; em 320×480 rola 23 px, com o botão
   "Começar" inteiro na tela. A nota ocupa duas linhas nesses tamanhos.
 
-No CI do PR, visto pelo agente principal: no commit `09d6095`, anterior aos
-ajustes, todos os trabalhos passaram, entre eles `browser-smoke` em Chromium
-e em WebKit e a integração com PostgreSQL. O CI do commit de ajustes é
-conferido no gate e fica registrado no PR.
+No CI do PR, visto pelo agente principal:
+
+- No commit `09d6095`, anterior aos ajustes, todos os trabalhos passaram,
+  entre eles `browser-smoke` em Chromium e em WebKit e a integração com
+  PostgreSQL.
+- No commit `3e4511c`, com os ajustes da primeira leitura, sete trabalhos
+  passaram, entre eles `browser-smoke` em Chromium e a integração com
+  PostgreSQL. O `browser-smoke` em WebKit ficou parado na instalação do
+  navegador, antes de rodar código do projeto, e o commit foi substituído
+  pelo seguinte.
+- O CI do último commit é conferido no gate e fica registrado no PR.
 
 Rodados só pelo agente da ligação, antes dos ajustes, segundo o relato dele:
 
@@ -130,8 +145,11 @@ antiga, por um roteiro auxiliar fora do repositório, e em WebKit, direto.
 
 ## Leitura independente
 
-Um agente que não escreveu o código leu o PR no commit `09d6095`, somente
-leitura. Segurou o merge por um ponto do registro e apontou ajustes.
+Duas passadas, somente leitura, por agentes que não escreveram o código.
+
+### Primeira, no commit `09d6095`
+
+Segurou o merge por um ponto do registro e apontou ajustes.
 
 - **O que segurou:** o registro dizia que a capa "continua abrindo em
   Política". Não é o que o código faz para quem já respondeu as duas
@@ -145,7 +163,8 @@ leitura. Segurou o merge por um ponto do registro e apontou ajustes.
   escolhas 3 e 4 da decisão 0005 saíram de "detalhe de desenho" e vão a ele
   no gate; entraram na lista a ilustração da entrada e a declaração de IA; o
   teste das cartas ficou mais apertado; a chama foi redesenhada, simétrica;
-  o selo "DEMO" entrou em cada carta; a fonte deixou de ser a do sistema; a
+  o selo "DEMO" entrou em cada carta; a fonte deixou de ser a de interface
+  do sistema e passou a ser a Helvetica Neue, que também vem com o macOS; a
   nota da entrada passou a dizer "desenhadas com IA".
 - **O que ele conferiu:** os três conjuntos de teste de unidade, o CI no
   mesmo commit, os 16 desenhos refeitos a partir do roteiro (idênticos, byte
@@ -154,9 +173,41 @@ leitura. Segurou o merge por um ponto do registro e apontou ajustes.
 - **O que ele não conferiu:** que cada WebP é o desenho do seu SVG, busca de
   marca registrada, celular de verdade e produção.
 
+### Segunda, no commit `3e4511c`
+
+Sem bloqueio no conteúdo. Conferiu que o ponto que segurava o merge foi
+corrigido em todos os lugares e que a frase citada da mensagem bate, palavra
+por palavra, com a mensagem que o Stefan recebeu.
+
+- **O que ele conferiu:** os três conjuntos de teste de unidade (119, 218 e
+  306); os roteiros de navegador em WebKit, num build local (49 e 34
+  cenários); a entrada em cinco tamanhos de tela; e uma geração completa das
+  cartas numa cópia, na mesma máquina, que saiu igual, byte a byte, aos 32
+  arquivos, ao catálogo, ao manifesto e aos desenhos gravados. Fez 25
+  alterações de teste numa cópia para ver o que o teste das cartas pega.
+- **Ajustes feitos depois dela:** o teste das cartas passou a prender o selo
+  "DEMO" e a legenda ao desenho de origem; a estrela do moletom mudou de cor
+  (um azul-marinho sobre cinza lembrava, de longe, o emblema de um time
+  americano); números e frases do registro que tinham ficado para trás; o
+  que vai ao gate ficou igual em todos os documentos.
+- **O que ficou como está:** o tamanho do selo "DEMO" (ver "Não entregue");
+  o resumo do motivo na decisão 0005, sem a parte comercial.
+- **O que ele não conferiu:** quem rodou o quê, busca de marca registrada,
+  os termos de uso da Helvetica Neue, celular de verdade e produção.
+
+O último commit, com esses ajustes, não passou por uma terceira leitura
+inteira: ver o comentário do gate no PR.
+
+### Revisão automática do GitHub
+
+A revisão automática apontou, no commit `d1f25fa`, que faltavam o HANDOFF e
+a verificação do estágio. Os dois entraram no commit `09d6095`. A conversa
+foi respondida e resolvida no PR.
+
 ## Não verificado
 
-- O CI do commit de ajustes, no momento em que este texto foi escrito.
+- O CI do último commit, no momento em que este texto foi escrito.
+- Os termos de uso da Helvetica Neue em imagem publicada.
 - As imagens Docker do app e da API fora do CI (não há Docker na máquina).
 - Celular de verdade, botão real do Google e compartilhamento real do
   aparelho.
@@ -195,9 +246,10 @@ Do agente, fora da decisão 0005: a linha no filtro de caminhos do CI.
 ## Próximo passo exato
 
 1. Gate humano do merge do PR #346. A pergunta do gate leva a ele, por
-   extenso, a escolha 3 da decisão 0005 (a pesquisa grava respostas de
-   pessoas cadastradas sobre peças que não existem) e o que muda na capa para
-   quem já respondeu as duas pesquisas de Política.
+   extenso, as escolhas 3 e 4 da decisão 0005 (a pesquisa grava respostas de
+   pessoas cadastradas sobre peças que não existem; as 16 peças aparecem para
+   cada pessoa) e o que muda na capa para quem já respondeu as duas pesquisas
+   de Política.
 2. Depois do merge, 73d: copiar o banco, publicar a API, publicar o app e
    conferir de fora por leitura, cada passo com o sim do Stefan.
 

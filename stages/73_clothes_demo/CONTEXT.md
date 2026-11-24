@@ -35,7 +35,7 @@ qualquer pessoa ou empresa de fora (decisão 0002, item 3).
 | Aviso | Nenhum | A entrada da pesquisa de roupas diz: "Peças de demonstração, desenhadas com IA pelo PoliMatch." |
 | Título da final | "Entre elas, quem fica?" | Igual em Política. Em roupas, "Entre elas, qual fica?" |
 | "Em breve" | "Famosos e influenciadores" e "Roupas" | Só "Famosos e influenciadores" |
-| Capa | Destaca a primeira pesquisa aberta que a pessoa não respondeu; respondidas as duas, diz que ela respondeu todas | A mesma regra. A de roupas vem depois das duas de Política: quem já respondeu as duas passa a ver a de roupas em destaque |
+| Capa | Destaca a pesquisa que a pessoa deixou pela metade ou, sem isso, a primeira aberta que ela não respondeu; respondidas as duas, diz que ela respondeu todas | A mesma regra. A de roupas vem depois das duas de Política: quem já respondeu as duas passa a ver a de roupas em destaque |
 
 ## O formato deste estágio
 
@@ -83,8 +83,9 @@ qualquer pessoa ou empresa de fora (decisão 0002, item 3).
   entrada, mesmo título da final e mesma posição na lista, à frente da de
   roupas.
 - **O que muda para quem já respondeu as duas de Política:** a capa passa a
-  destacar a pesquisa de roupas, e a tela de resposta registrada da segunda
-  pesquisa passa a oferecer "Próxima pesquisa" no lugar de "Ver pesquisas".
+  destacar a pesquisa de roupas, e as telas de resposta registrada das duas
+  pesquisas de Política passam a oferecer "Próxima pesquisa" no lugar de "Ver
+  pesquisas".
 
 ## Entregas
 
@@ -154,6 +155,13 @@ está disponível.
 - **O que é "de Política" é o assunto da pesquisa.** A lista fixa da entrada
   e o "quem fica?" valem para `subject` igual a "Política". Uma pesquisa
   futura sobre pessoas com outro assunto vai precisar rever isso.
-- **A nota empurra a ilustração da entrada cerca de 21 px para baixo.** Em
-  telas de 320×480 a entrada da pesquisa de roupas rola um pouco; o botão
-  "Começar" continua inteiro na tela.
+- **A nota ocupa duas linhas no celular e empurra a ilustração da entrada
+  para baixo** (32 px em 390×844, pela medida da segunda leitura
+  independente). A entrada da pesquisa de roupas não rola em 390×844,
+  375×667, 360×640 e 320×568. Em 320×480 ela rola um pouco (23 px no
+  Chromium, 19 px no WebKit), com o botão "Começar" inteiro na tela.
+- **O selo "DEMO" é pequeno fora da carta em tamanho grande.** Na grade de
+  quatro cartas o texto dele fica com cerca de 5 a 6 px. Na imagem do
+  compartilhar ele se lê na carta escolhida e não nas outras três, e o texto
+  da imagem não fala em demonstração. Quem usa leitor de tela só ouve o aviso
+  na entrada.

@@ -213,7 +213,8 @@ hash do conteúdo como versão e o `ci.yml` roda em todo PR e em todo push para
 ## Pesquisa por foto, etapa 1 — issue #324
 Decisão 0002, de 13/11/2026: a construção começa pela política que já funciona,
 no formato novo e com as cartas de moldura que já existem; depois celebridades
-e influenciadores; depois roupas com imagens próprias. Estágio
+e influenciadores; depois roupas com imagens próprias. (Ordem alterada pela
+decisão 0005, de 23/11/2026: roupas antes de celebridades.) Estágio
 `stages/68_photo_survey_politics/CONTEXT.md`: 16 cartas em 4 telas de 4, final
 e confirmação, em página própria ao lado do jogo atual. Sem CPF, sem resultado
 público e sem mudança no jogo que está no ar. Ninguém de fora é chamado antes
@@ -269,7 +270,8 @@ frente da pesquisa de famosos, o Stefan respondeu: "Sim, roupas antes"
 "Qual você usaria?", com 16 cartas de roupa desenhadas por código no próprio
 repositório, sem foto, pessoa, preço nem marca de terceiros. A entrada da
 pesquisa diz que as peças são de demonstração. As regras e o cadastro não
-mudam. A pesquisa de roupas vem depois das duas de Política: a capa só passa
-a destacá-la para quem já respondeu as duas. "Roupas" sai de "Em breve". Em
+mudam. A pesquisa de roupas vem depois das duas de Política: quem já
+respondeu as duas passa a vê-la em destaque na capa. "Roupas" sai de "Em
+breve". Em
 23/11/2026 o estágio estava construído e fora de produção: o HANDOFF dele diz
 o estado atual.

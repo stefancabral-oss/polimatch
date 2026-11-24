@@ -146,14 +146,14 @@
   {
     "id": "moletom-estrela",
     "name": "Moletom Estrela",
-    "src": "/chromas/roupas/moletom-estrela-v01-7107688a-530.webp",
-    "srcset": "/chromas/roupas/moletom-estrela-v01-7107688a-530.webp 530w, /chromas/roupas/moletom-estrela-v01-7107688a-1060.webp 1060w",
+    "src": "/chromas/roupas/moletom-estrela-v01-c24dc11c-530.webp",
+    "srcset": "/chromas/roupas/moletom-estrela-v01-c24dc11c-530.webp 530w, /chromas/roupas/moletom-estrela-v01-c24dc11c-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "drawnByCode": true,
     "aiAssisted": true,
     "edition": "roupas-demo-v1",
-    "masterSha256": "7107688ac400a4a1768a5f0c45f648d5e556f0b9fb526c6a2e40d48945b22c48"
+    "masterSha256": "c24dc11ca5685f0de7fc14b6a68513c6a48c8965932785af3b64d98122cbf3e8"
   },
   {
     "id": "moletom-arco",

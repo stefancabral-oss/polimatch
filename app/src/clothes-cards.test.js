@@ -59,7 +59,13 @@ test("as dezesseis cartas de roupas batem com a pesquisa, com os desenhos de ori
     const master = readFileSync(new URL(`../../${proof.master}`, import.meta.url));
     assert.equal(hash(master), card.masterSha256, card.id);
     assert.equal(card.masterSha256, proof.masterSha256, card.id);
-    assert.ok(master.toString("utf8").includes(`<title>${card.name} — `), `${card.id}: o desenho de origem é o desta carta`);
+    const drawing = master.toString("utf8");
+    assert.ok(drawing.includes(`<title>${card.name} — `), `${card.id}: o desenho de origem é o desta carta`);
+    // O aviso de demonstração e a declaração de IA estão no desenho de toda carta.
+    assert.ok(drawing.includes(">DEMO</text>"), `${card.id}: selo "DEMO"`);
+    assert.ok(drawing.includes(">PEÇA DE DEMONSTRAÇÃO · ARTE COM IA</text>"), `${card.id}: legenda de demonstração e de IA`);
+    assert.equal(card.edition, "roupas-demo-v1", card.id);
+    assert.ok(typeof proof.tool === "string" && proof.tool.includes("agente de IA"), `${card.id}: o manifesto diz como a arte foi feita`);
 
     // Dois tamanhos, com o código da carta e o começo do hash do desenho no nome.
     assert.deepEqual(proof.variants.map((variant) => [variant.width, variant.height]), SIZES, card.id);

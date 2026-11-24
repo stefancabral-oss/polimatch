@@ -241,7 +241,7 @@ function shell({ step, filled = null, mainClass = "", body, focus = false, fit =
 
 // Os avisos ficam logo abaixo do título: aparecem sem rolar, em qualquer tela.
 // O título leva a etapa como descrição, para o leitor de tela dizer "Tela 2 de 4".
-// `note` é a observação da pesquisa, só na entrada: uma linha discreta sob o texto de apoio.
+// `note` é a observação da pesquisa, só na entrada: um texto discreto sob o texto de apoio.
 const heading = (eyebrow, title, hint, note = "") => `<p class="ps-kicker">${escapeText(eyebrow)}</p><h1 class="ps-title" id="ps-title" tabindex="-1" aria-describedby="ps-step">${escapeText(title)}</h1><p class="ps-hint">${escapeText(hint)}</p>${note ? `<p class="ps-note">${escapeText(note)}</p>` : ""}${noticeMarkup()}${offlineMarkup()}`;
 
 const MENU_LINK = '<button class="ps-link" data-action="menu" type="button">Abrir o menu</button>';

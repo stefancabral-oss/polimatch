@@ -52,8 +52,8 @@ export const PHOTO_SURVEYS = Object.freeze([
     drawSize: 16,
     groupSize: 4,
   }),
-  // Demonstração de roupas (ICM 73, #345). Vem depois das de política: a capa
-  // só a destaca para quem já respondeu as duas.
+  // Demonstração de roupas (ICM 73, #345). Vem depois das de política na
+  // ordem da capa.
   definePhotoSurvey({
     id: "roupas-demo-01",
     subject: "Roupas",

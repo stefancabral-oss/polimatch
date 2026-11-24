@@ -42,9 +42,9 @@
     <path d="M444,250 C470,314 590,314 616,250" fill="none" stroke="#7e8084" stroke-width="32" stroke-linecap="round"/>
     <path d="M444,250 C470,314 590,314 616,250" fill="none" stroke="#b0b2b8" stroke-width="26" stroke-linecap="round"/>
   <g transform="translate(530,612) scale(1.18)">
-    <polygon points="12.0,-138.0 48.4,-38.2 154.7,-34.4 71.0,31.2 100.2,133.4 12.0,74.0 -76.2,133.4 -47.0,31.2 -130.7,-34.4 -24.4,-38.2" fill="#E8644A"/>
-    <polygon points="0.0,-150.0 36.4,-50.2 142.7,-46.4 59.0,19.2 88.2,121.4 0.0,62.0 -88.2,121.4 -59.0,19.2 -142.7,-46.4 -36.4,-50.2" fill="#1F2A44" stroke="#1F2A44" stroke-width="6" stroke-linejoin="round"/>
-    <g fill="#FBFAF7"><path transform="translate(-18,-8)" d="M0,-30 Q6,-6 30,0 Q6,6 0,30 Q-6,6 -30,0 Q-6,-6 0,-30 Z"/><path transform="translate(40,42)" d="M0,-14 Q2.8000000000000003,-2.8000000000000003 14,0 Q2.8000000000000003,2.8000000000000003 0,14 Q-2.8000000000000003,2.8000000000000003 -14,0 Q-2.8000000000000003,-2.8000000000000003 0,-14 Z"/></g></g>
+    <polygon points="12.0,-138.0 48.4,-38.2 154.7,-34.4 71.0,31.2 100.2,133.4 12.0,74.0 -76.2,133.4 -47.0,31.2 -130.7,-34.4 -24.4,-38.2" fill="#1F2A44"/>
+    <polygon points="0.0,-150.0 36.4,-50.2 142.7,-46.4 59.0,19.2 88.2,121.4 0.0,62.0 -88.2,121.4 -59.0,19.2 -142.7,-46.4 -36.4,-50.2" fill="#E3A63A" stroke="#E3A63A" stroke-width="6" stroke-linejoin="round"/>
+    <g fill="#1F2A44"><path transform="translate(-18,-8)" d="M0,-30 Q6,-6 30,0 Q6,6 0,30 Q-6,6 -30,0 Q-6,-6 0,-30 Z"/><path transform="translate(40,42)" d="M0,-14 Q2.8000000000000003,-2.8000000000000003 14,0 Q2.8000000000000003,2.8000000000000003 0,14 Q-2.8000000000000003,2.8000000000000003 -14,0 Q-2.8000000000000003,-2.8000000000000003 0,-14 Z"/></g></g>
   <rect x="70" y="1150" width="920" height="264" rx="28" fill="#FBFAF7" stroke="rgba(17,20,24,0.10)" stroke-width="2"/>
   <text x="530" y="1222" font-size="34" font-weight="800" fill="#08805A" text-anchor="middle" letter-spacing="9">MOLETOM</text>
   <text x="530" y="1332" font-size="112" font-weight="800" fill="#111418" text-anchor="middle" letter-spacing="-2.5">Estrela</text>

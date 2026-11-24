@@ -43,8 +43,9 @@ agente, e ele pode mudar qualquer uma.
 
 As escolhas de desenho (1, 2, 5, 6, 7, 8 e 9) se apoiam no pedido dele de não
 ser parado por detalhes de desenho (decisão 0003, item 5). As escolhas 3 e 4
-não são de desenho: são de regra e de dado. Elas vão a ele, com estas
-palavras, no gate do merge.
+não são de desenho: são de regra e de dado. Por isso a pergunta do gate do
+merge as apresenta por extenso, junto com o que muda na capa (escolha 5). A
+pergunta e a resposta dele ficam no HANDOFF do estágio.
 
 1. **As peças são desenhadas por código.** As 16 peças (12 camisetas e 4
    moletons) saem de um roteiro que está no repositório. Não há foto, pessoa,
@@ -62,10 +63,12 @@ palavras, no gate do merge.
    de 20 cartas. Aqui as 16 entram sempre: o sorteio decide só em que tela e
    em que posição cada uma aparece.
 5. **A pesquisa de roupas vem depois das duas de Política.** A capa destaca a
-   primeira pesquisa aberta que a pessoa ainda não respondeu. Para quem não
-   respondeu as duas de Política, nada muda. Quem já respondeu as duas passa
-   a ver a de roupas em destaque, no lugar do aviso de que respondeu todas. A
-   pesquisa tem endereço próprio (`/?p=roupas-demo-01`).
+   pesquisa que a pessoa deixou pela metade ou, sem isso, a primeira aberta
+   que ela ainda não respondeu. Para quem não respondeu as duas de Política e
+   não começou a de roupas, nada muda. Quem já respondeu as duas passa a ver
+   a de roupas em destaque, no lugar do aviso de que respondeu todas, e as
+   telas de resposta registrada das duas passam a oferecer "Próxima
+   pesquisa". A pesquisa tem endereço próprio (`/?p=roupas-demo-01`).
 6. **Mesma moldura para as 16**, como pede a decisão 0002. É uma moldura
    nova, mais simples que a das cartas de Política.
 7. **"Qual fica?" no lugar de "quem fica?".** O título da tela final muda nas

@@ -9,7 +9,8 @@
 // o manifesto dizem "arte com IA" (CREDITS.md, "Chromas e artes editadas").
 //
 // Uso, a partir de app/:  node scripts/build-clothes-cards.mjs
-// Precisa do Chromium do Playwright e do `cwebp` no PATH. O texto das cartas é
+// Precisa do Chromium do Playwright e do `cwebp` no PATH. Os arquivos gravados
+// saíram do Chromium headless shell 1187 e do cwebp 1.6.0. O texto das cartas é
 // desenhado com a Helvetica Neue instalada no macOS; a fonte não vai para o
 // repositório nem para o site, só a imagem pronta. Em outra máquina o texto
 // pode sair diferente: o resultado é conferido pelos hashes gravados, não
@@ -173,9 +174,9 @@ const PRINTS = {
     <path d="M-150,128 q25,-24 50,0 t50,0 t50,0 t50,0 t50,0 t50,0" fill="none" stroke="${CREAM}" stroke-width="11" stroke-linecap="round"/>`,
 
   estrela: () => `
-    <polygon points="${starPoints(150, 62, 12, 12)}" fill="#E8644A"/>
-    <polygon points="${starPoints(150, 62)}" fill="#1F2A44" stroke="#1F2A44" stroke-width="6" stroke-linejoin="round"/>
-    <g fill="${PAPER}">${sparkle(-18, -8, 30)}${sparkle(40, 42, 14)}</g>`,
+    <polygon points="${starPoints(150, 62, 12, 12)}" fill="#1F2A44"/>
+    <polygon points="${starPoints(150, 62)}" fill="#E3A63A" stroke="#E3A63A" stroke-width="6" stroke-linejoin="round"/>
+    <g fill="#1F2A44">${sparkle(-18, -8, 30)}${sparkle(40, 42, 14)}</g>`,
 
   arco: () => `
     <g fill="none" stroke-width="25" stroke-linecap="butt">
