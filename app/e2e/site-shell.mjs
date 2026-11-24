@@ -1812,7 +1812,7 @@ try {
     assert.equal(await page.locator("#ps-title").innerText(), "Qual você usaria?");
     assert.equal(await page.locator(".ps-hint").first().innerText(), "Leva menos de um minuto.");
     assert.equal(await page.locator(".ps-note").innerText(), CLOTHES_NOTE);
-    // A observação é a linha logo abaixo do texto de apoio, e é discreta: menor que ele, na mesma cor.
+    // A observação vem logo abaixo do texto de apoio, e é discreta: menor que ele, na mesma cor.
     assert.equal(await page.locator(".ps-note").evaluate((node) => node.previousElementSibling?.className), "ps-hint");
     const [hint, note] = await page.locator(".ps-hint, .ps-note").evaluateAll((nodes) => nodes.slice(0, 2).map((node) => ({ size: parseFloat(getComputedStyle(node).fontSize), color: getComputedStyle(node).color, top: node.getBoundingClientRect().top })));
     assert.ok(note.size < hint.size && note.color === hint.color && note.top > hint.top, `a observação é discreta e vem depois do texto de apoio (${JSON.stringify([hint, note])})`);

@@ -23,7 +23,7 @@
     "masters": "stages/73_clothes_demo/output/masters/*.svg",
     "published": "app/public/chromas/roupas/*.webp, dois tamanhos por carta (530x742 e 1060x1484)",
     "manifest": "stages/73_clothes_demo/output/manifest.json",
-    "pinnedBy": "app/src/clothes-cards.test.js: código, nome, caminho, hash, os dois tamanhos, o tamanho gravado em cada arquivo, o selo DEMO e a legenda no desenho de origem; nenhum arquivo sobrando nas duas pastas",
+    "pinnedBy": "app/src/clothes-cards.test.js: código, nome, caminho, hash, edição, os dois tamanhos, o tamanho gravado em cada arquivo, o texto do selo DEMO e da legenda no desenho de origem (presentes, não se visíveis) e o texto de como a arte foi feita no manifesto; nenhum arquivo sobrando nas duas pastas",
     "notProven": "que cada WebP é o desenho do seu SVG (pediria gerar de novo, e o texto depende da fonte da máquina)",
     "tools": "Chromium headless shell 1187 e cwebp 1.6.0"
   },
@@ -40,8 +40,9 @@
     },
     "ci": {
       "09d6095": "anterior aos ajustes: todos os trabalhos passaram, entre eles browser-smoke em Chromium e em WebKit e a integração com PostgreSQL; visto pelo agente principal",
-      "3e4511c": "ajustes da primeira leitura: sete trabalhos passaram, entre eles browser-smoke em Chromium e a integração com PostgreSQL; browser-smoke em WebKit ficou parado na instalação do navegador e o commit foi substituído",
-      "lastCommit": "conferido no gate e registrado no PR #346"
+      "3e4511c": "ajustes da primeira leitura: sete trabalhos passaram, entre eles browser-smoke em Chromium e a integração com PostgreSQL; browser-smoke em WebKit ficou parado na instalação do navegador; execução cancelada à mão pelo agente principal, e por isso o ci-gate daquele commit aparece como falha",
+      "lastCommit": "conferido no gate e registrado no PR #346",
+      "3c09121": "ajustes da segunda leitura: o mesmo; sete trabalhos passaram, o WebKit parou na instalação do navegador e a execução foi cancelada à mão"
     },
     "ranOnlyByWiringAgent": {
       "note": "agente à parte que escreveu a 73c; resultados do relato dele, antes dos ajustes",
@@ -79,19 +80,21 @@
     "second": {
       "on": "3e4511c",
       "blocking": "nenhum no conteúdo",
-      "checked": "testes de unidade 119, 218 e 306; roteiros de navegador em WebKit num build local (49 e 34 cenários); entrada em cinco tamanhos de tela; geração completa das cartas numa cópia, na mesma máquina, igual byte a byte ao que está gravado; 25 alterações de teste numa cópia",
+      "checked": "testes de unidade 119, 218 e 306; roteiros de navegador em WebKit num build local (49 e 34 cenários); entrada em cinco tamanhos de tela; geração completa das cartas numa cópia, na mesma máquina, igual byte a byte ao que está gravado; 25 alterações de teste numa cópia; a frase citada na decisão 0005 contra o texto da mensagem que o agente principal lhe passou (ele não viu a conversa)",
       "adjustedAfter": "selo e legenda presos ao desenho de origem no teste; cor da estrela do moletom; números e frases do registro; o que vai ao gate igual em todos os documentos",
       "leftAsIs": "tamanho do selo DEMO; resumo do motivo na decisão 0005, sem a parte comercial"
     },
-    "lastCommit": "os ajustes feitos depois da segunda leitura não passaram por uma terceira leitura inteira; ver o comentário do gate no PR",
     "by": "agentes que não escreveram o código, somente leitura",
     "notChecked": [
       "quem rodou o quê",
+      "os roteiros de navegador em Chromium",
+      "os testes com PostgreSQL",
       "busca de marca registrada",
       "termos de uso da Helvetica Neue",
       "celular de verdade",
       "produção"
     ],
-    "automatedReview": "a revisão automática do GitHub apontou em d1f25fa a falta do HANDOFF e da verificação; os dois entraram em 09d6095; conversa respondida e resolvida no PR"
+    "automatedReview": "a revisão automática no PR (Codex) apontou em d1f25fa a falta do HANDOFF e da verificação; os dois entraram em 09d6095; conversa respondida e resolvida no PR",
+    "deltaOn3c09121": "o mesmo revisor leu só o que mudou depois da segunda passada: sem bloqueio no conteúdo; testes de unidade e roteiros em WebKit de novo; cartas geradas de novo numa cópia, iguais byte a byte; dez alterações de teste. O commit seguinte só mexe em texto do registro e num comentário de teste"
   }
 }

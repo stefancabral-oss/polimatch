@@ -43,8 +43,10 @@
   `references/cartas-roupas.jpg`.
 - `app/src/clothes-cards.test.js` prende uns aos outros a pesquisa, o
   catálogo, o manifesto, os desenhos de origem e os arquivos publicados:
-  código, nome, caminho, hash, os dois tamanhos e o tamanho gravado em cada
-  arquivo. Confere também que não sobra arquivo nas duas pastas e que nenhum
+  código, nome, caminho, hash, edição, os dois tamanhos e o tamanho gravado
+  em cada arquivo. Confere que o texto do selo "DEMO" e o da legenda estão no
+  desenho de origem (presentes, não se estão visíveis), que o manifesto diz
+  como a arte foi feita, que não sobra arquivo nas duas pastas e que nenhum
   código repete os de Política. Ele não prova que cada WebP é o desenho do
   seu SVG: isso pediria gerar de novo, e o texto depende da fonte da máquina.
 
@@ -128,8 +130,11 @@ No CI do PR, visto pelo agente principal:
 - No commit `3e4511c`, com os ajustes da primeira leitura, sete trabalhos
   passaram, entre eles `browser-smoke` em Chromium e a integração com
   PostgreSQL. O `browser-smoke` em WebKit ficou parado na instalação do
-  navegador, antes de rodar código do projeto, e o commit foi substituído
-  pelo seguinte.
+  navegador, antes de rodar código do projeto. O agente principal cancelou a
+  execução à mão; por isso o `ci-gate` daquele commit aparece como falha.
+- No commit `3c09121`, com os ajustes da segunda leitura, aconteceu o mesmo:
+  sete trabalhos passaram, o WebKit parou na instalação do navegador e a
+  execução foi cancelada à mão.
 - O CI do último commit é conferido no gate e fica registrado no PR.
 
 Rodados só pelo agente da ligação, antes dos ajustes, segundo o relato dele:
@@ -176,8 +181,9 @@ Segurou o merge por um ponto do registro e apontou ajustes.
 ### Segunda, no commit `3e4511c`
 
 Sem bloqueio no conteúdo. Conferiu que o ponto que segurava o merge foi
-corrigido em todos os lugares e que a frase citada da mensagem bate, palavra
-por palavra, com a mensagem que o Stefan recebeu.
+corrigido em todos os lugares. Conferiu também que a frase citada na decisão
+0005 bate, palavra por palavra, com o texto da mensagem que o agente
+principal lhe passou; ele não viu a conversa.
 
 - **O que ele conferiu:** os três conjuntos de teste de unidade (119, 218 e
   306); os roteiros de navegador em WebKit, num build local (49 e 34
@@ -192,13 +198,23 @@ por palavra, com a mensagem que o Stefan recebeu.
   que vai ao gate ficou igual em todos os documentos.
 - **O que ficou como está:** o tamanho do selo "DEMO" (ver "Não entregue");
   o resumo do motivo na decisão 0005, sem a parte comercial.
-- **O que ele não conferiu:** quem rodou o quê, busca de marca registrada,
-  os termos de uso da Helvetica Neue, celular de verdade e produção.
+- **O que ele não conferiu:** quem rodou o quê, os roteiros de navegador em
+  Chromium, os testes com PostgreSQL, busca de marca registrada, os termos de
+  uso da Helvetica Neue, celular de verdade e produção.
 
-O último commit, com esses ajustes, não passou por uma terceira leitura
-inteira: ver o comentário do gate no PR.
+### Conferência do commit `3c09121`
 
-### Revisão automática do GitHub
+O mesmo revisor leu só o que mudou depois da segunda passada. Sem bloqueio no
+conteúdo. Rodou de novo os três conjuntos de teste de unidade e os roteiros
+de navegador em WebKit, gerou as cartas de novo numa cópia (iguais, byte a
+byte, com o Chromium headless shell 1187 e o cwebp 1.6.0) e fez dez
+alterações de teste: o teste das cartas pega a falta do texto do selo, da
+legenda e da edição, e não pega um selo presente mas invisível. Pediu que
+este HANDOFF dissesse com exatidão o que ele conferiu sobre a frase citada, e
+isso foi feito. O commit seguinte só mexe em texto do registro e num
+comentário de teste.
+
+### Revisão automática no PR (Codex)
 
 A revisão automática apontou, no commit `d1f25fa`, que faltavam o HANDOFF e
 a verificação do estágio. Os dois entraram no commit `09d6095`. A conversa

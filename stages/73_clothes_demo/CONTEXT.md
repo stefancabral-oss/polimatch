@@ -156,8 +156,8 @@ está disponível.
   e o "quem fica?" valem para `subject` igual a "Política". Uma pesquisa
   futura sobre pessoas com outro assunto vai precisar rever isso.
 - **A nota ocupa duas linhas no celular e empurra a ilustração da entrada
-  para baixo** (32 px em 390×844, pela medida da segunda leitura
-  independente). A entrada da pesquisa de roupas não rola em 390×844,
+  para baixo** (32 px em 390×844 no WebKit, pela medida da segunda leitura
+  independente; no Chromium a nota tem 34 px de altura). A entrada da pesquisa de roupas não rola em 390×844,
   375×667, 360×640 e 320×568. Em 320×480 ela rola um pouco (23 px no
   Chromium, 19 px no WebKit), com o botão "Começar" inteiro na tela.
 - **O selo "DEMO" é pequeno fora da carta em tamanho grande.** Na grade de
