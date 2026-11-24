@@ -4,9 +4,9 @@
 - Quem decidiu: Stefan
 - Registrado por: agente (Claude)
 - Issue: #345 ([ICM 73])
-- Estado: direção aprovada. Em 23/11/2026 a pesquisa de roupas de
-  demonstração estava construída no estágio 73 e fora de produção. O estado
-  atual está no HANDOFF do estágio.
+- Estado: em produção desde 23/11/2026, quando a pesquisa de roupas de
+  demonstração (estágio 73) foi publicada, com API e app no commit `2cfa3e9`.
+  O que foi e o que não foi conferido está no HANDOFF do estágio.
 - Altera a [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md) no
   item 1 (ordem de construção). O resto dela continua valendo.
 

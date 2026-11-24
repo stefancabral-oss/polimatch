@@ -2,12 +2,14 @@
 
 ## Status
 
-- Estado: `pronto para gate`. Em 23/11/2026 as partes 73a, 73b e 73c estavam
-  construídas e testadas, no PR #346, sem merge. Nada deste estágio estava em
-  produção.
+- Estado: `publicado`. As partes 73a, 73b e 73c foram mescladas (PR #346,
+  commit `2cfa3e9`) e a 73d aconteceu em 23/11/2026, com API e app publicados
+  nesse commit (ver "Publicação (73d)"). Em 24/11/2026, quando este registro
+  foi escrito, a issue seguia aberta: fechar pede o sim do Stefan.
 - Issue: #345
 - Branch: `icm/73-clothes-demo`, feita sobre a `main` em `0b30d64`.
 - PR: #346
+- Em produção desde 23/11/2026.
 - Origem: em 23/11/2026, à pergunta do agente "Passo a demonstração de roupas
   na frente da pesquisa de famosos?", o Stefan respondeu "Sim, roupas antes".
   A resposta cobre a ordem de construção. O resto é escolha do agente.
@@ -81,14 +83,106 @@ desenhadas com IA pelo PoliMatch." e "Entre elas, qual fica?".
   resposta registrada das duas pesquisas de Política passam a oferecer
   "Próxima pesquisa" no lugar de "Ver pesquisas".
 
+## Merge — 23/11/2026
+
+Com a instrução do Stefan ("Sim, mescla"), transcrita em "Human gate":
+
+- PR #346 mesclado em `2cfa3e9`. A árvore do merge é a do commit `a4ba4e1`,
+  o último do PR.
+- No commit `a4ba4e1` todos os trabalhos do CI passaram, e o `ci-gate`
+  também. O `browser-smoke` em WebKit levou 32 minutos, quase todos na
+  instalação do navegador; no commit `09d6095` o trabalho inteiro tinha
+  levado menos de 5. No log da execução anterior, cancelada, o download dos
+  pacotes do Ubuntu estava lento.
+- Enquanto o CI rodava, o agente principal executou localmente, em WebKit e
+  no mesmo commit, `app/e2e/site-shell.mjs` (49 cenários) e
+  `app/e2e/photo-survey.mjs` (34 cenários): passaram.
+- O CI do push do merge na `main` (commit `2cfa3e9`, a mesma árvore) ainda
+  rodava quando os dois deploys aconteceram: faltava o `browser-smoke` em
+  WebKit, outra vez lento. Terminou depois, por volta de 03:17 UTC, com todos
+  os trabalhos e o `ci-gate` verdes. Na 72d esse CI tinha terminado antes do
+  deploy; aqui, não.
+
+## Publicação (73d) — 23/11/2026
+
+Com a instrução do Stefan ("Sim, publica"), transcrita em "Human gate".
+Horários em UTC, já no dia 24. Em Brasília, a cópia do banco e os dois
+deploys foram entre 23:53 e 23:58 de 23/11; o vigia foi até 00:03, e a
+resposta dele ao pedido de teste veio por volta da meia-noite.
+
+- **Antes (02:51), de fora:** capa, saúde da API e as duas pesquisas de
+  Política respondiam 200; a pesquisa de roupas e as 32 imagens das cartas de
+  roupa, 404.
+- **Cópia do banco (02:53):** `pg_dump` no contêiner do banco, saída 0:
+  `/tmp/pre-deploy-20261123.dump`, 614.010 bytes, 31 tabelas (uma entrada de
+  dados por tabela, vazia ou não). A contagem de linhas das 31 tabelas foi
+  gravada antes do deploy.
+- **API (02:54 a 02:55):** publicada no commit `2cfa3e9`, em 21 s. No log,
+  `database_ready` às 02:55:23 com `resetApplied: false`, depois `listening`.
+  Uma busca por "error", "failed", "fatal" e "falha", sem diferenciar
+  maiúsculas de minúsculas, nas 131 linhas que o painel mostrava não achou
+  nenhuma. De fora, a cada
+  5 s, a saúde respondeu 200 nas quatro leituras, e a rota da pesquisa de
+  roupas passou de 404 a 200 às 02:55:32.
+- **Banco depois da API:** as mesmas 31 tabelas. Trinta com a mesma contagem;
+  `abuse_quota_counters` foi de 55 para 1. Pelo código, é a poda que a API
+  faz ao subir, dos contadores com mais de oito dias. Nenhuma tabela nova.
+  Respostas da pesquisa de roupas: 0.
+- **App (02:57 a 02:58):** publicado no commit `2cfa3e9`, em 24 s, build de
+  2026-11-24T02:57:49Z. De fora, a cada 5 s, a capa respondeu 200 nas seis
+  leituras.
+- **Vigia:** um roteiro leu a capa e a saúde da API a cada 3 s, de 02:52 a
+  03:03. Estava previsto para 25 minutos e foi parado pelo agente depois de
+  11. Nenhuma leitura falhou.
+- As imagens do app e da API foram construídas pelo painel de deploy. O
+  agente não as construiu nem inspecionou.
+- O commit publicado é o que o painel de deploy registrou. `version.json`
+  segue com `sha: "unknown"` (#287).
+
+Conferido de fora depois dos dois deploys, só por GET:
+
+- Capa, "Como funciona" e `/?p=roupas-demo-01`: 200.
+- As três pesquisas respondem 200 na API. A de roupas vem com o assunto, a
+  pergunta, a nota, 16 cartas, sorteio de 16 e `status: open`. As duas de
+  Política vêm com a nota vazia.
+- As 32 imagens das cartas de roupa respondem 200, e o hash de cada uma é o
+  do manifesto.
+- Os dois arquivos JS que a capa referencia (`main-vjn7p00_.js` e
+  `site-menu-Dtz1zF8k.js`) trazem, juntos, `roupas-demo-01`, "Qual você
+  usaria?", a nota, "Entre elas, qual fica?" e os endereços das cartas de
+  roupa. Isso mostra o que está nos arquivos, não o comportamento na tela.
+
+Entre a API nova e o app novo passaram cerca de dois minutos e meio. Pelo
+código, nesse intervalo o app antigo só lista as duas pesquisas que conhece.
+É o esperado, não algo que o agente tenha observado.
+
+O que o agente não fez: não abriu o site em navegador nem tocou em carta em
+produção; não fez pedido de escrita (nenhum sorteio, nenhuma resposta); não
+abriu a aba de variáveis de nenhum serviço nem alterou configuração.
+
+Depois da publicação, a mensagem do agente ao Stefan dava o endereço direto
+da pesquisa de roupas e terminava assim: "A pesquisa de roupas funcionou no
+seu celular? Abra o endereço, responda e toque em Compartilhar; depois me
+diga "funcionou" ou "deu problema" e o que apareceu." Menos de três minutos
+depois ele respondeu: "Funcionou". Era uma das duas respostas oferecidas. Ele
+não disse o que testou, em que aparelho, nem o que apareceu. O registro não
+afirma que houve teste em celular.
+
+No contêiner do banco ficaram cinco cópias, todas com dado pessoal: as
+quatro anteriores e a de 23/11. Apagar ou guardar fora é decisão do Stefan
+(#279). Os dois arquivos de contagem que o agente criou foram apagados.
+
+Visto de passagem, sem mexer: durante a publicação, no painel de deploy, a
+chave "Autodeploy" aparecia ligada nos dois serviços. Às 02:51, nove minutos depois
+do merge do PR #346, a produção ainda estava como antes; disso o agente
+conclui que o merge não disparou deploy. O `docs/ops/RELEASE.md` descreve o
+deploy manual "com o autodeploy desligado".
+
+O registro feito na hora está na issue #345.
+
 ## Não entregue / pendente
 
-- **73d — publicação.** API e app, a API primeiro, cada passo com o sim do
-  Stefan. O registro da 73d precisa atualizar duas frases no presente que
-  ficam falsas com a publicação: na decisão 0002, "As construções seguintes
-  da ordem não estão em produção"; na decisão 0001, "os outros assuntos"
-  entre o que não está em produção. Precisa também atualizar o estado, o
-  gate e o CI neste HANDOFF e o "Estado" da decisão 0005.
+- Em 24/11/2026 faltava fechar a issue #345, o que pede o sim do Stefan.
 - O que recebe quem encomenda uma pesquisa (resultado, recortes): fora deste
   estágio.
 - O título e a descrição da página (`app/index.html`) dizem "Quem você
@@ -135,7 +229,7 @@ No CI do PR, visto pelo agente principal:
 - No commit `3c09121`, com os ajustes da segunda leitura, aconteceu o mesmo:
   sete trabalhos passaram, o WebKit parou na instalação do navegador e a
   execução foi cancelada à mão.
-- O CI do último commit é conferido no gate e fica registrado no PR.
+- No commit `a4ba4e1`, o último, todos os trabalhos passaram (ver "Merge").
 
 Rodados só pelo agente da ligação, antes dos ajustes, segundo o relato dele:
 
@@ -211,8 +305,8 @@ byte, com o Chromium headless shell 1187 e o cwebp 1.6.0) e fez dez
 alterações de teste: o teste das cartas pega a falta do texto do selo, da
 legenda e da edição, e não pega um selo presente mas invisível. Pediu que
 este HANDOFF dissesse com exatidão o que ele conferiu sobre a frase citada, e
-isso foi feito. O commit seguinte só mexe em texto do registro e num
-comentário de teste.
+isso foi feito. O commit seguinte, `a4ba4e1`, só mexe em texto do registro e
+num comentário de teste.
 
 ### Revisão automática no PR (Codex)
 
@@ -222,13 +316,12 @@ foi respondida e resolvida no PR.
 
 ## Não verificado
 
-- O CI do último commit, no momento em que este texto foi escrito.
 - Os termos de uso da Helvetica Neue em imagem publicada.
-- As imagens Docker do app e da API fora do CI (não há Docker na máquina).
-- Celular de verdade, botão real do Google e compartilhamento real do
-  aparelho.
 - Busca de marca registrada para os nomes das peças e para "Sem Pressa".
-- Produção.
+- Pelo agente, em produção: nenhuma tela, nenhum sorteio e nenhuma resposta;
+  o botão real do Google e o compartilhamento real do aparelho.
+- Celular de verdade. Do teste pedido ao Stefan só se sabe a palavra
+  "Funcionou".
 
 ## Riscos conhecidos
 
@@ -261,17 +354,25 @@ Do agente, fora da decisão 0005: a linha no filtro de caminhos do CI.
 
 ## Próximo passo exato
 
-1. Gate humano do merge do PR #346. A pergunta do gate leva a ele, por
-   extenso, as escolhas 3 e 4 da decisão 0005 (a pesquisa grava respostas de
-   pessoas cadastradas sobre peças que não existem; as 16 peças aparecem para
-   cada pessoa) e o que muda na capa para quem já respondeu as duas pesquisas
-   de Política.
-2. Depois do merge, 73d: copiar o banco, publicar a API, publicar o app e
-   conferir de fora por leitura, cada passo com o sim do Stefan.
+1. Em 24/11/2026 faltava fechar a issue #345, o que pede o sim do Stefan.
 
 ## Human gate
 
-- Decisão: `pendente`
+- Decisão: `aprovado` para o merge e para a publicação. Em 24/11/2026 o
+  fechamento da issue seguia pendente.
 - Responsável: Stefan
-- Observação: a resposta dele cobre a mudança de ordem. O merge e a
-  publicação pedem um sim próprio, um a um.
+- Observação:
+  - **Ordem de construção (23/11/2026).** À pergunta "Passo a demonstração de
+    roupas na frente da pesquisa de famosos?", ele respondeu: "Sim, roupas
+    antes".
+  - **Merge (23/11/2026).** A mensagem do agente trazia, por extenso, três
+    escolhas do agente: a pesquisa é de verdade e grava a resposta de quem
+    tem cadastro com CPF, ligada à conta, sobre peças que não existem, sem
+    data para fechar; as 16 peças aparecem para cada pessoa; e a capa muda
+    para quem já respondeu as duas pesquisas de Política. A pergunta foi
+    "Mesclo o PR 346 quando o CI do último commit ficar verde?". Ele
+    respondeu: "Sim, mescla". O merge só foi feito depois de o CI passar. A
+    transcrição está no PR #346.
+  - **Publicação (23/11/2026).** À pergunta "Faço a cópia do banco e publico
+    a API e o app?", que listava os três passos nessa ordem, ele respondeu:
+    "Sim, publica". Foi um sim para o conjunto, não um por passo.

@@ -9,7 +9,7 @@
     "73a": "decisão 0005 e notas nas decisões 0001 e 0002, no AGENTS.md, no README.md e no CONTEXT.md",
     "73b": "16 cartas de roupa desenhadas por app/scripts/build-clothes-cards.mjs: desenhos de origem, arquivos publicados, catálogo, manifesto e teste",
     "73c": "pesquisa roupas-demo-01 em shared/, na tela e nos testes do servidor; nota na entrada; ilustração da entrada por pesquisa; \"qual fica?\" na final; Roupas fora de Em breve; filtro do CI",
-    "73d": "não feita em 23/11/2026: publicação de API e app, com o sim do Stefan"
+    "73d": "feita em 23/11/2026: cópia do banco, API e app publicados no commit 2cfa3e9 (ver publication)"
   },
   "cards": {
     "count": 16,
@@ -36,12 +36,13 @@
       "npm test --prefix back": "306/306",
       "npm run build --prefix app": "sem erro",
       "caminho inteiro da pesquisa de roupas no aplicativo local, servidor simulado, roteiro fora do repositório": "entrada, quatro telas, final, confirmação, resposta registrada, imagem do compartilhar e capa, sem erro de página",
-      "entrada da pesquisa de roupas em cinco tamanhos de tela": "não rola em 390x844, 375x667, 360x640 e 320x568; em 320x480 rola 23 px, com o botão Começar inteiro na tela"
+      "entrada da pesquisa de roupas em cinco tamanhos de tela": "não rola em 390x844, 375x667, 360x640 e 320x568; em 320x480 rola 23 px, com o botão Começar inteiro na tela",
+      "app/e2e/site-shell.mjs e app/e2e/photo-survey.mjs em WebKit, localmente, no commit a4ba4e1": "49 e 34 cenários, aprovados"
     },
     "ci": {
       "09d6095": "anterior aos ajustes: todos os trabalhos passaram, entre eles browser-smoke em Chromium e em WebKit e a integração com PostgreSQL; visto pelo agente principal",
       "3e4511c": "ajustes da primeira leitura: sete trabalhos passaram, entre eles browser-smoke em Chromium e a integração com PostgreSQL; browser-smoke em WebKit ficou parado na instalação do navegador; execução cancelada à mão pelo agente principal, e por isso o ci-gate daquele commit aparece como falha",
-      "lastCommit": "conferido no gate e registrado no PR #346",
+      "lastCommit": "a4ba4e1: todos os trabalhos passaram, e o ci-gate também; browser-smoke em WebKit levou 32 minutos, quase todos na instalação do navegador",
       "3c09121": "ajustes da segunda leitura: o mesmo; sete trabalhos passaram, o WebKit parou na instalação do navegador e a execução foi cancelada à mão"
     },
     "ranOnlyByWiringAgent": {
@@ -59,17 +60,17 @@
     "seenByMainAgent": true
   },
   "notVerified": [
-    "o CI do último commit, no momento em que este arquivo foi escrito",
     "os termos de uso da Helvetica Neue em imagem publicada",
-    "as imagens Docker do app e da API fora do CI (não há Docker na máquina)",
-    "celular de verdade, botão real do Google e compartilhamento real do aparelho",
     "busca de marca registrada para os nomes das peças e para a frase Sem Pressa",
-    "produção: nada deste estágio foi publicado em 23/11/2026"
+    "pelo agente, em produção: nenhuma tela, nenhum sorteio e nenhuma resposta; o botão real do Google e o compartilhamento real do aparelho",
+    "celular de verdade: do teste pedido ao Stefan só se sabe a palavra Funcionou"
   ],
   "humanGate": {
-    "decision": "pendente",
+    "decision": "aprovado para o merge e para a publicação; em 24/11/2026 o fechamento da issue seguia pendente",
     "owner": "Stefan",
-    "note": "a resposta dele cobre a mudança de ordem; merge e publicação pedem um sim próprio, um a um. A pergunta do gate leva a ele as escolhas 3 e 4 da decisão 0005 e o que muda na capa para quem já respondeu as duas pesquisas de Política"
+    "order": "Sim, roupas antes",
+    "merge": "Sim, mescla, à pergunta \"Mesclo o PR 346 quando o CI do último commit ficar verde?\", que trazia por extenso as três escolhas do agente; transcrição no PR #346",
+    "publication": "Sim, publica"
   },
   "independentReview": {
     "first": {
@@ -96,5 +97,45 @@
     ],
     "automatedReview": "a revisão automática no PR (Codex) apontou em d1f25fa a falta do HANDOFF e da verificação; os dois entraram em 09d6095; conversa respondida e resolvida no PR",
     "deltaOn3c09121": "o mesmo revisor leu só o que mudou depois da segunda passada: sem bloqueio no conteúdo; testes de unidade e roteiros em WebKit de novo; cartas geradas de novo numa cópia, iguais byte a byte; dez alterações de teste. O commit seguinte só mexe em texto do registro e num comentário de teste"
+  },
+  "merge": {
+    "PR 346": "2cfa3e9, mesma árvore de a4ba4e1",
+    "instruction": "Sim, mescla"
+  },
+  "publication": {
+    "date": "2026-11-23 em Brasília para a cópia do banco e os dois deploys (02:53 a 02:58 UTC do dia 24); o vigia foi até 03:03 UTC",
+    "instruction": "Sim, publica, à pergunta \"Faço a cópia do banco e publico a API e o app?\"; um sim para os três passos",
+    "databaseCopy": "/tmp/pre-deploy-20261123.dump no contêiner do banco, 614.010 bytes, 31 tabelas (uma entrada de dados por tabela, vazia ou não)",
+    "api": {
+      "commit": "2cfa3e9",
+      "duration": "21 s",
+      "log": "database_ready com resetApplied false, depois listening; uma busca por error, failed, fatal e falha, sem diferenciar maiúsculas de minúsculas, nas 131 linhas que o painel mostrava não achou nenhuma",
+      "fromOutside": "saúde 200 nas quatro leituras; a rota da pesquisa de roupas passou de 404 a 200 às 02:55:32"
+    },
+    "databaseAfterApi": "as mesmas 31 tabelas; trinta com a mesma contagem; abuse_quota_counters de 55 para 1 (pelo código, a poda dos contadores com mais de oito dias que a API faz ao subir); nenhuma tabela nova; respostas da pesquisa de roupas: 0",
+    "app": {
+      "commit": "2cfa3e9",
+      "duration": "24 s",
+      "builtAt": "2026-11-24T02:57:49Z",
+      "fromOutside": "capa 200 nas seis leituras"
+    },
+    "commitSource": "o commit é o que o painel de deploy registrou; version.json segue com sha unknown (#287)",
+    "watch": "capa e saúde da API a cada 3 s, de 02:52 a 03:03; previsto para 25 minutos, parado pelo agente depois de 11; nenhuma leitura falhou",
+    "checkedByGet": [
+      "capa, Como funciona e /?p=roupas-demo-01: 200",
+      "as três pesquisas 200 na API; a de roupas com assunto, pergunta, nota, 16 cartas, sorteio de 16 e status open; as de Política com a nota vazia",
+      "as 32 imagens das cartas de roupa 200, com o hash do manifesto",
+      "main-vjn7p00_.js e site-menu-Dtz1zF8k.js trazem, juntos, roupas-demo-01, a pergunta, a nota, \"Entre elas, qual fica?\" e os endereços das cartas"
+    ],
+    "notDoneByAgent": [
+      "abrir o site em navegador ou tocar em carta em produção",
+      "pedido de escrita: nenhum sorteio, nenhuma resposta",
+      "abrir a aba de variáveis ou alterar configuração"
+    ],
+    "ownerReport": "a mensagem do agente dava o endereço da pesquisa de roupas e perguntava \"A pesquisa de roupas funcionou no seu celular? Abra o endereço, responda e toque em Compartilhar; depois me diga \\\"funcionou\\\" ou \\\"deu problema\\\" e o que apareceu.\"; menos de três minutos depois o Stefan respondeu \"Funcionou\", uma das duas respostas oferecidas; não disse o que testou, em que aparelho, nem o que apareceu",
+    "seenInPassing": "durante a publicação a chave Autodeploy aparecia ligada nos dois serviços; nove minutos depois do merge a produção ainda estava como antes, e disso o agente conclui que o merge não disparou deploy",
+    "images": "as imagens do app e da API foram construídas pelo painel de deploy; o agente não as construiu nem inspecionou",
+    "mainCi": "o CI do push do merge na main (2cfa3e9) ainda rodava durante os dois deploys, só com o browser-smoke em WebKit pendente; terminou depois, por volta de 03:17 UTC, com todos os trabalhos e o ci-gate verdes",
+    "copiesInContainer": "cinco cópias do banco em /tmp no contêiner, as quatro anteriores e a de 23/11, todas com dado pessoal; apagar ou guardar fora é decisão do Stefan (#279)"
   }
 }
