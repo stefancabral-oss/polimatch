@@ -1,0 +1,178 @@
+[
+  {
+    "id": "camiseta-onda",
+    "name": "Camiseta Onda",
+    "src": "/chromas/roupas/camiseta-onda-v01-30d3d480-530.webp",
+    "srcset": "/chromas/roupas/camiseta-onda-v01-30d3d480-530.webp 530w, /chromas/roupas/camiseta-onda-v01-30d3d480-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "30d3d480741bae31f2b329e86f8b798b89a1af0c0ad2405dafa13df8e914a2d3"
+  },
+  {
+    "id": "camiseta-sol",
+    "name": "Camiseta Sol",
+    "src": "/chromas/roupas/camiseta-sol-v01-77b83f98-530.webp",
+    "srcset": "/chromas/roupas/camiseta-sol-v01-77b83f98-530.webp 530w, /chromas/roupas/camiseta-sol-v01-77b83f98-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "77b83f98844e85f2ccf2ec6463f1f5ff719f683121da30153108efc09d953e60"
+  },
+  {
+    "id": "camiseta-raio",
+    "name": "Camiseta Raio",
+    "src": "/chromas/roupas/camiseta-raio-v01-ebd88627-530.webp",
+    "srcset": "/chromas/roupas/camiseta-raio-v01-ebd88627-530.webp 530w, /chromas/roupas/camiseta-raio-v01-ebd88627-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "ebd88627c1dc4f03a6ed740b40773916d6c3a6adcdb582b2a5fc3855fbfbe6ea"
+  },
+  {
+    "id": "camiseta-cacto",
+    "name": "Camiseta Cacto",
+    "src": "/chromas/roupas/camiseta-cacto-v01-ea79e4eb-530.webp",
+    "srcset": "/chromas/roupas/camiseta-cacto-v01-ea79e4eb-530.webp 530w, /chromas/roupas/camiseta-cacto-v01-ea79e4eb-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "ea79e4eb3202c8364a174a3a6ef966ef980ac93c0bd512171f7b9b130a87e73f"
+  },
+  {
+    "id": "camiseta-planeta",
+    "name": "Camiseta Planeta",
+    "src": "/chromas/roupas/camiseta-planeta-v01-b19eee12-530.webp",
+    "srcset": "/chromas/roupas/camiseta-planeta-v01-b19eee12-530.webp 530w, /chromas/roupas/camiseta-planeta-v01-b19eee12-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "b19eee1231d3525157cb3193c37ccda1d040f4a6c4b6e495d420a052439ff1e6"
+  },
+  {
+    "id": "camiseta-olho",
+    "name": "Camiseta Olho",
+    "src": "/chromas/roupas/camiseta-olho-v01-dcf8dbd1-530.webp",
+    "srcset": "/chromas/roupas/camiseta-olho-v01-dcf8dbd1-530.webp 530w, /chromas/roupas/camiseta-olho-v01-dcf8dbd1-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "dcf8dbd12486296b54e5305dd33cf848148e1944b9720919883a82c712a24c9f"
+  },
+  {
+    "id": "camiseta-chama",
+    "name": "Camiseta Chama",
+    "src": "/chromas/roupas/camiseta-chama-v01-f186a002-530.webp",
+    "srcset": "/chromas/roupas/camiseta-chama-v01-f186a002-530.webp 530w, /chromas/roupas/camiseta-chama-v01-f186a002-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "f186a0029a2396b226f7fff696c361aed3d7816801e6bca03735fae56004c59e"
+  },
+  {
+    "id": "camiseta-montanha",
+    "name": "Camiseta Montanha",
+    "src": "/chromas/roupas/camiseta-montanha-v01-c601e684-530.webp",
+    "srcset": "/chromas/roupas/camiseta-montanha-v01-c601e684-530.webp 530w, /chromas/roupas/camiseta-montanha-v01-c601e684-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "c601e684712bb30030046f664b10fd54662071540f66defd7ca14fa83b057837"
+  },
+  {
+    "id": "camiseta-pipa",
+    "name": "Camiseta Pipa",
+    "src": "/chromas/roupas/camiseta-pipa-v01-2f1a3659-530.webp",
+    "srcset": "/chromas/roupas/camiseta-pipa-v01-2f1a3659-530.webp 530w, /chromas/roupas/camiseta-pipa-v01-2f1a3659-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "2f1a3659c093d248255c5d86d737a98ea6bf3c8f573e4cc709d4061669b92b15"
+  },
+  {
+    "id": "camiseta-flor",
+    "name": "Camiseta Flor",
+    "src": "/chromas/roupas/camiseta-flor-v01-ae0443f2-530.webp",
+    "srcset": "/chromas/roupas/camiseta-flor-v01-ae0443f2-530.webp 530w, /chromas/roupas/camiseta-flor-v01-ae0443f2-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "ae0443f2e73bcb4b27961ccd713b96434546657946c51622a0044279f725da6b"
+  },
+  {
+    "id": "camiseta-xadrez",
+    "name": "Camiseta Xadrez",
+    "src": "/chromas/roupas/camiseta-xadrez-v01-ada51ef3-530.webp",
+    "srcset": "/chromas/roupas/camiseta-xadrez-v01-ada51ef3-530.webp 530w, /chromas/roupas/camiseta-xadrez-v01-ada51ef3-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "ada51ef3873e7fca1dba15d66bbfe6f8be5134b8e58b929d3c4fed81730da6dc"
+  },
+  {
+    "id": "camiseta-sem-pressa",
+    "name": "Camiseta Sem Pressa",
+    "src": "/chromas/roupas/camiseta-sem-pressa-v01-f245289d-530.webp",
+    "srcset": "/chromas/roupas/camiseta-sem-pressa-v01-f245289d-530.webp 530w, /chromas/roupas/camiseta-sem-pressa-v01-f245289d-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "f245289da93ed39d2959ecf42f65c501870327483211cfb81f24f16c733277fb"
+  },
+  {
+    "id": "moletom-estrela",
+    "name": "Moletom Estrela",
+    "src": "/chromas/roupas/moletom-estrela-v01-6dbaa62a-530.webp",
+    "srcset": "/chromas/roupas/moletom-estrela-v01-6dbaa62a-530.webp 530w, /chromas/roupas/moletom-estrela-v01-6dbaa62a-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "6dbaa62a95d259577afcfe9406f285ddb8c89bc56758ab927a38171ec48cb676"
+  },
+  {
+    "id": "moletom-arco",
+    "name": "Moletom Arco",
+    "src": "/chromas/roupas/moletom-arco-v01-73ea5e0f-530.webp",
+    "srcset": "/chromas/roupas/moletom-arco-v01-73ea5e0f-530.webp 530w, /chromas/roupas/moletom-arco-v01-73ea5e0f-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "73ea5e0fcfc7f43b0685d4408b405acf04af303623cb4be4825bdc4d3ef41713"
+  },
+  {
+    "id": "moletom-folha",
+    "name": "Moletom Folha",
+    "src": "/chromas/roupas/moletom-folha-v01-78f02e13-530.webp",
+    "srcset": "/chromas/roupas/moletom-folha-v01-78f02e13-530.webp 530w, /chromas/roupas/moletom-folha-v01-78f02e13-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "78f02e13580bad982fb1ca2f668cb4dc96df3588024de72c2f5df7fa0aef38d8"
+  },
+  {
+    "id": "moletom-lua",
+    "name": "Moletom Lua",
+    "src": "/chromas/roupas/moletom-lua-v01-3f49ddd3-530.webp",
+    "srcset": "/chromas/roupas/moletom-lua-v01-3f49ddd3-530.webp 530w, /chromas/roupas/moletom-lua-v01-3f49ddd3-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "drawnByCode": true,
+    "edition": "roupas-demo-v1",
+    "masterSha256": "3f49ddd3be840f18f66a7384e8ae22d99c9dd21b188cc002088d77c0a9aac341"
+  }
+]

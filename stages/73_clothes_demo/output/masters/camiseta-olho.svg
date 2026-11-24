@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 1484" width="1060" height="1484" font-family="-apple-system, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <title>Camiseta Olho — peça de demonstração do PoliMatch</title>
+  <defs>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#0B1220" flood-opacity="0.24"/>
+    </filter>
+    <linearGradient id="fold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.16"/><stop offset="0.2" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#fff" stop-opacity="0.05"/><stop offset="0.8" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.16"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e4e7e8"/><stop offset="1" stop-color="#D6DADC"/>
+    </linearGradient>
+  </defs>
+  <rect width="1060" height="1484" fill="#111418"/>
+  <rect x="26" y="26" width="1008" height="1432" rx="34" fill="url(#panel)"/>
+  <rect x="78" y="76" width="50" height="50" rx="12" fill="#08805A"/>
+  <text x="103" y="114" font-size="36" font-weight="800" fill="#fff" text-anchor="middle">M</text>
+  <text x="144" y="114" font-size="38" font-weight="700" fill="#111418" letter-spacing="-0.5">PoliMatch</text>
+  <text x="982" y="112" font-size="26" font-weight="700" fill="#5B6470" text-anchor="end" letter-spacing="7">ROUPAS</text>
+  
+    <g filter="url(#drop)">
+      <path d="M440,250 C470,226 590,226 620,250 C592,330 468,330 440,250 Z" fill="#a2a09a"/>
+      <path d="M440,250 C468,330 592,330 620,250 L810,312 L952,548 L846,606 L778,500 L778,1066 Q530,1080 282,1066 L282,500 L214,606 L108,548 L250,312 Z" fill="#F5F2EA" stroke="rgba(0,0,0,0.26)" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+    <path d="M440,250 C468,330 592,330 620,250 L810,312 L952,548 L846,606 L778,500 L778,1066 Q530,1080 282,1066 L282,500 L214,606 L108,548 L250,312 Z" fill="url(#fold)"/>
+    <path d="M810,312 Q770,404 778,500" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="3"/>
+      <path d="M778,516 q-34,54 -22,128" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="14" stroke-linecap="round"/>
+      <path d="M939,532 L842,585" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="3" stroke-dasharray="10 8"/><g transform="translate(1060,0) scale(-1,1)"><path d="M810,312 Q770,404 778,500" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="3"/>
+      <path d="M778,516 q-34,54 -22,128" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="14" stroke-linecap="round"/>
+      <path d="M939,532 L842,585" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="3" stroke-dasharray="10 8"/></g>
+    <path d="M292,1042 Q530,1056 768,1042" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="3" stroke-dasharray="10 8"/>
+    <path d="M440,250 C468,330 592,330 620,250" fill="none" stroke="#a2a09a" stroke-width="30" stroke-linecap="round"/>
+    <path d="M440,250 C468,330 592,330 620,250" fill="none" stroke="#e1dfd7" stroke-width="24" stroke-linecap="round"/>
+  <g transform="translate(530,604) scale(1.18)">
+    <path d="M-155,0 Q0,-120 155,0 Q0,120 -155,0 Z" fill="#FBFAF7" stroke="#16181C" stroke-width="14" stroke-linejoin="round"/>
+    <circle r="58" fill="#2F6FB5"/><circle r="26" fill="#16181C"/><circle cx="-17" cy="-19" r="10" fill="#fff"/>
+    <g stroke="#16181C" stroke-width="12" stroke-linecap="round">
+      <path d="M0,-80 V-122"/><path d="M-62,-68 L-84,-104"/><path d="M62,-68 L84,-104"/>
+      <path d="M-118,-46 L-144,-72"/><path d="M118,-46 L144,-72"/>
+    </g></g>
+  <rect x="70" y="1150" width="920" height="264" rx="28" fill="#FBFAF7" stroke="rgba(17,20,24,0.10)" stroke-width="2"/>
+  <text x="530" y="1222" font-size="34" font-weight="800" fill="#08805A" text-anchor="middle" letter-spacing="9">CAMISETA</text>
+  <text x="530" y="1332" font-size="112" font-weight="800" fill="#111418" text-anchor="middle" letter-spacing="-2.5">Olho</text>
+  <text x="530" y="1384" font-size="22" font-weight="600" fill="#6B7280" text-anchor="middle" letter-spacing="6">PEÇA DE DEMONSTRAÇÃO</text>
+</svg>

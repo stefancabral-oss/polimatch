@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 1484" width="1060" height="1484" font-family="-apple-system, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <title>Moletom Folha — peça de demonstração do PoliMatch</title>
+  <defs>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#0B1220" flood-opacity="0.24"/>
+    </filter>
+    <linearGradient id="fold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.16"/><stop offset="0.2" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#fff" stop-opacity="0.05"/><stop offset="0.8" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.16"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e4e7e8"/><stop offset="1" stop-color="#D6DADC"/>
+    </linearGradient>
+  </defs>
+  <rect width="1060" height="1484" fill="#111418"/>
+  <rect x="26" y="26" width="1008" height="1432" rx="34" fill="url(#panel)"/>
+  <rect x="78" y="76" width="50" height="50" rx="12" fill="#08805A"/>
+  <text x="103" y="114" font-size="36" font-weight="800" fill="#fff" text-anchor="middle">M</text>
+  <text x="144" y="114" font-size="38" font-weight="700" fill="#111418" letter-spacing="-0.5">PoliMatch</text>
+  <text x="982" y="112" font-size="26" font-weight="700" fill="#5B6470" text-anchor="end" letter-spacing="7">ROUPAS</text>
+  
+    <defs>
+      <pattern id="rib" width="12" height="12" patternUnits="userSpaceOnUse">
+        <rect width="12" height="12" fill="#626742"/>
+        <path d="M6,0 V12" stroke="rgba(255,255,255,0.16)" stroke-width="3"/>
+      </pattern>
+    </defs>
+    <g filter="url(#drop)">
+      <path d="M444,250 C472,228 588,228 616,250 C590,314 470,314 444,250 Z" fill="#474a30"/>
+      <path d="M444,250 C470,314 590,314 616,250 L820,318 L958,900 L872,916 L782,522 L782,1002 L278,1002 L278,522 L188,916 L102,900 L240,318 Z" fill="#6B7048" stroke="rgba(0,0,0,0.55)" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="286" y="1000" width="488" height="70" rx="10" fill="url(#rib)" stroke="rgba(0,0,0,0.55)" stroke-width="3"/>
+      <path d="M958,898 L872,914 L878,984 L950,974 Z" fill="#626742" stroke="rgba(0,0,0,0.55)" stroke-width="3" stroke-linejoin="round"/><g transform="translate(1060,0) scale(-1,1)"><path d="M958,898 L872,914 L878,984 L950,974 Z" fill="#626742" stroke="rgba(0,0,0,0.55)" stroke-width="3" stroke-linejoin="round"/></g>
+    </g>
+    <path d="M444,250 C470,314 590,314 616,250 L820,318 L958,900 L872,916 L782,522 L782,1002 L278,1002 L278,522 L188,916 L102,900 L240,318 Z" fill="url(#fold)"/>
+    <path d="M820,318 Q774,416 782,522" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="3"/>
+      <path d="M782,540 q-34,60 -22,150" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="14" stroke-linecap="round"/>
+      <path d="M898,918 L903,978 M924,914 L928,975" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="3"/><g transform="translate(1060,0) scale(-1,1)"><path d="M820,318 Q774,416 782,522" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="3"/>
+      <path d="M782,540 q-34,60 -22,150" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="14" stroke-linecap="round"/>
+      <path d="M898,918 L903,978 M924,914 L928,975" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="3"/></g>
+    <path d="M444,250 C470,314 590,314 616,250" fill="none" stroke="#474a30" stroke-width="32" stroke-linecap="round"/>
+    <path d="M444,250 C470,314 590,314 616,250" fill="none" stroke="#626742" stroke-width="26" stroke-linecap="round"/>
+  <g transform="translate(530,612) scale(1.18)">
+    <g transform="rotate(18)">
+      <path d="M0,-158 C95,-95 115,45 0,158 C-115,45 -95,-95 0,-158 Z" fill="#F1E9D8"/>
+      <g fill="none" stroke="#6B7048" stroke-width="9" stroke-linecap="round">
+        <path d="M0,-118 V150"/>
+        <path d="M0,-48 L46,-86"/><path d="M0,-48 L-46,-86"/>
+        <path d="M0,12 L62,-34"/><path d="M0,12 L-62,-34"/>
+        <path d="M0,72 L56,26"/><path d="M0,72 L-56,26"/>
+      </g>
+    </g></g>
+  <rect x="70" y="1150" width="920" height="264" rx="28" fill="#FBFAF7" stroke="rgba(17,20,24,0.10)" stroke-width="2"/>
+  <text x="530" y="1222" font-size="34" font-weight="800" fill="#08805A" text-anchor="middle" letter-spacing="9">MOLETOM</text>
+  <text x="530" y="1332" font-size="112" font-weight="800" fill="#111418" text-anchor="middle" letter-spacing="-2.5">Folha</text>
+  <text x="530" y="1384" font-size="22" font-weight="600" fill="#6B7280" text-anchor="middle" letter-spacing="6">PEÇA DE DEMONSTRAÇÃO</text>
+</svg>
