@@ -44,7 +44,8 @@
  * Capa com várias pesquisas (ICM 70, #334):
  *  25. Cada pesquisa tem endereço; um código desconhecido cai na capa.
  *  26. Responder a primeira: a capa mostra a escolha e destaca a segunda;
- *      respondidas as duas, a capa diz isso. Uma não mexe na outra.
+ *      respondidas as duas, destaca a de roupas; respondidas as três, a capa
+ *      diz isso. Uma não mexe na outra.
  *  27. A capa destaca a pesquisa que ficou pela metade, com "Continuar"; se
  *      ela fecha, a capa não fica presa nela.
  *  28. Uma pesquisa fechada sai do destaque e aparece como fechada.
@@ -57,17 +58,27 @@
  *      arquivo, a imagem aparece na tela.
  *  31c. A imagem demora, falha ou perde uma carta: o botão não fica preso
  *      e o toque nunca manda só o link.
- *  32. Servidor que ainda não conhece a segunda pesquisa: a capa mostra só a
- *      primeira (é o que acontece se o app for publicado antes da API).
+ *  32. Servidor que ainda não conhece uma pesquisa: a capa mostra só as que
+ *      ele conhece (é o que acontece se o app for publicado antes da API).
  *  33. Uma leitura que falha não vira informação falsa: a capa pede para
  *      tentar de novo.
  *  34. Outra aba sai da conta: a capa desta se refaz.
+ *
+ * Pesquisa de roupas (ICM 73, #345):
+ *  35. `/?p=roupas-demo-01` abre a entrada com o assunto, a pergunta, a
+ *      observação e três cartas de roupa; a observação entra como texto.
+ *  36. O caminho inteiro da pesquisa de roupas: quatro telas com as 16
+ *      cartas, final, confirmação, resposta registrada e compartilhar; a
+ *      capa mostra a escolha e continua abrindo nas pesquisas de política.
+ *  37. A entrada das pesquisas de política não tem observação e só ilustra
+ *      com as cartas da lista da entrada.
  */
 import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
 import { chromium, webkit } from "playwright";
 import { PHOTO_SURVEYS, drawCards, drawGroups, photoSurveyById, publicPhotoSurvey, validateBracket } from "../../shared/photo-survey.js";
-import { PHOTO_SURVEY_STORAGE_KEY, identityTag, savedProgressText } from "../src/photo-survey-flow.js";
+import CLOTHES_CARDS from "../src/clothes-cards.json" with { type: "json" };
+import { ENTRY_CARD_IDS, PHOTO_SURVEY_STORAGE_KEY, identityTag, savedProgressText } from "../src/photo-survey-flow.js";
 
 const browserName = process.env.POLIMATCH_E2E_BROWSER || "chromium";
 const appUrl = process.env.POLIMATCH_E2E_URL || "http://127.0.0.1:4173/";
@@ -76,6 +87,7 @@ if (!browserType) throw new Error(`Navegador não suportado: ${browserName}`);
 
 const SURVEY = PHOTO_SURVEYS[0];
 const SECOND = PHOTO_SURVEYS[1];
+const CLOTHES = PHOTO_SURVEYS[2];
 const surveyUrl = (survey) => new URL(`?p=${survey.id}`, appUrl).href;
 const HOW_URL = new URL("como-funciona.html", appUrl).href;
 const IDENTITY_KEY = "polimatch:v3:recovery-key";
@@ -97,6 +109,8 @@ function createServer() {
     closed: new Set(),
     // Pesquisas que este servidor ainda não conhece: respondem 404.
     unknown: new Set(),
+    // Observação que este servidor devolve no lugar da que está na definição.
+    notes: new Map(),
     googleDown: false,
     // Falhas programadas da entrada com Google: cada item é um status HTTP,
     // ou um objeto com status e código.
@@ -130,7 +144,11 @@ function createServer() {
       return server.requests.filter((request) => request.method === method && request.pathname.endsWith(suffix)).length;
     },
   };
-  const view = (survey = SURVEY) => ({ ...publicPhotoSurvey(survey, new Date()), status: server.closed.has(survey.id) ? "closed" : server.status });
+  const view = (survey = SURVEY) => ({
+    ...publicPhotoSurvey(survey, new Date()),
+    ...(server.notes.has(survey.id) ? { note: server.notes.get(survey.id) } : {}),
+    status: server.closed.has(survey.id) ? "closed" : server.status,
+  });
   const slot = (survey, key) => `${survey.id}:${key}`;
   server.handler = async (route) => {
     const request = route.request();
@@ -343,12 +361,16 @@ try {
     assert.deepEqual(server.requests.map(({ method, pathname, key }) => `${method} ${pathname} ${key}`).sort(), PHOTO_SURVEYS.map((survey) => `GET /api/photo-surveys/${survey.id} `).sort());
     assert.equal(await storedKey(page), null, "nenhum jogador foi criado");
     assert.equal(await page.evaluate(() => localStorage.length), 0, "nada foi guardado no aparelho");
-    // Abaixo do destaque: a outra pesquisa aberta e as que vêm.
+    // Abaixo do destaque: as outras pesquisas abertas e a que vem.
     assert.equal(await page.locator(".ps-kicker").first().innerText(), "POLÍTICA · 16 CARTAS");
+    assert.equal(await page.locator(".ps-note").count(), 0, "a capa abre numa pesquisa de política, que não tem observação");
     assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Mais pesquisas", "Em breve"]);
     const more = await page.locator(".ps-home a.ps-survey").evaluateAll((rows) => rows.map((row) => ({ href: row.getAttribute("href"), title: row.querySelector("b").textContent, sub: row.querySelector("small").textContent, tag: row.querySelector(".pm-tag").textContent })));
-    assert.deepEqual(more, [{ href: `./?p=${SECOND.id}`, title: "Em quem você confia mais?", sub: "Política · 16 cartas", tag: "Aberta" }]);
-    assert.deepEqual(await page.locator(".ps-home .pm-item.is-soon span").allInnerTexts(), ["Famosos e influenciadores", "Roupas"]);
+    assert.deepEqual(more, [
+      { href: `./?p=${SECOND.id}`, title: "Em quem você confia mais?", sub: "Política · 16 cartas", tag: "Aberta" },
+      { href: `./?p=${CLOTHES.id}`, title: "Qual você usaria?", sub: "Roupas · 16 cartas", tag: "Aberta" },
+    ]);
+    assert.deepEqual(await page.locator(".ps-home .pm-item.is-soon span").allInnerTexts(), ["Famosos e influenciadores"]);
     assert.equal(await page.locator(".ps-home .ps-pick").count(), 0, "sem resposta, não há Suas escolhas");
     assert.equal(new URL(page.url()).search, "", "a capa não tem pesquisa no endereço");
   });
@@ -370,8 +392,8 @@ try {
     assert.deepEqual(items, [
       { text: "Quem você prefere?", note: "Política", href: `./?p=${SURVEY.id}`, current: null },
       { text: "Em quem você confia mais?", note: "Política", href: `./?p=${SECOND.id}`, current: null },
+      { text: "Qual você usaria?", note: "Roupas", href: `./?p=${CLOTHES.id}`, current: null },
       { text: "Famosos e influenciadores", note: "Em breve", href: null, current: null },
-      { text: "Roupas", note: "Em breve", href: null, current: null },
       { text: "Início", note: "", href: "./", current: "page" },
       { text: "Como funciona", note: "", href: "./como-funciona.html", current: null },
     ]);
@@ -440,7 +462,7 @@ try {
     const server = createServer();
     server.registered.delete(GOOGLE_KEY);
     const answered = server.answered(ANONYMOUS_KEY);
-    // O aparelho guarda que essa chave sem conta respondeu as duas pesquisas.
+    // O aparelho guarda que essa chave sem conta respondeu todas as pesquisas.
     const tag = identityTag(ANONYMOUS_KEY);
     const storedProgress = PHOTO_SURVEYS.reduce((text, survey) => savedProgressText(text, survey.id, { identity: tag, answered: true }), "");
     const page = await open(await newContext(server, { storedKey: ANONYMOUS_KEY, storedProgress }));
@@ -1266,7 +1288,7 @@ try {
     assert.equal(await unknown.locator(".ps-home").count(), 1, "código desconhecido abre a capa");
   });
 
-  await scenario("responder a primeira: a capa mostra a escolha e destaca a segunda; uma não mexe na outra", async () => {
+  await scenario("responder a primeira: a capa mostra a escolha e destaca a segunda, e depois a de roupas; uma não mexe na outra", async () => {
     const server = createServer();
     const context = await newContext(server, { storedKey: GOOGLE_KEY });
     const page = await open(context);
@@ -1286,8 +1308,8 @@ try {
     assert.equal(await pick.getAttribute("href"), `./?p=${SURVEY.id}`);
     assert.match(await pick.locator("small").innerText(), /Política · Quem você prefere\?/);
     assert.equal(await pick.locator("img").evaluate((image) => image.naturalWidth > 0), true, "a carta escolhida aparece");
-    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas", "Em breve"]);
-    assert.equal(await page.locator(".ps-home a.ps-survey").count(), 0, "a segunda está no destaque, não na lista");
+    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas", "Mais pesquisas", "Em breve"]);
+    assert.deepEqual(await page.locator(".ps-home a.ps-survey b").allInnerTexts(), ["Qual você usaria?"], "a segunda está no destaque, não na lista; a de roupas continua na lista");
     assert.equal(server.count("POST", `/api/photo-surveys/${SECOND.id}/draw`), 0, "a capa não emite sorteio da pesquisa em destaque");
 
     // A segunda começa do zero: sorteio próprio, nenhuma escolha herdada.
@@ -1295,16 +1317,31 @@ try {
     await waitStep(page, "Tela 1 de 4");
     assert.equal(await page.locator('.ps-grid button[aria-pressed="true"]').count(), 0);
     const second = await answer(page, 1);
-    assert.equal(await page.getByRole("link", { name: "Ver pesquisas" }).getAttribute("href"), "./", "sem próxima, o botão leva à capa");
     assert.notEqual(server.responseOf(GOOGLE_KEY, SURVEY).answerId, server.responseOf(GOOGLE_KEY, SECOND).answerId);
+    assert.equal(server.responseOf(GOOGLE_KEY, CLOTHES), null, "responder as de política não responde a de roupas");
 
-    // Respondidas as duas, a capa diz isso e mostra as duas escolhas.
+    // Respondidas as duas de política, a capa mostra as duas escolhas e destaca a de roupas.
+    await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Próxima pesquisa" }).click()]);
+    await entryReady(page);
+    assert.equal(await page.locator("#ps-title").innerText(), "Qual você usaria?");
+    assert.equal(await page.locator(".ps-note").innerText(), "Peças de demonstração, criadas pelo PoliMatch.");
+    // As duas de política sorteiam das mesmas cartas: a escolha pode ser a mesma pessoa nas duas.
+    await page.locator(".ps-home .ps-pick").nth(1).locator("b", { hasText: second }).waitFor();
+    assert.deepEqual(await page.locator(".ps-home .ps-pick b").allInnerTexts(), [first, second]);
+    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas", "Em breve"]);
+    await page.locator("#ps-action").click();
+    const third = await answer(page, 2);
+    assert.equal(new URL(page.url()).search, `?p=${CLOTHES.id}`);
+    assert.equal(await page.getByRole("link", { name: "Ver pesquisas" }).getAttribute("href"), "./", "sem próxima, o botão leva à capa");
+
+    // Respondidas as três, a capa diz isso e mostra as três escolhas.
     await page.getByRole("link", { name: "Ver pesquisas" }).click();
     await page.locator("#ps-title", { hasText: "Você respondeu todas as pesquisas abertas." }).waitFor();
     assert.equal(await page.locator("#ps-action").count(), 0);
-    // As duas pesquisas sorteiam das mesmas cartas: a escolha pode ser a mesma pessoa nas duas.
-    await page.locator(".ps-home .ps-pick").nth(1).locator("b", { hasText: second }).waitFor();
-    assert.deepEqual(await page.locator(".ps-home .ps-pick b").allInnerTexts(), [first, second]);
+    assert.equal(await page.locator(".ps-note").count(), 0, "sem pesquisa em destaque não há observação");
+    await page.locator(".ps-home .ps-pick").nth(2).locator("b", { hasText: third }).waitFor();
+    assert.deepEqual(await page.locator(".ps-home .ps-pick b").allInnerTexts(), [first, second, third]);
+    assert.match(await page.locator(".ps-home .ps-pick").nth(2).locator("small").innerText(), /Roupas · Qual você usaria\?/);
     // Tocar numa escolha abre a tela da resposta daquela pesquisa.
     await page.locator(".ps-home .ps-pick").first().click();
     await waitStep(page, "Registrada");
@@ -1329,7 +1366,7 @@ try {
     assert.equal(new URL(page.url()).search, "");
     assert.equal(await page.locator("#ps-title").innerText(), "Em quem você confia mais?");
     assert.match(await page.locator(".ps-hint").first().innerText(), /Você parou no meio/);
-    assert.deepEqual(await page.locator(".ps-home a.ps-survey b").allInnerTexts(), ["Quem você prefere?"]);
+    assert.deepEqual(await page.locator(".ps-home a.ps-survey b").allInnerTexts(), ["Quem você prefere?", "Qual você usaria?"]);
     assert.equal(server.count("POST", `/api/photo-surveys/${SURVEY.id}/draw`), 0);
     await page.locator("#ps-action").click();
     await waitStep(page, "Tela 2 de 4");
@@ -1342,7 +1379,7 @@ try {
     await entryReady(page, "Começar");
     assert.equal(new URL(page.url()).search, "", "a capa não manda para a pesquisa fechada");
     assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
-    assert.deepEqual(await page.locator(".ps-home a.ps-survey").evaluateAll((rows) => rows.map((row) => `${row.querySelector("b").textContent} | ${row.querySelector(".pm-tag").textContent}`)), ["Em quem você confia mais? | Fechada"]);
+    assert.deepEqual(await page.locator(".ps-home a.ps-survey").evaluateAll((rows) => rows.map((row) => `${row.querySelector("b").textContent} | ${row.querySelector(".pm-tag").textContent}`)), ["Em quem você confia mais? | Fechada", "Qual você usaria? | Aberta"]);
   });
 
   await scenario("uma pesquisa fechada sai do destaque e aparece como fechada", async () => {
@@ -1352,7 +1389,7 @@ try {
     await entryReady(page);
     assert.equal(await page.locator("#ps-title").innerText(), "Em quem você confia mais?");
     const rows = await page.locator(".ps-home a.ps-survey").evaluateAll((items) => items.map((row) => `${row.querySelector("b").textContent} | ${row.querySelector(".pm-tag").textContent}`));
-    assert.deepEqual(rows, ["Quem você prefere? | Fechada"]);
+    assert.deepEqual(rows, ["Quem você prefere? | Fechada", "Qual você usaria? | Aberta"]);
     assert.deepEqual(server.writes(), []);
 
     // Todas fechadas: sem destaque e sem botão de começar.
@@ -1361,7 +1398,7 @@ try {
     const empty = await open(await newContext(none));
     await empty.locator("#ps-title", { hasText: "Nenhuma pesquisa aberta agora." }).waitFor();
     assert.equal(await empty.locator("#ps-action").count(), 0);
-    assert.equal(await empty.locator(".ps-home a.ps-survey .pm-tag", { hasText: "Fechada" }).count(), 2);
+    assert.equal(await empty.locator(".ps-home a.ps-survey .pm-tag", { hasText: "Fechada" }).count(), PHOTO_SURVEYS.length);
 
     // Quem tem conta no aparelho e respondeu antes de fechar vê a escolha, mesmo sem registro local.
     const past = createServer();
@@ -1378,7 +1415,7 @@ try {
     odd.status = "constructor";
     const strange = await open(await newContext(odd));
     await strange.locator("#ps-title", { hasText: "Nenhuma pesquisa aberta agora." }).waitFor();
-    assert.equal(await strange.locator(".ps-home a.ps-survey .pm-tag", { hasText: "Fechada" }).count(), 2);
+    assert.equal(await strange.locator(".ps-home a.ps-survey .pm-tag", { hasText: "Fechada" }).count(), PHOTO_SURVEYS.length);
   });
 
   await scenario("com a API fora do ar, a capa avisa e tenta de novo", async () => {
@@ -1394,7 +1431,7 @@ try {
     await page.locator("#ps-action").click();
     await entryReady(page);
     assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
-    assert.equal(await page.locator(".ps-home a.ps-survey").count(), 1);
+    assert.equal(await page.locator(".ps-home a.ps-survey").count(), 2);
   });
 
   // O compartilhamento do aparelho é simulado: guarda o que a página mandou e
@@ -1684,14 +1721,28 @@ try {
     assert.deepEqual(await urls(old.page), { created: 1, revoked: 1 });
   });
 
-  await scenario("servidor que ainda não conhece a segunda pesquisa: a capa mostra só a primeira", async () => {
+  await scenario("servidor que ainda não conhece uma pesquisa: a capa mostra só as que ele conhece", async () => {
+    // A API de antes da pesquisa de roupas (ICM 73): a capa fica como era, com as duas de política.
+    const older = createServer();
+    older.unknown.add(CLOTHES.id);
+    const before = await newContext(older);
+    const home = await open(before);
+    await entryReady(home);
+    assert.equal(await home.locator("#ps-title").innerText(), "Quem você prefere?");
+    assert.deepEqual(await home.locator(".ps-home a.ps-survey b").allInnerTexts(), ["Em quem você confia mais?"]);
+    assert.equal(await home.locator("#ps-notice:not([hidden])").count(), 0);
+    const clothes = await open(before, surveyUrl(CLOTHES));
+    await clothes.locator("#ps-title", { hasText: "Esta pesquisa não está disponível." }).waitFor();
+    assert.equal(await clothes.locator("#ps-action, .ps-fan, .ps-note").count(), 0);
+
     const server = createServer();
     server.unknown.add(SECOND.id);
+    server.unknown.add(CLOTHES.id);
     const context = await newContext(server, { storedKey: GOOGLE_KEY });
     const page = await open(context);
     await entryReady(page);
     assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
-    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Em breve"], "a pesquisa desconhecida não entra na lista");
+    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Em breve"], "as pesquisas desconhecidas não entram na lista");
     assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
     await page.locator("#ps-action").click();
     await waitStep(page, "Tela 1 de 4");
@@ -1745,6 +1796,183 @@ try {
     // Sem a conta, a escolha dela some da capa e o destaque volta para a primeira pesquisa.
     await first.waitForFunction(() => document.querySelectorAll(".ps-home .ps-pick").length === 0 && document.querySelector("#ps-title")?.textContent === "Quem você prefere?");
     assert.deepEqual(await first.locator(".ps-home .ps-label").allInnerTexts(), ["Mais pesquisas", "Em breve"]);
+  });
+
+  // Pesquisa de roupas (ICM 73, #345) -----------------------------------------
+  const CLOTHES_NOTE = "Peças de demonstração, criadas pelo PoliMatch.";
+  const clothesBySrc = new Map(CLOTHES_CARDS.map((card) => [card.src, card]));
+  const clothesName = new Map(CLOTHES_CARDS.map((card) => [card.id, card.name]));
+  const fanSources = (page) => page.locator(".ps-fan img").evaluateAll((images) => images.map((image) => image.getAttribute("src")));
+
+  await scenario("a pesquisa de roupas abre no endereço dela, com a observação e três cartas de roupa", async () => {
+    const server = createServer();
+    const page = await open(await newContext(server), surveyUrl(CLOTHES));
+    await entryReady(page);
+    assert.equal(await page.locator(".ps-kicker").first().innerText(), "ROUPAS · 16 CARTAS");
+    assert.equal(await page.locator("#ps-title").innerText(), "Qual você usaria?");
+    assert.equal(await page.locator(".ps-hint").first().innerText(), "Leva menos de um minuto.");
+    assert.equal(await page.locator(".ps-note").innerText(), CLOTHES_NOTE);
+    // A observação é a linha logo abaixo do texto de apoio, e é discreta: menor que ele, na mesma cor.
+    assert.equal(await page.locator(".ps-note").evaluate((node) => node.previousElementSibling?.className), "ps-hint");
+    const [hint, note] = await page.locator(".ps-hint, .ps-note").evaluateAll((nodes) => nodes.slice(0, 2).map((node) => ({ size: parseFloat(getComputedStyle(node).fontSize), color: getComputedStyle(node).color, top: node.getBoundingClientRect().top })));
+    assert.ok(note.size < hint.size && note.color === hint.color && note.top > hint.top, `a observação é discreta e vem depois do texto de apoio (${JSON.stringify([hint, note])})`);
+    assert.equal(await page.locator(".ps-cta-note").innerText(), "Para responder, entre com Google e cadastre o CPF.");
+    assert.equal(await page.locator(".ps-home").count(), 0, "na página da pesquisa não há as listas da capa");
+    assert.equal(await page.getByRole("link", { name: "Todas as pesquisas" }).getAttribute("href"), "./");
+    // O leque sai das cartas da própria pesquisa: três, distintas, sorteadas a cada visita.
+    assert.deepEqual([...clothesBySrc.values()].map((card) => card.id).sort(), [...CLOTHES.cardIds], "o catálogo tem as cartas da pesquisa");
+    const seen = new Set();
+    for (let visit = 0; visit < 6; visit += 1) {
+      if (visit > 0) {
+        await page.reload({ waitUntil: "domcontentloaded" });
+        await entryReady(page);
+      }
+      const fan = await fanSources(page);
+      assert.equal(fan.length, 3);
+      assert.equal(new Set(fan).size, 3, "as cartas da entrada são distintas");
+      for (const src of fan) {
+        assert.ok(clothesBySrc.has(src), `${src} é uma carta de roupa`);
+        seen.add(src);
+      }
+      await page.waitForFunction(() => [...document.querySelectorAll(".ps-fan img")].every((image) => image.complete && image.naturalWidth > 0));
+    }
+    assert.ok(seen.size > 3, "as cartas da entrada continuam sorteadas a cada visita");
+    // A entrada cabe na tela, com o botão à vista, e não rola para o lado.
+    const button = await page.locator("#ps-action").boundingBox();
+    assert.ok(button.y >= 0 && button.y + button.height <= 844 + 0.5, `o botão de começar aparece sem rolar (${Math.round(button.y + button.height)})`);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "a entrada não rola para o lado");
+    await openMenu(page);
+    assert.equal(await menu(page).locator('a[aria-current="page"] span').innerText(), "Qual você usaria?");
+    await page.keyboard.press("Escape");
+    // Abrir e recarregar só leu a pesquisa: nenhuma gravação.
+    assert.deepEqual([...new Set(server.requests.map(({ method, pathname, key }) => `${method} ${pathname} ${key}`))], [`GET /api/photo-surveys/${CLOTHES.id} `]);
+    assert.equal(await storedKey(page), null);
+
+    // A observação que vem do servidor entra como texto, nunca como marcação.
+    const hostile = createServer();
+    hostile.notes.set(CLOTHES.id, '<img src=x onerror="window.__nota=1"> Peças & cia');
+    const escaped = await open(await newContext(hostile), surveyUrl(CLOTHES));
+    await entryReady(escaped);
+    assert.equal(await escaped.locator(".ps-note").innerText(), '<img src=x onerror="window.__nota=1"> Peças & cia');
+    assert.equal(await escaped.locator(".ps-note *").count(), 0);
+    assert.equal(await escaped.evaluate(() => window.__nota ?? null), null);
+    // Sem observação válida na resposta do servidor, vale a da definição do app.
+    for (const value of ["", 7, null]) {
+      const plain = createServer();
+      plain.notes.set(CLOTHES.id, value);
+      const fallback = await open(await newContext(plain), surveyUrl(CLOTHES));
+      await entryReady(fallback);
+      assert.equal(await fallback.locator(".ps-note").innerText(), CLOTHES_NOTE, JSON.stringify(value));
+    }
+  });
+
+  await scenario("o caminho inteiro da pesquisa de roupas: as 16 cartas, final, confirmação, resposta registrada e compartilhar", async () => {
+    const server = createServer();
+    const context = await newContext(server, { storedKey: GOOGLE_KEY });
+    await context.addInitScript(SHARE_STUB, { mode: "file" });
+    const page = await open(context, surveyUrl(CLOTHES));
+    await entryReady(page);
+    assert.equal(await page.locator(".ps-cta-note").innerText(), "Sua escolha só é registrada quando você confirmar.");
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Tela 1 de 4");
+    // As 16 peças entram no sorteio de toda pessoa, uma vez cada: só a ordem muda.
+    const shown = server.draws.get(`${CLOTHES.id}:${GOOGLE_KEY}`);
+    assert.deepEqual([...shown].sort(), [...CLOTHES.cardIds]);
+    assert.equal(await page.locator(".ps-kicker").first().innerText(), "ROUPAS · 16 CARTAS");
+    assert.equal(await page.locator("#ps-title").innerText(), "Qual você usaria?");
+    assert.equal(await page.locator(".ps-note").count(), 0, "a observação é da entrada, não das telas de voto");
+    const picks = [];
+    for (let screen = 0; screen < 4; screen += 1) {
+      await waitStep(page, `Tela ${screen + 1} de 4`);
+      await page.locator('.ps-grid[data-ready="true"]').waitFor({ timeout: 20000 });
+      const cards = await page.locator(".ps-grid button[data-card]").evaluateAll((buttons) => buttons.map((button) => ({
+        id: button.dataset.card,
+        label: button.getAttribute("aria-label"),
+        src: button.querySelector("img").getAttribute("src"),
+        loaded: button.querySelector("img").naturalWidth > 0,
+      })));
+      const group = shown.slice(screen * 4, screen * 4 + 4);
+      assert.deepEqual(cards.map((card) => card.id), group, `tela ${screen + 1}: as cartas do sorteio, na ordem`);
+      assert.deepEqual(cards.map((card) => card.label), group.map((id) => `Escolher ${clothesName.get(id)}`));
+      assert.ok(cards.every((card) => card.loaded && clothesBySrc.get(card.src)?.id === card.id), `tela ${screen + 1}: cada carta mostra a própria peça`);
+      await tapCard(page, screen);
+      picks.push(group[screen]);
+    }
+    await waitStep(page, "Final");
+    assert.equal(await page.locator(".ps-kicker").first().innerText(), "AS SUAS QUATRO ESCOLHAS");
+    assert.equal(await page.locator("#ps-title").innerText(), "Entre elas, qual fica?");
+    await page.locator('.ps-grid[data-ready="true"]').waitFor({ timeout: 20000 });
+    assert.deepEqual(await page.locator(".ps-grid button[data-card]").evaluateAll((buttons) => buttons.map((button) => button.dataset.card)), picks);
+    await tapCard(page, 1);
+    await waitStep(page, "Confirmar");
+    const chosen = clothesName.get(picks[1]);
+    const others = picks.filter((id) => id !== picks[1]).map((id) => clothesName.get(id));
+    assert.equal(await page.locator("#ps-title").innerText(), chosen);
+    assert.deepEqual(await page.locator(".ps-row [role=img]").evaluateAll((cards) => cards.map((card) => card.getAttribute("aria-label"))), others);
+    assert.equal(server.count("POST", "/response"), 0, "nada é gravado antes de confirmar");
+    await page.locator('[data-action="confirm"]:not([disabled])').click();
+    await waitStep(page, "Registrada");
+    assert.equal(await page.locator("#ps-title").innerText(), chosen);
+    assert.equal(await page.locator(".ps-hero img").getAttribute("src"), CLOTHES_CARDS.find((card) => card.id === picks[1]).src);
+    assert.deepEqual(await page.locator(".ps-row [role=img]").evaluateAll((cards) => cards.map((card) => card.getAttribute("aria-label"))), others);
+    assert.equal(server.last("/response").pathname, `/api/photo-surveys/${CLOTHES.id}/response`);
+    const recorded = server.responseOf(GOOGLE_KEY, CLOTHES);
+    assert.deepEqual([recorded.pickIds, recorded.championId], [picks, picks[1]]);
+    assert.equal(server.responseOf(GOOGLE_KEY, SURVEY), null, "responder a de roupas não responde as de política");
+    assert.equal(server.responseOf(GOOGLE_KEY, SECOND), null);
+    assert.equal(await page.locator(".ps-grid, [data-action=confirm], #ps-action").count(), 0, "depois de registrar não há como responder de novo");
+
+    // Compartilhar: a imagem leva a peça escolhida, as finalistas e a pergunta desta pesquisa.
+    await shareReady(page);
+    assert.equal((await page.evaluate(() => window.__drawn)).length, 4, "a escolhida e as três finalistas");
+    const texts = await page.evaluate(() => window.__texts);
+    assert.ok(texts.includes(chosen) && texts.includes("Qual você usaria?"), `a imagem leva o nome da peça e a pergunta (${texts.join(" | ")})`);
+    assert.deepEqual(texts.filter((text) => /\p{L}/u.test(text) && text === text.toUpperCase()), ["MINHA ESCOLHA", "TAMBÉM NA FINAL"]);
+    await shareButton(page).click();
+    await page.waitForFunction(() => window.__shared.length === 1);
+    const [shared] = await page.evaluate(() => window.__shared);
+    assert.deepEqual(shared.keys, ["files"]);
+    assert.deepEqual([shared.files[0].type, shared.files[0].width, shared.files[0].height], ["image/jpeg", 1080, 1350]);
+
+    // A capa continua abrindo nas pesquisas de política, e mostra a escolha de roupas.
+    await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Próxima pesquisa" }).click()]);
+    await entryReady(page);
+    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
+    assert.equal(await page.locator(".ps-note").count(), 0);
+    const pick = page.locator(".ps-home .ps-pick");
+    await pick.locator("b", { hasText: chosen }).waitFor();
+    assert.equal(await pick.count(), 1);
+    assert.equal(await pick.getAttribute("href"), `./?p=${CLOTHES.id}`);
+    assert.match(await pick.locator("small").innerText(), /Roupas · Qual você usaria\?/);
+    assert.equal(await pick.locator("img").getAttribute("src"), CLOTHES_CARDS.find((card) => card.id === picks[1]).src);
+    assert.equal(await pick.locator("img").evaluate((image) => image.naturalWidth > 0), true, "a carta escolhida aparece");
+    assert.deepEqual(await page.locator(".ps-home a.ps-survey b").allInnerTexts(), ["Em quem você confia mais?"]);
+    // Tocar na escolha abre a tela da resposta da pesquisa de roupas.
+    await pick.click();
+    await waitStep(page, "Registrada");
+    assert.equal(await page.locator("#ps-title").innerText(), chosen);
+  });
+
+  await scenario("a entrada das pesquisas de política não tem observação e só ilustra com as cartas da lista da entrada", async () => {
+    const entrySources = new Set(ARTS.filter((art) => ENTRY_CARD_IDS.includes(art.id)).map((art) => art.src));
+    assert.equal(entrySources.size, ENTRY_CARD_IDS.length);
+    // Na capa (que abre numa pesquisa de política) e no endereço de cada uma das duas.
+    for (const [label, url, title] of [["capa", appUrl, "Quem você prefere?"], [SURVEY.id, surveyUrl(SURVEY), "Quem você prefere?"], [SECOND.id, surveyUrl(SECOND), "Em quem você confia mais?"]]) {
+      const page = await open(await newContext(createServer()), url);
+      for (let visit = 0; visit < 4; visit += 1) {
+        if (visit > 0) await page.reload({ waitUntil: "domcontentloaded" });
+        await entryReady(page);
+        assert.equal(await page.locator("#ps-title").innerText(), title, label);
+        assert.equal(await page.locator(".ps-kicker").first().innerText(), "POLÍTICA · 16 CARTAS", label);
+        assert.equal(await page.locator(".ps-note").count(), 0, `${label}: pesquisa de política não tem observação`);
+        const fan = await fanSources(page);
+        assert.equal(fan.length, 3, label);
+        for (const src of fan) {
+          assert.ok(entrySources.has(src), `${label}: ${src} é uma carta da lista da entrada`);
+          assert.ok(!clothesBySrc.has(src), `${label}: ${src} não é carta de roupa`);
+        }
+      }
+    }
   });
 
   assert.deepEqual(pageErrors, [], `erros de página: ${pageErrors.join(" | ")}`);

@@ -59,6 +59,8 @@ item 5). Ele pode mudar qualquer uma destas escolhas.
    (`/?p=roupas-demo-01`).
 6. **Mesma moldura para as 16**, como pede a decisão 0002. É uma moldura
    nova, mais simples que a das cartas de Política.
+7. **"Qual fica?" no lugar de "quem fica?".** O título da tela final muda nas
+   pesquisas que não são de pessoas.
 
 ## O que muda
 

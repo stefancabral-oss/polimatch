@@ -1,6 +1,7 @@
 import "./install-error-reporter.js";
 import "./photo-survey.css";
 import "./site-menu.css";
+import CLOTHES from "./clothes-cards.json" with { type: "json" };
 import ARTS from "./political-chromas.json" with { type: "json" };
 import { PHOTO_SURVEYS, photoSurveyById } from "../../shared/photo-survey.js";
 import { formatCpf } from "../../shared/registration.js";
@@ -9,11 +10,12 @@ import { drawPhotoSurvey, loadPhotoSurvey, registerCpf, respondPhotoSurvey } fro
 import { googleClientId, mountGoogleButton } from "./google-login.js";
 import { safeStorage } from "./safe-storage.js";
 import {
-  ENTRY_CARD_IDS,
   PHOTO_SURVEY_STORAGE_KEY,
   answeredSurveyIds,
   chooseChampion,
+  entryCardIdsFor,
   featuredSurveyId,
+  finalTitleFor,
   goBack,
   identityTag,
   inProgressSurveyId,
@@ -62,7 +64,8 @@ const ADVANCE_MS = 220;
 const GRID_TIMEOUT_MS = 12000;
 
 const root = document.querySelector("#photo-survey");
-const artById = new Map(ARTS.map((art) => [art.id, art]));
+// As cartas de todas as pesquisas: as de política e as de roupas (ICM 73, #345).
+const artById = new Map([...ARTS, ...CLOTHES].map((art) => [art.id, art]));
 
 // A pesquisa na tela. Na capa é a pesquisa em destaque; "" quando não há uma.
 let surveyId = "";
@@ -86,7 +89,7 @@ function useSurvey(id) {
 }
 
 function entryCards() {
-  if (!fans.has(surveyId)) fans.set(surveyId, sampleCards(ENTRY_CARD_IDS.filter((id) => artById.has(id)), 3));
+  if (!fans.has(surveyId)) fans.set(surveyId, sampleCards(entryCardIdsFor(definition).filter((id) => artById.has(id)), 3));
   return fans.get(surveyId);
 }
 
@@ -122,6 +125,8 @@ const inWords = (number) => WORDS[number] || String(number);
 const subject = () => (typeof survey?.subject === "string" && survey.subject) || definition.subject;
 const kicker = () => `${subject()} · ${drawSize()} cartas`;
 const question = () => (typeof survey?.question === "string" && survey.question) || definition.question;
+// A observação da pesquisa, quando ela tem uma. As de política não têm.
+const surveyNote = () => (typeof survey?.note === "string" && survey.note) || definition.note;
 
 /**
  * Lê direto do navegador. O safeStorage devolve primeiro o que esta aba
@@ -236,7 +241,8 @@ function shell({ step, filled = null, mainClass = "", body, focus = false, fit =
 
 // Os avisos ficam logo abaixo do título: aparecem sem rolar, em qualquer tela.
 // O título leva a etapa como descrição, para o leitor de tela dizer "Tela 2 de 4".
-const heading = (eyebrow, title, hint) => `<p class="ps-kicker">${escapeText(eyebrow)}</p><h1 class="ps-title" id="ps-title" tabindex="-1" aria-describedby="ps-step">${escapeText(title)}</h1><p class="ps-hint">${escapeText(hint)}</p>${noticeMarkup()}${offlineMarkup()}`;
+// `note` é a observação da pesquisa, só na entrada: uma linha discreta sob o texto de apoio.
+const heading = (eyebrow, title, hint, note = "") => `<p class="ps-kicker">${escapeText(eyebrow)}</p><h1 class="ps-title" id="ps-title" tabindex="-1" aria-describedby="ps-step">${escapeText(title)}</h1><p class="ps-hint">${escapeText(hint)}</p>${note ? `<p class="ps-note">${escapeText(note)}</p>` : ""}${noticeMarkup()}${offlineMarkup()}`;
 
 const MENU_LINK = '<button class="ps-link" data-action="menu" type="button">Abrir o menu</button>';
 const ALL_SURVEYS_LINK = '<a class="ps-btn ps-btn--ghost" href="./">Ver pesquisas</a>';
@@ -289,7 +295,7 @@ function homeSections() {
  */
 function renderEntry({ pending = "", action = "start", label = atHome && homeResume ? "Continuar" : "Começar", focus = false } = {}) {
   const featured = surveyId
-    ? `${heading(kicker(), question(), atHome && homeResume ? "Você parou no meio. Continue de onde parou." : "Leva menos de um minuto.")}
+    ? `${heading(kicker(), question(), atHome && homeResume ? "Você parou no meio. Continue de onde parou." : "Leva menos de um minuto.", surveyNote())}
       <div class="ps-fan" aria-hidden="true">${entryCards().map((id) => staticCard(id, "176px")).join("")}</div>
       <div class="ps-cta"><button class="ps-btn" id="ps-action" data-action="${action}" type="button"${pending ? " disabled" : ""}>${escapeText(pending || label)}</button>
         <p class="ps-muted ps-cta-note">${signedIn() ? "Sua escolha só é registrada quando você confirmar." : "Para responder, entre com Google e cadastre o CPF."}</p></div>`
@@ -335,7 +341,7 @@ function renderPlay({ focus = false, sending = false } = {}) {
       filled: total + 1,
       mainClass: "ps-main--play",
       focus,
-      body: `${heading(`As suas ${inWords(total)} escolhas`, "Entre elas, quem fica?", "Um toque decide.")}
+      body: `${heading(`As suas ${inWords(total)} escolhas`, finalTitleFor(definition), "Um toque decide.")}
         ${choiceGrid(current.cards, current.selectedId)}
         <div class="ps-foot"><button class="ps-link" data-action="back" type="button">← Voltar</button><span class="ps-muted">${footHint("Você confirma na próxima tela.")}</span></div>`,
     });

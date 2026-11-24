@@ -32,6 +32,7 @@ qualquer pessoa ou empresa de fora (decisão 0002, item 3).
 | Sorteio | 16 de 20 cartas por pessoa | Em roupas, as 16 entram sempre; o sorteio decide a tela e a posição |
 | Ilustração da entrada | Três cartas de uma lista fixa, para as duas pesquisas | Em Política, a mesma lista. Em roupas, três das cartas da própria pesquisa |
 | Aviso | Nenhum | A entrada da pesquisa de roupas diz: "Peças de demonstração, criadas pelo PoliMatch." |
+| Título da final | "Entre elas, quem fica?" | Igual em Política. Em roupas, "Entre elas, qual fica?" |
 | "Em breve" | "Famosos e influenciadores" e "Roupas" | Só "Famosos e influenciadores" |
 | Capa | Abre na primeira pesquisa de Política sem resposta | Igual. A de roupas vem depois das duas de Política |
 
@@ -56,8 +57,14 @@ qualquer pessoa ou empresa de fora (decisão 0002, item 3).
 4. **Entrada.** A ilustração da entrada de uma pesquisa de Política continua
    saindo da lista fixa do estágio 68. Para qualquer outro assunto, sai das
    cartas da própria pesquisa.
-5. **Capa e menu.** A pesquisa nova aparece em "Mais pesquisas" e no menu,
+5. **Final.** O título da tela final é "Entre elas, quem fica?" nas pesquisas
+   de Política, em que as cartas são pessoas, e "Entre elas, qual fica?" nas
+   outras.
+6. **Capa e menu.** A pesquisa nova aparece em "Mais pesquisas" e no menu,
    pelas mesmas regras do estágio 70. "Roupas" sai de "Em breve".
+7. **CI.** O filtro de caminhos do CI passa a incluir
+   `stages/73_clothes_demo/output/**`: o teste das cartas lê essa pasta, e sem
+   a linha um PR que só mexesse nela pularia os testes do app.
 
 ## Regras
 
@@ -103,6 +110,9 @@ Um PR, com commits por parte:
   confirmação, resposta registrada e compartilhar.
 - A entrada das pesquisas de Política não mostra nota e só usa as cartas da
   lista do estágio 68.
+- Um servidor que não conhece a pesquisa de roupas (a API antiga com o app
+  novo) não quebra a capa: aparecem as duas de Política, e o endereço da
+  pesquisa de roupas diz que ela não está disponível.
 - Na capa sem identidade: destaque na primeira pesquisa de Política; as
   outras duas em "Mais pesquisas"; uma só "em breve".
 - Os roteiros de navegador dos estágios 68 a 72 passam, ajustados onde a tela
@@ -126,3 +136,9 @@ e mostra só as duas de Política.
 - **A marca na carta é texto simples**, não o emblema das cartas de Política.
 - **Menores de 18.** O cadastro aceita a faixa "16 a 24" (pendência da
   decisão 0004).
+- **O que é "de Política" é o assunto da pesquisa.** A lista fixa da entrada
+  e o "quem fica?" valem para `subject` igual a "Política". Uma pesquisa
+  futura sobre pessoas com outro assunto vai precisar rever isso.
+- **A nota empurra a ilustração da entrada cerca de 21 px para baixo.** Em
+  telas de 320×480 a entrada da pesquisa de roupas rola um pouco; o botão
+  "Começar" continua inteiro na tela.

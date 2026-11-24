@@ -10,8 +10,11 @@ import { safeStorage } from "./safe-storage.js";
 
 const GOOGLE_SESSION_PREFIX = "pms_";
 
-/** Próximas pesquisas, na ordem da decisão 0002. São só anúncio: sem página, data nem cartas. */
-export const UPCOMING_SURVEYS = Object.freeze(["Famosos e influenciadores", "Roupas"]);
+/**
+ * Próximas pesquisas, na ordem da decisão 0002. São só anúncio: sem página, data nem cartas.
+ * "Roupas" saiu daqui quando ganhou pesquisa própria (ICM 73, #345).
+ */
+export const UPCOMING_SURVEYS = Object.freeze(["Famosos e influenciadores"]);
 
 const escapeText = (value = "") => String(value).replace(
   /[&<>"']/g,

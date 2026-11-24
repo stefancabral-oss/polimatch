@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { PHOTO_SURVEYS, publicPhotoSurvey } from "../../shared/photo-survey.js";
 import { createHttpApp } from "./http-app.js";
+import { photoSurveyStore } from "./photo-survey-store.js";
 
 const NOW = new Date("2026-11-20T15:00:00.000Z");
 const googleIdentity = { configured: false, verify: async () => ({ subject: "test" }) };
@@ -47,6 +49,31 @@ test("a definição da pesquisa é pública e não aceita cache", async () => {
     assert.deepEqual(await response.json(), SURVEY_VIEW);
   });
   assert.deepEqual(calls, [["photoSurvey", "politica-2026-01", { now: NOW }]]);
+});
+
+test("as três pesquisas saem pela API como estão em shared, e a de roupas leva a observação", async () => {
+  // O store de verdade: a definição de uma pesquisa não lê o banco.
+  const { photoSurvey } = photoSurveyStore({ pool: null, findPlayer: null });
+  const { app } = harness({ photoSurvey });
+  await withServer(app, async (base) => {
+    const read = async (id) => {
+      const response = await fetch(`${base}/api/photo-surveys/${id}`);
+      return { status: response.status, body: await response.json() };
+    };
+    assert.deepEqual(PHOTO_SURVEYS.map((survey) => survey.id), ["politica-2026-01", "politica-2026-02", "roupas-demo-01"]);
+    for (const survey of PHOTO_SURVEYS) {
+      assert.deepEqual(await read(survey.id), { status: 200, body: publicPhotoSurvey(survey, NOW) }, survey.id);
+    }
+    const { body: clothes } = await read("roupas-demo-01");
+    assert.equal(clothes.subject, "Roupas");
+    assert.equal(clothes.question, "Qual você usaria?");
+    assert.equal(clothes.note, "Peças de demonstração, criadas pelo PoliMatch.");
+    assert.deepEqual([clothes.cardIds.length, clothes.drawSize, clothes.groupSize, clothes.screens, clothes.status], [16, 16, 4, 4, "open"]);
+    for (const id of ["politica-2026-01", "politica-2026-02"]) assert.equal((await read(id)).body.note, "", id);
+    const missing = await read("roupas-demo-02");
+    assert.equal(missing.status, 404);
+    assert.equal(missing.body.code, "PHOTO_SURVEY_NOT_FOUND");
+  });
 });
 
 test("sorteio e resposta exigem sessão de jogador antes de chegar ao store", async () => {

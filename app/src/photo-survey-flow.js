@@ -16,6 +16,20 @@ export const ENTRY_CARD_IDS = Object.freeze([
   "gustavo-gayer", "jeffrey-chiquini", "lucas-pavanato", "nikolas-ferreira", "sergio-moro",
 ]);
 
+// A lista acima vale para as pesquisas de política. Uma pesquisa de outro
+// assunto (ICM 73, #345) ilustra a entrada com as próprias cartas.
+const isPolitics = (definition) => definition?.subject === "Política";
+
+/** As cartas que podem ilustrar a entrada de uma pesquisa. */
+export function entryCardIdsFor(definition) {
+  return isPolitics(definition) ? ENTRY_CARD_IDS : [...(definition?.cardIds ?? [])];
+}
+
+/** O título da final: "quem" nas pesquisas de política, em que as cartas são pessoas; "qual" nas outras. */
+export function finalTitleFor(definition) {
+  return isPolitics(definition) ? "Entre elas, quem fica?" : "Entre elas, qual fica?";
+}
+
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const newUuid = () => crypto.randomUUID();
 

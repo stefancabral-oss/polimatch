@@ -6,5 +6,9 @@
   para conferir de uma vez que a moldura, o fundo e o tamanho da peça são
   iguais nas 16.
 
+- `telas-roupas.jpg`: quatro capturas do aplicativo rodando localmente, com
+  servidor simulado, em 23/11/2026: a entrada, uma das quatro telas, a escolha
+  registrada e a imagem do compartilhar. Não são capturas da produção.
+
 As peças, os nomes e as estampas são criação do agente para esta
 demonstração. Não representam produto, marca ou coleção de ninguém.
