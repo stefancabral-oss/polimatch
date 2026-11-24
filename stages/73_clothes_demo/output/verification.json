@@ -1,0 +1,58 @@
+{
+  "checkedAt": "2026-11-23",
+  "issue": 345,
+  "stage": "73_clothes_demo",
+  "base": "main em 0b30d64",
+  "pullRequest": 346,
+  "instruction": "Stefan, 23/11/2026, à pergunta do agente \"Passo a demonstração de roupas na frente da pesquisa de famosos?\": \"Sim, roupas antes\". A ordem é decisão dele; o resto do pacote é escolha do agente, por delegação (decisão 0005).",
+  "parts": {
+    "73a": "decisão 0005 e notas nas decisões 0001 e 0002, no AGENTS.md, no README.md e no CONTEXT.md",
+    "73b": "16 cartas de roupa desenhadas por app/scripts/build-clothes-cards.mjs: desenhos de origem, arquivos publicados, catálogo, manifesto e teste",
+    "73c": "pesquisa roupas-demo-01 em shared/, na tela e nos testes do servidor; nota na entrada; ilustração da entrada por pesquisa; \"qual fica?\" na final; Roupas fora de Em breve; filtro do CI",
+    "73d": "não feita em 23/11/2026: publicação de API e app, com o sim do Stefan"
+  },
+  "cards": {
+    "count": 16,
+    "kinds": { "Camiseta": 12, "Moletom": 4 },
+    "source": "desenho por código, sem foto, pessoa, preço, marca de terceiros nem serviço externo de imagem",
+    "masters": "stages/73_clothes_demo/output/masters/*.svg",
+    "published": "app/public/chromas/roupas/*.webp, dois tamanhos por carta (530 e 1060 de largura, proporção 5:7)",
+    "manifest": "stages/73_clothes_demo/output/manifest.json",
+    "pinnedBy": "app/src/clothes-cards.test.js"
+  },
+  "tests": {
+    "environment": "macOS, local, 23/11/2026",
+    "ranByMainAgent": {
+      "npm run test:shared": "119/119",
+      "npm test --prefix app": "218/218",
+      "npm test --prefix back": "306/306",
+      "npm run build --prefix app": "sem erro"
+    },
+    "ranOnlyByWiringAgent": {
+      "note": "agente à parte que escreveu a 73c; resultados do relato dele",
+      "app/e2e/site-shell.mjs": "49 cenários, em Chromium e em WebKit (eram 46)",
+      "app/e2e/photo-survey.mjs": "34 cenários, em Chromium e em WebKit",
+      "app/e2e/client-error-report.mjs": "aprovado em Chromium e em WebKit",
+      "npm run test:card-art-pilot-contract --prefix app": "64/64",
+      "npm run test:photo-survey --prefix back": "aprovado, duas vezes no mesmo banco, em PostgreSQL 16 descartável",
+      "npm run test:registration --prefix back": "aprovado, no mesmo PostgreSQL"
+    },
+    "browsers": "em Chromium, uma versão mais antiga que a do CI (a que estava na máquina), por um roteiro auxiliar fora do repositório; em WebKit, a versão que o Playwright do projeto pede"
+  },
+  "screens": {
+    "file": "stages/73_clothes_demo/references/telas-roupas.jpg",
+    "what": "entrada, uma tela de voto, escolha registrada e imagem do compartilhar, do aplicativo local com servidor simulado",
+    "seenByMainAgent": true
+  },
+  "notVerified": [
+    "os roteiros de navegador na versão do Chromium e no WebKit de Linux do CI, antes do CI do PR #346",
+    "as imagens Docker do app e da API (não há Docker na máquina)",
+    "celular de verdade, botão real do Google e compartilhamento real do aparelho",
+    "produção: nada deste estágio foi publicado em 23/11/2026"
+  ],
+  "humanGate": {
+    "decision": "pendente",
+    "owner": "Stefan",
+    "note": "o pedido dele cobre a mudança de ordem; merge e publicação pedem um sim próprio, um a um"
+  }
+}
