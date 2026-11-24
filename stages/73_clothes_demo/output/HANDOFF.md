@@ -4,8 +4,8 @@
 
 - Estado: `publicado`. As partes 73a, 73b e 73c foram mescladas (PR #346,
   commit `2cfa3e9`) e a 73d aconteceu em 23/11/2026, com API e app publicados
-  nesse commit (ver "Publicação (73d)"). Falta fechar a issue, que pede o sim
-  do Stefan.
+  nesse commit (ver "Publicação (73d)"). Em 24/11/2026, quando este registro
+  foi escrito, a issue seguia aberta: fechar pede o sim do Stefan.
 - Issue: #345
 - Branch: `icm/73-clothes-demo`, feita sobre a `main` em `0b30d64`.
 - PR: #346
@@ -97,31 +97,45 @@ Com a instrução do Stefan ("Sim, mescla"), transcrita em "Human gate":
 - Enquanto o CI rodava, o agente principal executou localmente, em WebKit e
   no mesmo commit, `app/e2e/site-shell.mjs` (49 cenários) e
   `app/e2e/photo-survey.mjs` (34 cenários): passaram.
+- O CI do push do merge na `main` (commit `2cfa3e9`, a mesma árvore) ainda
+  rodava quando os dois deploys aconteceram: faltava o `browser-smoke` em
+  WebKit, outra vez lento. Terminou depois, por volta de 03:17 UTC, com todos
+  os trabalhos e o `ci-gate` verdes. Na 72d esse CI tinha terminado antes do
+  deploy; aqui, não.
 
 ## Publicação (73d) — 23/11/2026
 
 Com a instrução do Stefan ("Sim, publica"), transcrita em "Human gate".
-Horários em UTC, já no dia 24; em Brasília, entre 23:51 e 23:59 de 23/11.
+Horários em UTC, já no dia 24. Em Brasília, a cópia do banco e os dois
+deploys foram entre 23:53 e 23:58 de 23/11; o vigia e a resposta dele sobre o
+teste passaram da meia-noite.
 
 - **Antes (02:51), de fora:** capa, saúde da API e as duas pesquisas de
   Política respondiam 200; a pesquisa de roupas e as 32 imagens das cartas de
   roupa, 404.
 - **Cópia do banco (02:53):** `pg_dump` no contêiner do banco, saída 0:
-  `/tmp/pre-deploy-20261123.dump`, 614.010 bytes, 31 tabelas com dados. A
-  contagem de linhas das 31 tabelas foi gravada antes do deploy.
+  `/tmp/pre-deploy-20261123.dump`, 614.010 bytes, 31 tabelas (uma entrada de
+  dados por tabela, vazia ou não). A contagem de linhas das 31 tabelas foi
+  gravada antes do deploy.
 - **API (02:54 a 02:55):** publicada no commit `2cfa3e9`, em 21 s. No log,
-  `database_ready` às 02:55:23 com `resetApplied: false`, depois `listening`,
-  e nenhuma linha de erro entre as que o painel mostrava. De fora, a cada
+  `database_ready` às 02:55:23 com `resetApplied: false`, depois `listening`.
+  Uma busca por "error", "failed", "fatal" e "falha" nas 131 linhas que o
+  painel mostrava não achou nenhuma. De fora, a cada
   5 s, a saúde respondeu 200 nas quatro leituras, e a rota da pesquisa de
   roupas passou de 404 a 200 às 02:55:32.
 - **Banco depois da API:** as mesmas 31 tabelas. Trinta com a mesma contagem;
-  `abuse_quota_counters` foi de 55 para 1, a poda que a API faz ao subir.
-  Nenhuma tabela nova. Respostas da pesquisa de roupas: 0.
+  `abuse_quota_counters` foi de 55 para 1. Pelo código, é a poda que a API
+  faz ao subir, dos contadores com mais de oito dias. Nenhuma tabela nova.
+  Respostas da pesquisa de roupas: 0.
 - **App (02:57 a 02:58):** publicado no commit `2cfa3e9`, em 24 s, build de
   2026-11-24T02:57:49Z. De fora, a cada 5 s, a capa respondeu 200 nas seis
   leituras.
 - **Vigia:** um roteiro leu a capa e a saúde da API a cada 3 s, de 02:52 a
-  03:03. Nenhuma leitura falhou.
+  03:03. Estava previsto para 25 minutos e foi parado pelo agente depois de
+  11. Nenhuma leitura falhou.
+- As imagens do app e da API foram construídas pelo painel de deploy, a
+  partir dos Dockerfiles do repositório. O agente não as construiu nem
+  inspecionou.
 - O commit publicado é o que o painel de deploy registrou. `version.json`
   segue com `sha: "unknown"` (#287).
 
@@ -134,9 +148,9 @@ Conferido de fora depois dos dois deploys, só por GET:
 - As 32 imagens das cartas de roupa respondem 200, e o hash de cada uma é o
   do manifesto.
 - Os dois arquivos JS que a capa referencia (`main-vjn7p00_.js` e
-  `site-menu-Dtz1zF8k.js`) trazem `roupas-demo-01`, "Qual você usaria?", a
-  nota, "Entre elas, qual fica?" e os endereços das cartas de roupa. Isso
-  mostra o que está nos arquivos, não o comportamento na tela.
+  `site-menu-Dtz1zF8k.js`) trazem, juntos, `roupas-demo-01`, "Qual você
+  usaria?", a nota, "Entre elas, qual fica?" e os endereços das cartas de
+  roupa. Isso mostra o que está nos arquivos, não o comportamento na tela.
 
 Entre a API nova e o app novo passaram cerca de dois minutos e meio. Pelo
 código, nesse intervalo o app antigo só lista as duas pesquisas que conhece.
@@ -146,25 +160,29 @@ O que o agente não fez: não abriu o site em navegador nem tocou em carta em
 produção; não fez pedido de escrita (nenhum sorteio, nenhuma resposta); não
 abriu a aba de variáveis de nenhum serviço nem alterou configuração.
 
-Depois da publicação, o agente pediu ao Stefan que abrisse a pesquisa de
-roupas no celular, respondesse e tocasse em Compartilhar. Cerca de três
-minutos depois ele respondeu: "Funcionou". Ele não disse o que testou nem em
-que aparelho.
+Depois da publicação, a mensagem do agente ao Stefan dava o endereço direto
+da pesquisa de roupas e terminava assim: "A pesquisa de roupas funcionou no
+seu celular? Abra o endereço, responda e toque em Compartilhar; depois me
+diga "funcionou" ou "deu problema" e o que apareceu." Menos de três minutos
+depois ele respondeu: "Funcionou". Era uma das duas respostas oferecidas. Ele
+não disse o que testou, em que aparelho, nem o que apareceu. O registro não
+afirma que houve teste em celular.
 
 No contêiner do banco ficaram cinco cópias, todas com dado pessoal: as
 quatro anteriores e a de 23/11. Apagar ou guardar fora é decisão do Stefan
 (#279). Os dois arquivos de contagem que o agente criou foram apagados.
 
-Visto de passagem, sem mexer: no painel de deploy, a chave "Autodeploy"
-aparece ligada nos dois serviços. O merge do PR #346, às 02:42, não disparou
-deploy: às 02:51 a produção ainda estava como antes. O `docs/ops/RELEASE.md`
-descreve o deploy manual "com o autodeploy desligado".
+Visto de passagem, sem mexer: em 24/11/2026, no painel de deploy, a chave
+"Autodeploy" aparecia ligada nos dois serviços. Às 02:51, nove minutos depois
+do merge do PR #346, a produção ainda estava como antes; disso o agente
+conclui que o merge não disparou deploy. O `docs/ops/RELEASE.md` descreve o
+deploy manual "com o autodeploy desligado".
 
 O registro feito na hora está na issue #345.
 
 ## Não entregue / pendente
 
-- Fechar a issue #345, com o sim do Stefan.
+- Em 24/11/2026, fechar a issue #345, com o sim do Stefan.
 - O que recebe quem encomenda uma pesquisa (resultado, recortes): fora deste
   estágio.
 - O título e a descrição da página (`app/index.html`) dizem "Quem você
@@ -301,8 +319,9 @@ foi respondida e resolvida no PR.
 - Os termos de uso da Helvetica Neue em imagem publicada.
 - Busca de marca registrada para os nomes das peças e para "Sem Pressa".
 - Pelo agente, em produção: nenhuma tela, nenhum sorteio e nenhuma resposta;
-  o botão real do Google e o compartilhamento real do aparelho. Do teste do
-  Stefan no celular só se sabe a palavra "Funcionou".
+  o botão real do Google e o compartilhamento real do aparelho.
+- Celular de verdade. Do teste pedido ao Stefan só se sabe a palavra
+  "Funcionou".
 
 ## Riscos conhecidos
 
@@ -335,12 +354,12 @@ Do agente, fora da decisão 0005: a linha no filtro de caminhos do CI.
 
 ## Próximo passo exato
 
-1. Fechar a issue #345, com o sim do Stefan.
+1. Em 24/11/2026: fechar a issue #345, com o sim do Stefan.
 
 ## Human gate
 
-- Decisão: `aprovado` para o merge e para a publicação. O fechamento da
-  issue segue pendente.
+- Decisão: `aprovado` para o merge e para a publicação. Em 24/11/2026 o
+  fechamento da issue seguia pendente.
 - Responsável: Stefan
 - Observação:
   - **Ordem de construção (23/11/2026).** À pergunta "Passo a demonstração de
@@ -353,7 +372,7 @@ Do agente, fora da decisão 0005: a linha no filtro de caminhos do CI.
     para quem já respondeu as duas pesquisas de Política. A pergunta foi
     "Mesclo o PR 346 quando o CI do último commit ficar verde?". Ele
     respondeu: "Sim, mescla". O merge só foi feito depois de o CI passar. A
-    transcrição inteira está no PR #346.
+    transcrição está no PR #346.
   - **Publicação (23/11/2026).** À pergunta "Faço a cópia do banco e publico
     a API e o app?", que listava os três passos nessa ordem, ele respondeu:
     "Sim, publica". Foi um sim para o conjunto, não um por passo.

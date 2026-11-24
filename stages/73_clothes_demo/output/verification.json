@@ -62,10 +62,11 @@
   "notVerified": [
     "os termos de uso da Helvetica Neue em imagem publicada",
     "busca de marca registrada para os nomes das peças e para a frase Sem Pressa",
-    "pelo agente, em produção: nenhuma tela, nenhum sorteio e nenhuma resposta; o botão real do Google e o compartilhamento real do aparelho"
+    "pelo agente, em produção: nenhuma tela, nenhum sorteio e nenhuma resposta; o botão real do Google e o compartilhamento real do aparelho",
+    "celular de verdade: do teste pedido ao Stefan só se sabe a palavra Funcionou"
   ],
   "humanGate": {
-    "decision": "aprovado para o merge e para a publicação; o fechamento da issue segue pendente",
+    "decision": "aprovado para o merge e para a publicação; em 24/11/2026 o fechamento da issue seguia pendente",
     "owner": "Stefan",
     "order": "Sim, roupas antes",
     "merge": "Sim, mescla, à pergunta \"Mesclo o PR 346 quando o CI do último commit ficar verde?\", que trazia por extenso as três escolhas do agente; transcrição no PR #346",
@@ -102,16 +103,16 @@
     "instruction": "Sim, mescla"
   },
   "publication": {
-    "date": "2026-11-23 (02:51 a 03:03 UTC do dia 24)",
+    "date": "2026-11-23 em Brasília para a cópia do banco e os dois deploys (02:53 a 02:58 UTC do dia 24); o vigia foi até 03:03 UTC",
     "instruction": "Sim, publica, à pergunta \"Faço a cópia do banco e publico a API e o app?\"; um sim para os três passos",
-    "databaseCopy": "/tmp/pre-deploy-20261123.dump no contêiner do banco, 614.010 bytes, 31 tabelas com dados",
+    "databaseCopy": "/tmp/pre-deploy-20261123.dump no contêiner do banco, 614.010 bytes, 31 tabelas (uma entrada de dados por tabela, vazia ou não)",
     "api": {
       "commit": "2cfa3e9",
       "duration": "21 s",
-      "log": "database_ready com resetApplied false, depois listening; nenhuma linha de erro entre as que o painel mostrava",
+      "log": "database_ready com resetApplied false, depois listening; uma busca por error, failed, fatal e falha nas 131 linhas que o painel mostrava não achou nenhuma",
       "fromOutside": "saúde 200 nas quatro leituras; a rota da pesquisa de roupas passou de 404 a 200 às 02:55:32"
     },
-    "databaseAfterApi": "as mesmas 31 tabelas; trinta com a mesma contagem; abuse_quota_counters de 55 para 1 (poda ao subir); nenhuma tabela nova; respostas da pesquisa de roupas: 0",
+    "databaseAfterApi": "as mesmas 31 tabelas; trinta com a mesma contagem; abuse_quota_counters de 55 para 1 (pelo código, a poda dos contadores com mais de oito dias que a API faz ao subir); nenhuma tabela nova; respostas da pesquisa de roupas: 0",
     "app": {
       "commit": "2cfa3e9",
       "duration": "24 s",
@@ -119,19 +120,22 @@
       "fromOutside": "capa 200 nas seis leituras"
     },
     "commitSource": "o commit é o que o painel de deploy registrou; version.json segue com sha unknown (#287)",
-    "watch": "capa e saúde da API a cada 3 s, de 02:52 a 03:03: nenhuma leitura falhou",
+    "watch": "capa e saúde da API a cada 3 s, de 02:52 a 03:03; previsto para 25 minutos, parado pelo agente depois de 11; nenhuma leitura falhou",
     "checkedByGet": [
       "capa, Como funciona e /?p=roupas-demo-01: 200",
       "as três pesquisas 200 na API; a de roupas com assunto, pergunta, nota, 16 cartas, sorteio de 16 e status open; as de Política com a nota vazia",
       "as 32 imagens das cartas de roupa 200, com o hash do manifesto",
-      "main-vjn7p00_.js e site-menu-Dtz1zF8k.js trazem roupas-demo-01, a pergunta, a nota, \"Entre elas, qual fica?\" e os endereços das cartas"
+      "main-vjn7p00_.js e site-menu-Dtz1zF8k.js trazem, juntos, roupas-demo-01, a pergunta, a nota, \"Entre elas, qual fica?\" e os endereços das cartas"
     ],
     "notDoneByAgent": [
       "abrir o site em navegador ou tocar em carta em produção",
       "pedido de escrita: nenhum sorteio, nenhuma resposta",
       "abrir a aba de variáveis ou alterar configuração"
     ],
-    "ownerReport": "depois de o agente pedir o teste no celular (abrir a pesquisa de roupas, responder e tocar em Compartilhar), o Stefan respondeu \"Funcionou\"; não disse o que testou nem em que aparelho",
-    "seenInPassing": "a chave Autodeploy aparece ligada nos dois serviços; o merge não disparou deploy"
+    "ownerReport": "a mensagem do agente dava o endereço da pesquisa de roupas e perguntava \"A pesquisa de roupas funcionou no seu celular? Abra o endereço, responda e toque em Compartilhar; depois me diga \\\"funcionou\\\" ou \\\"deu problema\\\" e o que apareceu.\"; menos de três minutos depois o Stefan respondeu \"Funcionou\", uma das duas respostas oferecidas; não disse o que testou, em que aparelho, nem o que apareceu",
+    "seenInPassing": "em 24/11/2026 a chave Autodeploy aparecia ligada nos dois serviços; nove minutos depois do merge a produção ainda estava como antes, e disso o agente conclui que o merge não disparou deploy",
+    "images": "as imagens do app e da API foram construídas pelo painel de deploy a partir dos Dockerfiles; o agente não as construiu nem inspecionou",
+    "mainCi": "o CI do push do merge na main (2cfa3e9) ainda rodava durante os dois deploys, só com o browser-smoke em WebKit pendente; terminou depois, por volta de 03:17 UTC, com todos os trabalhos e o ci-gate verdes",
+    "copiesInContainer": "cinco cópias do banco em /tmp no contêiner, as quatro anteriores e a de 23/11, todas com dado pessoal; apagar ou guardar fora é decisão do Stefan (#279)"
   }
 }

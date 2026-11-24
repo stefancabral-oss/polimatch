@@ -96,7 +96,7 @@ Um PR, com commits por parte:
 | 73a — Registro | Decisão 0005, este contexto, notas nas decisões 0001 e 0002, no `AGENTS.md` e no `CONTEXT.md` |
 | 73b — Cartas | O roteiro, os 16 desenhos de origem, os 32 arquivos publicados, o catálogo, o manifesto e o teste que prende uns aos outros |
 | 73c — Pesquisa | A pesquisa nas regras, no servidor e na tela; a nota; a ilustração da entrada por pesquisa; "Em breve" |
-| 73d — Publicação | API e app, com o sim do Stefan. Feita em 23/11/2026 |
+| 73d — Publicação | API e app, com o sim do Stefan. Feita em 23/11/2026, com um sim para os três passos (ver o HANDOFF) |
 
 ## Fora de escopo
 
