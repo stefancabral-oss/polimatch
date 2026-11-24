@@ -272,6 +272,4 @@ repositório, sem foto, pessoa, preço nem marca de terceiros. A entrada da
 pesquisa diz que as peças são de demonstração. As regras e o cadastro não
 mudam. A pesquisa de roupas vem depois das duas de Política: quem já
 respondeu as duas passa a vê-la em destaque na capa. "Roupas" sai de "Em
-breve". Em
-23/11/2026 o estágio estava construído e fora de produção: o HANDOFF dele diz
-o estado atual.
+breve". Publicado em 23/11/2026, com API e app no commit `2cfa3e9`.

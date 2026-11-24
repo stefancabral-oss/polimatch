@@ -7,9 +7,11 @@
 - Estado: direção aprovada, em produção em parte. Desde 14/11/2026, a pesquisa
   de Política por foto (estágios 68 e 69; o 70 desde 16/11/2026); desde
   16/11/2026, o cadastro com CPF para responder, na forma da decisão 0004
-  (estágio 71). Não estão em produção,
+  (estágio 71); desde 23/11/2026, uma pesquisa de roupas de demonstração
+  (estágio 73, decisão 0005). Em 23/11/2026 não estavam em produção,
   entre outros pontos: os cinco primeiros e o resultado somado (itens 4 e 5),
-  os outros assuntos (item 6) e o som.
+  os outros assuntos de abertura do item 6 (famosos e influenciadores,
+  futebol) e o som.
 - Alterada em quatro pontos pela [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md), de 13/11/2026. Cada ponto está marcado abaixo.
 - Alterada no item 7 pela [decisão 0003](0003-a-pesquisa-vira-a-capa.md), de 14/11/2026: os jogos de leitura e a capa do jogo saem do site.
 - Alterada no item 3 pela [decisão 0004](0004-cadastro-obrigatorio-com-cpf.md), de 16/11/2026: só responde quem entrou com Google e tem cadastro com CPF.
