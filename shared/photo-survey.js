@@ -2,14 +2,16 @@
 // servidor e pela tela: definição das pesquisas, sorteio, telas e validação
 // da chave. Nada aqui lê relógio, banco ou rede.
 
-function definePhotoSurvey({ id, subject, question, cardIds, drawSize, groupSize, opensAt = null, closesAt = null }) {
+// `note` é opcional: uma linha que a entrada da pesquisa mostra abaixo da pergunta.
+function definePhotoSurvey({ id, subject, question, note = "", cardIds, drawSize, groupSize, opensAt = null, closesAt = null }) {
   if (!subject || !question) throw new Error(`pesquisa ${id}: falta o assunto ou a pergunta`);
+  if (typeof note !== "string") throw new Error(`pesquisa ${id}: a observação precisa ser texto`);
   const cards = Object.freeze([...cardIds].sort());
   if (new Set(cards).size !== cards.length) throw new Error(`pesquisa ${id}: carta repetida`);
   if (drawSize > cards.length || drawSize % groupSize !== 0) {
     throw new Error(`pesquisa ${id}: sorteio de ${drawSize} não fecha em telas de ${groupSize}`);
   }
-  return Object.freeze({ id, subject, question, cardIds: cards, drawSize, groupSize, opensAt, closesAt });
+  return Object.freeze({ id, subject, question, note, cardIds: cards, drawSize, groupSize, opensAt, closesAt });
 }
 
 // As 20 cartas "Políticos 2026", todas com a mesma moldura
@@ -19,6 +21,15 @@ const POLITICS_CARD_IDS = Object.freeze([
   "erika-hilton", "fernando-haddad", "geraldo-alckmin", "guilherme-boulos", "guilherme-derrite",
   "gustavo-gayer", "jeffrey-chiquini", "joao-campos", "lindbergh-farias", "lucas-pavanato",
   "marina-silva", "nikolas-ferreira", "samia-bonfim", "sergio-moro", "simone-tebet",
+]);
+
+// As 16 peças da demonstração de roupas (ICM 73, #345), criadas pelo PoliMatch
+// e todas no mesmo padrão de carta (app/public/chromas/roupas). O sorteio é
+// de 16: todo mundo vê todas, só a ordem muda.
+const CLOTHES_CARD_IDS = Object.freeze([
+  "camiseta-onda", "camiseta-sol", "camiseta-raio", "camiseta-cacto", "camiseta-planeta", "camiseta-olho",
+  "camiseta-chama", "camiseta-montanha", "camiseta-pipa", "camiseta-flor", "camiseta-xadrez", "camiseta-sem-pressa",
+  "moletom-estrela", "moletom-arco", "moletom-folha", "moletom-lua",
 ]);
 
 // A ordem é a da capa: a primeira pesquisa aberta sem resposta fica em destaque.
@@ -38,6 +49,17 @@ export const PHOTO_SURVEYS = Object.freeze([
     subject: "Política",
     question: "Em quem você confia mais?",
     cardIds: POLITICS_CARD_IDS,
+    drawSize: 16,
+    groupSize: 4,
+  }),
+  // Demonstração de roupas (ICM 73, #345). Vem depois das de política na
+  // ordem da capa.
+  definePhotoSurvey({
+    id: "roupas-demo-01",
+    subject: "Roupas",
+    question: "Qual você usaria?",
+    note: "Peças de demonstração, desenhadas com IA pelo PoliMatch.",
+    cardIds: CLOTHES_CARD_IDS,
     drawSize: 16,
     groupSize: 4,
   }),
@@ -61,6 +83,7 @@ export function publicPhotoSurvey(survey, now) {
     id: survey.id,
     subject: survey.subject,
     question: survey.question,
+    note: survey.note ?? "",
     cardIds: [...survey.cardIds],
     drawSize: survey.drawSize,
     groupSize: survey.groupSize,

@@ -9,6 +9,8 @@
   construções seguintes da ordem não estão em produção.
 - Altera a [decisão 0001](0001-pesquisa-de-preferencia-por-foto.md) nos pontos
   listados em "O que muda na decisão 0001". O resto dela continua valendo.
+- Alterada no item 1 pela [decisão 0005](0005-roupas-antes-de-celebridades.md),
+  de 23/11/2026: roupas passam à frente de celebridades e influenciadores.
 
 ## Contexto
 
@@ -32,6 +34,8 @@ Palavras dele, transcritas de conversa por voz:
    formato novo. Depois celebridades e influenciadores. Depois roupas, com
    imagens criadas pelo próprio PoliMatch; nenhuma empresa envia foto nesta
    fase.
+   (Alterado pela decisão 0005: política, depois roupas, depois celebridades
+   e influenciadores. O que vale para roupas não muda.)
 2. **Cartas com moldura no voto.** As cartas de moldura que já existem passam a
    ser o padrão das telas de voto. Condição: todas as cartas de uma mesma
    pesquisa usam o mesmo padrão de moldura, para ninguém sair em vantagem.

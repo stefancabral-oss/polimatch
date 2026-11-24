@@ -13,6 +13,7 @@
 - Alterada em quatro pontos pela [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md), de 13/11/2026. Cada ponto está marcado abaixo.
 - Alterada no item 7 pela [decisão 0003](0003-a-pesquisa-vira-a-capa.md), de 14/11/2026: os jogos de leitura e a capa do jogo saem do site.
 - Alterada no item 3 pela [decisão 0004](0004-cadastro-obrigatorio-com-cpf.md), de 16/11/2026: só responde quem entrou com Google e tem cadastro com CPF.
+- A ordem de construção citada no item 6 foi alterada pela [decisão 0005](0005-roupas-antes-de-celebridades.md), de 23/11/2026: roupas passam à frente de celebridades e influenciadores.
 
 ## Contexto
 
@@ -39,6 +40,8 @@ o arquivo, ou pausa. O Stefan respondeu com um quarto caminho.
 6. **Assuntos de abertura.** Política, Famosos e influenciadores, Futebol.
    (Decisão 0002: a ordem de construção é política, celebridades e
    influenciadores, roupas. Futebol não foi tratado nela.)
+   (Decisão 0005: a ordem passa a ser política, roupas, celebridades e
+   influenciadores.)
 7. **Congelado.** Os jogos de leitura ("Quem disse isso?", "Fato ou fake?") e a
    parte cívica e de notícias ficam no ar sem trabalho novo.
    (Alterado pela decisão 0003: saem do site quando a pesquisa virar a capa.)

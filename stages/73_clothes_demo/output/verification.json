@@ -1,0 +1,100 @@
+{
+  "checkedAt": "2026-11-23",
+  "issue": 345,
+  "stage": "73_clothes_demo",
+  "base": "main em 0b30d64",
+  "pullRequest": 346,
+  "instruction": "Stefan, 23/11/2026, à pergunta do agente \"Passo a demonstração de roupas na frente da pesquisa de famosos?\": \"Sim, roupas antes\". A resposta cobre a ordem de construção; o resto do pacote é escolha do agente (decisão 0005).",
+  "parts": {
+    "73a": "decisão 0005 e notas nas decisões 0001 e 0002, no AGENTS.md, no README.md e no CONTEXT.md",
+    "73b": "16 cartas de roupa desenhadas por app/scripts/build-clothes-cards.mjs: desenhos de origem, arquivos publicados, catálogo, manifesto e teste",
+    "73c": "pesquisa roupas-demo-01 em shared/, na tela e nos testes do servidor; nota na entrada; ilustração da entrada por pesquisa; \"qual fica?\" na final; Roupas fora de Em breve; filtro do CI",
+    "73d": "não feita em 23/11/2026: publicação de API e app, com o sim do Stefan"
+  },
+  "cards": {
+    "count": 16,
+    "kinds": {
+      "Camiseta": 12,
+      "Moletom": 4
+    },
+    "source": "desenho por código, sem foto, pessoa, preço, marca de terceiros nem serviço de geração de imagem; roteiro escrito por agente de IA, declarado na carta, no catálogo e no manifesto (aiAssisted)",
+    "font": "texto desenhado com a Helvetica Neue do macOS da máquina que gerou; a fonte não vai para o repositório nem para o site",
+    "labels": "selo DEMO e legenda \"Peça de demonstração · Arte com IA\" em cada carta",
+    "masters": "stages/73_clothes_demo/output/masters/*.svg",
+    "published": "app/public/chromas/roupas/*.webp, dois tamanhos por carta (530x742 e 1060x1484)",
+    "manifest": "stages/73_clothes_demo/output/manifest.json",
+    "pinnedBy": "app/src/clothes-cards.test.js: código, nome, caminho, hash, edição, os dois tamanhos, o tamanho gravado em cada arquivo, o texto do selo DEMO e da legenda no desenho de origem (presentes, não se visíveis) e o texto de como a arte foi feita no manifesto; nenhum arquivo sobrando nas duas pastas",
+    "notProven": "que cada WebP é o desenho do seu SVG (pediria gerar de novo, e o texto depende da fonte da máquina)",
+    "tools": "Chromium headless shell 1187 e cwebp 1.6.0"
+  },
+  "tests": {
+    "date": "2026-11-23",
+    "ranByMainAgent": {
+      "when": "depois dos ajustes das duas leituras independentes, no macOS",
+      "npm run test:shared": "119/119",
+      "npm test --prefix app": "218/218",
+      "npm test --prefix back": "306/306",
+      "npm run build --prefix app": "sem erro",
+      "caminho inteiro da pesquisa de roupas no aplicativo local, servidor simulado, roteiro fora do repositório": "entrada, quatro telas, final, confirmação, resposta registrada, imagem do compartilhar e capa, sem erro de página",
+      "entrada da pesquisa de roupas em cinco tamanhos de tela": "não rola em 390x844, 375x667, 360x640 e 320x568; em 320x480 rola 23 px, com o botão Começar inteiro na tela"
+    },
+    "ci": {
+      "09d6095": "anterior aos ajustes: todos os trabalhos passaram, entre eles browser-smoke em Chromium e em WebKit e a integração com PostgreSQL; visto pelo agente principal",
+      "3e4511c": "ajustes da primeira leitura: sete trabalhos passaram, entre eles browser-smoke em Chromium e a integração com PostgreSQL; browser-smoke em WebKit ficou parado na instalação do navegador; execução cancelada à mão pelo agente principal, e por isso o ci-gate daquele commit aparece como falha",
+      "lastCommit": "conferido no gate e registrado no PR #346",
+      "3c09121": "ajustes da segunda leitura: o mesmo; sete trabalhos passaram, o WebKit parou na instalação do navegador e a execução foi cancelada à mão"
+    },
+    "ranOnlyByWiringAgent": {
+      "note": "agente à parte que escreveu a 73c; resultados do relato dele, antes dos ajustes",
+      "app/e2e/site-shell.mjs": "49 cenários, em Chromium e em WebKit (eram 46)",
+      "app/e2e/photo-survey.mjs": "34 cenários, em Chromium e em WebKit",
+      "npm run test:photo-survey --prefix back": "aprovado, em PostgreSQL 16 descartável",
+      "npm run test:registration --prefix back": "aprovado, no mesmo PostgreSQL"
+    },
+    "localBrowsers": "a máquina não tinha a versão do Chromium que o Playwright do projeto pede; localmente os roteiros rodaram em Chromium numa versão mais antiga, por um roteiro auxiliar fora do repositório, e em WebKit, direto"
+  },
+  "screens": {
+    "file": "stages/73_clothes_demo/references/telas-roupas.jpg",
+    "what": "entrada, uma tela de voto, escolha registrada e imagem do compartilhar, do aplicativo local com servidor simulado, na execução do agente principal",
+    "seenByMainAgent": true
+  },
+  "notVerified": [
+    "o CI do último commit, no momento em que este arquivo foi escrito",
+    "os termos de uso da Helvetica Neue em imagem publicada",
+    "as imagens Docker do app e da API fora do CI (não há Docker na máquina)",
+    "celular de verdade, botão real do Google e compartilhamento real do aparelho",
+    "busca de marca registrada para os nomes das peças e para a frase Sem Pressa",
+    "produção: nada deste estágio foi publicado em 23/11/2026"
+  ],
+  "humanGate": {
+    "decision": "pendente",
+    "owner": "Stefan",
+    "note": "a resposta dele cobre a mudança de ordem; merge e publicação pedem um sim próprio, um a um. A pergunta do gate leva a ele as escolhas 3 e 4 da decisão 0005 e o que muda na capa para quem já respondeu as duas pesquisas de Política"
+  },
+  "independentReview": {
+    "first": {
+      "on": "09d6095",
+      "blocking": "o registro dizia que a capa continua abrindo em Política; para quem já respondeu as duas pesquisas de Política, a capa passa a destacar a de roupas. Corrigido no registro; o comportamento não mudou",
+      "adjusted": "parágrafo da pergunta na decisão 0005; \"pedido\" por \"resposta\"; escolhas de regra e de dado separadas das de desenho; teste das cartas mais apertado; chama redesenhada; selo DEMO; fonte; declaração de IA"
+    },
+    "second": {
+      "on": "3e4511c",
+      "blocking": "nenhum no conteúdo",
+      "checked": "testes de unidade 119, 218 e 306; roteiros de navegador em WebKit num build local (49 e 34 cenários); entrada em cinco tamanhos de tela; geração completa das cartas numa cópia, na mesma máquina, igual byte a byte ao que está gravado; 25 alterações de teste numa cópia; a frase citada na decisão 0005 contra o texto da mensagem que o agente principal lhe passou (ele não viu a conversa)",
+      "adjustedAfter": "selo e legenda presos ao desenho de origem no teste; cor da estrela do moletom; números e frases do registro; o que vai ao gate igual em todos os documentos",
+      "leftAsIs": "tamanho do selo DEMO; resumo do motivo na decisão 0005, sem a parte comercial"
+    },
+    "by": "agentes que não escreveram o código, somente leitura",
+    "notChecked": [
+      "quem rodou o quê",
+      "os roteiros de navegador em Chromium",
+      "os testes com PostgreSQL",
+      "busca de marca registrada",
+      "termos de uso da Helvetica Neue",
+      "celular de verdade",
+      "produção"
+    ],
+    "automatedReview": "a revisão automática no PR (Codex) apontou em d1f25fa a falta do HANDOFF e da verificação; os dois entraram em 09d6095; conversa respondida e resolvida no PR",
+    "deltaOn3c09121": "o mesmo revisor leu só o que mudou depois da segunda passada: sem bloqueio no conteúdo; testes de unidade e roteiros em WebKit de novo; cartas geradas de novo numa cópia, iguais byte a byte; dez alterações de teste. O commit seguinte só mexe em texto do registro e num comentário de teste"
+  }
+}

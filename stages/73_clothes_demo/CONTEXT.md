@@ -1,0 +1,167 @@
+# ICM 73 — Pesquisa de roupas de demonstração — #345
+
+Base: `main` em `0b30d64`.
+Ler o contexto raiz, o `AGENTS.md`, as decisões 0001, 0002, 0004 e 0005 e os
+contextos dos estágios 68, 70 e 71.
+
+## Objetivo
+
+Abrir no PoliMatch uma pesquisa de roupas, com peças criadas pelo próprio
+PoliMatch, para existir algo que se possa abrir e usar antes de chamar
+qualquer pessoa ou empresa de fora (decisão 0002, item 3).
+
+## Entradas
+
+- Issue #345. Em 23/11/2026, à pergunta do agente "Passo a demonstração de
+  roupas na frente da pesquisa de famosos?", o Stefan respondeu: "Sim, roupas
+  antes". Registro na decisão 0005. A resposta dele cobre a ordem; as outras
+  escolhas deste estágio são do agente e estão listadas lá.
+- Decisão 0002, item 1: roupas "com imagens criadas pelo próprio PoliMatch;
+  nenhuma empresa envia foto nesta fase". Item 2: todas as cartas de uma
+  pesquisa usam o mesmo padrão de moldura.
+- O que os estágios 68 a 72 construíram: regras em `shared/photo-survey.js`,
+  servidor em `back/src/photo-survey-store.js`, página em
+  `app/src/photo-survey-page.js`, menu em `app/src/site-menu.js`, imagem do
+  compartilhar em `app/src/share-choice.js`.
+
+## O que existe hoje e o que muda
+
+| Tema | Hoje | Depois deste estágio |
+|---|---|---|
+| Pesquisas | Duas, de Política, com as mesmas 20 cartas | Três: entra `roupas-demo-01`, "Qual você usaria?", com 16 cartas próprias |
+| Cartas | Um catálogo: as 20 de Política | Dois catálogos: as 20 de Política e as 16 de roupa |
+| Sorteio | 16 de 20 cartas por pessoa | Em roupas, as 16 entram sempre; o sorteio decide a tela e a posição |
+| Ilustração da entrada | Três cartas de uma lista fixa, para as duas pesquisas | Em Política, a mesma lista. Em roupas, três das cartas da própria pesquisa |
+| Aviso | Nenhum | A entrada da pesquisa de roupas diz: "Peças de demonstração, desenhadas com IA pelo PoliMatch." |
+| Título da final | "Entre elas, quem fica?" | Igual em Política. Em roupas, "Entre elas, qual fica?" |
+| "Em breve" | "Famosos e influenciadores" e "Roupas" | Só "Famosos e influenciadores" |
+| Capa | Destaca a pesquisa que a pessoa deixou pela metade ou, sem isso, a primeira aberta que ela não respondeu; respondidas as duas, diz que ela respondeu todas | A mesma regra. A de roupas vem depois das duas de Política: quem já respondeu as duas passa a ver a de roupas em destaque |
+
+## O formato deste estágio
+
+1. **Cartas.** 16 peças: 12 camisetas e 4 moletons. Todas com a mesma
+   moldura, a mesma silhueta por tipo, o mesmo fundo e o mesmo tamanho na
+   carta. O que muda de uma para a outra é a cor e a estampa. Cada carta traz
+   o selo "DEMO", o tipo, o nome da peça e "Peça de demonstração · Arte com
+   IA". Não há foto, pessoa, preço nem marca de terceiros.
+2. **Origem.** As cartas são desenhadas por `app/scripts/build-clothes-cards.mjs`.
+   O roteiro grava o desenho de origem de cada carta (SVG, em
+   `output/masters/`), os dois tamanhos publicados (WebP de 530 e 1060 de
+   largura, em `app/public/chromas/roupas/`), o catálogo do app
+   (`app/src/clothes-cards.json`) e o manifesto com o hash de cada arquivo
+   (`output/manifest.json`). O nome de cada arquivo publicado leva o começo do
+   hash do desenho de origem: mudar o desenho muda o endereço. O roteiro foi
+   escrito por um agente de IA; catálogo e manifesto dizem `aiAssisted`, como
+   pede o `CREDITS.md`.
+3. **Pesquisa.** `roupas-demo-01`, assunto "Roupas", pergunta "Qual você
+   usaria?", 16 cartas, sorteio de 16, telas de 4. A definição ganha um campo
+   opcional, `note`, que a entrada mostra abaixo da pergunta. As pesquisas de
+   Política não têm nota.
+4. **Entrada.** A ilustração da entrada de uma pesquisa de Política continua
+   saindo da lista fixa do estágio 68. Para qualquer outro assunto, sai das
+   cartas da própria pesquisa.
+5. **Final.** O título da tela final é "Entre elas, quem fica?" nas pesquisas
+   de Política, em que as cartas são pessoas, e "Entre elas, qual fica?" nas
+   outras.
+6. **Capa e menu.** A pesquisa nova aparece em "Mais pesquisas" e no menu,
+   pelas mesmas regras do estágio 70. "Roupas" sai de "Em breve".
+7. **CI.** O filtro de caminhos do CI passa a incluir
+   `stages/73_clothes_demo/output/**`: o teste das cartas lê essa pasta, e sem
+   a linha um PR que só mexesse nela pularia os testes do app.
+
+## Regras
+
+- **As regras do estágio 68 valem sem mudança:** um toque por tela, final,
+  confirmação, uma resposta por pessoa, sem troca depois de confirmar.
+- **O cadastro do estágio 71 vale sem mudança:** só responde quem entrou com
+  Google e tem cadastro com CPF.
+- **Mesma exposição.** As 16 peças aparecem para toda pessoa, uma vez cada, em
+  telas de quatro montadas por sorteio.
+- **Sem resultado público.** Nenhuma soma de respostas aparece (#177).
+  Compartilhar leva só a escolha da pessoa.
+- **As pesquisas de Política não mudam:** mesmas cartas, mesma ilustração de
+  entrada, mesmo título da final e mesma posição na lista, à frente da de
+  roupas.
+- **O que muda para quem já respondeu as duas de Política:** a capa passa a
+  destacar a pesquisa de roupas, e as telas de resposta registrada das duas
+  pesquisas de Política passam a oferecer "Próxima pesquisa" no lugar de "Ver
+  pesquisas".
+
+## Entregas
+
+Um PR, com commits por parte:
+
+| Parte | O que traz |
+|---|---|
+| 73a — Registro | Decisão 0005, este contexto, notas nas decisões 0001 e 0002, no `AGENTS.md` e no `CONTEXT.md` |
+| 73b — Cartas | O roteiro, os 16 desenhos de origem, os 32 arquivos publicados, o catálogo, o manifesto e o teste que prende uns aos outros |
+| 73c — Pesquisa | A pesquisa nas regras, no servidor e na tela; a nota; a ilustração da entrada por pesquisa; "Em breve" |
+| 73d — Publicação | API e app, com o sim do Stefan |
+
+## Fora de escopo
+
+- Resultado para quem encomenda, soma de respostas e os cinco primeiros.
+- Foto enviada por empresa, nome de marca e qualquer contato com marca.
+- Celebridades e influenciadores.
+- Mudança no cadastro, nas faixas de idade ou no texto de consentimento.
+- Rota nova no servidor e tabela nova no banco.
+
+## Critérios de aceite
+
+- `shared/`: três pesquisas com ids únicos; a de roupas tem 16 cartas,
+  sorteio de 16 em telas de 4, assunto, pergunta e nota.
+- Catálogo, manifesto e arquivos batem: 16 cartas, dois tamanhos cada, hash
+  conferido, proporção 5:7, nenhum arquivo sobrando na pasta publicada.
+- `/?p=roupas-demo-01` abre a entrada com o assunto, a pergunta, a nota e
+  três cartas de roupa.
+- O caminho inteiro da pesquisa de roupas funciona: quatro telas, final,
+  confirmação, resposta registrada e compartilhar.
+- A entrada das pesquisas de Política não mostra nota e só usa as cartas da
+  lista do estágio 68.
+- Um servidor que não conhece a pesquisa de roupas (a API antiga com o app
+  novo) não quebra a capa: aparecem as duas de Política, e o endereço da
+  pesquisa de roupas diz que ela não está disponível.
+- Na capa sem identidade: destaque na primeira pesquisa de Política; as
+  outras duas em "Mais pesquisas"; uma só "em breve".
+- Os roteiros de navegador dos estágios 68 a 72 passam, ajustados onde a tela
+  mudou de propósito.
+
+## Condições de publicação
+
+As dos estágios 69 e 71 continuam abertas (privacidade, #283; backup, #279).
+A publicação é de API e app, a API primeiro: a pesquisa é definida em
+`shared/`. Com a API antiga, o app novo recebe 404 para a pesquisa de roupas:
+as listas da capa mostram só as duas de Política, mas o menu, que vem do
+próprio app, ainda lista a de roupas, e o endereço dela diz que a pesquisa não
+está disponível.
+
+## Dependências e riscos
+
+- **Respostas de verdade sobre peças que não existem.** A pesquisa grava
+  respostas de pessoas cadastradas, sem data para fechar. O aviso por extenso
+  está só na entrada. Nas outras telas e na imagem do compartilhar, o que
+  avisa é o selo "DEMO" de cada carta; a legenda da carta fica pequena no
+  celular.
+- **O texto das cartas é desenhado com a Helvetica Neue do macOS.** A fonte
+  não vai para o repositório nem para o site, só a imagem pronta. Gerar de
+  novo em outra máquina pode mudar os arquivos. O teste confere os arquivos
+  gravados; não gera de novo, e por isso não prova que cada arquivo publicado
+  é o desenho do seu SVG.
+- **Nomes e estampas.** Não foi feita busca de marca registrada para os nomes
+  das peças nem para a frase "Sem Pressa".
+- **A marca na carta é texto simples**, não o emblema das cartas de Política.
+- **Menores de 18.** O cadastro aceita a faixa "16 a 24" (pendência da
+  decisão 0004).
+- **O que é "de Política" é o assunto da pesquisa.** A lista fixa da entrada
+  e o "quem fica?" valem para `subject` igual a "Política". Uma pesquisa
+  futura sobre pessoas com outro assunto vai precisar rever isso.
+- **A nota ocupa duas linhas no celular e empurra a ilustração da entrada
+  para baixo** (32 px em 390×844 no WebKit, pela medida da segunda leitura
+  independente; no Chromium a nota tem 34 px de altura). A entrada da pesquisa de roupas não rola em 390×844,
+  375×667, 360×640 e 320×568. Em 320×480 ela rola um pouco (23 px no
+  Chromium, 19 px no WebKit), com o botão "Começar" inteiro na tela.
+- **O selo "DEMO" é pequeno fora da carta em tamanho grande.** Na grade de
+  quatro cartas o texto dele fica com cerca de 5 a 6 px. Na imagem do
+  compartilhar ele se lê na carta escolhida e não nas outras três, e o texto
+  da imagem não fala em demonstração. Quem usa leitor de tela só ouve o aviso
+  na entrada.

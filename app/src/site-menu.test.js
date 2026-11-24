@@ -9,12 +9,13 @@ test("o tipo de conta sai do prefixo da chave guardada no aparelho", () => {
   for (const empty of ["", "   ", null, undefined]) assert.equal(accountKind(empty), "none");
 });
 
-test("as próximas pesquisas seguem a ordem da decisão 0002 e são só anúncio", () => {
-  assert.deepEqual([...UPCOMING_SURVEYS], ["Famosos e influenciadores", "Roupas"]);
+test("a próxima pesquisa é só anúncio, e Roupas não está mais entre as que vêm", () => {
+  assert.deepEqual([...UPCOMING_SURVEYS], ["Famosos e influenciadores"]);
   assert.ok(Object.isFrozen(UPCOMING_SURVEYS));
   const markup = upcomingMarkup();
-  assert.ok(markup.indexOf("Famosos e influenciadores") < markup.indexOf("Roupas"));
-  assert.equal(markup.match(/Em breve/g).length, 2);
+  assert.match(markup, /Famosos e influenciadores/);
+  assert.doesNotMatch(markup, /Roupas/);
+  assert.equal(markup.match(/Em breve/g).length, 1);
   assert.doesNotMatch(markup, /<a\b|href=/);
 });
 
@@ -22,7 +23,10 @@ test("o menu leva cada pesquisa ao endereço dela e não dá link às próximas"
   const markup = menuMarkup();
   assert.match(markup, /<a class="pm-item" href="\.\/\?p=politica-2026-01"><span>Quem você prefere\?<\/span><small class="pm-sub">Política<\/small><\/a>/);
   assert.match(markup, /<a class="pm-item" href="\.\/\?p=politica-2026-02"><span>Em quem você confia mais\?<\/span><small class="pm-sub">Política<\/small><\/a>/);
+  assert.match(markup, /<a class="pm-item" href="\.\/\?p=roupas-demo-01"><span>Qual você usaria\?<\/span><small class="pm-sub">Roupas<\/small><\/a>/);
   assert.ok(markup.indexOf("politica-2026-01") < markup.indexOf("politica-2026-02"), "na ordem da capa");
+  assert.ok(markup.indexOf("politica-2026-02") < markup.indexOf("roupas-demo-01"), "a de roupas vem depois das de política");
+  assert.equal(markup.match(/Em breve/g).length, 1, "Roupas é pesquisa aberta, não anúncio");
   assert.match(markup, /<a class="pm-item" href="\.\/"><span>Início<\/span>/);
   assert.match(markup, /<a class="pm-item" href="\.\/como-funciona\.html"><span>Como funciona<\/span>/);
   for (const name of UPCOMING_SURVEYS) {
@@ -34,7 +38,7 @@ test("o menu leva cada pesquisa ao endereço dela e não dá link às próximas"
 test("o menu lista as pesquisas que recebe, com o texto escapado", () => {
   const markup = menuMarkup({ surveys: [{ id: "x-1", subject: "A & B", question: "<b>Qual?</b>" }] });
   assert.match(markup, /href="\.\/\?p=x-1"><span>&lt;b&gt;Qual\?&lt;\/b&gt;<\/span><small class="pm-sub">A &amp; B<\/small>/);
-  assert.doesNotMatch(markup, /politica-2026/);
+  assert.doesNotMatch(markup, /politica-2026|roupas-demo/);
   assert.match(menuMarkup({ surveys: [{ id: "a b&c", subject: "S", question: "Q?" }] }), /href="\.\/\?p=a%20b%26c"/);
 });
 
@@ -42,6 +46,7 @@ test("o menu marca a página em que a pessoa está", () => {
   const marked = (markup) => [...markup.matchAll(/href="([^"]+)" aria-current="page"/g)].map((match) => match[1]);
   assert.deepEqual(marked(menuMarkup({ current: "home" })), ["./"]);
   assert.deepEqual(marked(menuMarkup({ current: "politica-2026-02" })), ["./?p=politica-2026-02"]);
+  assert.deepEqual(marked(menuMarkup({ current: "roupas-demo-01" })), ["./?p=roupas-demo-01"]);
   assert.deepEqual(marked(menuMarkup({ current: "how" })), ["./como-funciona.html"]);
   assert.deepEqual(marked(menuMarkup()), []);
 });

@@ -34,7 +34,8 @@
  *  18. Toques repetidos e voltar durante a troca de tela.
  *  19. Falhas do servidor no sorteio e na resposta, e recibo recusado.
  *  20. Quem respondeu e abre sem servidor não volta para a entrada.
- *  21. A entrada só ilustra com as cartas da lista da entrada.
+ *  21. A entrada só ilustra com as cartas da lista da entrada, e não tem
+ *      observação (a pesquisa de roupas, que tem, é do roteiro site-shell.mjs).
  */
 import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
@@ -353,6 +354,7 @@ try {
       await actionButton(page).and(page.locator(":not([disabled])")).waitFor();
       const fan = await page.locator(".ps-fan img").evaluateAll((images) => images.map((image) => image.getAttribute("src")));
       assert.equal(fan.length, 3);
+      assert.equal(await page.locator(".ps-note").count(), 0, "a pesquisa de política não tem observação");
       for (const src of fan) {
         assert.ok(!offEntryNames.has(src), `${offEntryNames.get(src)} apareceu na entrada`);
         assert.ok(entryNames.has(src), `${src} é uma carta da lista da entrada`);

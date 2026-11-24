@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { randomInt } from "node:crypto";
 import test from "node:test";
 import {
   PHOTO_SURVEYS,
@@ -36,6 +37,7 @@ test("a primeira pesquisa tem 20 cartas de política, sorteio de 16 e telas de 4
   assert.equal(SURVEY.id, "politica-2026-01");
   assert.equal(SURVEY.subject, "Política");
   assert.equal(SURVEY.question, "Quem você prefere?");
+  assert.equal(SURVEY.note, "", "as pesquisas de política não têm observação");
   assert.equal(SURVEY.cardIds.length, 20);
   assert.equal(new Set(SURVEY.cardIds).size, 20);
   assert.deepEqual(SURVEY.cardIds, [...SURVEY.cardIds].sort());
@@ -48,10 +50,10 @@ test("a primeira pesquisa tem 20 cartas de política, sorteio de 16 e telas de 4
 
 test("a segunda pesquisa faz outra pergunta sobre as mesmas 20 cartas", () => {
   const second = photoSurveyById("politica-2026-02");
-  assert.equal(PHOTO_SURVEYS.length, 2);
   assert.equal(PHOTO_SURVEYS[1], second);
   assert.equal(second.subject, "Política");
   assert.equal(second.question, "Em quem você confia mais?");
+  assert.equal(second.note, "");
   assert.deepEqual(second.cardIds, SURVEY.cardIds);
   assert.equal(second.drawSize, 16);
   assert.equal(second.groupSize, 4);
@@ -60,12 +62,43 @@ test("a segunda pesquisa faz outra pergunta sobre as mesmas 20 cartas", () => {
   assert.ok(Object.isFrozen(second) && Object.isFrozen(second.cardIds));
 });
 
+test("a terceira pesquisa é a demonstração de roupas, com 16 cartas que todo mundo vê", () => {
+  const clothes = photoSurveyById("roupas-demo-01");
+  assert.equal(PHOTO_SURVEYS.length, 3);
+  assert.equal(PHOTO_SURVEYS[2], clothes, "depois das duas de política: a ordem é a da capa");
+  assert.equal(clothes.subject, "Roupas");
+  assert.equal(clothes.question, "Qual você usaria?");
+  assert.equal(clothes.note, "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
+  assert.deepEqual(clothes.cardIds, [
+    "camiseta-cacto", "camiseta-chama", "camiseta-flor", "camiseta-montanha", "camiseta-olho", "camiseta-onda",
+    "camiseta-pipa", "camiseta-planeta", "camiseta-raio", "camiseta-sem-pressa", "camiseta-sol", "camiseta-xadrez",
+    "moletom-arco", "moletom-estrela", "moletom-folha", "moletom-lua",
+  ]);
+  assert.equal(clothes.drawSize, 16);
+  assert.equal(clothes.groupSize, 4);
+  assert.equal(clothes.opensAt, null);
+  assert.equal(clothes.closesAt, null);
+  assert.ok(Object.isFrozen(clothes) && Object.isFrozen(clothes.cardIds));
+  assert.ok(clothes.cardIds.every((id) => !SURVEY.cardIds.includes(id)), "nenhuma carta em comum com as de política");
+
+  // Sorteio de 16 em 16: só embaralha. Vale também com o gerador que o servidor usa.
+  for (const generator of [seededRandomInt(73), (limit) => randomInt(limit)]) {
+    const shown = drawCards(clothes, generator);
+    assert.deepEqual([...shown].sort(), clothes.cardIds, "todas as cartas aparecem, uma vez cada");
+    const groups = drawGroups(shown, clothes.groupSize);
+    assert.equal(groups.length, 4);
+    const pickIds = groups.map((group) => group[1]);
+    assert.equal(validateBracket(clothes, shown, { pickIds, championId: pickIds[3] }).ok, true);
+  }
+});
+
 test("cada pesquisa tem código, assunto e pergunta próprios", () => {
   assert.equal(new Set(PHOTO_SURVEYS.map((survey) => survey.id)).size, PHOTO_SURVEYS.length);
   assert.equal(new Set(PHOTO_SURVEYS.map((survey) => survey.question)).size, PHOTO_SURVEYS.length);
   for (const survey of PHOTO_SURVEYS) {
     assert.match(survey.id, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, survey.id);
     assert.ok(survey.subject.length > 0 && survey.question.endsWith("?"), survey.id);
+    assert.equal(typeof survey.note, "string", survey.id);
   }
 });
 
@@ -194,9 +227,13 @@ test("a janela define se a pesquisa está agendada, aberta ou fechada", () => {
 test("a visão pública traz só a definição e o estado, sem contagem de respostas", () => {
   const view = publicPhotoSurvey(SURVEY, new Date("2026-11-13T12:00:00Z"));
   assert.deepEqual(Object.keys(view).sort(), [
-    "cardIds", "closesAt", "drawSize", "groupSize", "id", "opensAt", "question", "screens", "status", "subject",
+    "cardIds", "closesAt", "drawSize", "groupSize", "id", "note", "opensAt", "question", "screens", "status", "subject",
   ]);
   assert.equal(view.subject, "Política");
+  assert.equal(view.note, "");
+  assert.equal(publicPhotoSurvey(photoSurveyById("roupas-demo-01"), new Date("2026-11-23T12:00:00Z")).note, "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
+  // Uma definição montada à mão, sem observação, sai com a observação vazia.
+  assert.equal(publicPhotoSurvey({ ...SURVEY, note: undefined }, new Date("2026-11-13T12:00:00Z")).note, "");
   assert.equal(view.screens, 4);
   assert.deepEqual(view.cardIds, SURVEY.cardIds);
   assert.notEqual(view.cardIds, SURVEY.cardIds, "a lista devolvida é uma cópia");

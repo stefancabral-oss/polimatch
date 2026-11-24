@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import CLOTHES from "./clothes-cards.json" with { type: "json" };
 import ARTS from "./political-chromas.json" with { type: "json" };
 import { PHOTO_SURVEYS, photoSurveyById } from "../../shared/photo-survey.js";
 import {
@@ -7,7 +8,9 @@ import {
   PHOTO_SURVEY_STORAGE_KEY,
   answeredSurveyIds,
   chooseChampion,
+  entryCardIdsFor,
   featuredSurveyId,
+  finalTitleFor,
   freshProgress,
   goBack,
   identityTag,
@@ -26,6 +29,7 @@ import {
 
 const PHOTO_SURVEY_ID = "politica-2026-01";
 const SECOND_SURVEY_ID = "politica-2026-02";
+const CLOTHES_SURVEY_ID = "roupas-demo-01";
 
 const GROUPS = [
   ["a1", "a2", "a3", "a4"],
@@ -50,6 +54,37 @@ test("as cartas da entrada são uma lista fixa, dentro da pesquisa e com arte", 
   }
 });
 
+test("as pesquisas de política ilustram a entrada só com a lista fixa; a de outro assunto, com as próprias cartas", () => {
+  for (const id of [PHOTO_SURVEY_ID, SECOND_SURVEY_ID]) {
+    assert.equal(entryCardIdsFor(photoSurveyById(id)), ENTRY_CARD_IDS, id);
+  }
+  // Política com outro conjunto de cartas continua na lista: mudar isso é rever a lista.
+  assert.equal(entryCardIdsFor({ subject: "Política", cardIds: ["x", "y", "z"] }), ENTRY_CARD_IDS);
+
+  const clothes = photoSurveyById(CLOTHES_SURVEY_ID);
+  const entry = entryCardIdsFor(clothes);
+  assert.deepEqual(entry, clothes.cardIds);
+  assert.ok(entry.length > 3, "sobra carta para o sorteio variar");
+  for (const id of entry) {
+    assert.ok(!ENTRY_CARD_IDS.includes(id), `${id} não é da lista de política`);
+    assert.ok(CLOTHES.some((art) => art.id === id), `${id} tem arte`);
+    assert.ok(!ARTS.some((art) => art.id === id), `${id} não é carta de política`);
+  }
+  // Devolve uma cópia: quem recebe não altera a definição.
+  assert.notEqual(entry, clothes.cardIds);
+  assert.deepEqual(entryCardIdsFor({ subject: "Outro assunto", cardIds: ["x", "y", "z", "w"] }), ["x", "y", "z", "w"]);
+  assert.deepEqual(entryCardIdsFor({ subject: "Outro assunto" }), []);
+  assert.deepEqual(entryCardIdsFor(null), []);
+});
+
+test("a final pergunta \"quem fica\" nas pesquisas de política e \"qual fica\" nas outras", () => {
+  for (const id of [PHOTO_SURVEY_ID, SECOND_SURVEY_ID]) {
+    assert.equal(finalTitleFor(photoSurveyById(id)), "Entre elas, quem fica?", id);
+  }
+  assert.equal(finalTitleFor(photoSurveyById(CLOTHES_SURVEY_ID)), "Entre elas, qual fica?");
+  assert.equal(finalTitleFor({ subject: "Outro assunto" }), "Entre elas, qual fica?");
+});
+
 test("a chave de armazenamento é fixa", () => {
   assert.equal(PHOTO_SURVEY_STORAGE_KEY, "polimatch:photo-survey:v1");
 });
@@ -57,6 +92,7 @@ test("a chave de armazenamento é fixa", () => {
 test("o endereço diz qual pesquisa abrir, e um código desconhecido cai na capa", () => {
   assert.equal(surveyIdFromSearch("?p=politica-2026-02"), SECOND_SURVEY_ID);
   assert.equal(surveyIdFromSearch("?x=1&p=politica-2026-01"), PHOTO_SURVEY_ID);
+  assert.equal(surveyIdFromSearch("?p=roupas-demo-01"), CLOTHES_SURVEY_ID);
   for (const search of ["", "?", "?p=", "?p=nao-existe", "?p=politica-2026-02%20", "?q=politica-2026-01", "?p=__proto__"]) {
     assert.equal(surveyIdFromSearch(search), "", search);
   }
@@ -87,7 +123,9 @@ test("o aparelho sabe quais pesquisas esta identidade respondeu e qual está em 
     assert.equal(inProgressSurveyId(broken, tag), "");
   }
   text = savedProgressText(text, SECOND_SURVEY_ID, { identity: tag, answered: true });
-  assert.deepEqual(answeredSurveyIds(text, tag), PHOTO_SURVEYS.map((survey) => survey.id));
+  assert.deepEqual(answeredSurveyIds(text, tag), [PHOTO_SURVEY_ID, SECOND_SURVEY_ID]);
+  text = savedProgressText(text, CLOTHES_SURVEY_ID, { identity: tag, answered: true });
+  assert.deepEqual(answeredSurveyIds(text, tag), PHOTO_SURVEYS.map((survey) => survey.id), "todas, na ordem da capa");
 });
 
 test("o destaque da capa é a primeira pesquisa aberta que a pessoa ainda não respondeu", () => {
@@ -104,7 +142,10 @@ test("depois de responder, a próxima é a primeira pesquisa sem resposta, fora 
   assert.equal(nextSurveyId(PHOTO_SURVEY_ID, []), SECOND_SURVEY_ID);
   assert.equal(nextSurveyId(PHOTO_SURVEY_ID, [PHOTO_SURVEY_ID]), SECOND_SURVEY_ID);
   assert.equal(nextSurveyId(SECOND_SURVEY_ID, [SECOND_SURVEY_ID]), PHOTO_SURVEY_ID);
-  assert.equal(nextSurveyId(PHOTO_SURVEY_ID, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID]), "");
+  // Respondidas as duas de política, a próxima é a de roupas; respondidas as três, não há próxima.
+  assert.equal(nextSurveyId(SECOND_SURVEY_ID, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID]), CLOTHES_SURVEY_ID);
+  assert.equal(nextSurveyId(CLOTHES_SURVEY_ID, [CLOTHES_SURVEY_ID]), PHOTO_SURVEY_ID);
+  assert.equal(nextSurveyId(CLOTHES_SURVEY_ID, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID, CLOTHES_SURVEY_ID]), "");
   assert.equal(nextSurveyId("a", [], [{ id: "a" }]), "");
 });
 

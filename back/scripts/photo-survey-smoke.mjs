@@ -12,6 +12,7 @@ const connection = requireDisposableDatabase();
 
 const SURVEY = PHOTO_SURVEYS[0];
 const SECOND = PHOTO_SURVEYS[1];
+const CLOTHES = PHOTO_SURVEYS[2];
 const WINDOWED = Object.freeze({
   ...SURVEY,
   id: "smoke-janela",
@@ -28,7 +29,7 @@ let now = OPEN_INSTANT;
 const options = {
   candidateRegistry: createApprovedTestRegistry(CATALOG.map((person) => person.id)),
   clock: () => now,
-  photoSurveys: [SURVEY, SECOND, WINDOWED],
+  photoSurveys: [SURVEY, SECOND, CLOTHES, WINDOWED],
   requirePhotoSurveyRegistration: async () => {},
 };
 const store = createTopicStore(connection, options);
@@ -361,7 +362,28 @@ try {
   assert.equal((await store.photoSurveyDraw(vera.recoveryKey, SECOND.id)).response.championId, answeredTwo.response.championId);
   await rejectsWith(respond(vera, { pickIds: picksOf(veraTwo.draw), championId: picksOf(veraTwo.draw)[0] }, SECOND.id), 409, "PHOTO_SURVEY_ALREADY_ANSWERED");
 
-  console.log("Smoke da pesquisa por foto aprovado: sorteio estável e simultâneo, resposta única e idempotente, corrida de duas abas, respostas forjadas recusadas, janela, imutabilidade, jogo atual intacto, identidade Google, duas pesquisas independentes e segundo boot.");
+  // --- Pesquisa de roupas (ICM 73): as 16 cartas entram no sorteio de toda pessoa ---
+  assert.equal(CLOTHES.id, "roupas-demo-01");
+  const veraClothes = await store.photoSurveyDraw(vera.recoveryKey, CLOTHES.id);
+  assert.equal(veraClothes.survey.subject, "Roupas");
+  assert.equal(veraClothes.survey.note, "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
+  assert.equal(veraClothes.response, null, "as respostas de política não respondem a de roupas");
+  assert.deepEqual(veraClothes.draw.groups.map((group) => group.length), [4, 4, 4, 4]);
+  assert.deepEqual(veraClothes.draw.groups.flat().sort(), [...CLOTHES.cardIds], "todas as cartas, uma vez cada");
+  assert.deepEqual(await store.photoSurveyDraw(vera.recoveryKey, CLOTHES.id), veraClothes, "o sorteio não muda");
+  // Uma carta de política não entra numa resposta da pesquisa de roupas.
+  const clothesPicks = picksOf(veraClothes.draw, 2);
+  await assert.rejects(respond(vera, { pickIds: [veraOne.draw.groups[0][0], ...clothesPicks.slice(1)], championId: clothesPicks[1] }, CLOTHES.id), (error) => {
+    assert.equal(error.code, "PHOTO_SURVEY_RESPONSE_INVALID");
+    assert.equal(error.current.reason, "pick-outside-group");
+    return true;
+  });
+  const answeredClothes = await respond(vera, { pickIds: clothesPicks, championId: clothesPicks[1] }, CLOTHES.id);
+  assert.equal(answeredClothes.status, "created");
+  assert.equal((await store.photoSurveyDraw(vera.recoveryKey, CLOTHES.id)).response.championId, clothesPicks[1]);
+  assert.equal((await store.photoSurveyDraw(vera.recoveryKey, SURVEY.id)).response.championId, answeredOne.response.championId);
+
+  console.log("Smoke da pesquisa por foto aprovado: sorteio estável e simultâneo, resposta única e idempotente, corrida de duas abas, respostas forjadas recusadas, janela, imutabilidade, jogo atual intacto, identidade Google, duas pesquisas independentes, a de roupas com as 16 cartas e segundo boot.");
 } finally {
   await audit.end();
   await store.close();
