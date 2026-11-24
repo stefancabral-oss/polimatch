@@ -109,7 +109,7 @@
     "api": {
       "commit": "2cfa3e9",
       "duration": "21 s",
-      "log": "database_ready com resetApplied false, depois listening; uma busca por error, failed, fatal e falha nas 131 linhas que o painel mostrava não achou nenhuma",
+      "log": "database_ready com resetApplied false, depois listening; uma busca por error, failed, fatal e falha, sem diferenciar maiúsculas de minúsculas, nas 131 linhas que o painel mostrava não achou nenhuma",
       "fromOutside": "saúde 200 nas quatro leituras; a rota da pesquisa de roupas passou de 404 a 200 às 02:55:32"
     },
     "databaseAfterApi": "as mesmas 31 tabelas; trinta com a mesma contagem; abuse_quota_counters de 55 para 1 (pelo código, a poda dos contadores com mais de oito dias que a API faz ao subir); nenhuma tabela nova; respostas da pesquisa de roupas: 0",
@@ -133,8 +133,8 @@
       "abrir a aba de variáveis ou alterar configuração"
     ],
     "ownerReport": "a mensagem do agente dava o endereço da pesquisa de roupas e perguntava \"A pesquisa de roupas funcionou no seu celular? Abra o endereço, responda e toque em Compartilhar; depois me diga \\\"funcionou\\\" ou \\\"deu problema\\\" e o que apareceu.\"; menos de três minutos depois o Stefan respondeu \"Funcionou\", uma das duas respostas oferecidas; não disse o que testou, em que aparelho, nem o que apareceu",
-    "seenInPassing": "em 24/11/2026 a chave Autodeploy aparecia ligada nos dois serviços; nove minutos depois do merge a produção ainda estava como antes, e disso o agente conclui que o merge não disparou deploy",
-    "images": "as imagens do app e da API foram construídas pelo painel de deploy a partir dos Dockerfiles; o agente não as construiu nem inspecionou",
+    "seenInPassing": "durante a publicação a chave Autodeploy aparecia ligada nos dois serviços; nove minutos depois do merge a produção ainda estava como antes, e disso o agente conclui que o merge não disparou deploy",
+    "images": "as imagens do app e da API foram construídas pelo painel de deploy; o agente não as construiu nem inspecionou",
     "mainCi": "o CI do push do merge na main (2cfa3e9) ainda rodava durante os dois deploys, só com o browser-smoke em WebKit pendente; terminou depois, por volta de 03:17 UTC, com todos os trabalhos e o ci-gate verdes",
     "copiesInContainer": "cinco cópias do banco em /tmp no contêiner, as quatro anteriores e a de 23/11, todas com dado pessoal; apagar ou guardar fora é decisão do Stefan (#279)"
   }

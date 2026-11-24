@@ -107,8 +107,8 @@ Com a instrução do Stefan ("Sim, mescla"), transcrita em "Human gate":
 
 Com a instrução do Stefan ("Sim, publica"), transcrita em "Human gate".
 Horários em UTC, já no dia 24. Em Brasília, a cópia do banco e os dois
-deploys foram entre 23:53 e 23:58 de 23/11; o vigia e a resposta dele sobre o
-teste passaram da meia-noite.
+deploys foram entre 23:53 e 23:58 de 23/11; o vigia foi até 00:03, e a
+resposta dele ao pedido de teste veio por volta da meia-noite.
 
 - **Antes (02:51), de fora:** capa, saúde da API e as duas pesquisas de
   Política respondiam 200; a pesquisa de roupas e as 32 imagens das cartas de
@@ -119,8 +119,9 @@ teste passaram da meia-noite.
   gravada antes do deploy.
 - **API (02:54 a 02:55):** publicada no commit `2cfa3e9`, em 21 s. No log,
   `database_ready` às 02:55:23 com `resetApplied: false`, depois `listening`.
-  Uma busca por "error", "failed", "fatal" e "falha" nas 131 linhas que o
-  painel mostrava não achou nenhuma. De fora, a cada
+  Uma busca por "error", "failed", "fatal" e "falha", sem diferenciar
+  maiúsculas de minúsculas, nas 131 linhas que o painel mostrava não achou
+  nenhuma. De fora, a cada
   5 s, a saúde respondeu 200 nas quatro leituras, e a rota da pesquisa de
   roupas passou de 404 a 200 às 02:55:32.
 - **Banco depois da API:** as mesmas 31 tabelas. Trinta com a mesma contagem;
@@ -133,9 +134,8 @@ teste passaram da meia-noite.
 - **Vigia:** um roteiro leu a capa e a saúde da API a cada 3 s, de 02:52 a
   03:03. Estava previsto para 25 minutos e foi parado pelo agente depois de
   11. Nenhuma leitura falhou.
-- As imagens do app e da API foram construídas pelo painel de deploy, a
-  partir dos Dockerfiles do repositório. O agente não as construiu nem
-  inspecionou.
+- As imagens do app e da API foram construídas pelo painel de deploy. O
+  agente não as construiu nem inspecionou.
 - O commit publicado é o que o painel de deploy registrou. `version.json`
   segue com `sha: "unknown"` (#287).
 
@@ -172,8 +172,8 @@ No contêiner do banco ficaram cinco cópias, todas com dado pessoal: as
 quatro anteriores e a de 23/11. Apagar ou guardar fora é decisão do Stefan
 (#279). Os dois arquivos de contagem que o agente criou foram apagados.
 
-Visto de passagem, sem mexer: em 24/11/2026, no painel de deploy, a chave
-"Autodeploy" aparecia ligada nos dois serviços. Às 02:51, nove minutos depois
+Visto de passagem, sem mexer: durante a publicação, no painel de deploy, a
+chave "Autodeploy" aparecia ligada nos dois serviços. Às 02:51, nove minutos depois
 do merge do PR #346, a produção ainda estava como antes; disso o agente
 conclui que o merge não disparou deploy. O `docs/ops/RELEASE.md` descreve o
 deploy manual "com o autodeploy desligado".
@@ -182,7 +182,7 @@ O registro feito na hora está na issue #345.
 
 ## Não entregue / pendente
 
-- Em 24/11/2026, fechar a issue #345, com o sim do Stefan.
+- Em 24/11/2026 faltava fechar a issue #345, o que pede o sim do Stefan.
 - O que recebe quem encomenda uma pesquisa (resultado, recortes): fora deste
   estágio.
 - O título e a descrição da página (`app/index.html`) dizem "Quem você
@@ -354,7 +354,7 @@ Do agente, fora da decisão 0005: a linha no filtro de caminhos do CI.
 
 ## Próximo passo exato
 
-1. Em 24/11/2026: fechar a issue #345, com o sim do Stefan.
+1. Em 24/11/2026 faltava fechar a issue #345, o que pede o sim do Stefan.
 
 ## Human gate
 
