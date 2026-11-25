@@ -279,10 +279,11 @@ Em 24/11/2026 o Stefan respondeu "Sim, começa" e, depois, "Sim, baixa" à
 proposta de fazer as cartas com fotografia de licença livre da Wikimedia
 Commons dentro de uma moldura desenhada por código (decisão 0006). Estágio
 `stages/74_celebrity_survey/CONTEXT.md`: uma quarta pesquisa, `famosos-01`,
-"De quem você é mais fã?", com 20 cartas e sorteio de 16. Cada carta traz o
-crédito da foto, e a página nova "Créditos das fotos" lista autor, licença e
-origem. Nenhum retrato é gerado ou editado por IA. A pesquisa de famosos vem
-depois das duas de Política e antes da de roupas. "Em breve" fica sem itens.
-A licença livre trata do direito de quem fez a foto; a situação das
-fotografias de pessoas públicas segue a resposta à Q3 da #277. Em 24/11/2026
-o estágio estava em construção, sem merge e sem publicação.
+"De quem você é mais fã?", com 20 cartas e sorteio de 16. A página nova
+"Créditos das fotos" lista autor, licença e origem de cada foto, e a imagem
+do compartilhar leva o crédito. Nenhum retrato é gerado ou editado por IA. A
+pesquisa de famosos vem depois das duas de Política e antes da de roupas.
+"Em breve" fica sem itens. A licença livre trata do direito de quem fez a
+foto, não do direito da pessoa retratada; como o agente lê a resposta à Q3
+da #277 para estas fotos é uma das escolhas listadas na decisão 0006. Em
+24/11/2026 o estágio estava em construção, sem merge e sem publicação.

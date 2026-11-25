@@ -34,14 +34,14 @@
   {
     "id": "ludmilla",
     "name": "Ludmilla",
-    "src": "/chromas/famosos/ludmilla-v01-8a5fa9dc-530.webp",
-    "srcset": "/chromas/famosos/ludmilla-v01-8a5fa9dc-530.webp 530w, /chromas/famosos/ludmilla-v01-8a5fa9dc-1060.webp 1060w",
+    "src": "/chromas/famosos/ludmilla-v01-dc354a67-530.webp",
+    "srcset": "/chromas/famosos/ludmilla-v01-dc354a67-530.webp 530w, /chromas/famosos/ludmilla-v01-dc354a67-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "8a5fa9dc",
+    "stamp": "dc354a67",
     "photo": {
-      "author": "Humor Multishow",
+      "author": "Multishow",
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Ludmilla_at_Rock_in_Rio_in_September_2022_(1).png"
@@ -50,14 +50,14 @@
   {
     "id": "luisa-sonza",
     "name": "Luísa Sonza",
-    "src": "/chromas/famosos/luisa-sonza-v01-8b3236da-530.webp",
-    "srcset": "/chromas/famosos/luisa-sonza-v01-8b3236da-530.webp 530w, /chromas/famosos/luisa-sonza-v01-8b3236da-1060.webp 1060w",
+    "src": "/chromas/famosos/luisa-sonza-v01-64636b87-530.webp",
+    "srcset": "/chromas/famosos/luisa-sonza-v01-64636b87-530.webp 530w, /chromas/famosos/luisa-sonza-v01-64636b87-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "8b3236da",
+    "stamp": "64636b87",
     "photo": {
-      "author": "Humor Multishow",
+      "author": "Multishow",
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Lu%C3%ADsa_Sonza_in_2022.jpg"
@@ -66,14 +66,14 @@
   {
     "id": "xuxa",
     "name": "Xuxa",
-    "src": "/chromas/famosos/xuxa-v01-d129804c-530.webp",
-    "srcset": "/chromas/famosos/xuxa-v01-d129804c-530.webp 530w, /chromas/famosos/xuxa-v01-d129804c-1060.webp 1060w",
+    "src": "/chromas/famosos/xuxa-v01-33066c1e-530.webp",
+    "srcset": "/chromas/famosos/xuxa-v01-33066c1e-530.webp 530w, /chromas/famosos/xuxa-v01-33066c1e-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "d129804c",
+    "stamp": "33066c1e",
     "photo": {
-      "author": "Humor Multishow",
+      "author": "Multishow",
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Xuxa_on_the_Pr%C3%AAmio_Multishow_de_M%C3%BAsica_Brasileira_2021_red_carpet.png"
@@ -82,33 +82,33 @@
   {
     "id": "tata-werneck",
     "name": "Tatá Werneck",
-    "src": "/chromas/famosos/tata-werneck-v01-75ba54be-530.webp",
-    "srcset": "/chromas/famosos/tata-werneck-v01-75ba54be-530.webp 530w, /chromas/famosos/tata-werneck-v01-75ba54be-1060.webp 1060w",
+    "src": "/chromas/famosos/tata-werneck-v01-c2e538b3-530.webp",
+    "srcset": "/chromas/famosos/tata-werneck-v01-c2e538b3-530.webp 530w, /chromas/famosos/tata-werneck-v01-c2e538b3-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "75ba54be",
+    "stamp": "c2e538b3",
     "photo": {
-      "author": "Humor Multishow",
+      "author": "Multishow",
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Tat%C3%A1_Werneck_at_Lady_Night_in_2023.jpg"
     }
   },
   {
-    "id": "bianca-andrade",
-    "name": "Bianca Andrade",
-    "src": "/chromas/famosos/bianca-andrade-v01-d9b0a2cd-530.webp",
-    "srcset": "/chromas/famosos/bianca-andrade-v01-d9b0a2cd-530.webp 530w, /chromas/famosos/bianca-andrade-v01-d9b0a2cd-1060.webp 1060w",
+    "id": "ana-maria-braga",
+    "name": "Ana Maria Braga",
+    "src": "/chromas/famosos/ana-maria-braga-v01-0275f667-530.webp",
+    "srcset": "/chromas/famosos/ana-maria-braga-v01-0275f667-530.webp 530w, /chromas/famosos/ana-maria-braga-v01-0275f667-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "d9b0a2cd",
+    "stamp": "0275f667",
     "photo": {
-      "author": "Web Summit Rio",
-      "license": "CC BY 2.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Web_Summit_Rio_2025_-_1219_(54487067277).jpg"
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ana_Maria_Braga_in_2019_01.jpg"
     }
   },
   {
@@ -144,19 +144,19 @@
     }
   },
   {
-    "id": "marina-ruy-barbosa",
-    "name": "Marina Ruy Barbosa",
-    "src": "/chromas/famosos/marina-ruy-barbosa-v01-855b2268-530.webp",
-    "srcset": "/chromas/famosos/marina-ruy-barbosa-v01-855b2268-530.webp 530w, /chromas/famosos/marina-ruy-barbosa-v01-855b2268-1060.webp 1060w",
+    "id": "iza",
+    "name": "Iza",
+    "src": "/chromas/famosos/iza-v01-abc30c74-530.webp",
+    "srcset": "/chromas/famosos/iza-v01-abc30c74-530.webp 530w, /chromas/famosos/iza-v01-abc30c74-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "855b2268",
+    "stamp": "abc30c74",
     "photo": {
-      "author": "Manuela Muniz Feijó Scarpa",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Marina_Ruy_Barbosa7.jpg"
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Iza_at_the_Pr%C3%AAmio_Multishow_2020_(02).png"
     }
   },
   {
@@ -178,12 +178,12 @@
   {
     "id": "gusttavo-lima",
     "name": "Gusttavo Lima",
-    "src": "/chromas/famosos/gusttavo-lima-v01-7ea2ffbb-530.webp",
-    "srcset": "/chromas/famosos/gusttavo-lima-v01-7ea2ffbb-530.webp 530w, /chromas/famosos/gusttavo-lima-v01-7ea2ffbb-1060.webp 1060w",
+    "src": "/chromas/famosos/gusttavo-lima-v01-30d95e9a-530.webp",
+    "srcset": "/chromas/famosos/gusttavo-lima-v01-30d95e9a-530.webp 530w, /chromas/famosos/gusttavo-lima-v01-30d95e9a-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "7ea2ffbb",
+    "stamp": "30d95e9a",
     "photo": {
       "author": "Record TV Goiás",
       "license": "CC BY 3.0",
@@ -192,19 +192,19 @@
     }
   },
   {
-    "id": "luan-santana",
-    "name": "Luan Santana",
-    "src": "/chromas/famosos/luan-santana-v01-de90c022-530.webp",
-    "srcset": "/chromas/famosos/luan-santana-v01-de90c022-530.webp 530w, /chromas/famosos/luan-santana-v01-de90c022-1060.webp 1060w",
+    "id": "rodrigo-santoro",
+    "name": "Rodrigo Santoro",
+    "src": "/chromas/famosos/rodrigo-santoro-v01-c479f28b-530.webp",
+    "srcset": "/chromas/famosos/rodrigo-santoro-v01-c479f28b-530.webp 530w, /chromas/famosos/rodrigo-santoro-v01-c479f28b-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "de90c022",
+    "stamp": "c479f28b",
     "photo": {
-      "author": "amigosdaarte",
-      "license": "CC0",
-      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
-      "page": "https://commons.wikimedia.org/wiki/File:Luan_Santana_2022.JPG"
+      "author": "David Shankbone",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rodrigo_Santoro_WE_2012_Shankbone_3.JPG"
     }
   },
   {
@@ -224,32 +224,32 @@
     }
   },
   {
-    "id": "luciano-huck",
-    "name": "Luciano Huck",
-    "src": "/chromas/famosos/luciano-huck-v01-6cc1b605-530.webp",
-    "srcset": "/chromas/famosos/luciano-huck-v01-6cc1b605-530.webp 530w, /chromas/famosos/luciano-huck-v01-6cc1b605-1060.webp 1060w",
+    "id": "selton-mello",
+    "name": "Selton Mello",
+    "src": "/chromas/famosos/selton-mello-v01-255bc03e-530.webp",
+    "srcset": "/chromas/famosos/selton-mello-v01-255bc03e-530.webp 530w, /chromas/famosos/selton-mello-v01-255bc03e-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "6cc1b605",
+    "stamp": "255bc03e",
     "photo": {
-      "author": "Romério Cunha",
-      "license": "CC BY 2.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Luciano_Huck_in_April_2019.jpg"
+      "author": "Harald Krichel",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Selton_Mello-68509.jpg"
     }
   },
   {
     "id": "whindersson-nunes",
     "name": "Whindersson Nunes",
-    "src": "/chromas/famosos/whindersson-nunes-v01-a9217642-530.webp",
-    "srcset": "/chromas/famosos/whindersson-nunes-v01-a9217642-530.webp 530w, /chromas/famosos/whindersson-nunes-v01-a9217642-1060.webp 1060w",
+    "src": "/chromas/famosos/whindersson-nunes-v01-c9cf2a4d-530.webp",
+    "srcset": "/chromas/famosos/whindersson-nunes-v01-c9cf2a4d-530.webp 530w, /chromas/famosos/whindersson-nunes-v01-c9cf2a4d-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "a9217642",
+    "stamp": "c9cf2a4d",
     "photo": {
-      "author": "Humor Multishow",
+      "author": "Multishow",
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Whindersson_Nunes_em_2019.png"
@@ -258,14 +258,14 @@
   {
     "id": "felipe-neto",
     "name": "Felipe Neto",
-    "src": "/chromas/famosos/felipe-neto-v01-1f4538bb-530.webp",
-    "srcset": "/chromas/famosos/felipe-neto-v01-1f4538bb-530.webp 530w, /chromas/famosos/felipe-neto-v01-1f4538bb-1060.webp 1060w",
+    "src": "/chromas/famosos/felipe-neto-v01-22c0f59e-530.webp",
+    "srcset": "/chromas/famosos/felipe-neto-v01-22c0f59e-530.webp 530w, /chromas/famosos/felipe-neto-v01-22c0f59e-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "1f4538bb",
+    "stamp": "22c0f59e",
     "photo": {
-      "author": "Humor Multishow",
+      "author": "Multishow",
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Felipe_Neto_at_the_Lady_Night_in_2022_(01).png"
@@ -274,12 +274,12 @@
   {
     "id": "casimiro",
     "name": "Casimiro",
-    "src": "/chromas/famosos/casimiro-v01-8489db9f-530.webp",
-    "srcset": "/chromas/famosos/casimiro-v01-8489db9f-530.webp 530w, /chromas/famosos/casimiro-v01-8489db9f-1060.webp 1060w",
+    "src": "/chromas/famosos/casimiro-v01-ec04d198-530.webp",
+    "srcset": "/chromas/famosos/casimiro-v01-ec04d198-530.webp 530w, /chromas/famosos/casimiro-v01-ec04d198-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "8489db9f",
+    "stamp": "ec04d198",
     "photo": {
       "author": "TNT Sports Brasil",
       "license": "CC BY 3.0",
@@ -290,14 +290,14 @@
   {
     "id": "wagner-moura",
     "name": "Wagner Moura",
-    "src": "/chromas/famosos/wagner-moura-v01-85a3fc49-530.webp",
-    "srcset": "/chromas/famosos/wagner-moura-v01-85a3fc49-530.webp 530w, /chromas/famosos/wagner-moura-v01-85a3fc49-1060.webp 1060w",
+    "src": "/chromas/famosos/wagner-moura-v01-29d91959-530.webp",
+    "srcset": "/chromas/famosos/wagner-moura-v01-29d91959-530.webp 530w, /chromas/famosos/wagner-moura-v01-29d91959-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "85a3fc49",
+    "stamp": "29d91959",
     "photo": {
-      "author": "Harald Krichel",
+      "author": "Harald Krichel / WikiPortraits",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Wagner_Moura-6546.jpg"

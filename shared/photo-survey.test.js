@@ -72,7 +72,7 @@ test("a terceira pesquisa é a de famosos, com 20 cartas de pessoas e sorteio de
   assert.equal(PHOTO_SURVEYS[2], celebrities, "depois das duas de política e antes da de roupas");
   assert.equal(celebrities.subject, "Famosos");
   assert.equal(celebrities.question, "De quem você é mais fã?");
-  assert.equal(celebrities.note, "Fotos de licença livre, com o crédito em cada carta.");
+  assert.equal(celebrities.note, "Fotos de licença livre.");
   assert.equal(celebrities.people, true, "as cartas de famosos são pessoas");
   // Quem está na lista pode mudar; o que não muda é a forma dela.
   assert.equal(celebrities.cardIds.length, 20);
@@ -305,7 +305,7 @@ test("a visão pública traz só a definição e o estado, sem contagem de respo
   assert.equal(view.note, "");
   assert.equal(publicPhotoSurvey(photoSurveyById("roupas-demo-01"), new Date("2026-11-23T12:00:00Z")).note, "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
   const celebrities = publicPhotoSurvey(photoSurveyById("famosos-01"), new Date("2026-11-24T12:00:00Z"));
-  assert.equal(celebrities.note, "Fotos de licença livre, com o crédito em cada carta.");
+  assert.equal(celebrities.note, "Fotos de licença livre.");
   assert.deepEqual([celebrities.subject, celebrities.cardIds.length, celebrities.drawSize, celebrities.screens, celebrities.status], ["Famosos", 20, 16, 4, "open"]);
   // `people` fica na definição: a visão pública não muda de formato por causa dele.
   assert.deepEqual(Object.keys(celebrities).sort(), Object.keys(view).sort());

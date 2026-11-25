@@ -389,7 +389,7 @@ try {
   const veraCelebrities = await store.photoSurveyDraw(vera.recoveryKey, CELEBRITIES.id);
   assert.equal(veraCelebrities.survey.subject, "Famosos");
   assert.equal(veraCelebrities.survey.question, "De quem você é mais fã?");
-  assert.equal(veraCelebrities.survey.note, "Fotos de licença livre, com o crédito em cada carta.");
+  assert.equal(veraCelebrities.survey.note, "Fotos de licença livre.");
   assert.equal(veraCelebrities.response, null, "as respostas de política e de roupas não respondem a de famosos");
   assert.deepEqual(veraCelebrities.draw.groups.map((group) => group.length), [4, 4, 4, 4]);
   const celebrityShown = veraCelebrities.draw.groups.flat();

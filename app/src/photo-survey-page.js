@@ -131,6 +131,8 @@ const question = () => (typeof survey?.question === "string" && survey.question)
 // A observação da pesquisa, quando ela tem uma. As de política não têm; as de
 // famosos e de roupas têm.
 const surveyNote = () => (typeof survey?.note === "string" && survey.note) || definition.note;
+// As cartas desta pesquisa levam foto com crédito? Então a entrada aponta para a página de créditos.
+const hasPhotoCredits = () => definition.cardIds.some((id) => Boolean(artById.get(id)?.photo));
 
 /**
  * Lê direto do navegador. O safeStorage devolve primeiro o que esta aba
@@ -246,7 +248,8 @@ function shell({ step, filled = null, mainClass = "", body, focus = false, fit =
 // Os avisos ficam logo abaixo do título: aparecem sem rolar, em qualquer tela.
 // O título leva a etapa como descrição, para o leitor de tela dizer "Tela 2 de 4".
 // `note` é a observação da pesquisa, só na entrada: um texto discreto sob o texto de apoio.
-const heading = (eyebrow, title, hint, note = "") => `<p class="ps-kicker">${escapeText(eyebrow)}</p><h1 class="ps-title" id="ps-title" tabindex="-1" aria-describedby="ps-step">${escapeText(title)}</h1><p class="ps-hint">${escapeText(hint)}</p>${note ? `<p class="ps-note">${escapeText(note)}</p>` : ""}${noticeMarkup()}${offlineMarkup()}`;
+// `credits` põe, ao lado da nota, o caminho para a página de créditos das fotos (ICM 74, #348).
+const heading = (eyebrow, title, hint, note = "", credits = false) => `<p class="ps-kicker">${escapeText(eyebrow)}</p><h1 class="ps-title" id="ps-title" tabindex="-1" aria-describedby="ps-step">${escapeText(title)}</h1><p class="ps-hint">${escapeText(hint)}</p>${note || credits ? `<p class="ps-note">${escapeText(note)}${credits ? `${note ? " " : ""}<a href="./creditos.html">Ver os créditos</a>` : ""}</p>` : ""}${noticeMarkup()}${offlineMarkup()}`;
 
 const MENU_LINK = '<button class="ps-link" data-action="menu" type="button">Abrir o menu</button>';
 const ALL_SURVEYS_LINK = '<a class="ps-btn ps-btn--ghost" href="./">Ver pesquisas</a>';
@@ -305,7 +308,7 @@ function homeSections() {
  */
 function renderEntry({ pending = "", action = "start", label = atHome && homeResume ? "Continuar" : "Começar", focus = false } = {}) {
   const featured = surveyId
-    ? `${heading(kicker(), question(), atHome && homeResume ? "Você parou no meio. Continue de onde parou." : "Leva menos de um minuto.", surveyNote())}
+    ? `${heading(kicker(), question(), atHome && homeResume ? "Você parou no meio. Continue de onde parou." : "Leva menos de um minuto.", surveyNote(), hasPhotoCredits())}
       <div class="ps-fan" aria-hidden="true">${entryCards().map((id) => staticCard(id, "176px")).join("")}</div>
       <div class="ps-cta"><button class="ps-btn" id="ps-action" data-action="${action}" type="button"${pending ? " disabled" : ""}>${escapeText(pending || label)}</button>
         <p class="ps-muted ps-cta-note">${signedIn() ? "Sua escolha só é registrada quando você confirmar." : "Para responder, entre com Google e cadastre o CPF."}</p></div>`
@@ -441,6 +444,7 @@ function prepareShare(champion, others = shareOthers) {
     name: art.name,
     question: question(),
     others: others.map((id) => ({ src: artById.get(id).src })),
+    photos: [art, ...others.map((id) => artById.get(id))].map((card) => card.photo).filter(Boolean),
   }).then((file) => {
     window.clearTimeout(timer);
     if (!current()) return;

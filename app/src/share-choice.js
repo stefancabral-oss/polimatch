@@ -170,6 +170,21 @@ function roundedRect(context, x, y, width, height, radius) {
 }
 
 /**
+ * As linhas de crédito da imagem, quando as cartas levam foto de outra pessoa
+ * (ICM 74, #348). `photos` são os créditos das cartas que entram na imagem
+ * (`{ author, license }`, como no catálogo). Sai uma linha com quem fez cada
+ * foto e a licença, sem repetir, e outra dizendo onde estão os créditos
+ * completos. Sem foto com crédito, nenhuma linha: a imagem fica como era.
+ */
+export function shareCreditLines(photos = []) {
+  const credits = [...new Set(photos
+    .filter((photo) => photo && typeof photo.author === "string" && photo.author && typeof photo.license === "string" && photo.license)
+    .map((photo) => `${photo.author} (${photo.license})`))];
+  if (!credits.length) return [];
+  return [`${credits.length === 1 ? "Foto" : "Fotos"}: ${credits.join(" · ")}`, `Créditos completos em ${SHARE_ORIGIN.replace("https://", "")}/creditos.html`];
+}
+
+/**
  * Uma linha que cabe na largura: a letra diminui de 2 em 2 até caber; no
  * tamanho mínimo, o que ainda sobra é cortado com reticências.
  * `measure(texto, tamanho)` devolve a largura, como o canvas faria.
@@ -184,12 +199,12 @@ export function fitLine(measure, text, { size, min = 20, maxWidth }) {
 }
 
 /** Escreve o texto centrado, numa linha que cabe na largura. */
-function fitText(context, text, y, { size, weight, color, maxWidth = WIDTH - 140 }) {
+function fitText(context, text, y, { size, weight, color, maxWidth = WIDTH - 140, min = 20 }) {
   const measure = (value, current) => {
     context.font = `${weight} ${current}px ${FONT}`;
     return context.measureText(value).width;
   };
-  const line = fitLine(measure, text, { size, maxWidth });
+  const line = fitLine(measure, text, { size, min, maxWidth });
   context.font = `${weight} ${line.size}px ${FONT}`;
   context.fillStyle = color;
   context.fillText(line.text, WIDTH / 2, y);
@@ -213,12 +228,13 @@ function drawCard(context, image, { x, y, width, height }, radius) {
 
 /**
  * Monta a imagem que vai para a rede social: fundo branco, o nome, a
- * pergunta, a carta escolhida, as finalistas e o endereço. `others` são as
+ * pergunta, a carta escolhida, as finalistas, o endereço e, quando as cartas
+ * levam foto de outra pessoa, o crédito das fotos (`photos`). `others` são as
  * outras finalistas (`{ src }`); uma que não carregue fica de fora, e a
  * imagem sai assim mesmo. Devolve um `File` JPEG, ou null se o navegador não
  * conseguir desenhar.
  */
-export async function shareImage({ src, name, question, others = [] }) {
+export async function shareImage({ src, name, question, others = [], photos = [] }) {
   try {
     const [card, ...rest] = await Promise.all([
       loadImage(src),
@@ -252,6 +268,11 @@ export async function shareImage({ src, name, question, others = [] }) {
       context.fillText(part, x, layout.footerY);
       x += context.measureText(part).width;
     }
+    // O crédito das fotos, embaixo do endereço, quando as cartas levam foto de outra pessoa.
+    context.textAlign = "center";
+    shareCreditLines(photos).forEach((line, index) => {
+      fitText(context, line, layout.footerY + 30 + index * 22, { size: 18, min: 12, weight: 500, color: "#6b7280", maxWidth: WIDTH - 80 });
+    });
 
     const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.9));
     return blob ? new File([blob], SHARE_FILE_NAME, { type: "image/jpeg" }) : null;

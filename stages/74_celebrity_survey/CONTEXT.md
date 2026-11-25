@@ -37,22 +37,29 @@ licença livre.
 | Título da final | "Quem fica?" quando o assunto é "Política"; "qual fica?" nos outros | "Quem fica?" quando as cartas são pessoas (Política e famosos); "qual fica?" em roupas |
 | "Em breve" | "Famosos e influenciadores" | Nenhum item, e o título "Em breve" não aparece |
 | Menu | Início, Como funciona | Entra "Créditos das fotos" |
-| Capa | Quem respondeu as duas de Política vê a de roupas em destaque | Vê a de famosos; respondida essa, a de roupas |
+| Imagem do compartilhar | Sem crédito de foto | Duas linhas de crédito no pé, só quando as cartas levam foto de outra pessoa |
+| Capa | Quem respondeu as duas de Política vê a de roupas em destaque; quem respondeu as três vê o aviso de que respondeu todas | Nos dois casos vê a de famosos; respondida essa, a de roupas |
 
 ## O formato deste estágio
 
 1. **Cartas.** Vinte, todas com a mesma moldura: a marca do PoliMatch, a
    janela da foto, o nome e a linha "Foto: autor · licença". O que muda de
-   uma para a outra é a foto, o nome e o crédito.
-2. **Fotos.** Cada foto é a imagem principal da pessoa na Wikidata, baixada
-   da Wikimedia Commons em 24/11/2026, com licença livre declarada na página
-   do arquivo (CC BY, CC BY-SA ou CC0). O arquivo entra no repositório como
+   uma para a outra é a foto, o nome e o crédito. Nos tamanhos em que o
+   aplicativo mostra a carta, a linha do crédito não se lê; o crédito legível
+   fica na página de créditos e na imagem do compartilhar.
+2. **Fotos.** Cada foto é a primeira imagem listada no item da pessoa na
+   Wikidata, baixada da Wikimedia Commons em 24/11/2026, com licença livre
+   declarada na página do arquivo (CC BY ou CC BY-SA). Para Anitta, Ludmilla
+   e Rodrigo Santoro a Wikidata marcava, nesse dia, outra imagem como
+   preferida. O arquivo entra no repositório como
    foi baixado, em `output/sources/`. Para arquivo mais largo que 1280 px foi
    baixada a miniatura de 1280 px gerada pela Wikimedia. A foto não é
    editada: é posicionada, recortada pela janela da moldura e redimensionada.
 3. **Origem.** `output/sources.json` diz, para cada carta, a página do
    arquivo na Commons, o endereço e o SHA-1 do original, o que foi baixado, o
-   autor, a licença, a data de nascimento da pessoa na Wikidata e o
+   autor, a licença, o que a Commons marca sobre a revisão da licença, a
+   origem fora da Commons (vídeo do YouTube ou foto do Flickr) com a licença
+   vista nela em 24/11/2026, a data de nascimento da pessoa na Wikidata e o
    enquadramento. As cartas são montadas por
    `app/scripts/build-celebrity-cards.mjs`, que grava o desenho de origem de
    cada carta (SVG, em `output/masters/`), os dois tamanhos publicados (WebP
@@ -63,9 +70,13 @@ licença livre.
    feito do desenho e da foto: mudar um dos dois muda o endereço.
 4. **Pesquisa.** `famosos-01`, assunto "Famosos", pergunta "De quem você é
    mais fã?", 20 cartas, sorteio de 16, telas de 4. A entrada mostra a nota
-   "Fotos de licença livre, com o crédito em cada carta.". A definição de
+   "Fotos de licença livre." e, ao lado, "Ver os créditos". A definição de
    pesquisa ganha um campo, `people`, que diz se as cartas são pessoas.
-5. **Créditos.** Página estática `/creditos.html`, ligada no menu.
+5. **Créditos.** Página estática `/creditos.html`, ligada no menu e na
+   entrada da pesquisa: autor, licença, título e página de origem de cada
+   foto, e o que foi mudado. A imagem do compartilhar ganha duas linhas no
+   pé, com o autor e a licença das fotos que estão nela e o endereço da
+   página de créditos.
 
 ## Entregas
 
@@ -73,7 +84,7 @@ licença livre.
 |---|---|
 | 74a — Registro | Decisão 0006, este contexto, notas no `AGENTS.md`, no `CONTEXT.md` e no `CREDITS.md` |
 | 74b — Cartas | As 20 cartas, as fotos de origem, a lista de origem, o manifesto, a página de créditos e o teste que prende uns aos outros |
-| 74c — Pesquisa | `famosos-01` nas regras, no servidor e na tela; o campo `people`; "Em breve" vazio; "Créditos das fotos" no menu; filtro do CI |
+| 74c — Pesquisa | `famosos-01` nas regras, no servidor e na tela; o campo `people`; "Em breve" vazio; "Créditos das fotos" no menu e na entrada; crédito na imagem do compartilhar; filtro do CI |
 | 74d — Publicação | API e app, com o sim do Stefan |
 
 ## Critérios de aceite
@@ -82,9 +93,11 @@ licença livre.
   telas de 4.
 - Todas as cartas da pesquisa têm a mesma moldura e a mesma apresentação.
 - Cada foto tem, no repositório, a página de origem, o autor, a licença e o
-  hash, e o crédito aparece na carta e na página de créditos.
+  hash. O crédito legível aparece na página de créditos e na imagem do
+  compartilhar.
 - Nenhuma pessoa com menos de 18 anos e nenhuma pessoa falecida entre as
   cartas, pela data de nascimento e pelo registro da Wikidata em 24/11/2026.
+- Nenhuma carta mostra o rosto de outra pessoa.
 - A pergunta é positiva.
 - As regras do estágio 68 e o cadastro do estágio 71 valem sem mudança: uma
   resposta por pessoa, só com conta e cadastro.
@@ -105,4 +118,4 @@ licença livre.
 ## Gate humano
 
 Merge e publicação pedem o sim do Stefan, um a um. A pergunta do merge leva
-por extenso as escolhas de regra e de dado da decisão 0006.
+por extenso as escolhas de regra e de dado da decisão 0006 (1 a 9).

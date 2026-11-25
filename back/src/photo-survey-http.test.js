@@ -67,7 +67,7 @@ test("as quatro pesquisas saem pela API como estão em shared; a de famosos e a 
     const { body: celebrities } = await read("famosos-01");
     assert.equal(celebrities.subject, "Famosos");
     assert.equal(celebrities.question, "De quem você é mais fã?");
-    assert.equal(celebrities.note, "Fotos de licença livre, com o crédito em cada carta.");
+    assert.equal(celebrities.note, "Fotos de licença livre.");
     assert.deepEqual([celebrities.cardIds.length, celebrities.drawSize, celebrities.groupSize, celebrities.screens, celebrities.status], [20, 16, 4, 4, "open"]);
     assert.deepEqual([celebrities.opensAt, celebrities.closesAt], [null, null], "sem data para abrir nem para fechar");
     assert.deepEqual(celebrities.cardIds, [...PHOTO_SURVEYS[2].cardIds]);

@@ -140,6 +140,16 @@ body {
   color: var(--ps-muted);
 }
 
+/* O caminho para a página de créditos, na entrada da pesquisa (ICM 74, #348). */
+.ps-note a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+  /* Área de toque maior, sem mexer na altura da linha. */
+  padding: 10px 0;
+}
+
 /* Cartas ---------------------------------------------------------------- */
 
 .ps-card {

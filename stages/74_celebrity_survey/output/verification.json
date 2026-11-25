@@ -3,64 +3,94 @@
   "issue": 348,
   "stage": "74_celebrity_survey",
   "base": "main em b9be219",
+  "pullRequest": 349,
   "instruction": "Stefan, 24/11/2026: \"Sim, começa\", à pergunta \"Começo a pesquisa de famosos e influenciadores?\"; e \"Sim, baixa\", à pergunta \"Baixo as fotos e monto as cartas dos famosos?\", numa mensagem que propunha foto de licença livre da Wikimedia em moldura feita por código, listava vinte nomes e dezesseis reservas e descrevia o download. As respostas cobrem começar o estágio, o tipo de carta e o download; o resto é escolha do agente (decisão 0006).",
   "parts": {
     "74a": "decisão 0006, contexto do estágio, notas no AGENTS.md, no CONTEXT.md, no README.md e no CREDITS.md",
     "74b": "20 cartas montadas por app/scripts/build-celebrity-cards.mjs: fotos de origem, lista de origem, desenhos, arquivos publicados, catálogo, manifesto, página de créditos e teste",
-    "74c": "pesquisa famosos-01 em shared/, na tela, no menu e nos testes; campo people; Em breve vazio; Créditos das fotos no menu; filtro do CI",
+    "74c": "pesquisa famosos-01 em shared/, na tela, no menu e nos testes; campo people; Em breve vazio; Créditos das fotos no menu e na entrada; crédito na imagem do compartilhar; filtro do CI",
     "74d": "pendente: publicação pede o sim do Stefan"
   },
   "cards": {
     "count": 20,
-    "people": "Anitta, Ivete Sangalo, Ludmilla, Luísa Sonza, Xuxa, Tatá Werneck, Bianca Andrade, Juliette, Bruna Marquezine, Marina Ruy Barbosa, Pabllo Vittar, Gusttavo Lima, Luan Santana, Alok, Luciano Huck, Whindersson Nunes, Felipe Neto, Casimiro, Wagner Moura, Gil do Vigor",
-    "swaps": "Virginia Fonseca e Fernanda Torres estavam na lista de vinte que o Stefan recebeu e saíram depois que o agente viu as fotos; Bianca Andrade e Marina Ruy Barbosa vieram das reservas (motivos no HANDOFF)",
-    "source": "imagem principal de cada pessoa na Wikidata, baixada da Wikimedia Commons em 24/11/2026; licença livre declarada na página do arquivo",
+    "people": "Anitta, Ivete Sangalo, Ludmilla, Luísa Sonza, Xuxa, Tatá Werneck, Ana Maria Braga, Juliette, Bruna Marquezine, Iza, Pabllo Vittar, Gusttavo Lima, Rodrigo Santoro, Alok, Selton Mello, Whindersson Nunes, Felipe Neto, Casimiro, Wagner Moura, Gil do Vigor",
+    "fromTheListHeSaw": 16,
+    "swaps": "saíram Virginia Fonseca, Fernanda Torres, Luan Santana e Luciano Huck; entraram, das reservas, Ana Maria Braga, Iza, Rodrigo Santoro e Selton Mello; Bianca Andrade, Marina Ruy Barbosa e Carlinhos Maia foram tentadas e não ficaram (motivos no HANDOFF)",
+    "inElectionCatalogue": "8 das 20 estão em shared/elections-2026.json: Anitta, Ludmilla, Pabllo Vittar, Gusttavo Lima, Whindersson Nunes, Casimiro e Wagner Moura no grupo influencia_debate; Felipe Neto no grupo politica",
+    "source": "primeira imagem listada no item de cada pessoa na Wikidata, baixada da Wikimedia Commons em 24/11/2026; para Anitta, Ludmilla e Rodrigo Santoro a Wikidata marcava outra imagem como preferida",
     "licenses": {
-      "CC BY 3.0": 12,
-      "CC BY 2.0": 3,
+      "CC BY 3.0": 15,
       "CC BY-SA 4.0": 3,
       "CC BY 4.0": 1,
-      "CC0": 1
+      "CC BY 2.0": 1
     },
-    "downloaded": "16 arquivos originais, com o SHA-1 igual ao que a Commons informa; 4 miniaturas de 1280 px geradas pela Wikimedia (Juliette, Marina Ruy Barbosa, Alok, Wagner Moura)",
-    "sourcesInRepo": "stages/74_celebrity_survey/output/sources/, 20 arquivos, 11,9 MB, como foram baixados",
-    "published": "app/public/chromas/famosos/*.webp, dois tamanhos por carta (530x742 e 1060x1484), 40 arquivos, 2,6 MB",
+    "origins": {
+      "quadro de vídeo do YouTube": 15,
+      "obra própria declarada na Commons": 4,
+      "foto do Flickr": 1
+    },
+    "downloaded": "15 arquivos originais, com o SHA-1 igual ao que a Commons informa; 5 miniaturas de 1280 px geradas pela Wikimedia (Juliette, Rodrigo Santoro, Alok, Selton Mello, Wagner Moura)",
+    "sourcesInRepo": "stages/74_celebrity_survey/output/sources/, 20 arquivos, 11,4 MB, como foram baixados",
+    "published": "app/public/chromas/famosos/*.webp, dois tamanhos por carta (530x742 e 1060x1484), 40 arquivos, 2,3 MB",
     "edits": "nenhuma edição na foto: posicionada, recortada pela janela da moldura e redimensionada; nenhum retrato gerado ou editado por IA",
     "frame": "desenhada por código; o roteiro foi escrito por agente de IA, e o manifesto e a página de créditos dizem isso",
     "font": "texto desenhado com a Helvetica Neue do macOS da máquina que gerou; a fonte não vai para o repositório nem para o site",
-    "enlarged": "15 das 20 fotos são ampliadas na carta de 1060 px; a maior ampliação é de 2,44 vezes (Gil do Vigor)",
+    "enlarged": "14 das 20 fotos são ampliadas na carta de 1060 px; a maior ampliação é de 2,64 vezes (Ana Maria Braga)",
     "adults": "data de nascimento da Wikidata registrada para as 20; a mais nova nasceu em 1998; nenhuma com registro de falecimento na Wikidata em 24/11/2026",
-    "pinnedBy": "app/src/celebrity-cards.test.js: código, nome, foto, hash, SHA-1 do original quando o arquivo é o original, página e endereço de origem, autor, licença aceita, crédito na carta e na página de créditos, data de nascimento, carimbo, os dois tamanhos, o tamanho gravado em cada arquivo; nenhum arquivo sobrando nas três pastas; nenhum código repetido com as outras pesquisas",
-    "reproducible": "gerado duas vezes na mesma máquina, com os mesmos nomes e os mesmos hashes nos 40 arquivos publicados",
+    "creditOnCard": "a linha \"Foto: autor · licença\" está em cada carta, mas não se lê nos tamanhos em que o aplicativo mostra a carta; o crédito legível está na página de créditos e no pé da imagem do compartilhar",
+    "pinnedBy": "app/src/celebrity-cards.test.js: código, nome, foto, hash e tamanho da foto, SHA-1 e tamanho do original quando o arquivo é o original, 1280 px e endereço de miniatura quando não é, página e endereço de origem batendo com o título, crédito igual ao campo de atribuição da Commons salvo nota, endereço da licença derivado da licença, origem fora da Commons, data de nascimento, enquadramento recalculado, lugar da foto e textos no desenho de origem, carimbo, os dois tamanhos, a página de créditos inteira; nenhum arquivo sobrando nas quatro pastas; nenhum código repetido com as outras pesquisas",
+    "notPinned": "que a foto é da pessoa; que a licença declarada é verdadeira; que cada WebP é o desenho do seu SVG; que uma miniatura é a da Wikimedia",
+    "reproducible": "gerado mais de uma vez na mesma máquina com os mesmos nomes e hashes; a leitura independente gerou de novo numa cópia o conjunto do primeiro commit, igual byte a byte",
     "tools": "Chromium headless shell 1187 e cwebp 1.6.0"
+  },
+  "originChecks": {
+    "date": "2026-11-24, por leitura de páginas, sem baixar imagem",
+    "commons": "página, autor, licença e SHA-1 do original das 20, pela API",
+    "youtube": "as 15 páginas de vídeo dadas como origem mostravam \"License: Creative Commons Attribution license (reuse allowed)\"; um vídeo de controle sem essa licença não mostrava a linha; canais: Multishow (12), Record Goiás (1), TNT Sports Brasil (1), Attractive Mindset Network (1)",
+    "flickr": "a página da foto de Alok mostra CC BY 2.0",
+    "ownWork": "Juliette, Rodrigo Santoro, Selton Mello e Wagner Moura: obra própria declarada na Commons, sem origem fora dela",
+    "commonsLicenseReview": {
+      "revisada": 9,
+      "pede revisão": 4,
+      "sem categoria de revisão": 7
+    },
+    "commonsFlags": "Bruna Marquezine: a Commons avisa que a licença do modelo da página (CC BY 4.0) difere da dos dados estruturados; 11 dos 20 arquivos trazem o aviso de direitos de personalidade",
+    "wikidata": "nenhuma das 20 com falecimento, cargo, partido ou candidatura registrados"
   },
   "download": {
     "date": "2026-11-24, entre 21:48 e 22:12 de Brasília",
-    "what": "a imagem principal de 36 nomes; 20 viraram carta e 16 ficaram fora do repositório",
+    "what": "uma imagem de cada um de 36 nomes; 20 viraram carta e 16 ficaram fora do repositório",
     "rateLimit": "depois do oitavo arquivo o servidor da Wikimedia respondeu 429, com espera de 600 s e pedido para usar miniaturas; o agente esperou e baixou os outros 28 com 8 s entre um e outro",
     "userAgent": "nome genérico de cliente, sem dado de contato"
   },
   "tests": {
     "date": "2026-11-24",
     "ranByMainAgent": {
+      "when": "no estado final dos arquivos do commit, no macOS",
       "npm run test:shared": "121/121",
-      "npm test --prefix app": "226/226",
+      "npm test --prefix app": "228/228",
       "npm test --prefix back": "306/306",
-      "caminho inteiro de famosos-01 no aplicativo local, servidor simulado, roteiro fora do repositório, Chromium 1187": "entrada, quatro telas, final com \"Entre elas, quem fica?\", confirmação, resposta registrada, imagem do compartilhar, capa e página de créditos com 20 itens, sem erro de página"
+      "npm run build --prefix app": "sem erro, três páginas",
+      "app/e2e/site-shell.mjs em Chromium, execução inteira": "53/53",
+      "app/e2e/photo-survey.mjs em Chromium": "34/34",
+      "app/e2e/client-error-report.mjs em Chromium": "três páginas",
+      "app/e2e/photo-survey.mjs em WebKit": "34/34",
+      "app/e2e/client-error-report.mjs em WebKit": "três páginas",
+      "app/e2e/site-shell.mjs em WebKit, execução inteira": "42 cenários e parou no 43º por estouro de tempo ao abrir a página",
+      "app/e2e/site-shell.mjs em WebKit, do 43º ao 53º, um a um": "11/11",
+      "caminho inteiro de famosos-01 no aplicativo local, servidor simulado, roteiro fora do repositório": "entrada, quatro telas, final com \"Entre elas, quem fica?\", confirmação, resposta registrada, imagem do compartilhar com o crédito, capa e página de créditos com 20 itens, sem erro de página"
     },
     "ranOnlyByWiringAgent": {
-      "note": "agente à parte que escreveu a 74c; resultados do relato dele",
-      "npm run build --prefix app": "sem erro, três páginas",
-      "app/e2e/photo-survey.mjs": "34/34 em WebKit e em Chromium",
-      "app/e2e/site-shell.mjs em Chromium, execução inteira": "53/53",
-      "app/e2e/site-shell.mjs em WebKit, cenário por cenário": "53/53",
-      "app/e2e/site-shell.mjs em WebKit, execução inteira": "parou no cenário 43 em quatro tentativas; pelo relato, o mesmo acontece com o código da main nesta máquina",
-      "app/e2e/client-error-report.mjs": "três páginas, em WebKit e em Chromium",
+      "note": "agente à parte que escreveu a maior parte da 74c; resultados do relato dele, antes das mudanças feitas depois da leitura independente",
       "back/scripts/photo-survey-smoke.mjs e cpf-registration-smoke.mjs": "aprovados, em PostgreSQL 16 descartável",
       "entrada de famosos em quatro tamanhos de tela": "sem rolagem em 390x844, 375x667, 360x640 e 320x568",
       "página de créditos": "20 linhas, sem rolagem lateral em 390 e 320 px de largura"
     },
-    "ci": "pendente"
+    "localBrowsers": "Chromium 1187, mais antigo que o 1193 que o Playwright do projeto pede, por um roteiro auxiliar fora do repositório; WebKit 2203, direto",
+    "ci": {
+      "bc37f7c": "primeiro commit do PR: os nove trabalhos passaram, entre eles os roteiros de navegador em Chromium e em WebKit e a integração com PostgreSQL",
+      "commitDesteRegistro": "pendente quando este arquivo foi escrito"
+    }
   },
   "screens": {
     "file": "stages/74_celebrity_survey/references/telas-famosos.jpg",
@@ -69,10 +99,12 @@
   },
   "notVerified": [
     "que cada foto é da pessoa que o nome diz: a identidade é a da Wikidata e da página do arquivo",
-    "que a licença declarada na Wikimedia Commons é verdadeira; os vídeos de origem dos 13 quadros de vídeo não foram abertos",
-    "candidaturas: só listas parciais da imprensa foram lidas; o registro do TSE não foi consultado",
+    "que cada quadro vem do vídeo indicado e que o canal podia licenciar tudo o que aparece nele: os vídeos não foram assistidos",
+    "a licença das quatro obras próprias, além do que a Commons declara",
+    "candidaturas no registro do TSE",
     "cada carta no tamanho maior, uma a uma",
-    "a execução inteira de app/e2e/site-shell.mjs em WebKit",
+    "se o crédito na imagem do compartilhar basta para cada licença",
+    "a altura dos links da página de créditos com fontes que não as do macOS",
     "celular de verdade, o botão real do Google e o compartilhamento real do aparelho",
     "produção: nada foi publicado"
   ],
@@ -80,7 +112,16 @@
     "decision": "pendente em 24/11/2026",
     "owner": "Stefan",
     "start": "Sim, começa",
-    "cards": "Sim, baixa"
+    "cards": "Sim, baixa",
+    "toAskInFull": "as escolhas 1 a 9 da decisão 0006"
   },
-  "independentReview": "pendente"
+  "independentReview": {
+    "first": {
+      "on": "bc37f7c",
+      "result": "segurou a pergunta do merge por achados de registro e de procedência das fotos; código, testes e CI se sustentaram",
+      "adjusted": "registro; quatro cartas trocadas; conferência da licença no YouTube e no Flickr; crédito pelo campo de atribuição; título da obra na página de créditos; crédito na imagem do compartilhar; caminho para os créditos na entrada; teste das cartas mais apertado"
+    },
+    "delta": "pendente quando este arquivo foi escrito",
+    "by": "agente que não escreveu o código, somente leitura"
+  }
 }

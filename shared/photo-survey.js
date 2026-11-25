@@ -40,8 +40,8 @@ const CLOTHES_CARD_IDS = Object.freeze([
 // crédito na carta. Cada pessoa recebe 16 por sorteio, como na política.
 const CELEBRITY_CARD_IDS = Object.freeze([
   "anitta", "ivete-sangalo", "ludmilla", "luisa-sonza", "xuxa",
-  "tata-werneck", "bianca-andrade", "juliette", "bruna-marquezine", "marina-ruy-barbosa",
-  "pabllo-vittar", "gusttavo-lima", "luan-santana", "alok", "luciano-huck",
+  "tata-werneck", "ana-maria-braga", "juliette", "bruna-marquezine", "iza",
+  "pabllo-vittar", "gusttavo-lima", "rodrigo-santoro", "alok", "selton-mello",
   "whindersson-nunes", "felipe-neto", "casimiro", "wagner-moura", "gil-do-vigor",
 ]);
 
@@ -73,7 +73,7 @@ export const PHOTO_SURVEYS = Object.freeze([
     id: "famosos-01",
     subject: "Famosos",
     question: "De quem você é mais fã?",
-    note: "Fotos de licença livre, com o crédito em cada carta.",
+    note: "Fotos de licença livre.",
     cardIds: CELEBRITY_CARD_IDS,
     drawSize: 16,
     groupSize: 4,

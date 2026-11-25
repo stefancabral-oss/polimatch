@@ -39,11 +39,13 @@ As prévias em `app/public/chromas/` são ativos separados das fotografias docum
 
 ## Cartas de famosos — estágio 74
 
-As cartas da pesquisa de famosos e influenciadores ([ICM 74] #348, decisão 0006) usam fotografias da Wikimedia Commons com licença livre declarada na página de cada arquivo (CC BY, CC BY-SA ou CC0). Autor, licença, página de origem, endereço e SHA-1 do original e o hash do arquivo baixado estão em `stages/74_celebrity_survey/output/sources.json` e no manifesto do estágio. Os arquivos estão em `stages/74_celebrity_survey/output/sources/`, como foram baixados em 24/11/2026.
+As cartas da pesquisa de famosos e influenciadores ([ICM 74] #348, decisão 0006) usam fotografias da Wikimedia Commons com licença livre declarada na página de cada arquivo (CC BY ou CC BY-SA). Autor, licença, página de origem, endereço e SHA-1 do original, o hash do arquivo baixado e o que foi conferido fora da Commons estão em `stages/74_celebrity_survey/output/sources.json` e no manifesto do estágio. Os arquivos estão em `stages/74_celebrity_survey/output/sources/`, como foram baixados em 24/11/2026.
 
-A fotografia não é editada: é posicionada, recortada pela janela da moldura e redimensionada. A moldura é desenhada por código, e o roteiro que a desenha e monta a carta (`app/scripts/build-celebrity-cards.mjs`) foi escrito por um agente de IA. Cada carta traz "Foto: autor · licença", e a página `/creditos.html` lista os créditos e diz o que foi mudado. As cartas feitas de fotografia com licença CC BY-SA podem ser reutilizadas nos termos da mesma licença.
+A fotografia não é editada: é posicionada, recortada pela janela da moldura e redimensionada. A moldura é desenhada por código, e o roteiro que a desenha e monta a carta (`app/scripts/build-celebrity-cards.mjs`) foi escrito por um agente de IA. Cada carta traz "Foto: autor · licença", em letra que não se lê nos tamanhos em que o aplicativo mostra a carta. O crédito legível está na página `/creditos.html`, que lista autor, licença, título e origem de cada fotografia e diz o que foi mudado, e no pé da imagem do compartilhar.
 
-A licença é a declarada na Wikimedia Commons; a origem de cada fotografia não foi conferida. A licença trata do direito de quem fez a fotografia, não do direito da pessoa retratada.
+As cartas feitas de fotografia com licença CC BY-SA 4.0 (Juliette, Selton Mello e Wagner Moura) podem ser reutilizadas nos termos dessa mesma licença. Isso vale para essas três cartas, não para a marca do PoliMatch nem para o resto do repositório.
+
+A licença é a declarada na Wikimedia Commons. O que foi conferido na origem, e o que não foi, está no HANDOFF do estágio. A licença trata do direito de quem fez a fotografia, não do direito da pessoa retratada.
 
 ## Independência
 

@@ -5,7 +5,7 @@
 // fotografia não é editada: só é posicionada e recortada pela janela da
 // moldura e redimensionada com a carta. Não há retrato gerado nem editado por
 // IA. Este roteiro, que desenha a moldura e monta a carta, foi escrito por um
-// agente de IA (CREDITS.md, "Chromas e artes editadas").
+// agente de IA (CREDITS.md, "Cartas de famosos — estágio 74").
 //
 // Entradas, as duas no repositório:
 //   stages/74_celebrity_survey/output/sources.json   quem aparece, de onde veio
@@ -33,12 +33,10 @@ import { tmpdir } from "node:os";
 import { dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
+import { HEIGHT, STAGE, WIDTH, WINDOW, creditLine, creditsPage, escapeXml, licenseAddress, placement } from "./celebrity-cards-lib.mjs";
 
-const WIDTH = 1060;
-const HEIGHT = 1484;
 const EDITION = "famosos-v1";
 const VERSION = "v01";
-const STAGE = "stages/74_celebrity_survey";
 
 const repo = (path) => fileURLToPath(new URL(`../../${path}`, import.meta.url));
 const SOURCES_JSON = repo(`${STAGE}/output/sources.json`);
@@ -56,37 +54,16 @@ const PANEL = "#D6DADC";
 const INK = "#111418";
 const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
-// A janela da foto e a placa do nome: iguais em todas as cartas.
-const WINDOW = { x: 70, y: 150, width: 920, height: 1000, radius: 28 };
+// A placa do nome: igual em todas as cartas.
 const PLATE = { x: 70, y: 1170, width: 920, height: 244, radius: 28 };
 const TEXT_WIDTH = 840;
 const NAME = { size: 112, weight: 800, spacing: -2.5, baseline: 1300 };
 const CREDIT = { size: 26, weight: 700, spacing: 3, baseline: 1372, minimum: 17 };
-// Onde, dentro da janela, fica o ponto de foco da foto (o rosto).
-const FOCUS_AT = { x: 0.5, y: 0.42 };
 
 const MIME = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp" };
 const TOOL = "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada";
 
-const escapeXml = (text) => String(text).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
-const round = (value) => Math.round(value * 100) / 100;
-const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
-
-/** A linha de crédito da carta: quem fez a foto e a licença, como a licença pede. */
-const creditLine = (card) => `Foto: ${card.authorShown} · ${card.license}`;
-
-/** Onde a foto inteira fica para o ponto de foco cair na janela, sem deixar a janela vazia. */
-function placement(card, width, height) {
-  const zoom = card.crop?.zoom ?? 1;
-  if (!(zoom >= 1)) throw new Error(`${card.id}: o zoom precisa ser 1 ou mais`);
-  const scale = Math.max(WINDOW.width / width, WINDOW.height / height) * zoom;
-  const shownWidth = width * scale;
-  const shownHeight = height * scale;
-  const x = clamp(WINDOW.x + WINDOW.width * FOCUS_AT.x - (card.crop?.x ?? 0.5) * shownWidth, WINDOW.x + WINDOW.width - shownWidth, WINDOW.x);
-  const y = clamp(WINDOW.y + WINDOW.height * FOCUS_AT.y - (card.crop?.y ?? 0.35) * shownHeight, WINDOW.y + WINDOW.height - shownHeight, WINDOW.y);
-  return { x: round(x), y: round(y), width: round(shownWidth), height: round(shownHeight), scale: round(scale) };
-}
 
 function cardSvg(card, place, sizes, href) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${WIDTH} ${HEIGHT}" width="${WIDTH}" height="${HEIGHT}" font-family="${FONT}">
@@ -112,67 +89,14 @@ function cardSvg(card, place, sizes, href) {
 `;
 }
 
-/** A página de créditos: quem fez cada foto, a licença e o que foi mudado. Texto fixo, sem depender de script. */
-function creditsPage(cards) {
-  const shareAlike = cards.filter((card) => /\bBY-SA\b/.test(card.license));
-  const item = (card) => `          <li><b>${escapeXml(card.name)}</b><span>Foto de <a href="${escapeXml(card.commons.page)}" rel="noopener">${escapeXml(card.authorShown)}</a>, licença <a href="${escapeXml(card.licenseUrl)}" rel="noopener license">${escapeXml(card.license)}</a>.</span></li>`;
-  const description = "De quem é cada foto das cartas de famosos do PoliMatch, com a licença de cada uma.";
-  return `<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#ffffff" />
-    <meta name="description" content="${description}" />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="pt_BR" />
-    <meta property="og:site_name" content="PoliMatch" />
-    <meta property="og:title" content="Créditos das fotos — PoliMatch" />
-    <meta property="og:description" content="${description}" />
-    <meta property="og:url" content="https://polimatch.com.br/creditos.html" />
-    <meta property="og:image" content="https://polimatch.com.br/brand/logo-volumetric.png" />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1600" />
-    <meta property="og:image:height" content="1000" />
-    <meta property="og:image:alt" content="PoliMatch" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Créditos das fotos — PoliMatch" />
-    <meta name="twitter:description" content="${description}" />
-    <meta name="twitter:image" content="https://polimatch.com.br/brand/logo-volumetric.png" />
-    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
-    <title>Créditos das fotos — PoliMatch</title>
-  </head>
-  <body>
-    <!-- Página gerada por app/scripts/build-celebrity-cards.mjs a partir de stages/74_celebrity_survey/output/sources.json. Não editar à mão. -->
-    <div class="ps-shell" data-view="credits">
-      <header class="ps-top">
-        <a class="ps-brand" href="./" aria-label="PoliMatch, início">Poli<b>Match</b></a>
-        <button class="pm-menu-btn" type="button" data-action="menu" aria-haspopup="dialog" aria-label="Abrir menu"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" /></svg></button>
-      </header>
-      <main class="ps-main ps-main--entry" aria-labelledby="credits-title">
-        <p class="ps-kicker">PoliMatch</p>
-        <h1 class="ps-title" id="credits-title">Créditos das fotos</h1>
-        <p class="ps-hint">As fotos das cartas de famosos vêm da Wikimedia Commons, com licença livre.</p>
-        <ul class="ps-credits">
-${cards.map(item).join("\n")}
-        </ul>
-        <p class="pm-note">Cada foto foi recortada e redimensionada para caber na carta, que leva o nome da pessoa e este crédito. Nenhuma foto foi editada por IA. A moldura é desenhada por código, escrito com IA.</p>
-${shareAlike.length ? `        <p class="pm-note">${shareAlike.length === 1 ? "A carta" : "As cartas"} de ${escapeXml(new Intl.ListFormat("pt-BR").format(shareAlike.map((card) => card.name)))} ${shareAlike.length === 1 ? "pode ser reutilizada" : "podem ser reutilizadas"} nos termos da mesma licença da foto.</p>\n` : ""}        <p class="pm-note">A licença trata do direito de quem fez a foto. O PoliMatch não tem vínculo com as pessoas retratadas, e a presença de alguém aqui não indica apoio dela ao PoliMatch.</p>
-        <div class="ps-stack"><a class="ps-btn" href="./">Voltar para as pesquisas</a></div>
-      </main>
-    </div>
-    <script type="module" src="/src/credits-page.js"></script>
-  </body>
-</html>
-`;
-}
-
 // ---------------------------------------------------------------------------
 // Geração
 
 const cards = JSON.parse(readFileSync(SOURCES_JSON, "utf8"));
 if (new Set(cards.map((card) => card.id)).size !== cards.length) throw new Error("código de carta repetido em sources.json");
+for (const card of cards) {
+  if (card.licenseUrl !== licenseAddress(card.license)) throw new Error(`${card.id}: o endereço da licença não é o da ${card.license}`);
+}
 
 mkdirSync(MASTERS_DIR, { recursive: true });
 mkdirSync(PUBLIC_DIR, { recursive: true });
@@ -274,16 +198,17 @@ for (const card of cards) {
       height,
       commons: card.commons,
       download: card.download,
-      author: card.author,
+      origin: card.origin,
+      wikidata: card.wikidata,
       authorShown: card.authorShown,
       license: card.license,
       licenseUrl: card.licenseUrl,
-      dateOnCommons: card.dateOnCommons,
-      wikidata: card.wikidata,
     },
     credit: creditLine(card),
     changes: "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    crop: card.crop,
     placement: place,
+    textSizes: sizes,
     aiEdited: false,
     tool: TOOL,
     variants,

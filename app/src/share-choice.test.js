@@ -5,6 +5,7 @@ import {
   SHARE_IMAGE_SIZE,
   fitLine,
   shareChoice,
+  shareCreditLines,
   shareImageLayout,
   shareMode,
   sharePlan,
@@ -197,3 +198,24 @@ test("enquanto a imagem é montada a prévia avisa; se não sair, oferece tentar
   assert.doesNotMatch(sharePreviewMarkup({ url: "blob:x", name: "Ana" }), /data-share="retry"|ps-share-wait/);
 });
 
+test("a imagem leva o crédito das fotos quando as cartas têm foto de outra pessoa", () => {
+  // Sem foto com crédito (política, roupas), nenhuma linha: a imagem fica como era.
+  assert.deepEqual(shareCreditLines(), []);
+  assert.deepEqual(shareCreditLines([]), []);
+  assert.deepEqual(shareCreditLines([undefined, null, {}, { author: "Fulana" }, { license: "CC BY 3.0" }]), []);
+  // Uma foto: singular. O endereço dos créditos completos vem na segunda linha.
+  assert.deepEqual(shareCreditLines([{ author: "Fulana", license: "CC BY 3.0" }]), [
+    "Foto: Fulana (CC BY 3.0)",
+    "Créditos completos em polimatch.com.br/creditos.html",
+  ]);
+  // Várias: na ordem em que as cartas entram na imagem, sem repetir o mesmo autor com a mesma licença.
+  assert.deepEqual(shareCreditLines([
+    { author: "Canal", license: "CC BY 3.0" },
+    { author: "Fulana", license: "CC BY-SA 4.0" },
+    { author: "Canal", license: "CC BY 3.0" },
+    { author: "Canal", license: "CC BY 4.0" },
+  ]), [
+    "Fotos: Canal (CC BY 3.0) · Fulana (CC BY-SA 4.0) · Canal (CC BY 4.0)",
+    "Créditos completos em polimatch.com.br/creditos.html",
+  ]);
+});

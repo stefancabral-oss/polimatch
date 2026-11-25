@@ -1353,7 +1353,7 @@ try {
     await entryReady(page);
     assert.equal(await page.locator("#ps-title").innerText(), "De quem você é mais fã?");
     assert.equal(await page.locator(".ps-kicker").first().innerText(), "FAMOSOS · 16 CARTAS");
-    assert.equal(await page.locator(".ps-note").innerText(), "Fotos de licença livre, com o crédito em cada carta.");
+    assert.equal(await page.locator(".ps-note").innerText(), "Fotos de licença livre. Ver os créditos");
     // As duas de política sorteiam das mesmas cartas: a escolha pode ser a mesma pessoa nas duas.
     await page.locator(".ps-home .ps-pick").nth(1).locator("b", { hasText: second }).waitFor();
     assert.deepEqual(await page.locator(".ps-home .ps-pick b").allInnerTexts(), [first, second]);
@@ -2049,7 +2049,8 @@ try {
   });
 
   // Pesquisa de famosos e créditos das fotos (ICM 74, #348) -------------------
-  const CELEBRITY_NOTE = "Fotos de licença livre, com o crédito em cada carta.";
+  // A nota da pesquisa e, ao lado, o caminho para a página de créditos.
+  const CELEBRITY_NOTE = "Fotos de licença livre. Ver os créditos";
 
   await scenario("a pesquisa de famosos abre no endereço dela, com a observação e três cartas de famosos", async () => {
     // O catálogo do app tem as cartas da pesquisa, nem mais nem menos.
@@ -2061,6 +2062,7 @@ try {
     assert.equal(await page.locator("#ps-title").innerText(), "De quem você é mais fã?");
     assert.equal(await page.locator(".ps-hint").first().innerText(), "Leva menos de um minuto.");
     assert.equal(await page.locator(".ps-note").innerText(), CELEBRITY_NOTE);
+    assert.equal(await page.locator(".ps-note a").getAttribute("href"), "./creditos.html");
     assert.equal(await page.locator(".ps-note").evaluate((node) => node.previousElementSibling?.className), "ps-hint");
     assert.equal(await page.locator(".ps-cta-note").innerText(), "Para responder, entre com Google e cadastre o CPF.");
     assert.equal(await page.locator(".ps-home").count(), 0, "na página da pesquisa não há as listas da capa");
