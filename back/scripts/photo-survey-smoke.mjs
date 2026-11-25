@@ -12,7 +12,8 @@ const connection = requireDisposableDatabase();
 
 const SURVEY = PHOTO_SURVEYS[0];
 const SECOND = PHOTO_SURVEYS[1];
-const CLOTHES = PHOTO_SURVEYS[2];
+const CELEBRITIES = PHOTO_SURVEYS.find((survey) => survey.id === "famosos-01");
+const CLOTHES = PHOTO_SURVEYS.find((survey) => survey.id === "roupas-demo-01");
 const WINDOWED = Object.freeze({
   ...SURVEY,
   id: "smoke-janela",
@@ -29,7 +30,7 @@ let now = OPEN_INSTANT;
 const options = {
   candidateRegistry: createApprovedTestRegistry(CATALOG.map((person) => person.id)),
   clock: () => now,
-  photoSurveys: [SURVEY, SECOND, CLOTHES, WINDOWED],
+  photoSurveys: [SURVEY, SECOND, CELEBRITIES, CLOTHES, WINDOWED],
   requirePhotoSurveyRegistration: async () => {},
 };
 const store = createTopicStore(connection, options);
@@ -383,7 +384,34 @@ try {
   assert.equal((await store.photoSurveyDraw(vera.recoveryKey, CLOTHES.id)).response.championId, clothesPicks[1]);
   assert.equal((await store.photoSurveyDraw(vera.recoveryKey, SURVEY.id)).response.championId, answeredOne.response.championId);
 
-  console.log("Smoke da pesquisa por foto aprovado: sorteio estável e simultâneo, resposta única e idempotente, corrida de duas abas, respostas forjadas recusadas, janela, imutabilidade, jogo atual intacto, identidade Google, duas pesquisas independentes, a de roupas com as 16 cartas e segundo boot.");
+  // --- Pesquisa de famosos (ICM 74): 16 de 20 cartas próprias, por sorteio ---
+  assert.equal(CELEBRITIES.id, "famosos-01");
+  const veraCelebrities = await store.photoSurveyDraw(vera.recoveryKey, CELEBRITIES.id);
+  assert.equal(veraCelebrities.survey.subject, "Famosos");
+  assert.equal(veraCelebrities.survey.question, "De quem você é mais fã?");
+  assert.equal(veraCelebrities.survey.note, "Fotos de licença livre, com o crédito em cada carta.");
+  assert.equal(veraCelebrities.response, null, "as respostas de política e de roupas não respondem a de famosos");
+  assert.deepEqual(veraCelebrities.draw.groups.map((group) => group.length), [4, 4, 4, 4]);
+  const celebrityShown = veraCelebrities.draw.groups.flat();
+  assert.equal(new Set(celebrityShown).size, 16, "16 cartas, sem repetir");
+  assert.ok(celebrityShown.every((id) => CELEBRITIES.cardIds.includes(id)), "só cartas da pesquisa de famosos");
+  assert.deepEqual(await store.photoSurveyDraw(vera.recoveryKey, CELEBRITIES.id), veraCelebrities, "o sorteio não muda");
+  // Uma carta de roupa não entra numa resposta da pesquisa de famosos.
+  const celebrityPicks = picksOf(veraCelebrities.draw, 3);
+  await assert.rejects(respond(vera, { pickIds: [veraClothes.draw.groups[0][0], ...celebrityPicks.slice(1)], championId: celebrityPicks[1] }, CELEBRITIES.id), (error) => {
+    assert.equal(error.code, "PHOTO_SURVEY_RESPONSE_INVALID");
+    assert.equal(error.current.reason, "pick-outside-group");
+    return true;
+  });
+  const answeredCelebrities = await respond(vera, { pickIds: celebrityPicks, championId: celebrityPicks[2] }, CELEBRITIES.id);
+  assert.equal(answeredCelebrities.status, "created");
+  assert.equal((await store.photoSurveyDraw(vera.recoveryKey, CELEBRITIES.id)).response.championId, celebrityPicks[2]);
+  await rejectsWith(respond(vera, { pickIds: celebrityPicks, championId: celebrityPicks[0] }, CELEBRITIES.id), 409, "PHOTO_SURVEY_ALREADY_ANSWERED");
+  // As outras respostas dela continuam como estavam.
+  assert.equal((await store.photoSurveyDraw(vera.recoveryKey, CLOTHES.id)).response.championId, clothesPicks[1]);
+  assert.equal((await store.photoSurveyDraw(vera.recoveryKey, SECOND.id)).response.championId, answeredTwo.response.championId);
+
+  console.log("Smoke da pesquisa por foto aprovado: sorteio estável e simultâneo, resposta única e idempotente, corrida de duas abas, respostas forjadas recusadas, janela, imutabilidade, jogo atual intacto, identidade Google, duas pesquisas independentes, a de roupas com as 16 cartas, a de famosos com 16 de 20 e segundo boot.");
 } finally {
   await audit.end();
   await store.close();

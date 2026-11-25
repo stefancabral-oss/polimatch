@@ -649,6 +649,12 @@ button.ps-card[aria-pressed="true"]::after {
   margin-top: 28px;
 }
 
+/* Sem lista para mostrar (nenhuma escolha, nenhuma outra pesquisa e nenhum
+   anúncio), a área das listas não ocupa espaço. */
+.ps-home:empty {
+  display: none;
+}
+
 .ps-home-label {
   margin: 24px 0 2px;
 }
@@ -715,6 +721,13 @@ button.ps-card[aria-pressed="true"]::after {
 }
 
 .ps-home .pm-item:last-child {
+  border-bottom: 0;
+}
+
+/* Sem anúncio de próxima pesquisa (ICM 74, #348), a capa termina numa linha
+   de pesquisa ou de escolha: a última também fica sem o traço de baixo. */
+.ps-home > .ps-survey:last-child,
+.ps-home > .ps-pick:last-child {
   border-bottom: 0;
 }
 
@@ -936,4 +949,68 @@ select.ps-input {
 .ps-share-actions .ps-link {
   justify-self: center;
   padding-right: 12px;
+}
+
+/* Créditos das fotos (ICM 74, #348) --------------------------------------- */
+
+/* Uma linha por carta: o nome e, abaixo, de quem é a foto e a licença. A
+   página é gerada por app/scripts/build-celebrity-cards.mjs. */
+.ps-credits {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ps-credits li {
+  display: grid;
+  padding: 10px 0 4px;
+  border-bottom: 1px solid var(--ps-line);
+}
+
+.ps-credits li:last-child {
+  border-bottom: 0;
+}
+
+.ps-credits b {
+  font-size: 16px;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+/* A linha é alta para cada link ter área de toque própria, sem encostar no
+   link da linha de cima ou de baixo quando o crédito quebra. */
+.ps-credits span {
+  font-size: 14px;
+  line-height: 2.4;
+  color: var(--ps-muted);
+  overflow-wrap: anywhere;
+}
+
+.ps-credits a {
+  padding: 7px 0;
+  color: var(--ps-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* O nome da licença não quebra no meio: desce inteiro para a linha de baixo. */
+.ps-credits a[rel~="license"] {
+  white-space: nowrap;
+}
+
+.ps-credits a:focus-visible {
+  outline: 3px solid var(--ps-ink);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* O botão acompanha o texto em vez de ficar por cima da lista, e os avisos
+   do fim da página ficam juntos. */
+.ps-shell[data-view="credits"] .ps-stack {
+  position: static;
+}
+
+.ps-shell[data-view="credits"] .pm-note + .pm-note {
+  margin-top: 10px;
 }

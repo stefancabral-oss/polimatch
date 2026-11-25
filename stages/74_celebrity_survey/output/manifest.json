@@ -1,0 +1,1242 @@
+[
+  {
+    "id": "anitta",
+    "name": "Anitta",
+    "master": "stages/74_celebrity_survey/output/masters/anitta.svg",
+    "masterSha256": "3de998246515f4f35fef3e06bb1c65a07a3d0120fab587f5c1408d898a1a1632",
+    "stamp": "d36f9fbf",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/anitta.jpg",
+      "sha256": "a0b0af008ea3568c39e931e15dcb9a908892f76086d91571aa14988d62b467c5",
+      "bytes": 59195,
+      "width": 491,
+      "height": 602,
+      "commons": {
+        "title": "File:Anitta for Attractive Mindset podcast 02.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Anitta_for_Attractive_Mindset_podcast_02.jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/2/23/Anitta_for_Attractive_Mindset_podcast_02.jpg",
+        "originalSha1": "6dada59e1533bb0363ccae0dfb6d36809b4b1253",
+        "originalWidth": 491,
+        "originalHeight": 602,
+        "originalBytes": 59195
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/2/23/Anitta_for_Attractive_Mindset_podcast_02.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "Attractive Mindset",
+      "authorShown": "Attractive Mindset",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2024-06-16",
+      "wikidata": {
+        "id": "Q13476301",
+        "born": "1993-03-30"
+      }
+    },
+    "credit": "Foto: Attractive Mindset · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 70,
+      "y": 150,
+      "width": 920,
+      "height": 1127.98,
+      "scale": 1.87
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/anitta-v01-d36f9fbf-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "dee7c22d4909f63565a18a92ec83ea2d3696a34e9fbe87ba337e676b1ac56a60"
+      },
+      {
+        "src": "/chromas/famosos/anitta-v01-d36f9fbf-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "02b741bbde70cf1bf1e5b4b6535b7fabe9a6aaf3ee7fc341651e59b55349bb09"
+      }
+    ]
+  },
+  {
+    "id": "ivete-sangalo",
+    "name": "Ivete Sangalo",
+    "master": "stages/74_celebrity_survey/output/masters/ivete-sangalo.svg",
+    "masterSha256": "fdb57bfda640915efe4c5d3c628a7deb7b2b975a79c0154a07e8f1dab33c497a",
+    "stamp": "b858a64e",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/ivete-sangalo.png",
+      "sha256": "8664e8881f2b908ee047fd773dbc58dd26daf8d2c7632659d5a560ac7b45c411",
+      "bytes": 673952,
+      "width": 814,
+      "height": 982,
+      "commons": {
+        "title": "File:Ivete Sangalo (Jul 2024).png",
+        "page": "https://commons.wikimedia.org/wiki/File:Ivete_Sangalo_(Jul_2024).png",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Ivete_Sangalo_%28Jul_2024%29.png",
+        "originalSha1": "1a0e26bb2f2e5dc2add33441bc8cca7238d7c8d7",
+        "originalWidth": 814,
+        "originalHeight": 982,
+        "originalBytes": 673952
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Ivete_Sangalo_%28Jul_2024%29.png",
+        "date": "2026-11-24"
+      },
+      "author": "Multishow",
+      "authorShown": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2024-11-21",
+      "wikidata": {
+        "id": "Q235940",
+        "born": "1972-05-27"
+      }
+    },
+    "credit": "Foto: Multishow · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": -68,
+      "y": 150,
+      "width": 1058,
+      "height": 1276.36,
+      "scale": 1.3
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/ivete-sangalo-v01-b858a64e-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "021651a6c5dde30456116ad1d11bb7ebfa0aa77e865082a0424dc05e40cf799f"
+      },
+      {
+        "src": "/chromas/famosos/ivete-sangalo-v01-b858a64e-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "343ea0872aaa08f09d8633d0053b41fbaaa9d21884a2fa352de3dff37758e0fa"
+      }
+    ]
+  },
+  {
+    "id": "ludmilla",
+    "name": "Ludmilla",
+    "master": "stages/74_celebrity_survey/output/masters/ludmilla.svg",
+    "masterSha256": "7e99ab7c9b3893b5fb1db2694435fe13c9928a069a5b6578d28e031568413575",
+    "stamp": "8a5fa9dc",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/ludmilla.png",
+      "sha256": "225027f382974933889ead7b4494a4860f066e30da7e0a22c424f9936d913611",
+      "bytes": 787404,
+      "width": 853,
+      "height": 1280,
+      "commons": {
+        "title": "File:Ludmilla at Rock in Rio in September 2022 (1).png",
+        "page": "https://commons.wikimedia.org/wiki/File:Ludmilla_at_Rock_in_Rio_in_September_2022_(1).png",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/52/Ludmilla_at_Rock_in_Rio_in_September_2022_%281%29.png",
+        "originalSha1": "5de1e56931e25813b21608c23a0e35434a28f6bd",
+        "originalWidth": 853,
+        "originalHeight": 1280,
+        "originalBytes": 787404
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/5/52/Ludmilla_at_Rock_in_Rio_in_September_2022_%281%29.png",
+        "date": "2026-11-24"
+      },
+      "author": "Humor Multishow",
+      "authorShown": "Humor Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2022-09-11",
+      "wikidata": {
+        "id": "Q16337938",
+        "born": "1995-04-24"
+      }
+    },
+    "credit": "Foto: Humor Multishow · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 70,
+      "y": 114.42,
+      "width": 920,
+      "height": 1380.54,
+      "scale": 1.08
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/ludmilla-v01-8a5fa9dc-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "643248114c3dea02b19c7e3668b945bac97105ffabe83631bb2a02ff1ec69da3"
+      },
+      {
+        "src": "/chromas/famosos/ludmilla-v01-8a5fa9dc-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "8b777422dc3dfaf3a048c0492837f04b49df72a02c528093d775c11614a82811"
+      }
+    ]
+  },
+  {
+    "id": "luisa-sonza",
+    "name": "Luísa Sonza",
+    "master": "stages/74_celebrity_survey/output/masters/luisa-sonza.svg",
+    "masterSha256": "5f318ebca58a426cb714d0cd54989fe6364b3717e2fd1372d0fb3bdefa13e8c2",
+    "stamp": "8b3236da",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/luisa-sonza.jpg",
+      "sha256": "5be94d72cc52c26a4eb6df5b5ced777a25c516cd2403deddb9eca0e263ffa2f2",
+      "bytes": 88009,
+      "width": 868,
+      "height": 1138,
+      "commons": {
+        "title": "File:Luísa Sonza in 2022.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Lu%C3%ADsa_Sonza_in_2022.jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/2/28/Lu%C3%ADsa_Sonza_in_2022.jpg",
+        "originalSha1": "94c57b34d7e63373205e10bab5f8c63c12031712",
+        "originalWidth": 868,
+        "originalHeight": 1138,
+        "originalBytes": 88009
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Lu%C3%ADsa_Sonza_in_2022.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "Humor Multishow",
+      "authorShown": "Humor Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2022-03-18",
+      "wikidata": {
+        "id": "Q43193714",
+        "born": "1998-07-18"
+      }
+    },
+    "credit": "Foto: Humor Multishow · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 70,
+      "y": 150,
+      "width": 920,
+      "height": 1206.18,
+      "scale": 1.06
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/luisa-sonza-v01-8b3236da-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "1f56296e4359d363d17ca994917e37f8929157c12d9e731f973d9a69caa03ea9"
+      },
+      {
+        "src": "/chromas/famosos/luisa-sonza-v01-8b3236da-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "7ba54bd99d82c9e579851992092c5b200441676ed63ad56ab7f28c131e916648"
+      }
+    ]
+  },
+  {
+    "id": "xuxa",
+    "name": "Xuxa",
+    "master": "stages/74_celebrity_survey/output/masters/xuxa.svg",
+    "masterSha256": "8c62a2ba56892f950836d27ae2d0dbda0fc11e040b37207c6e3e91685337cb31",
+    "stamp": "d129804c",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/xuxa.png",
+      "sha256": "366fe3a5946c94c44b3b86291cd0ab65c947983bcdd37509e6055ebd775bfe54",
+      "bytes": 2674433,
+      "width": 757,
+      "height": 1080,
+      "commons": {
+        "title": "File:Xuxa on the Prêmio Multishow de Música Brasileira 2021 red carpet.png",
+        "page": "https://commons.wikimedia.org/wiki/File:Xuxa_on_the_Pr%C3%AAmio_Multishow_de_M%C3%BAsica_Brasileira_2021_red_carpet.png",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/d/da/Xuxa_on_the_Pr%C3%AAmio_Multishow_de_M%C3%BAsica_Brasileira_2021_red_carpet.png",
+        "originalSha1": "e087f4e0a2ce0fb899758d1715fcc484acbde820",
+        "originalWidth": 757,
+        "originalHeight": 1080,
+        "originalBytes": 2674433
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/da/Xuxa_on_the_Pr%C3%AAmio_Multishow_de_M%C3%BAsica_Brasileira_2021_red_carpet.png",
+        "date": "2026-11-24"
+      },
+      "author": "Humor Multishow",
+      "authorShown": "Humor Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2021-12-09",
+      "wikidata": {
+        "id": "Q275939",
+        "born": "1963-03-27"
+      }
+    },
+    "credit": "Foto: Humor Multishow · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 47,
+      "y": 150,
+      "width": 1150,
+      "height": 1640.69,
+      "scale": 1.52
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/xuxa-v01-d129804c-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "69d04890b597fb0e7adac5797894415c34fabe1359e0d727f8ebee33dfd158e8"
+      },
+      {
+        "src": "/chromas/famosos/xuxa-v01-d129804c-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "0e6315489ea37be487e31513647decad29a0e1d9d6e829d444fb2bccd4ee9ce8"
+      }
+    ]
+  },
+  {
+    "id": "tata-werneck",
+    "name": "Tatá Werneck",
+    "master": "stages/74_celebrity_survey/output/masters/tata-werneck.svg",
+    "masterSha256": "480e6d12a83b1436e7f92b6d0e2543d30edf10eb2c0e11d286a99a8dde18e661",
+    "stamp": "75ba54be",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/tata-werneck.jpg",
+      "sha256": "34974b38f8c8a6e7f265b3bf5cbef7a8310a6ed4ea5ca34df969ab653d395a55",
+      "bytes": 58959,
+      "width": 678,
+      "height": 808,
+      "commons": {
+        "title": "File:Tatá Werneck at Lady Night in 2023.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Tat%C3%A1_Werneck_at_Lady_Night_in_2023.jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Tat%C3%A1_Werneck_at_Lady_Night_in_2023.jpg",
+        "originalSha1": "049b73ea96ee9da08899d71753d28c6d9531e2a7",
+        "originalWidth": 678,
+        "originalHeight": 808,
+        "originalBytes": 58959
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Tat%C3%A1_Werneck_at_Lady_Night_in_2023.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "Humor Multishow",
+      "authorShown": "Humor Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2023-04-20",
+      "wikidata": {
+        "id": "Q6598039",
+        "born": "1983-08-11"
+      }
+    },
+    "credit": "Foto: Humor Multishow · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 24,
+      "y": 150,
+      "width": 1012,
+      "height": 1206.04,
+      "scale": 1.49
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/tata-werneck-v01-75ba54be-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "667a5b36249ce9a0607de1deb997112e8f8970cb71da03563f171a66575b4445"
+      },
+      {
+        "src": "/chromas/famosos/tata-werneck-v01-75ba54be-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "d8842fd5deb7ca835a83137c3c06b9489bbc0fe706e4430d963e58a5a3db79f9"
+      }
+    ]
+  },
+  {
+    "id": "bianca-andrade",
+    "name": "Bianca Andrade",
+    "master": "stages/74_celebrity_survey/output/masters/bianca-andrade.svg",
+    "masterSha256": "02f02b182f9b7a0f332408febd50c4ec931b44d55eba87a72a9eefde6b29ca0f",
+    "stamp": "d9b0a2cd",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/bianca-andrade.jpg",
+      "sha256": "3b3542469b79563d32b3f27ca53b450f6b99c3a5590efe2fc6b897310b7cb4ee",
+      "bytes": 1103942,
+      "width": 1200,
+      "height": 1600,
+      "commons": {
+        "title": "File:Amandamelo-wsummit-rastro-2438 (54487067277) (Bianca Andrade).jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Web_Summit_Rio_2025_-_1219_(54487067277).jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Web_Summit_Rio_2025_-_1219_%2854487067277%29.jpg",
+        "originalSha1": "c2a2503627f76bf6885c9b67e8691068755f934f",
+        "originalWidth": 1200,
+        "originalHeight": 1600,
+        "originalBytes": 1103942
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Web_Summit_Rio_2025_-_1219_%2854487067277%29.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "Web Summit Rio from Rio de Janeiro, Brazil",
+      "authorShown": "Web Summit Rio",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "dateOnCommons": "2025-04-30",
+      "wikidata": {
+        "id": "Q85869803",
+        "born": "1994-10-15"
+      }
+    },
+    "credit": "Foto: Web Summit Rio · CC BY 2.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 3.76,
+      "y": 150,
+      "width": 1012,
+      "height": 1349.33,
+      "scale": 0.84
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/bianca-andrade-v01-d9b0a2cd-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "14fa5a97b1a51c0ae0131e279e489146b6a249f836a7fdca4ec39993b17156ca"
+      },
+      {
+        "src": "/chromas/famosos/bianca-andrade-v01-d9b0a2cd-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "917e059bd86fed0023e1d1b47444ea57ddacc7adf20f06a901b4991b1e3587ed"
+      }
+    ]
+  },
+  {
+    "id": "juliette",
+    "name": "Juliette",
+    "master": "stages/74_celebrity_survey/output/masters/juliette.svg",
+    "masterSha256": "e14af755550e65fe6d3b2206fd01e4ca00f02d31b1ebbf7a32a0378bcdbd0da4",
+    "stamp": "1c7e65e1",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/juliette.jpg",
+      "sha256": "7f75b6aa5ceb0ec84947bba51d84ecb969dcfb8cc0839f77788463fd8d31a6c9",
+      "bytes": 461606,
+      "width": 1280,
+      "height": 1397,
+      "commons": {
+        "title": "File:Juliette at Web Summit Rio 2026 (cropped).jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Juliette_at_Web_Summit_Rio_2026_(cropped).jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Juliette_at_Web_Summit_Rio_2026_%28cropped%29.jpg",
+        "originalSha1": "6e5b0e677d3979ecfb6746a79297887d5068f7ee",
+        "originalWidth": 1899,
+        "originalHeight": 2072,
+        "originalBytes": 4365504
+      },
+      "download": {
+        "kind": "miniatura de 1280 px gerada pela Wikimedia",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Juliette_at_Web_Summit_Rio_2026_%28cropped%29.jpg/1280px-Juliette_at_Web_Summit_Rio_2026_%28cropped%29.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "Felipe.bzra",
+      "authorShown": "Felipe.bzra",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "dateOnCommons": "2026-06-09",
+      "wikidata": {
+        "id": "Q105824749",
+        "born": "1989-12-03"
+      }
+    },
+    "credit": "Foto: Felipe.bzra · CC BY-SA 4.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": -22,
+      "y": 150,
+      "width": 1104,
+      "height": 1204.91,
+      "scale": 0.86
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/juliette-v01-1c7e65e1-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "b041136b0c1f1399bae9ca7bffed9bb7bd4ffccb454520ae6e8a43542e0e91cb"
+      },
+      {
+        "src": "/chromas/famosos/juliette-v01-1c7e65e1-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "fb82fd70bc982196a03bee6894230572b753a364db83ecc02010e8e39d9a41dd"
+      }
+    ]
+  },
+  {
+    "id": "bruna-marquezine",
+    "name": "Bruna Marquezine",
+    "master": "stages/74_celebrity_survey/output/masters/bruna-marquezine.svg",
+    "masterSha256": "fb21df7971bbd9d138e15d97403066849418134ee546625c3dd77b61988d59f6",
+    "stamp": "a11027f0",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/bruna-marquezine.png",
+      "sha256": "ca3929b18127a1d99ce81d43dc9b43365902e73d733b3d7ca2fb0302947e9e16",
+      "bytes": 376622,
+      "width": 549,
+      "height": 653,
+      "commons": {
+        "title": "File:Bruna Marquezine 2025.png",
+        "page": "https://commons.wikimedia.org/wiki/File:Bruna_Marquezine_2025.png",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/9/98/Bruna_Marquezine_2025.png",
+        "originalSha1": "b5f6c7e2136572182d61702c31d328ae6988b573",
+        "originalWidth": 549,
+        "originalHeight": 653,
+        "originalBytes": 376622
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/9/98/Bruna_Marquezine_2025.png",
+        "date": "2026-11-24"
+      },
+      "author": "Multishow",
+      "authorShown": "Multishow",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "dateOnCommons": "2026-02-28",
+      "wikidata": {
+        "id": "Q4281880",
+        "born": "1995-08-04"
+      }
+    },
+    "credit": "Foto: Multishow · CC BY 4.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 70,
+      "y": 150,
+      "width": 920,
+      "height": 1094.28,
+      "scale": 1.68
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/bruna-marquezine-v01-a11027f0-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "e3a83b6ee94e77ea1473a9b383d19d32c4043ef57658396874785aa9ed41061f"
+      },
+      {
+        "src": "/chromas/famosos/bruna-marquezine-v01-a11027f0-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "900c361ca97f1c67c362062bc640ad95f5e287235f9c396dd56b26321214c295"
+      }
+    ]
+  },
+  {
+    "id": "marina-ruy-barbosa",
+    "name": "Marina Ruy Barbosa",
+    "master": "stages/74_celebrity_survey/output/masters/marina-ruy-barbosa.svg",
+    "masterSha256": "2151ef9e67a7c4516a44f95ae6f679dd22f82b1335329fa0d13083e90d77f83e",
+    "stamp": "855b2268",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/marina-ruy-barbosa.jpg",
+      "sha256": "47d58569db54f34966af559d411f90b7ceb8bcc68b3504a55e210a05661bbb1a",
+      "bytes": 301375,
+      "width": 1280,
+      "height": 1792,
+      "commons": {
+        "title": "File:Marina Ruy Barbosa7.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Marina_Ruy_Barbosa7.jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Marina_Ruy_Barbosa7.jpg",
+        "originalSha1": "f0e03cd7c2f5c8a91edf1f2bd372010a54514b64",
+        "originalWidth": 3370,
+        "originalHeight": 4718,
+        "originalBytes": 1933197
+      },
+      "download": {
+        "kind": "miniatura de 1280 px gerada pela Wikimedia",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Marina_Ruy_Barbosa7.jpg/1280px-Marina_Ruy_Barbosa7.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "Manuela Muniz Feijó Scarpa",
+      "authorShown": "Manuela Muniz Feijó Scarpa",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "dateOnCommons": "2025-05-28",
+      "wikidata": {
+        "id": "Q4399874",
+        "born": "1995-06-30"
+      }
+    },
+    "credit": "Foto: Manuela Muniz Feijó Scarpa · CC BY-SA 4.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 70,
+      "y": 29.04,
+      "width": 920,
+      "height": 1288,
+      "scale": 0.72
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/marina-ruy-barbosa-v01-855b2268-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "bc24e1d71a0785e3b96149368eb68586f35a76cba45e28a2b5128b03bb6728fd"
+      },
+      {
+        "src": "/chromas/famosos/marina-ruy-barbosa-v01-855b2268-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "807765d861ed2b3f2f51b8fecbcb4bd878c780087fbc0bbbb935703c6f5d69e7"
+      }
+    ]
+  },
+  {
+    "id": "pabllo-vittar",
+    "name": "Pabllo Vittar",
+    "master": "stages/74_celebrity_survey/output/masters/pabllo-vittar.svg",
+    "masterSha256": "539301d3854207d7281d655eb590fddd085fbdcb62bece6623c34ad4d0269dd7",
+    "stamp": "6cc198e1",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/pabllo-vittar.png",
+      "sha256": "20f8fd437226232553929631425df253a6752a3f7b5c46c37d56eb6b74696a8b",
+      "bytes": 1068895,
+      "width": 878,
+      "height": 1280,
+      "commons": {
+        "title": "File:Pabllo Vittar - TVZ 2024 (1).png",
+        "page": "https://commons.wikimedia.org/wiki/File:Pabllo_Vittar_-_TVZ_2024_(1).png",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Pabllo_Vittar_-_TVZ_2024_%281%29.png",
+        "originalSha1": "00324b8539d7957c9cbe0c24761633a72b1c3161",
+        "originalWidth": 878,
+        "originalHeight": 1280,
+        "originalBytes": 1068895
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Pabllo_Vittar_-_TVZ_2024_%281%29.png",
+        "date": "2026-11-24"
+      },
+      "author": "Multishow",
+      "authorShown": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2024-07-11",
+      "wikidata": {
+        "id": "Q23893181",
+        "born": "1993-11-01"
+      }
+    },
+    "credit": "Foto: Multishow · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 70,
+      "y": 113.98,
+      "width": 920,
+      "height": 1341.23,
+      "scale": 1.05
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/pabllo-vittar-v01-6cc198e1-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "16ae265dd4dc8d3597d173f012770a23bd734805edf81ba4268a30a42f0e2b75"
+      },
+      {
+        "src": "/chromas/famosos/pabllo-vittar-v01-6cc198e1-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "5cbf3cb3e83ca68d407ce9106ab17f8948400798e6ba5e254a03d43df7993de4"
+      }
+    ]
+  },
+  {
+    "id": "gusttavo-lima",
+    "name": "Gusttavo Lima",
+    "master": "stages/74_celebrity_survey/output/masters/gusttavo-lima.svg",
+    "masterSha256": "9bf6b4ed472cd6a1b7654c94d044877370c9ed15aacb240a072d4ed4b8156587",
+    "stamp": "7ea2ffbb",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/gusttavo-lima.jpg",
+      "sha256": "984ad76411f36b7eaf95189f41321243e538a07bd621873a8a5e9a69de4be640",
+      "bytes": 197677,
+      "width": 555,
+      "height": 702,
+      "commons": {
+        "title": "File:Gustavo Lima 2021.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Gustavo_Lima_2021.jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/51/Gustavo_Lima_2021.jpg",
+        "originalSha1": "1dcba7c9ba566b8a5986a98111381db94a6539a7",
+        "originalWidth": 555,
+        "originalHeight": 702,
+        "originalBytes": 197677
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Gustavo_Lima_2021.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "Record TV Goiás",
+      "authorShown": "Record TV Goiás",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2021-10-26",
+      "wikidata": {
+        "id": "Q380821",
+        "born": "1989-09-03"
+      }
+    },
+    "credit": "Foto: Record TV Goiás · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 70,
+      "y": 104.53,
+      "width": 920,
+      "height": 1163.68,
+      "scale": 1.66
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/gusttavo-lima-v01-7ea2ffbb-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "b6a6c428c174da5d5e8cdd1a0b9b4f94c900744d086f01099b0c6940711d674b"
+      },
+      {
+        "src": "/chromas/famosos/gusttavo-lima-v01-7ea2ffbb-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "fddcaf570a127b39e8cab5f5a3d3dbc27f271646849afbf4258ae7c668d64ced"
+      }
+    ]
+  },
+  {
+    "id": "luan-santana",
+    "name": "Luan Santana",
+    "master": "stages/74_celebrity_survey/output/masters/luan-santana.svg",
+    "masterSha256": "a089096543b8cbb20e7d295c99575468afe2006d55c39cbd05ceee7c55c309c5",
+    "stamp": "de90c022",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/luan-santana.jpg",
+      "sha256": "8bd2cd187361db50c5658263bc8b0914bb533be43d421fb5bedf766530e08ad1",
+      "bytes": 1210721,
+      "width": 720,
+      "height": 960,
+      "commons": {
+        "title": "File:Luan Santana 2022.JPG",
+        "page": "https://commons.wikimedia.org/wiki/File:Luan_Santana_2022.JPG",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/8/88/Luan_Santana_2022.JPG",
+        "originalSha1": "c08208812a8e65a2a5daf9df297d0c574f79d106",
+        "originalWidth": 720,
+        "originalHeight": 960,
+        "originalBytes": 1210721
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/8/88/Luan_Santana_2022.JPG",
+        "date": "2026-11-24"
+      },
+      "author": "amigosdaarte",
+      "authorShown": "amigosdaarte",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "dateOnCommons": "2022-12-04",
+      "wikidata": {
+        "id": "Q353853",
+        "born": "1991-03-13"
+      }
+    },
+    "credit": "Foto: amigosdaarte · CC0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 27.68,
+      "y": 139.44,
+      "width": 1196,
+      "height": 1594.67,
+      "scale": 1.66
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/luan-santana-v01-de90c022-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "e2d83ce44731ee39757b93900b260b69512c8dcdd08c7a7e7c814e1250f30fff"
+      },
+      {
+        "src": "/chromas/famosos/luan-santana-v01-de90c022-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "c977d9cd13ca324684b26afcf4def951a9244b744bcf9feaaccf777b72b00d40"
+      }
+    ]
+  },
+  {
+    "id": "alok",
+    "name": "Alok",
+    "master": "stages/74_celebrity_survey/output/masters/alok.svg",
+    "masterSha256": "07eb3f4f8e628911fb9d6c54b1b97c43ebf5abe8dc8d21d1f4eefe5ae3cb84ac",
+    "stamp": "c1a5d4f0",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/alok.jpg",
+      "sha256": "c112a4bfc884c322e2cdbe4acac599e783e81cde6190d82fae856eee069c0554",
+      "bytes": 301254,
+      "width": 1280,
+      "height": 1673,
+      "commons": {
+        "title": "File:19 03 2024 - Aniversário de Brasília terá mega show do DJ Alok na Esplanada dos Ministérios (53596862497) (cropped).jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:19_03_2024_-_Anivers%C3%A1rio_de_Bras%C3%ADlia_ter%C3%A1_mega_show_do_DJ_Alok_na_Esplanada_dos_Minist%C3%A9rios_(53596862497)_(cropped).jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/3/30/19_03_2024_-_Anivers%C3%A1rio_de_Bras%C3%ADlia_ter%C3%A1_mega_show_do_DJ_Alok_na_Esplanada_dos_Minist%C3%A9rios_%2853596862497%29_%28cropped%29.jpg",
+        "originalSha1": "4b7ce0d0cc89b8bbd77b856b97b3b3c1d852865e",
+        "originalWidth": 1408,
+        "originalHeight": 1840,
+        "originalBytes": 420354
+      },
+      "download": {
+        "kind": "miniatura de 1280 px gerada pela Wikimedia",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/19_03_2024_-_Anivers%C3%A1rio_de_Bras%C3%ADlia_ter%C3%A1_mega_show_do_DJ_Alok_na_Esplanada_dos_Minist%C3%A9rios_%2853596862497%29_%28cropped%29.jpg/1280px-19_03_2024_-_Anivers%C3%A1rio_de_Bras%C3%ADlia_ter%C3%A1_mega_show_do_DJ_Alok_na_Esplanada_dos_Minist%C3%A9rios_%2853596862497%29_%28cropped%29.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "Agência Brasília from Brasília, Brasil",
+      "authorShown": "Renato Alves/Agência Brasília",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "dateOnCommons": "2024-03-19",
+      "wikidata": {
+        "id": "Q28007321",
+        "born": "1991-08-26"
+      }
+    },
+    "credit": "Foto: Renato Alves/Agência Brasília · CC BY 2.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 24,
+      "y": 133.5,
+      "width": 1012,
+      "height": 1322.72,
+      "scale": 0.79
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/alok-v01-c1a5d4f0-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "b162e8ad79dbfb0745bcdcc8b91883e71607a511964aac8320823a2c5e685883"
+      },
+      {
+        "src": "/chromas/famosos/alok-v01-c1a5d4f0-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "cda27a7fac90e9ff0e3fc1e4dc062b7dddbabe242cea34c7e701855ed223b097"
+      }
+    ]
+  },
+  {
+    "id": "luciano-huck",
+    "name": "Luciano Huck",
+    "master": "stages/74_celebrity_survey/output/masters/luciano-huck.svg",
+    "masterSha256": "18741c8f05734bc4a90a74ea022fd272fc4ad0fdd094f38333ba348a78e48ce1",
+    "stamp": "6cc1b605",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/luciano-huck.jpg",
+      "sha256": "d6a40d540600d59025be30c33d6a5958434b15371a869f3d4b23365b3768c670",
+      "bytes": 122074,
+      "width": 911,
+      "height": 1132,
+      "commons": {
+        "title": "File:Luciano Huck in April 2019.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Luciano_Huck_in_April_2019.jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/1/15/Luciano_Huck_in_April_2019.jpg",
+        "originalSha1": "4d1cd050f2cbc5f7eb7ec88ca57d44bcc41f131f",
+        "originalWidth": 911,
+        "originalHeight": 1132,
+        "originalBytes": 122074
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Luciano_Huck_in_April_2019.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "Romério Cunha",
+      "authorShown": "Romério Cunha",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "dateOnCommons": "2019-04-06",
+      "wikidata": {
+        "id": "Q3329376",
+        "born": "1971-09-03"
+      }
+    },
+    "credit": "Foto: Romério Cunha · CC BY 2.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": -114,
+      "y": 150,
+      "width": 1104,
+      "height": 1371.82,
+      "scale": 1.21
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/luciano-huck-v01-6cc1b605-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "ff1f94c6b52aeda1cf2a48b60b67cc3ae425a9fc962c8e2948c93bfd130d9ce5"
+      },
+      {
+        "src": "/chromas/famosos/luciano-huck-v01-6cc1b605-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "c2ae7387f6b7a91be638985e6525eb1f88016f29b2f86ff017beb7e9fb9485c7"
+      }
+    ]
+  },
+  {
+    "id": "whindersson-nunes",
+    "name": "Whindersson Nunes",
+    "master": "stages/74_celebrity_survey/output/masters/whindersson-nunes.svg",
+    "masterSha256": "adc16be47dc676e9f9448d6f2974b23a5626917d1e521f92afbc02e9ae133129",
+    "stamp": "a9217642",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/whindersson-nunes.png",
+      "sha256": "4349f7fcfd520e7474fbbaf979af6c9a86a8625cce9662b0e11c348f2acd8467",
+      "bytes": 807754,
+      "width": 710,
+      "height": 670,
+      "commons": {
+        "title": "File:Whindersson Nunes em 2019.png",
+        "page": "https://commons.wikimedia.org/wiki/File:Whindersson_Nunes_em_2019.png",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Whindersson_Nunes_em_2019.png",
+        "originalSha1": "059f3ad79b9efac742f903338df8a967ba61d17e",
+        "originalWidth": 710,
+        "originalHeight": 670,
+        "originalBytes": 807754
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Whindersson_Nunes_em_2019.png",
+        "date": "2026-11-24"
+      },
+      "author": "Humor Multishow",
+      "authorShown": "Humor Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2019-05-15",
+      "wikidata": {
+        "id": "Q27839478",
+        "born": "1995-01-05"
+      }
+    },
+    "credit": "Foto: Humor Multishow · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": -264.78,
+      "y": 120,
+      "width": 1589.55,
+      "height": 1500,
+      "scale": 2.24
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/whindersson-nunes-v01-a9217642-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "8761caa33ed94240be65a17e66160b21a57712396221c581995edadee74a4464"
+      },
+      {
+        "src": "/chromas/famosos/whindersson-nunes-v01-a9217642-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "f7be69d6fca33bad26380e6c6ed47b52cc3d6417aeca215190343128b30e6a97"
+      }
+    ]
+  },
+  {
+    "id": "felipe-neto",
+    "name": "Felipe Neto",
+    "master": "stages/74_celebrity_survey/output/masters/felipe-neto.svg",
+    "masterSha256": "bb2230e1e8c24965c21ba323c19cfe5cadbd8b4898565afb889c1c22abd7f86f",
+    "stamp": "1f4538bb",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/felipe-neto.png",
+      "sha256": "56faace8fc900d8f1b0d21e7aa14a111ff8b2dc3aa28a9540f464a67880c4946",
+      "bytes": 913743,
+      "width": 853,
+      "height": 1280,
+      "commons": {
+        "title": "File:Felipe Neto at the Lady Night in 2022 (01).png",
+        "page": "https://commons.wikimedia.org/wiki/File:Felipe_Neto_at_the_Lady_Night_in_2022_(01).png",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/4/43/Felipe_Neto_at_the_Lady_Night_in_2022_%2801%29.png",
+        "originalSha1": "93b2d66737b0cf1cf22973ea67081c2cad85e8ee",
+        "originalWidth": 853,
+        "originalHeight": 1280,
+        "originalBytes": 913743
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/4/43/Felipe_Neto_at_the_Lady_Night_in_2022_%2801%29.png",
+        "date": "2026-11-24"
+      },
+      "author": "Humor Multishow",
+      "authorShown": "Humor Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2022-11-23",
+      "wikidata": {
+        "id": "Q10281000",
+        "born": "1988-01-21"
+      }
+    },
+    "credit": "Foto: Humor Multishow · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": -22,
+      "y": 106.14,
+      "width": 1104,
+      "height": 1656.65,
+      "scale": 1.29
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/felipe-neto-v01-1f4538bb-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "8f9b8af89a304cbac18666f90f7d57a5b5ec5739abba9235c25e94d2c5cce7ae"
+      },
+      {
+        "src": "/chromas/famosos/felipe-neto-v01-1f4538bb-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "7587bd0cb334d908ee9a1710cf7f495cf0dfa19ba9424bba095a9e96d0539d1d"
+      }
+    ]
+  },
+  {
+    "id": "casimiro",
+    "name": "Casimiro",
+    "master": "stages/74_celebrity_survey/output/masters/casimiro.svg",
+    "masterSha256": "b723bc93eca6419649dae669b11cca0c91c154752d327ee3b9e717785ffa73f0",
+    "stamp": "8489db9f",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/casimiro.jpg",
+      "sha256": "4d5d33e9be97699e08095832030d432ca59a8f9405b1c82a8a5cba5152fc40e8",
+      "bytes": 135253,
+      "width": 540,
+      "height": 587,
+      "commons": {
+        "title": "File:Casimiro Miguel.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Casimiro_Miguel.jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Casimiro_Miguel.jpg",
+        "originalSha1": "f4c91c70c67c0ba6cac810dbf2094bbfab0f0d44",
+        "originalWidth": 540,
+        "originalHeight": 587,
+        "originalBytes": 135253
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Casimiro_Miguel.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "TNT Sports Brasil",
+      "authorShown": "TNT Sports Brasil",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2012-12-06",
+      "wikidata": {
+        "id": "Q108757134",
+        "born": "1993-10-20"
+      }
+    },
+    "credit": "Foto: TNT Sports Brasil · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": -51.9,
+      "y": 150,
+      "width": 1058,
+      "height": 1150.09,
+      "scale": 1.96
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/casimiro-v01-8489db9f-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "1ed7938b2d400bdcb9ddf5ad251bdcdb12d7c55df0f915cf5603974a2c64837d"
+      },
+      {
+        "src": "/chromas/famosos/casimiro-v01-8489db9f-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "68ba537ddb0b4d719a1796bc2d48d49b30234f847f8f7f3a99f456a55cdc53f1"
+      }
+    ]
+  },
+  {
+    "id": "wagner-moura",
+    "name": "Wagner Moura",
+    "master": "stages/74_celebrity_survey/output/masters/wagner-moura.svg",
+    "masterSha256": "d82c14a771e1d17c2a3ba4486c6de5e3e77b75d5ce767511298fcd6216625241",
+    "stamp": "85a3fc49",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/wagner-moura.jpg",
+      "sha256": "6e627306e4dbda6b6d4f5d901583d38e0a1d552f88ca60ec29f2e3fa0b0b4a9b",
+      "bytes": 485909,
+      "width": 1280,
+      "height": 1919,
+      "commons": {
+        "title": "File:Wagner Moura-6546.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Wagner_Moura-6546.jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/8/85/Wagner_Moura-6546.jpg",
+        "originalSha1": "0e01923b9233727921ec7027d04da3e34669abd9",
+        "originalWidth": 2900,
+        "originalHeight": 4348,
+        "originalBytes": 6042481
+      },
+      "download": {
+        "kind": "miniatura de 1280 px gerada pela Wikimedia",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Wagner_Moura-6546.jpg/1280px-Wagner_Moura-6546.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "Harald Krichel",
+      "authorShown": "Harald Krichel",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "dateOnCommons": "2025-05-19",
+      "wikidata": {
+        "id": "Q922503",
+        "born": "1976-06-27"
+      }
+    },
+    "credit": "Foto: Harald Krichel · CC BY-SA 4.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": 1,
+      "y": 94.15,
+      "width": 1058,
+      "height": 1586.17,
+      "scale": 0.83
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/wagner-moura-v01-85a3fc49-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "869905f3408f71d15e550ee0f1d42b910d1355518d6037bdb50a102f3be82511"
+      },
+      {
+        "src": "/chromas/famosos/wagner-moura-v01-85a3fc49-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "2e52419d71046305f66b576d1d6d39f209a71ec6458abfdebf5faa1234358b51"
+      }
+    ]
+  },
+  {
+    "id": "gil-do-vigor",
+    "name": "Gil do Vigor",
+    "master": "stages/74_celebrity_survey/output/masters/gil-do-vigor.svg",
+    "masterSha256": "686db1a98c301c6d4cb1fde0c8ea58faf95aae6769b2c9ea932834d7e4b8954e",
+    "stamp": "88f15800",
+    "source": {
+      "file": "stages/74_celebrity_survey/output/sources/gil-do-vigor.jpg",
+      "sha256": "2f5340db4b94f5ad596af7088bdbf1314b556c79a1edefa4469e6ea16c6d9e8e",
+      "bytes": 75586,
+      "width": 528,
+      "height": 600,
+      "commons": {
+        "title": "File:GilDoVigor1.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:GilDoVigor1.jpg",
+        "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5c/GilDoVigor1.jpg",
+        "originalSha1": "2a907fed240594d02f28635904caeb82fe8c0615",
+        "originalWidth": 528,
+        "originalHeight": 600,
+        "originalBytes": 75586
+      },
+      "download": {
+        "kind": "arquivo original",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/5/5c/GilDoVigor1.jpg",
+        "date": "2026-11-24"
+      },
+      "author": "Multishow",
+      "authorShown": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "dateOnCommons": "2021-05-05",
+      "wikidata": {
+        "id": "Q106688014",
+        "born": "1991-07-14"
+      }
+    },
+    "credit": "Foto: Multishow · CC BY 3.0",
+    "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
+    "placement": {
+      "x": -178.4,
+      "y": 150,
+      "width": 1288,
+      "height": 1463.64,
+      "scale": 2.44
+    },
+    "aiEdited": false,
+    "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
+    "variants": [
+      {
+        "src": "/chromas/famosos/gil-do-vigor-v01-88f15800-530.webp",
+        "width": 530,
+        "height": 742,
+        "sha256": "516954fca297728e18b0627f09e5488f4debe2f4a590da88829ff7515a3519bd"
+      },
+      {
+        "src": "/chromas/famosos/gil-do-vigor-v01-88f15800-1060.webp",
+        "width": 1060,
+        "height": 1484,
+        "sha256": "97221dfcddf285e69153a44a81544c7b5fceaf9e4f3414e12afce3ca370fb8e0"
+      }
+    ]
+  }
+]

@@ -132,8 +132,9 @@ test("robots.txt and sitemap.xml describe the public pages at the canonical orig
 
   const inputs = [...viteConfig.match(/input:\s*\{([^}]*)\}/)[1].matchAll(/"([^"]+\.html)"/g)].map(([, name]) => name);
   // Desde a ICM 69 (#331) o build tem a capa, que é a pesquisa, e "Como
-  // funciona". Nenhuma das duas fica escondida.
-  assert.deepEqual(inputs, ["index.html", "como-funciona.html"]);
+  // funciona"; desde a ICM 74 (#348), também "Créditos das fotos". Nenhuma
+  // das três fica escondida.
+  assert.deepEqual(inputs, ["index.html", "como-funciona.html", "creditos.html"]);
   const hidden = inputs.filter((name) => /<meta name="robots" content="noindex">/.test(read(`../${name}`)));
   assert.deepEqual(hidden, []);
   const expected = inputs

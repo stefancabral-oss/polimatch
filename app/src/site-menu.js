@@ -11,10 +11,12 @@ import { safeStorage } from "./safe-storage.js";
 const GOOGLE_SESSION_PREFIX = "pms_";
 
 /**
- * Próximas pesquisas, na ordem das decisões 0002 e 0005. São só anúncio: sem página, data nem cartas.
- * "Roupas" saiu daqui quando ganhou pesquisa própria (ICM 73, #345).
+ * Próximas pesquisas: só anúncio, sem página, data nem cartas. A lista está
+ * vazia: "Roupas" saiu quando ganhou pesquisa própria (ICM 73, #345), e
+ * "Famosos e influenciadores", na ICM 74 (#348). Com a lista vazia, nem o menu
+ * nem a capa mostram "Em breve".
  */
-export const UPCOMING_SURVEYS = Object.freeze(["Famosos e influenciadores"]);
+export const UPCOMING_SURVEYS = Object.freeze([]);
 
 const escapeText = (value = "") => String(value).replace(
   /[&<>"']/g,
@@ -36,9 +38,15 @@ export function accountKind(key) {
 
 export const menuButtonMarkup = () => `<button class="pm-menu-btn" type="button" data-action="menu" aria-haspopup="dialog" aria-label="Abrir menu">${MENU_ICON}</button>`;
 
-export const upcomingMarkup = () => UPCOMING_SURVEYS
+/** Os anúncios das próximas pesquisas. Sem nenhuma, não sai nada. */
+export const upcomingMarkup = (names = UPCOMING_SURVEYS) => names
   .map((name) => `<div class="pm-item is-soon"><span>${escapeText(name)}</span><em class="pm-tag">Em breve</em></div>`)
   .join("");
+
+/** O bloco "Em breve" da capa: o rótulo e os anúncios. Sem anúncio, não sai nem o rótulo. */
+export const upcomingSectionMarkup = (names = UPCOMING_SURVEYS) => (names.length
+  ? `<p class="ps-label ps-home-label">Em breve</p>${upcomingMarkup(names)}`
+  : "");
 
 function accountMarkup({ account, googleReady, busy, error }) {
   const alert = error ? `<p class="pm-error" role="alert">${escapeText(error)}</p>` : "";
@@ -53,21 +61,22 @@ function accountMarkup({ account, googleReady, busy, error }) {
 
 /**
  * A marcação do painel. `account` é o resultado de `accountKind`; `current`
- * diz onde a pessoa está: `"home"`, `"how"` ou o código de uma pesquisa.
- * `surveys` são as pesquisas, na ordem da capa; cada uma tem endereço próprio.
+ * diz onde a pessoa está: `"home"`, `"how"`, `"credits"` ou o código de uma
+ * pesquisa. `surveys` são as pesquisas, na ordem da capa; cada uma tem
+ * endereço próprio. `upcoming` são os anúncios das próximas pesquisas.
  */
-export function menuMarkup({ account = "none", googleReady = false, busy = false, error = "", current = "", surveys = PHOTO_SURVEYS } = {}) {
+export function menuMarkup({ account = "none", googleReady = false, busy = false, error = "", current = "", surveys = PHOTO_SURVEYS, upcoming = UPCOMING_SURVEYS } = {}) {
   const here = (page) => (current === page ? ' aria-current="page"' : "");
   const surveyLinks = surveys
     .map((survey) => `<a class="pm-item" href="./?p=${encodeURIComponent(survey.id)}"${here(survey.id)}><span>${escapeText(survey.question)}</span><small class="pm-sub">${escapeText(survey.subject)}</small></a>`)
     .join("");
   return `<div class="pm-menu-top"><a class="ps-brand" href="./" aria-label="PoliMatch, início">Poli<b>Match</b></a><button class="pm-menu-btn" type="button" data-menu="close" aria-label="Fechar menu">${CLOSE_ICON}</button></div>
     <p class="pm-group">Pesquisas</p>
-    ${surveyLinks}
-    ${upcomingMarkup()}
+    ${surveyLinks}${upcomingMarkup(upcoming)}
     <p class="pm-group">PoliMatch</p>
     <a class="pm-item" href="./"${here("home")}><span>Início</span><i aria-hidden="true">›</i></a>
     <a class="pm-item" href="./como-funciona.html"${here("how")}><span>Como funciona</span><i aria-hidden="true">›</i></a>
+    <a class="pm-item" href="./creditos.html"${here("credits")}><span>Créditos das fotos</span><i aria-hidden="true">›</i></a>
     ${accountMarkup({ account, googleReady, busy, error })}`;
 }
 

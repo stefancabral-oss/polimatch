@@ -37,6 +37,14 @@ Essas artes têm aparência fotográfica, mas são sintéticas. Qualquer uso fut
 
 As prévias em `app/public/chromas/` são ativos separados das fotografias documentais e da arte básica da carta. Quando uma arte tiver edição ou geração assistida por IA, essa condição deve ser informada na interface e em seu manifesto. Raridade, brilho ou acabamento não representam julgamento sobre a pessoa retratada.
 
+## Cartas de famosos — estágio 74
+
+As cartas da pesquisa de famosos e influenciadores ([ICM 74] #348, decisão 0006) usam fotografias da Wikimedia Commons com licença livre declarada na página de cada arquivo (CC BY, CC BY-SA ou CC0). Autor, licença, página de origem, endereço e SHA-1 do original e o hash do arquivo baixado estão em `stages/74_celebrity_survey/output/sources.json` e no manifesto do estágio. Os arquivos estão em `stages/74_celebrity_survey/output/sources/`, como foram baixados em 24/11/2026.
+
+A fotografia não é editada: é posicionada, recortada pela janela da moldura e redimensionada. A moldura é desenhada por código, e o roteiro que a desenha e monta a carta (`app/scripts/build-celebrity-cards.mjs`) foi escrito por um agente de IA. Cada carta traz "Foto: autor · licença", e a página `/creditos.html` lista os créditos e diz o que foi mudado. As cartas feitas de fotografia com licença CC BY-SA podem ser reutilizadas nos termos da mesma licença.
+
+A licença é a declarada na Wikimedia Commons; a origem de cada fotografia não foi conferida. A licença trata do direito de quem fez a fotografia, não do direito da pessoa retratada.
+
 ## Independência
 
 O projeto não é afiliado a partidos, candidaturas, TSE, Wikimedia, OpenAI ou às pessoas retratadas. A presença de uma imagem no repositório não representa apoio, oposição nem aprovação para publicação.

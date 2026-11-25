@@ -1,6 +1,7 @@
 import "./install-error-reporter.js";
 import "./photo-survey.css";
 import "./site-menu.css";
+import CELEBRITIES from "./celebrity-cards.json" with { type: "json" };
 import CLOTHES from "./clothes-cards.json" with { type: "json" };
 import ARTS from "./political-chromas.json" with { type: "json" };
 import { PHOTO_SURVEYS, photoSurveyById } from "../../shared/photo-survey.js";
@@ -40,7 +41,7 @@ import {
   signInMarkup,
 } from "./registration-view.js";
 import { shareChoice, shareImage, sharePlan, sharePreviewMarkup } from "./share-choice.js";
-import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingMarkup } from "./site-menu.js";
+import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingSectionMarkup } from "./site-menu.js";
 
 // Pesquisa por foto (ICM 68, #324), que desde a ICM 69 (#331) é a capa do
 // site. Abrir esta página não grava nada: o sorteio nasce no toque em
@@ -64,8 +65,10 @@ const ADVANCE_MS = 220;
 const GRID_TIMEOUT_MS = 12000;
 
 const root = document.querySelector("#photo-survey");
-// As cartas de todas as pesquisas: as de política e as de roupas (ICM 73, #345).
-const artById = new Map([...ARTS, ...CLOTHES].map((art) => [art.id, art]));
+// As cartas de todas as pesquisas: as de política, as de famosos (ICM 74, #348)
+// e as de roupas (ICM 73, #345). Dos três catálogos a página só lê o que os
+// três têm: `id`, `name`, `src`, `srcset`, `width` e `height`.
+const artById = new Map([...ARTS, ...CELEBRITIES, ...CLOTHES].map((art) => [art.id, art]));
 
 // A pesquisa na tela. Na capa é a pesquisa em destaque; "" quando não há uma.
 let surveyId = "";
@@ -125,7 +128,8 @@ const inWords = (number) => WORDS[number] || String(number);
 const subject = () => (typeof survey?.subject === "string" && survey.subject) || definition.subject;
 const kicker = () => `${subject()} · ${drawSize()} cartas`;
 const question = () => (typeof survey?.question === "string" && survey.question) || definition.question;
-// A observação da pesquisa, quando ela tem uma. As de política não têm.
+// A observação da pesquisa, quando ela tem uma. As de política não têm; as de
+// famosos e de roupas têm.
 const surveyNote = () => (typeof survey?.note === "string" && survey.note) || definition.note;
 
 /**
@@ -279,13 +283,19 @@ function choiceRow(id) {
   return `<a class="ps-pick" href="${surveyHref(id)}" data-survey="${escapeText(id)}">${champion ? staticCard(champion, "44px") : '<span class="ps-card" aria-hidden="true"></span>'}<span class="ps-survey-text"><small>${escapeText(base.subject)} · ${escapeText(base.question)}</small><b>${champion ? escapeText(cardName(champion)) : "Ver a sua escolha"}</b></span><i aria-hidden="true">›</i></a>`;
 }
 
-/** As listas da capa: o que a pessoa já escolheu, as outras pesquisas e as que vêm. */
+/**
+ * As listas da capa: o que a pessoa já escolheu, as outras pesquisas e, quando
+ * há anúncio, as que vêm. Cada bloco só sai se tem o que mostrar; sem nenhum,
+ * o texto é vazio e a área das listas some (`.ps-home:empty`).
+ */
 function homeSections() {
   const chosen = homeViews.filter((view) => homeChoices.has(view.id));
   const others = homeViews.filter((view) => view.id !== surveyId && !homeChoices.has(view.id));
-  return `${chosen.length ? `<p class="ps-label ps-home-label">Suas escolhas</p>${chosen.map((view) => choiceRow(view.id)).join("")}` : ""}
-    ${others.length ? `<p class="ps-label ps-home-label">Mais pesquisas</p>${others.map(surveyRow).join("")}` : ""}
-    <p class="ps-label ps-home-label">Em breve</p>${upcomingMarkup()}`;
+  return [
+    chosen.length ? `<p class="ps-label ps-home-label">Suas escolhas</p>${chosen.map((view) => choiceRow(view.id)).join("")}` : "",
+    others.length ? `<p class="ps-label ps-home-label">Mais pesquisas</p>${others.map(surveyRow).join("")}` : "",
+    upcomingSectionMarkup(),
+  ].join("");
 }
 
 /**

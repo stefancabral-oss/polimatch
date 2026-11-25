@@ -1,0 +1,662 @@
+[
+  {
+    "id": "anitta",
+    "name": "Anitta",
+    "file": "anitta.jpg",
+    "commons": {
+      "title": "File:Anitta for Attractive Mindset podcast 02.jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:Anitta_for_Attractive_Mindset_podcast_02.jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/2/23/Anitta_for_Attractive_Mindset_podcast_02.jpg",
+      "originalSha1": "6dada59e1533bb0363ccae0dfb6d36809b4b1253",
+      "originalWidth": 491,
+      "originalHeight": 602,
+      "originalBytes": 59195
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/23/Anitta_for_Attractive_Mindset_podcast_02.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q13476301",
+      "born": "1993-03-30"
+    },
+    "author": "Attractive Mindset",
+    "authorShown": "Attractive Mindset",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2024-06-16",
+    "crop": {
+      "x": 0.52,
+      "y": 0.34,
+      "zoom": 1
+    }
+  },
+  {
+    "id": "ivete-sangalo",
+    "name": "Ivete Sangalo",
+    "file": "ivete-sangalo.png",
+    "commons": {
+      "title": "File:Ivete Sangalo (Jul 2024).png",
+      "page": "https://commons.wikimedia.org/wiki/File:Ivete_Sangalo_(Jul_2024).png",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Ivete_Sangalo_%28Jul_2024%29.png",
+      "originalSha1": "1a0e26bb2f2e5dc2add33441bc8cca7238d7c8d7",
+      "originalWidth": 814,
+      "originalHeight": 982,
+      "originalBytes": 673952
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Ivete_Sangalo_%28Jul_2024%29.png",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q235940",
+      "born": "1972-05-27"
+    },
+    "author": "Multishow",
+    "authorShown": "Multishow",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2024-11-21",
+    "crop": {
+      "x": 0.57,
+      "y": 0.27,
+      "zoom": 1.15
+    }
+  },
+  {
+    "id": "ludmilla",
+    "name": "Ludmilla",
+    "file": "ludmilla.png",
+    "commons": {
+      "title": "File:Ludmilla at Rock in Rio in September 2022 (1).png",
+      "page": "https://commons.wikimedia.org/wiki/File:Ludmilla_at_Rock_in_Rio_in_September_2022_(1).png",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/52/Ludmilla_at_Rock_in_Rio_in_September_2022_%281%29.png",
+      "originalSha1": "5de1e56931e25813b21608c23a0e35434a28f6bd",
+      "originalWidth": 853,
+      "originalHeight": 1280,
+      "originalBytes": 787404
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/52/Ludmilla_at_Rock_in_Rio_in_September_2022_%281%29.png",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q16337938",
+      "born": "1995-04-24"
+    },
+    "author": "Humor Multishow",
+    "authorShown": "Humor Multishow",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2022-09-11",
+    "crop": {
+      "x": 0.5,
+      "y": 0.33,
+      "zoom": 1
+    }
+  },
+  {
+    "id": "luisa-sonza",
+    "name": "Luísa Sonza",
+    "file": "luisa-sonza.jpg",
+    "commons": {
+      "title": "File:Luísa Sonza in 2022.jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:Lu%C3%ADsa_Sonza_in_2022.jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/2/28/Lu%C3%ADsa_Sonza_in_2022.jpg",
+      "originalSha1": "94c57b34d7e63373205e10bab5f8c63c12031712",
+      "originalWidth": 868,
+      "originalHeight": 1138,
+      "originalBytes": 88009
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Lu%C3%ADsa_Sonza_in_2022.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q43193714",
+      "born": "1998-07-18"
+    },
+    "author": "Humor Multishow",
+    "authorShown": "Humor Multishow",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2022-03-18",
+    "crop": {
+      "x": 0.58,
+      "y": 0.34,
+      "zoom": 1
+    }
+  },
+  {
+    "id": "xuxa",
+    "name": "Xuxa",
+    "file": "xuxa.png",
+    "commons": {
+      "title": "File:Xuxa on the Prêmio Multishow de Música Brasileira 2021 red carpet.png",
+      "page": "https://commons.wikimedia.org/wiki/File:Xuxa_on_the_Pr%C3%AAmio_Multishow_de_M%C3%BAsica_Brasileira_2021_red_carpet.png",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/d/da/Xuxa_on_the_Pr%C3%AAmio_Multishow_de_M%C3%BAsica_Brasileira_2021_red_carpet.png",
+      "originalSha1": "e087f4e0a2ce0fb899758d1715fcc484acbde820",
+      "originalWidth": 757,
+      "originalHeight": 1080,
+      "originalBytes": 2674433
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/da/Xuxa_on_the_Pr%C3%AAmio_Multishow_de_M%C3%BAsica_Brasileira_2021_red_carpet.png",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q275939",
+      "born": "1963-03-27"
+    },
+    "author": "Humor Multishow",
+    "authorShown": "Humor Multishow",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2021-12-09",
+    "crop": {
+      "x": 0.42,
+      "y": 0.2,
+      "zoom": 1.25
+    }
+  },
+  {
+    "id": "tata-werneck",
+    "name": "Tatá Werneck",
+    "file": "tata-werneck.jpg",
+    "commons": {
+      "title": "File:Tatá Werneck at Lady Night in 2023.jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:Tat%C3%A1_Werneck_at_Lady_Night_in_2023.jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Tat%C3%A1_Werneck_at_Lady_Night_in_2023.jpg",
+      "originalSha1": "049b73ea96ee9da08899d71753d28c6d9531e2a7",
+      "originalWidth": 678,
+      "originalHeight": 808,
+      "originalBytes": 58959
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Tat%C3%A1_Werneck_at_Lady_Night_in_2023.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q6598039",
+      "born": "1983-08-11"
+    },
+    "author": "Humor Multishow",
+    "authorShown": "Humor Multishow",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2023-04-20",
+    "crop": {
+      "x": 0.5,
+      "y": 0.33,
+      "zoom": 1.1
+    }
+  },
+  {
+    "id": "bianca-andrade",
+    "name": "Bianca Andrade",
+    "file": "bianca-andrade.jpg",
+    "commons": {
+      "title": "File:Amandamelo-wsummit-rastro-2438 (54487067277) (Bianca Andrade).jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:Web_Summit_Rio_2025_-_1219_(54487067277).jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Web_Summit_Rio_2025_-_1219_%2854487067277%29.jpg",
+      "originalSha1": "c2a2503627f76bf6885c9b67e8691068755f934f",
+      "originalWidth": 1200,
+      "originalHeight": 1600,
+      "originalBytes": 1103942
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Web_Summit_Rio_2025_-_1219_%2854487067277%29.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q85869803",
+      "born": "1994-10-15"
+    },
+    "author": "Web Summit Rio from Rio de Janeiro, Brazil",
+    "authorShown": "Web Summit Rio",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "dateOnCommons": "2025-04-30",
+    "crop": {
+      "x": 0.52,
+      "y": 0.27,
+      "zoom": 1.1
+    }
+  },
+  {
+    "id": "juliette",
+    "name": "Juliette",
+    "file": "juliette.jpg",
+    "commons": {
+      "title": "File:Juliette at Web Summit Rio 2026 (cropped).jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:Juliette_at_Web_Summit_Rio_2026_(cropped).jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Juliette_at_Web_Summit_Rio_2026_%28cropped%29.jpg",
+      "originalSha1": "6e5b0e677d3979ecfb6746a79297887d5068f7ee",
+      "originalWidth": 1899,
+      "originalHeight": 2072,
+      "originalBytes": 4365504
+    },
+    "download": {
+      "kind": "miniatura de 1280 px gerada pela Wikimedia",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Juliette_at_Web_Summit_Rio_2026_%28cropped%29.jpg/1280px-Juliette_at_Web_Summit_Rio_2026_%28cropped%29.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q105824749",
+      "born": "1989-12-03"
+    },
+    "author": "Felipe.bzra",
+    "authorShown": "Felipe.bzra",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "dateOnCommons": "2026-06-09",
+    "crop": {
+      "x": 0.5,
+      "y": 0.3,
+      "zoom": 1.2
+    }
+  },
+  {
+    "id": "bruna-marquezine",
+    "name": "Bruna Marquezine",
+    "file": "bruna-marquezine.png",
+    "commons": {
+      "title": "File:Bruna Marquezine 2025.png",
+      "page": "https://commons.wikimedia.org/wiki/File:Bruna_Marquezine_2025.png",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/9/98/Bruna_Marquezine_2025.png",
+      "originalSha1": "b5f6c7e2136572182d61702c31d328ae6988b573",
+      "originalWidth": 549,
+      "originalHeight": 653,
+      "originalBytes": 376622
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/98/Bruna_Marquezine_2025.png",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q4281880",
+      "born": "1995-08-04"
+    },
+    "author": "Multishow",
+    "authorShown": "Multishow",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "dateOnCommons": "2026-02-28",
+    "crop": {
+      "x": 0.52,
+      "y": 0.35,
+      "zoom": 1
+    }
+  },
+  {
+    "id": "marina-ruy-barbosa",
+    "name": "Marina Ruy Barbosa",
+    "file": "marina-ruy-barbosa.jpg",
+    "commons": {
+      "title": "File:Marina Ruy Barbosa7.jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:Marina_Ruy_Barbosa7.jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Marina_Ruy_Barbosa7.jpg",
+      "originalSha1": "f0e03cd7c2f5c8a91edf1f2bd372010a54514b64",
+      "originalWidth": 3370,
+      "originalHeight": 4718,
+      "originalBytes": 1933197
+    },
+    "download": {
+      "kind": "miniatura de 1280 px gerada pela Wikimedia",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Marina_Ruy_Barbosa7.jpg/1280px-Marina_Ruy_Barbosa7.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q4399874",
+      "born": "1995-06-30"
+    },
+    "author": "Manuela Muniz Feijó Scarpa",
+    "authorShown": "Manuela Muniz Feijó Scarpa",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "dateOnCommons": "2025-05-28",
+    "crop": {
+      "x": 0.5,
+      "y": 0.42,
+      "zoom": 1
+    }
+  },
+  {
+    "id": "pabllo-vittar",
+    "name": "Pabllo Vittar",
+    "file": "pabllo-vittar.png",
+    "commons": {
+      "title": "File:Pabllo Vittar - TVZ 2024 (1).png",
+      "page": "https://commons.wikimedia.org/wiki/File:Pabllo_Vittar_-_TVZ_2024_(1).png",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Pabllo_Vittar_-_TVZ_2024_%281%29.png",
+      "originalSha1": "00324b8539d7957c9cbe0c24761633a72b1c3161",
+      "originalWidth": 878,
+      "originalHeight": 1280,
+      "originalBytes": 1068895
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Pabllo_Vittar_-_TVZ_2024_%281%29.png",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q23893181",
+      "born": "1993-11-01"
+    },
+    "author": "Multishow",
+    "authorShown": "Multishow",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2024-07-11",
+    "crop": {
+      "x": 0.58,
+      "y": 0.34,
+      "zoom": 1
+    }
+  },
+  {
+    "id": "gusttavo-lima",
+    "name": "Gusttavo Lima",
+    "file": "gusttavo-lima.jpg",
+    "commons": {
+      "title": "File:Gustavo Lima 2021.jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:Gustavo_Lima_2021.jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/51/Gustavo_Lima_2021.jpg",
+      "originalSha1": "1dcba7c9ba566b8a5986a98111381db94a6539a7",
+      "originalWidth": 555,
+      "originalHeight": 702,
+      "originalBytes": 197677
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Gustavo_Lima_2021.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q380821",
+      "born": "1989-09-03"
+    },
+    "author": "Record TV Goiás",
+    "authorShown": "Record TV Goiás",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2021-10-26",
+    "crop": {
+      "x": 0.42,
+      "y": 0.4,
+      "zoom": 1
+    }
+  },
+  {
+    "id": "luan-santana",
+    "name": "Luan Santana",
+    "file": "luan-santana.jpg",
+    "commons": {
+      "title": "File:Luan Santana 2022.JPG",
+      "page": "https://commons.wikimedia.org/wiki/File:Luan_Santana_2022.JPG",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/8/88/Luan_Santana_2022.JPG",
+      "originalSha1": "c08208812a8e65a2a5daf9df297d0c574f79d106",
+      "originalWidth": 720,
+      "originalHeight": 960,
+      "originalBytes": 1210721
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/88/Luan_Santana_2022.JPG",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q353853",
+      "born": "1991-03-13"
+    },
+    "author": "amigosdaarte",
+    "authorShown": "amigosdaarte",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "dateOnCommons": "2022-12-04",
+    "crop": {
+      "x": 0.42,
+      "y": 0.27,
+      "zoom": 1.3
+    }
+  },
+  {
+    "id": "alok",
+    "name": "Alok",
+    "file": "alok.jpg",
+    "commons": {
+      "title": "File:19 03 2024 - Aniversário de Brasília terá mega show do DJ Alok na Esplanada dos Ministérios (53596862497) (cropped).jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:19_03_2024_-_Anivers%C3%A1rio_de_Bras%C3%ADlia_ter%C3%A1_mega_show_do_DJ_Alok_na_Esplanada_dos_Minist%C3%A9rios_(53596862497)_(cropped).jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/3/30/19_03_2024_-_Anivers%C3%A1rio_de_Bras%C3%ADlia_ter%C3%A1_mega_show_do_DJ_Alok_na_Esplanada_dos_Minist%C3%A9rios_%2853596862497%29_%28cropped%29.jpg",
+      "originalSha1": "4b7ce0d0cc89b8bbd77b856b97b3b3c1d852865e",
+      "originalWidth": 1408,
+      "originalHeight": 1840,
+      "originalBytes": 420354
+    },
+    "download": {
+      "kind": "miniatura de 1280 px gerada pela Wikimedia",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/19_03_2024_-_Anivers%C3%A1rio_de_Bras%C3%ADlia_ter%C3%A1_mega_show_do_DJ_Alok_na_Esplanada_dos_Minist%C3%A9rios_%2853596862497%29_%28cropped%29.jpg/1280px-19_03_2024_-_Anivers%C3%A1rio_de_Bras%C3%ADlia_ter%C3%A1_mega_show_do_DJ_Alok_na_Esplanada_dos_Minist%C3%A9rios_%2853596862497%29_%28cropped%29.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q28007321",
+      "born": "1991-08-26"
+    },
+    "author": "Agência Brasília from Brasília, Brasil",
+    "authorShown": "Renato Alves/Agência Brasília",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "dateOnCommons": "2024-03-19",
+    "crop": {
+      "x": 0.5,
+      "y": 0.33,
+      "zoom": 1.1
+    }
+  },
+  {
+    "id": "luciano-huck",
+    "name": "Luciano Huck",
+    "file": "luciano-huck.jpg",
+    "commons": {
+      "title": "File:Luciano Huck in April 2019.jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:Luciano_Huck_in_April_2019.jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/1/15/Luciano_Huck_in_April_2019.jpg",
+      "originalSha1": "4d1cd050f2cbc5f7eb7ec88ca57d44bcc41f131f",
+      "originalWidth": 911,
+      "originalHeight": 1132,
+      "originalBytes": 122074
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Luciano_Huck_in_April_2019.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q3329376",
+      "born": "1971-09-03"
+    },
+    "author": "Romério Cunha",
+    "authorShown": "Romério Cunha",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "dateOnCommons": "2019-04-06",
+    "crop": {
+      "x": 0.6,
+      "y": 0.3,
+      "zoom": 1.2
+    }
+  },
+  {
+    "id": "whindersson-nunes",
+    "name": "Whindersson Nunes",
+    "file": "whindersson-nunes.png",
+    "commons": {
+      "title": "File:Whindersson Nunes em 2019.png",
+      "page": "https://commons.wikimedia.org/wiki/File:Whindersson_Nunes_em_2019.png",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Whindersson_Nunes_em_2019.png",
+      "originalSha1": "059f3ad79b9efac742f903338df8a967ba61d17e",
+      "originalWidth": 710,
+      "originalHeight": 670,
+      "originalBytes": 807754
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Whindersson_Nunes_em_2019.png",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q27839478",
+      "born": "1995-01-05"
+    },
+    "author": "Humor Multishow",
+    "authorShown": "Humor Multishow",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2019-05-15",
+    "crop": {
+      "x": 0.5,
+      "y": 0.3,
+      "zoom": 1.5
+    }
+  },
+  {
+    "id": "felipe-neto",
+    "name": "Felipe Neto",
+    "file": "felipe-neto.png",
+    "commons": {
+      "title": "File:Felipe Neto at the Lady Night in 2022 (01).png",
+      "page": "https://commons.wikimedia.org/wiki/File:Felipe_Neto_at_the_Lady_Night_in_2022_(01).png",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/4/43/Felipe_Neto_at_the_Lady_Night_in_2022_%2801%29.png",
+      "originalSha1": "93b2d66737b0cf1cf22973ea67081c2cad85e8ee",
+      "originalWidth": 853,
+      "originalHeight": 1280,
+      "originalBytes": 913743
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/43/Felipe_Neto_at_the_Lady_Night_in_2022_%2801%29.png",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q10281000",
+      "born": "1988-01-21"
+    },
+    "author": "Humor Multishow",
+    "authorShown": "Humor Multishow",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2022-11-23",
+    "crop": {
+      "x": 0.5,
+      "y": 0.28,
+      "zoom": 1.2
+    }
+  },
+  {
+    "id": "casimiro",
+    "name": "Casimiro",
+    "file": "casimiro.jpg",
+    "commons": {
+      "title": "File:Casimiro Miguel.jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:Casimiro_Miguel.jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Casimiro_Miguel.jpg",
+      "originalSha1": "f4c91c70c67c0ba6cac810dbf2094bbfab0f0d44",
+      "originalWidth": 540,
+      "originalHeight": 587,
+      "originalBytes": 135253
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Casimiro_Miguel.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q108757134",
+      "born": "1993-10-20"
+    },
+    "author": "TNT Sports Brasil",
+    "authorShown": "TNT Sports Brasil",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2012-12-06",
+    "crop": {
+      "x": 0.55,
+      "y": 0.33,
+      "zoom": 1.15
+    }
+  },
+  {
+    "id": "wagner-moura",
+    "name": "Wagner Moura",
+    "file": "wagner-moura.jpg",
+    "commons": {
+      "title": "File:Wagner Moura-6546.jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:Wagner_Moura-6546.jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/8/85/Wagner_Moura-6546.jpg",
+      "originalSha1": "0e01923b9233727921ec7027d04da3e34669abd9",
+      "originalWidth": 2900,
+      "originalHeight": 4348,
+      "originalBytes": 6042481
+    },
+    "download": {
+      "kind": "miniatura de 1280 px gerada pela Wikimedia",
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Wagner_Moura-6546.jpg/1280px-Wagner_Moura-6546.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q922503",
+      "born": "1976-06-27"
+    },
+    "author": "Harald Krichel",
+    "authorShown": "Harald Krichel",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "dateOnCommons": "2025-05-19",
+    "crop": {
+      "x": 0.5,
+      "y": 0.3,
+      "zoom": 1.15
+    }
+  },
+  {
+    "id": "gil-do-vigor",
+    "name": "Gil do Vigor",
+    "file": "gil-do-vigor.jpg",
+    "commons": {
+      "title": "File:GilDoVigor1.jpg",
+      "page": "https://commons.wikimedia.org/wiki/File:GilDoVigor1.jpg",
+      "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5c/GilDoVigor1.jpg",
+      "originalSha1": "2a907fed240594d02f28635904caeb82fe8c0615",
+      "originalWidth": 528,
+      "originalHeight": 600,
+      "originalBytes": 75586
+    },
+    "download": {
+      "kind": "arquivo original",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5c/GilDoVigor1.jpg",
+      "date": "2026-11-24"
+    },
+    "wikidata": {
+      "id": "Q106688014",
+      "born": "1991-07-14"
+    },
+    "author": "Multishow",
+    "authorShown": "Multishow",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "dateOnCommons": "2021-05-05",
+    "crop": {
+      "x": 0.55,
+      "y": 0.22,
+      "zoom": 1.4
+    }
+  }
+]

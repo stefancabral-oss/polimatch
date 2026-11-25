@@ -3,15 +3,18 @@
 // da chave. Nada aqui lê relógio, banco ou rede.
 
 // `note` é opcional: uma linha que a entrada da pesquisa mostra abaixo da pergunta.
-function definePhotoSurvey({ id, subject, question, note = "", cardIds, drawSize, groupSize, opensAt = null, closesAt = null }) {
+// `people` é opcional e diz se as cartas são pessoas: a tela usa isso para
+// perguntar "quem" ou "qual" (ICM 74, #348).
+export function definePhotoSurvey({ id, subject, question, note = "", people = false, cardIds, drawSize, groupSize, opensAt = null, closesAt = null }) {
   if (!subject || !question) throw new Error(`pesquisa ${id}: falta o assunto ou a pergunta`);
   if (typeof note !== "string") throw new Error(`pesquisa ${id}: a observação precisa ser texto`);
+  if (typeof people !== "boolean") throw new Error(`pesquisa ${id}: "people" precisa ser verdadeiro ou falso`);
   const cards = Object.freeze([...cardIds].sort());
   if (new Set(cards).size !== cards.length) throw new Error(`pesquisa ${id}: carta repetida`);
   if (drawSize > cards.length || drawSize % groupSize !== 0) {
     throw new Error(`pesquisa ${id}: sorteio de ${drawSize} não fecha em telas de ${groupSize}`);
   }
-  return Object.freeze({ id, subject, question, note, cardIds: cards, drawSize, groupSize, opensAt, closesAt });
+  return Object.freeze({ id, subject, question, note, people, cardIds: cards, drawSize, groupSize, opensAt, closesAt });
 }
 
 // As 20 cartas "Políticos 2026", todas com a mesma moldura
@@ -32,6 +35,16 @@ const CLOTHES_CARD_IDS = Object.freeze([
   "moletom-estrela", "moletom-arco", "moletom-folha", "moletom-lua",
 ]);
 
+// As 20 cartas de famosos e influenciadores (ICM 74, #348), todas no mesmo
+// padrão de carta (app/public/chromas/famosos), com foto de licença livre e o
+// crédito na carta. Cada pessoa recebe 16 por sorteio, como na política.
+const CELEBRITY_CARD_IDS = Object.freeze([
+  "anitta", "ivete-sangalo", "ludmilla", "luisa-sonza", "xuxa",
+  "tata-werneck", "bianca-andrade", "juliette", "bruna-marquezine", "marina-ruy-barbosa",
+  "pabllo-vittar", "gusttavo-lima", "luan-santana", "alok", "luciano-huck",
+  "whindersson-nunes", "felipe-neto", "casimiro", "wagner-moura", "gil-do-vigor",
+]);
+
 // A ordem é a da capa: a primeira pesquisa aberta sem resposta fica em destaque.
 export const PHOTO_SURVEYS = Object.freeze([
   definePhotoSurvey({
@@ -41,6 +54,7 @@ export const PHOTO_SURVEYS = Object.freeze([
     cardIds: POLITICS_CARD_IDS,
     drawSize: 16,
     groupSize: 4,
+    people: true,
   }),
   // Segunda pergunta sobre as mesmas cartas (ICM 70, #334). Sorteio e resposta
   // são por pesquisa: responder uma não responde a outra.
@@ -51,9 +65,22 @@ export const PHOTO_SURVEYS = Object.freeze([
     cardIds: POLITICS_CARD_IDS,
     drawSize: 16,
     groupSize: 4,
+    people: true,
   }),
-  // Demonstração de roupas (ICM 73, #345). Vem depois das de política na
-  // ordem da capa.
+  // Famosos e influenciadores (ICM 74, #348). Vem depois das de política e
+  // antes da de roupas na ordem da capa.
+  definePhotoSurvey({
+    id: "famosos-01",
+    subject: "Famosos",
+    question: "De quem você é mais fã?",
+    note: "Fotos de licença livre, com o crédito em cada carta.",
+    cardIds: CELEBRITY_CARD_IDS,
+    drawSize: 16,
+    groupSize: 4,
+    people: true,
+  }),
+  // Demonstração de roupas (ICM 73, #345). Vem depois das de política e da de
+  // famosos na ordem da capa.
   definePhotoSurvey({
     id: "roupas-demo-01",
     subject: "Roupas",
@@ -78,6 +105,7 @@ export function photoSurveyStatus(survey, now) {
   return "open";
 }
 
+// `people` não sai daqui: a tela lê esse campo da definição que ela mesma importa.
 export function publicPhotoSurvey(survey, now) {
   return {
     id: survey.id,

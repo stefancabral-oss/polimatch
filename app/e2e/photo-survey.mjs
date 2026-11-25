@@ -35,7 +35,9 @@
  *  19. Falhas do servidor no sorteio e na resposta, e recibo recusado.
  *  20. Quem respondeu e abre sem servidor não volta para a entrada.
  *  21. A entrada só ilustra com as cartas da lista da entrada, e não tem
- *      observação (a pesquisa de roupas, que tem, é do roteiro site-shell.mjs).
+ *      observação (as pesquisas de famosos e de roupas, que têm, são do
+ *      roteiro site-shell.mjs, com a final de cada uma: "quem fica?" na de
+ *      famosos, como aqui, e "qual fica?" na de roupas).
  */
 import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
