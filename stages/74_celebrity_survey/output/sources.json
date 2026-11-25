@@ -15,6 +15,7 @@
       "attribution": "Attractive Mindset",
       "dateField": "2024-06-16",
       "licenseReview": "revisada",
+      "licenseReviewNote": "o arquivo também está na categoria \"RevengerTime uploads needing license review\"",
       "personalityRightsWarning": false,
       "seenOn": "2026-11-24"
     },
@@ -564,9 +565,9 @@
     "license": "CC BY 3.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
     "crop": {
-      "x": 0.5,
-      "y": 0.33,
-      "zoom": 1.1
+      "x": 0.9,
+      "y": 0.352,
+      "zoom": 1.25
     }
   },
   {
@@ -651,9 +652,9 @@
     "license": "CC BY-SA 4.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "crop": {
-      "x": 0.5,
-      "y": 0.3,
-      "zoom": 1.15
+      "x": 0.447,
+      "y": 0.276,
+      "zoom": 1.55
     }
   },
   {

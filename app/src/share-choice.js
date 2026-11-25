@@ -172,16 +172,21 @@ function roundedRect(context, x, y, width, height, radius) {
 /**
  * As linhas de crédito da imagem, quando as cartas levam foto de outra pessoa
  * (ICM 74, #348). `photos` são os créditos das cartas que entram na imagem
- * (`{ author, license }`, como no catálogo). Sai uma linha com quem fez cada
- * foto e a licença, sem repetir, e outra dizendo onde estão os créditos
- * completos. Sem foto com crédito, nenhuma linha: a imagem fica como era.
+ * (`{ author, license }`, como no catálogo). Saem sempre duas linhas: quem
+ * fez cada foto e a licença, sem repetir, e onde estão os créditos completos.
+ * Com mais de dois créditos, o terceiro e o quarto descem para a segunda
+ * linha, para a letra não encolher demais. Sem foto com crédito, nenhuma
+ * linha: a imagem fica como era.
  */
 export function shareCreditLines(photos = []) {
   const credits = [...new Set(photos
     .filter((photo) => photo && typeof photo.author === "string" && photo.author && typeof photo.license === "string" && photo.license)
     .map((photo) => `${photo.author} (${photo.license})`))];
   if (!credits.length) return [];
-  return [`${credits.length === 1 ? "Foto" : "Fotos"}: ${credits.join(" · ")}`, `Créditos completos em ${SHARE_ORIGIN.replace("https://", "")}/creditos.html`];
+  const where = `${SHARE_ORIGIN.replace("https://", "")}/creditos.html`;
+  const label = credits.length === 1 ? "Foto" : "Fotos";
+  if (credits.length <= 2) return [`${label}: ${credits.join(" · ")}`, `Créditos completos em ${where}`];
+  return [`${label}: ${credits.slice(0, 2).join(" · ")}`, `${credits.slice(2).join(" · ")} · créditos em ${where}`];
 }
 
 /**

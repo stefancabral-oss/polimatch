@@ -43,7 +43,7 @@ As cartas da pesquisa de famosos e influenciadores ([ICM 74] #348, decisão 0006
 
 A fotografia não é editada: é posicionada, recortada pela janela da moldura e redimensionada. A moldura é desenhada por código, e o roteiro que a desenha e monta a carta (`app/scripts/build-celebrity-cards.mjs`) foi escrito por um agente de IA. Cada carta traz "Foto: autor · licença", em letra que não se lê nos tamanhos em que o aplicativo mostra a carta. O crédito legível está na página `/creditos.html`, que lista autor, licença, título e origem de cada fotografia e diz o que foi mudado, e no pé da imagem do compartilhar.
 
-As cartas feitas de fotografia com licença CC BY-SA 4.0 (Juliette, Selton Mello e Wagner Moura) podem ser reutilizadas nos termos dessa mesma licença. Isso vale para essas três cartas, não para a marca do PoliMatch nem para o resto do repositório.
+As cartas feitas de fotografia com licença CC BY-SA 4.0 (Juliette, Selton Mello e Wagner Moura) podem ser reutilizadas nos termos dessa mesma licença. Isso vale para o desenho dessas três cartas, com a moldura e o nome "PoliMatch" que está nela, e não para o resto do repositório. A licença não dá direito de usar o nome como marca.
 
 A licença é a declarada na Wikimedia Commons. O que foi conferido na origem, e o que não foi, está no HANDOFF do estágio. A licença trata do direito de quem fez a fotografia, não do direito da pessoa retratada.
 

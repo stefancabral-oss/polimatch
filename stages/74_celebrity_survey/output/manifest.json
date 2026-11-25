@@ -23,6 +23,7 @@
         "attribution": "Attractive Mindset",
         "dateField": "2024-06-16",
         "licenseReview": "revisada",
+        "licenseReviewNote": "o arquivo também está na categoria \"RevengerTime uploads needing license review\"",
         "personalityRightsWarning": false,
         "seenOn": "2026-11-24"
       },
@@ -986,8 +987,8 @@
     "id": "rodrigo-santoro",
     "name": "Rodrigo Santoro",
     "master": "stages/74_celebrity_survey/output/masters/rodrigo-santoro.svg",
-    "masterSha256": "83ef8d23d6bc85ee30d799b25e4a46ba6a03f54c0a7dfd0cacb4ea6087b5ecd4",
-    "stamp": "c479f28b",
+    "masterSha256": "25d81c066b43ad66d4058ce14561edef4fef9c11e002db3654f07a9fec594c38",
+    "stamp": "b2727265",
     "source": {
       "file": "stages/74_celebrity_survey/output/sources/rodrigo-santoro.jpg",
       "sha256": "80307e98004922dd02c11e075c845858361c9aeff20f054377a43485a4a99a64",
@@ -1031,16 +1032,16 @@
     "credit": "Foto: David Shankbone · CC BY 3.0",
     "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
     "crop": {
-      "x": 0.5,
-      "y": 0.33,
-      "zoom": 1.1
+      "x": 0.9,
+      "y": 0.352,
+      "zoom": 1.25
     },
     "placement": {
-      "x": 24,
-      "y": 150,
-      "width": 1012,
-      "height": 1265,
-      "scale": 0.79
+      "x": -160,
+      "y": 64,
+      "width": 1150,
+      "height": 1437.5,
+      "scale": 0.9
     },
     "textSizes": {
       "name": 111,
@@ -1050,16 +1051,16 @@
     "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
     "variants": [
       {
-        "src": "/chromas/famosos/rodrigo-santoro-v01-c479f28b-530.webp",
+        "src": "/chromas/famosos/rodrigo-santoro-v01-b2727265-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "25c5b64abc2dde3a7bceca1bc1e3b19bb1f7ceaa1a4690f60b69b35d452fee7c"
+        "sha256": "0f2ec5196b036a10fea8a195e5e30d33cdc4364563fdf4b36d5559775fe4e9b4"
       },
       {
-        "src": "/chromas/famosos/rodrigo-santoro-v01-c479f28b-1060.webp",
+        "src": "/chromas/famosos/rodrigo-santoro-v01-b2727265-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "886edaace869f604b210c9e3784d423a8a398311fa83e9d10a1d1eca6574ac11"
+        "sha256": "c4a61532ae4ddcce9765d6cf2dd70878ef483be106d936d81d8841f7fd6afdbc"
       }
     ]
   },
@@ -1148,8 +1149,8 @@
     "id": "selton-mello",
     "name": "Selton Mello",
     "master": "stages/74_celebrity_survey/output/masters/selton-mello.svg",
-    "masterSha256": "f200779031104705ef69c8cefcb278cbf860a09ee7396bc380f9e81f230a9755",
-    "stamp": "255bc03e",
+    "masterSha256": "73e645ec2efa97cbf7445fadac08429f55682a96762f96d96618b44c8fafb036",
+    "stamp": "af51f42c",
     "source": {
       "file": "stages/74_celebrity_survey/output/sources/selton-mello.jpg",
       "sha256": "1c6787b8e4ec30a4f6d1777a9c96e2c642ce1ecf2f5424cc8a341f51cca934b5",
@@ -1193,16 +1194,16 @@
     "credit": "Foto: Harald Krichel · CC BY-SA 4.0",
     "changes": "recorte pela janela da moldura e redimensionamento; a foto não foi editada",
     "crop": {
-      "x": 0.5,
-      "y": 0.3,
-      "zoom": 1.15
+      "x": 0.447,
+      "y": 0.276,
+      "zoom": 1.55
     },
     "placement": {
-      "x": 1,
-      "y": 93.9,
-      "width": 1058,
-      "height": 1587,
-      "scale": 0.83
+      "x": -107.42,
+      "y": -20.36,
+      "width": 1426,
+      "height": 2139,
+      "scale": 1.11
     },
     "textSizes": {
       "name": 112,
@@ -1212,16 +1213,16 @@
     "tool": "moldura e montagem por código (app/scripts/build-celebrity-cards.mjs), escrito por agente de IA; fotografia sem edição por IA, só posicionada, recortada pela janela e redimensionada",
     "variants": [
       {
-        "src": "/chromas/famosos/selton-mello-v01-255bc03e-530.webp",
+        "src": "/chromas/famosos/selton-mello-v01-af51f42c-530.webp",
         "width": 530,
         "height": 742,
-        "sha256": "95343f49808cdaa8ed636c54faf6fcea6251eaa7f3d7f023786b98ece423b3e9"
+        "sha256": "632f077e02aeb2a24129e7db4d947e5a2f5481d4ce77af89fb365ea37b3c0cb1"
       },
       {
-        "src": "/chromas/famosos/selton-mello-v01-255bc03e-1060.webp",
+        "src": "/chromas/famosos/selton-mello-v01-af51f42c-1060.webp",
         "width": 1060,
         "height": 1484,
-        "sha256": "5ccd72e7c5909d66bf5c0286a125c8e8c16a6736dc485b7d1b3c1c0e6f53725c"
+        "sha256": "eff578e7618a37c4f7bb6606951f86613e43f92bd4c46e0545e53410c87d01d6"
       }
     ]
   },

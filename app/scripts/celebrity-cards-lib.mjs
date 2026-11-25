@@ -12,6 +12,17 @@ export const WINDOW = Object.freeze({ x: 70, y: 150, width: 920, height: 1000, r
 // Onde, dentro da janela, fica o ponto de foco da foto (o rosto).
 export const FOCUS_AT = Object.freeze({ x: 0.5, y: 0.42 });
 
+// A placa do nome e as medidas do texto: iguais em todas as cartas.
+const PLATE = Object.freeze({ x: 70, y: 1170, width: 920, height: 244, radius: 28 });
+export const TEXT_WIDTH = 840;
+export const NAME = Object.freeze({ size: 112, weight: 800, spacing: -2.5, baseline: 1300 });
+export const CREDIT = Object.freeze({ size: 26, weight: 700, spacing: 3, baseline: 1372, minimum: 17 });
+const PAPER = "#FBFAF7";
+const GREEN = "#08805A";
+const PANEL = "#D6DADC";
+export const INK = "#111418";
+export const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+
 export const escapeXml = (text) => String(text).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
 const round = (value) => Math.round(value * 100) / 100;
 const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
@@ -40,6 +51,37 @@ export function placement(card, width, height) {
   const x = clamp(WINDOW.x + WINDOW.width * FOCUS_AT.x - (card.crop?.x ?? 0.5) * shownWidth, WINDOW.x + WINDOW.width - shownWidth, WINDOW.x);
   const y = clamp(WINDOW.y + WINDOW.height * FOCUS_AT.y - (card.crop?.y ?? 0.35) * shownHeight, WINDOW.y + WINDOW.height - shownHeight, WINDOW.y);
   return { x: round(x), y: round(y), width: round(shownWidth), height: round(shownHeight), scale: round(scale) };
+}
+
+/**
+ * O desenho da carta inteira: a moldura, a marca, a janela com a foto, a placa
+ * com o nome e a linha do crédito. `place` é o lugar da foto (`placement`),
+ * `sizes` o tamanho de letra do nome e do crédito, medidos no navegador para
+ * caberem na placa, e `href` o endereço da foto. O que muda de uma carta para
+ * outra é só o que vem de `card`, `place` e `sizes`: a moldura é a mesma.
+ */
+export function cardSvg(card, place, sizes, href) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${WIDTH} ${HEIGHT}" width="${WIDTH}" height="${HEIGHT}" font-family="${FONT}">
+  <title>${escapeXml(card.name)} — carta da pesquisa de famosos do PoliMatch</title>
+  <defs>
+    <clipPath id="window"><rect x="${WINDOW.x}" y="${WINDOW.y}" width="${WINDOW.width}" height="${WINDOW.height}" rx="${WINDOW.radius}"/></clipPath>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E6E9EA"/><stop offset="1" stop-color="${PANEL}"/>
+    </linearGradient>
+  </defs>
+  <rect width="${WIDTH}" height="${HEIGHT}" fill="${INK}"/>
+  <rect x="26" y="26" width="1008" height="1432" rx="34" fill="url(#panel)"/>
+  <rect x="78" y="62" width="50" height="50" rx="12" fill="${GREEN}"/>
+  <text x="103" y="100" font-size="36" font-weight="800" fill="#fff" text-anchor="middle">M</text>
+  <text x="144" y="100" font-size="38" font-weight="700" fill="${INK}" letter-spacing="-0.5">PoliMatch</text>
+  <rect x="${WINDOW.x}" y="${WINDOW.y}" width="${WINDOW.width}" height="${WINDOW.height}" rx="${WINDOW.radius}" fill="#B9C0C4"/>
+  <image href="${escapeXml(href)}" x="${place.x}" y="${place.y}" width="${place.width}" height="${place.height}" preserveAspectRatio="none" clip-path="url(#window)"/>
+  <rect x="${WINDOW.x}" y="${WINDOW.y}" width="${WINDOW.width}" height="${WINDOW.height}" rx="${WINDOW.radius}" fill="none" stroke="rgba(17,20,24,0.16)" stroke-width="2"/>
+  <rect x="${PLATE.x}" y="${PLATE.y}" width="${PLATE.width}" height="${PLATE.height}" rx="${PLATE.radius}" fill="${PAPER}" stroke="rgba(17,20,24,0.10)" stroke-width="2"/>
+  <text x="530" y="${NAME.baseline}" font-size="${sizes.name}" font-weight="${NAME.weight}" fill="${INK}" text-anchor="middle" letter-spacing="${NAME.spacing}">${escapeXml(card.name)}</text>
+  <text x="530" y="${CREDIT.baseline}" font-size="${sizes.credit}" font-weight="${CREDIT.weight}" fill="#5B6470" text-anchor="middle" letter-spacing="${CREDIT.spacing}">${escapeXml(creditLine(card).toUpperCase())}</text>
+</svg>
+`;
 }
 
 /**

@@ -13,6 +13,7 @@ import {
   shareText,
   shareUrl,
 } from "./share-choice.js";
+import CELEBRITY_CARDS from "./celebrity-cards.json" with { type: "json" };
 
 const choice = { surveyId: "politica-2026-02", name: "Fulana de Tal", question: "Em quem você confia mais?" };
 const file = { name: SHARE_FILE_NAME, type: "image/jpeg" };
@@ -208,14 +209,42 @@ test("a imagem leva o crédito das fotos quando as cartas têm foto de outra pes
     "Foto: Fulana (CC BY 3.0)",
     "Créditos completos em polimatch.com.br/creditos.html",
   ]);
-  // Várias: na ordem em que as cartas entram na imagem, sem repetir o mesmo autor com a mesma licença.
+  // Duas: as duas na primeira linha, na ordem em que as cartas entram na imagem.
+  assert.deepEqual(shareCreditLines([{ author: "Canal", license: "CC BY 3.0" }, { author: "Fulana", license: "CC BY-SA 4.0" }]), [
+    "Fotos: Canal (CC BY 3.0) · Fulana (CC BY-SA 4.0)",
+    "Créditos completos em polimatch.com.br/creditos.html",
+  ]);
+  // Mais de duas: sem repetir o mesmo autor com a mesma licença, e as que passam de duas descem para a segunda linha.
   assert.deepEqual(shareCreditLines([
     { author: "Canal", license: "CC BY 3.0" },
     { author: "Fulana", license: "CC BY-SA 4.0" },
     { author: "Canal", license: "CC BY 3.0" },
     { author: "Canal", license: "CC BY 4.0" },
   ]), [
-    "Fotos: Canal (CC BY 3.0) · Fulana (CC BY-SA 4.0) · Canal (CC BY 4.0)",
-    "Créditos completos em polimatch.com.br/creditos.html",
+    "Fotos: Canal (CC BY 3.0) · Fulana (CC BY-SA 4.0)",
+    "Canal (CC BY 4.0) · créditos em polimatch.com.br/creditos.html",
   ]);
+  assert.deepEqual(shareCreditLines([
+    { author: "A", license: "CC BY 3.0" }, { author: "B", license: "CC BY 3.0" }, { author: "C", license: "CC BY 3.0" }, { author: "D", license: "CC BY 3.0" },
+  ]), [
+    "Fotos: A (CC BY 3.0) · B (CC BY 3.0)",
+    "C (CC BY 3.0) · D (CC BY 3.0) · créditos em polimatch.com.br/creditos.html",
+  ]);
+});
+
+test("o crédito de qualquer combinação de cartas de famosos cabe nas duas linhas da imagem", () => {
+  // A imagem leva a escolhida e até três finalistas. As linhas são desenhadas com letra de 18 px que encolhe
+  // até 12 px numa largura de 1000 px; com até 140 letras por linha nada é cortado. Um autor de nome mais
+  // comprido no catálogo faz este teste falhar antes de o crédito sair cortado na imagem.
+  const credits = [...new Map(CELEBRITY_CARDS.map((card) => [`${card.photo.author} (${card.photo.license})`, card.photo])).values()];
+  assert.ok(credits.length >= 4, "há créditos distintos bastantes para a pior combinação");
+  let longest = 0;
+  for (const first of credits) for (const second of credits) for (const third of credits) for (const fourth of credits) {
+    for (const size of [1, 2, 3, 4]) {
+      const lines = shareCreditLines([first, second, third, fourth].slice(0, size));
+      assert.equal(lines.length, 2);
+      longest = Math.max(longest, ...lines.map((line) => line.length));
+    }
+  }
+  assert.ok(longest <= 140, `a linha mais comprida tem ${longest} letras`);
 });

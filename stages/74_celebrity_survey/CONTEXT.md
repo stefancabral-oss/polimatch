@@ -52,8 +52,10 @@ licença livre.
    declarada na página do arquivo (CC BY ou CC BY-SA). Para Anitta, Ludmilla
    e Rodrigo Santoro a Wikidata marcava, nesse dia, outra imagem como
    preferida. O arquivo entra no repositório como
-   foi baixado, em `output/sources/`. Para arquivo mais largo que 1280 px foi
-   baixada a miniatura de 1280 px gerada pela Wikimedia. A foto não é
+   foi baixado, em `output/sources/`. Depois que o servidor da Wikimedia
+   limitou os downloads, para arquivo mais largo que 1280 px foi baixada a
+   miniatura de 1280 px que ela gera; o de Iza, de 1441 px, tinha sido
+   baixado antes, como original. A foto não é
    editada: é posicionada, recortada pela janela da moldura e redimensionada.
 3. **Origem.** `output/sources.json` diz, para cada carta, a página do
    arquivo na Commons, o endereço e o SHA-1 do original, o que foi baixado, o
@@ -118,4 +120,4 @@ licença livre.
 ## Gate humano
 
 Merge e publicação pedem o sim do Stefan, um a um. A pergunta do merge leva
-por extenso as escolhas de regra e de dado da decisão 0006 (1 a 9).
+por extenso as escolhas de regra e de dado da decisão 0006 (1 a 11).

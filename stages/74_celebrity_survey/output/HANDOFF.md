@@ -7,8 +7,8 @@ Estado: `aguardando gate do merge`. Nada deste estágio está em produção.
 ### 74a — Registro
 
 - Decisão 0006 (`docs/decisions/0006-famosos-com-foto-de-licenca-livre.md`):
-  as duas respostas do Stefan e as quinze escolhas do agente, nove de regra e
-  de dado e seis de desenho.
+  as duas respostas do Stefan e as dezesseis escolhas do agente, onze de
+  regra e de dado e cinco de desenho.
 - `stages/74_celebrity_survey/CONTEXT.md`.
 - Notas datadas no `AGENTS.md`, no `CONTEXT.md` e no `README.md`, e a seção
   "Cartas de famosos" no `CREDITS.md`.
@@ -36,7 +36,9 @@ Estado: `aguardando gate do merge`. Nada deste estágio está em produção.
   teste também usa.
 - `app/src/celebrity-cards.test.js` prende uns aos outros a pesquisa, o
   catálogo, o manifesto, a lista de origem, as fotos, os desenhos, os
-  arquivos publicados e a página de créditos.
+  arquivos publicados e a página de créditos. O desenho de origem de cada
+  carta é comparado inteiro com o que o roteiro gera: a moldura é a mesma
+  nas vinte, sem nada a mais.
 
 ### 74c — Pesquisa
 
@@ -113,6 +115,19 @@ Nos casos em que o problema era a foto, o agente trocou a pessoa em vez de
 procurar outra foto: o download combinado era o de uma foto por nome. Com
 outra foto, qualquer uma delas pode voltar.
 
+Os recortes de Rodrigo Santoro e de Selton Mello foram fechados depois da
+segunda leitura independente: no tamanho maior, o primeiro recorte deixava
+ver parte do rosto de outra pessoa ao fundo (num cartaz e numa pessoa
+desfocada).
+
+As fotos e as cartas que saíram continuam nos dois primeiros commits do PR,
+que são públicos: as de Luan Santana, Luciano Huck, Bianca Andrade e Marina
+Ruy Barbosa no primeiro (`bc37f7c`), e os recortes anteriores de Rodrigo
+Santoro e de Selton Mello no segundo (`a448cba`). Um merge que junta os
+commits as deixa fora da `main`; os commits do PR continuam alcançáveis no
+GitHub. Reescrever o histórico do branch antes do merge é possível e pede o
+sim do Stefan.
+
 ## O que foi conferido na origem
 
 Em 24/11/2026, por leitura das páginas, sem baixar imagem:
@@ -135,7 +150,9 @@ O que a própria Commons marcava nesse dia:
 
 - **Revisão de licença:** nove arquivos revisados; quatro esperando revisão
   (Ludmilla, Luísa Sonza, Tatá Werneck e Pabllo Vittar); sete sem categoria
-  de revisão (Gusttavo Lima, Casimiro, Alok e as quatro obras próprias).
+  de revisão (Gusttavo Lima, Casimiro, Alok e as quatro obras próprias). O
+  arquivo de Anitta está entre os revisados e, ao mesmo tempo, numa categoria
+  de envios de um usuário que pedem revisão.
 - **Bruna Marquezine:** a Commons avisa que a licença do modelo da página (CC
   BY 4.0) difere da que está nos dados estruturados do arquivo. A carta usa a
   do modelo da página.
@@ -145,14 +162,18 @@ O que a própria Commons marcava nesse dia:
 
 ## O que aparece nas fotos além da pessoa
 
-O agente olhou a folha das vinte cartas em tamanho reduzido. Não viu rosto de
-outra pessoa em nenhuma. Viu:
+O agente olhou as vinte cartas no tamanho publicado de 530 px e, no de 1060
+px, as de Rodrigo Santoro e de Selton Mello. Não viu rosto de outra pessoa
+em nenhuma. Viu:
 
 - microfone em Anitta, Xuxa, Iza e Alok;
 - parte de um letreiro atrás de Gusttavo Lima;
-- um cartaz desfocado, com a imagem de uma mulher, atrás de Rodrigo Santoro;
+- atrás de Rodrigo Santoro, o cabelo de uma mulher num cartaz desfocado, sem
+  o rosto dela;
+- fundo desfocado atrás de Selton Mello, sem rosto;
 - uma escultura atrás de Ana Maria Braga;
-- parte de logotipos no moletom de Casimiro, na borda de baixo;
+- dois logotipos legíveis no moletom de Casimiro, na borda de baixo, um
+  deles de um canal de TV;
 - cenário de estúdio ou de evento nas demais.
 
 A foto de Casimiro é de 2017, pela descrição na Commons, e a de Rodrigo
@@ -182,7 +203,7 @@ pelo agente principal:
 | O quê | Resultado |
 |---|---|
 | `npm run test:shared` | 121 de 121 |
-| `npm test --prefix app` | 228 de 228 |
+| `npm test --prefix app` | 229 de 229 |
 | `npm test --prefix back` | 306 de 306 |
 | `npm run build --prefix app` | sem erro, três páginas |
 | `app/e2e/site-shell.mjs`, Chromium, execução inteira | 53 de 53 |
@@ -199,9 +220,9 @@ máquina, a execução inteira em WebKit para nele por estouro de tempo ao abrir
 a página, e ele passa quando roda sozinho. A leitura independente viu o mesmo
 num build da `main`. Em 23/11/2026 a mesma execução inteira passou nesta
 máquina (HANDOFF do estágio 73): o comportamento é instável aqui, não um
-defeito fixo. No CI do primeiro commit deste PR (`bc37f7c`) os nove
-trabalhos passaram, entre eles os roteiros de navegador em Chromium e em
-WebKit.
+defeito fixo. No CI dos dois primeiros commits deste PR (`bc37f7c` e
+`a448cba`) os nove trabalhos passaram, entre eles os roteiros de navegador em
+Chromium e em WebKit.
 
 O Chromium local é o 1187, mais antigo que o 1193 que o Playwright do projeto
 pede. Os roteiros rodaram nele por um roteiro auxiliar fora do repositório.
@@ -225,8 +246,8 @@ feitas depois da leitura independente; o CI os roda a cada commit.
   partido nem candidatura para nenhuma. O registro do TSE não foi consultado.
 - **Qualidade no tamanho maior.** Catorze fotos são ampliadas na carta de
   1060 px; a de Ana Maria Braga, 2,64 vezes. Na carta de 530 px a ampliação
-  cai pela metade. O agente viu a folha das vinte cartas em tamanho reduzido,
-  não cada carta no tamanho maior.
+  cai pela metade. O agente viu as vinte no tamanho de 530 px e só duas no
+  de 1060 px.
 - **Se o crédito na imagem do compartilhar basta para cada licença.** Ele traz
   autor e licença das fotos da imagem e o endereço da página de créditos; o
   título e o endereço de cada foto ficam só na página.
@@ -287,8 +308,36 @@ entrada; e o teste das cartas, que passou a conferir o enquadramento, o
 endereço da licença, a página de créditos inteira e a diferença entre
 original e miniatura.
 
-A conferência do que mudou depois dessa leitura estava pendente quando este
-texto foi escrito.
+**Segunda passada,** sobre o segundo commit (`a448cba`), pelo mesmo revisor.
+Dos nove achados da primeira, seis estavam resolvidos e três em parte. Ela
+**segurou de novo**, por um ponto: um critério de aceite escrito naquele
+commit ("nenhuma carta mostra o rosto de outra pessoa") não valia, no tamanho
+maior, para duas das quatro cartas novas. Apontou também:
+
+- as fotos trocadas continuam nos commits públicos do PR;
+- o teste ainda não via mudanças no desenho de origem fora de três trechos;
+- pontos menores do registro (a miniatura de Iza, o que o catálogo diz de
+  Felipe Neto, a marca nas cartas de licença CC BY-SA, a legenda da folha de
+  telas, o CI);
+- duas escolhas a tratar como de regra e de dado: onde o crédito aparece e a
+  permanência das quatro fotos com revisão de licença pendente;
+- o crédito na imagem do compartilhar encolhia demais com quatro créditos
+  diferentes.
+
+O que ela conferiu e se sustentou: os campos das vinte na API da Commons; as
+quinze páginas do YouTube, que ela abriu por conta própria e mostravam a
+mesma licença; a geração das cartas numa cópia, igual byte a byte; a imagem
+do compartilhar das pesquisas de Política e de roupas, igual byte a byte
+antes e depois; a entrada com o caminho para os créditos em telas de 320 a
+390 px; os testes de unidade, o build e os roteiros em WebKit.
+
+O que mudou em resposta, no terceiro commit: os dois recortes; o teste
+compara o desenho de origem inteiro; o crédito na imagem do compartilhar
+passa a usar duas linhas equilibradas, com um teste sobre o catálogo; e o
+registro.
+
+A conferência do terceiro commit estava pendente quando este texto foi
+escrito.
 
 ## Gate humano
 
@@ -296,7 +345,7 @@ Pendente em 24/11/2026.
 
 O que o Stefan já respondeu: "Sim, começa" e "Sim, baixa" (decisão 0006).
 
-A pergunta do merge leva por extenso as escolhas de regra e de dado, as nove
+A pergunta do merge leva por extenso as escolhas de regra e de dado, as onze
 primeiras da decisão 0006:
 
 1. quem aparece (os vinte nomes, com as quatro trocas);
@@ -305,8 +354,11 @@ primeiras da decisão 0006:
 4. o sorteio de 16 entre 20;
 5. a ordem na capa, com o que muda para quem já respondeu;
 6. a leitura do agente de que a resposta à Q3 da #277 cobre estas fotos;
-7. as fotos entram no repositório público, com o crédito;
+7. as fotos entram no repositório público, com o crédito, e as que foram
+   trocadas continuam nos commits do PR;
 8. três cartas ficam sob a mesma licença da foto;
-9. a página de créditos é pública e pode ser achada por buscador.
+9. a página de créditos é pública e pode ser achada por buscador;
+10. onde o crédito aparece;
+11. ficam quatro fotos cuja licença a Commons ainda não revisou.
 
 Merge e publicação pedem o sim dele, um a um.

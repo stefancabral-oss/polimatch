@@ -13,8 +13,9 @@
 ## Contexto
 
 A issue do estágio 73 (#345, pesquisa de roupas de demonstração) foi fechada
-em 24/11/2026. A construção seguinte, pela decisão 0005, é a de celebridades
-e influenciadores.
+no fim do dia 24/11/2026, depois de mesclado o registro da publicação (PR
+#347). A construção seguinte, pela decisão 0005, é a de celebridades e
+influenciadores.
 
 O repositório tem dez cartas da "Edição Inaugural" (estágio 23), feitas com
 IA a partir de fotografias. Só três delas são de artistas ou influenciadores.
@@ -74,8 +75,8 @@ pergunta do gate do merge.
 Tudo o que vem abaixo é escolha do agente, e o Stefan pode mudar qualquer
 uma.
 
-As escolhas 1 a 9 não são de desenho: são de regra e de dado. Por isso a
-pergunta do gate do merge as apresenta por extenso. As escolhas 10 a 15 são
+As escolhas 1 a 11 não são de desenho: são de regra e de dado. Por isso a
+pergunta do gate do merge as apresenta por extenso. As escolhas 12 a 16 são
 de desenho e se apoiam no pedido dele de não ser parado por detalhes de
 desenho (decisão 0003, item 5). A pergunta e a resposta dele ficam no HANDOFF
 do estágio.
@@ -99,11 +100,13 @@ do estágio.
    Whindersson Nunes, Casimiro e Wagner Moura no grupo `influencia_debate`, e
    Felipe Neto no grupo `politica`. O mesmo arquivo registra que Gusttavo
    Lima ensaiou uma candidatura à Presidência em 2025 e desistiu, e que
-   Felipe Neto não é candidato. Nenhuma das vinte está registrada ali como
-   candidata em 2026, e a Wikidata não registrava, em 24/11/2026, cargo,
-   partido nem candidatura para nenhuma. O registro de candidaturas do TSE
-   não foi consultado. O agente manteve as oito porque estavam na lista que o
-   Stefan recebeu; a escolha de manter ou trocar é dele.
+   Felipe Neto anunciou em abril de 2025 uma pré-candidatura à Presidência
+   que era ação de publicidade e não é candidato. Nenhuma das vinte está
+   registrada ali como candidata em 2026, e a Wikidata não registrava, em
+   24/11/2026, cargo, partido nem candidatura para nenhuma. O registro de
+   candidaturas do TSE não foi consultado. O agente manteve as oito porque
+   estavam na lista que o Stefan recebeu; a escolha de manter ou trocar é
+   dele.
 3. **É uma pesquisa de verdade, sobre pessoas reais.** O código é
    `famosos-01` e a pergunta é "De quem você é mais fã?". Valem o cadastro da
    decisão 0004 e uma resposta por pessoa. As respostas ficam gravadas como
@@ -139,48 +142,65 @@ do estágio.
    página declara, e o hash do arquivo. O repositório é público e passa a
    redistribuir essas fotos, com o crédito. Uma foto tirada depois sai do
    aplicativo, mas continua no histórico do repositório e nas cópias dele.
+   Isso já vale para as fotos trocadas durante este estágio: os commits do
+   PR, que são públicos, têm as fotos de Luan Santana, Luciano Huck, Bianca
+   Andrade e Marina Ruy Barbosa e os recortes anteriores de duas cartas. Um
+   merge que junta os commits deixa essas fotos fora da `main`, mas os
+   commits do PR continuam alcançáveis no GitHub.
 8. **Três cartas ficam sob a mesma licença da foto.** As fotos de Juliette,
    Selton Mello e Wagner Moura têm licença CC BY-SA 4.0, que pede que a obra
    derivada seja oferecida nos mesmos termos. A página de créditos e o
-   `CREDITS.md` dizem que essas três cartas podem ser reutilizadas assim: a
-   moldura e a placa do nome dessas três cartas ficam abertas a reuso por
-   qualquer pessoa, nesses termos. O agente não avaliou se a imagem do
-   compartilhar que contém uma dessas cartas cai na mesma obrigação. O
-   repositório não tem arquivo de licença para o código.
+   `CREDITS.md` dizem que essas três cartas podem ser reutilizadas assim: o
+   desenho dessas três cartas, com a moldura, a placa do nome e o nome
+   "PoliMatch" que está na moldura, fica aberto a cópia e adaptação por
+   qualquer pessoa, nesses termos. A licença não dá direito de usar o nome
+   como marca. O agente não avaliou se a imagem do compartilhar que contém
+   uma dessas cartas cai na mesma obrigação. O repositório não tem arquivo
+   de licença para o código.
 9. **A página de créditos é pública e entra no mapa do site.** Ela lista os
    vinte nomes, o autor de cada foto e a licença, e pode ser achada por
    buscador.
-
-### De desenho
-
-10. **Mesma moldura para as vinte**, como pede a decisão 0002. É uma moldura
-    nova, da mesma família da das cartas de roupa: a marca do PoliMatch, a
-    foto, o nome e o crédito da foto.
-11. **Onde o crédito aparece.** Cada carta traz "Foto: autor · licença", mas
-    nos tamanhos em que o aplicativo mostra a carta essa linha não se lê. O
+10. **Onde o crédito aparece.** É assim que o estágio cumpre o crédito que
+    as licenças pedem. Cada carta traz "Foto: autor · licença", mas nos
+    tamanhos em que o aplicativo mostra a carta essa linha não se lê. O
     crédito que se lê está em três lugares: na página "Créditos das fotos"
     (`/creditos.html`), que tem autor, licença, título e endereço de origem
     de cada foto e diz o que foi mudado; no menu e na entrada da pesquisa,
     que levam a essa página; e em duas linhas no pé da imagem do
     compartilhar, com o autor e a licença das fotos que estão nela e o
-    endereço da página.
-12. **"Quem fica?" nas pesquisas de pessoas.** A decisão 0005 (escolha 7)
+    endereço da página. O agente não avaliou se isso basta para cada
+    licença.
+11. **Ficam quatro fotos cuja licença a Commons ainda não revisou.** Os
+    arquivos de Ludmilla, Luísa Sonza, Tatá Werneck e Pabllo Vittar estavam,
+    em 24/11/2026, na fila de revisão de licença da Wikimedia Commons. O
+    agente as manteve porque a página do vídeo de origem de cada uma
+    mostrava, nesse dia, a licença Creative Commons. O que foi e o que não
+    foi conferido está no HANDOFF do estágio.
+
+### De desenho
+
+12. **Mesma moldura para as vinte**, como pede a decisão 0002. É uma moldura
+    nova, da mesma família da das cartas de roupa: a marca do PoliMatch, a
+    foto, o nome e o crédito da foto.
+13. **"Quem fica?" nas pesquisas de pessoas.** A decisão 0005 (escolha 7)
     deixou anotado que uma pesquisa sobre pessoas com outro assunto pediria
     rever o título da final. A definição de cada pesquisa passa a dizer se as
     cartas são pessoas; Política e famosos dizem que sim, roupas diz que não.
-13. **"Em breve" sai da capa e do menu.** "Famosos e influenciadores" era o
+14. **"Em breve" sai da capa e do menu.** "Famosos e influenciadores" era o
     único item. Sem item, o título "Em breve" não aparece.
-14. **A entrada da pesquisa ilustra com três das vinte cartas dela,**
+15. **A entrada da pesquisa ilustra com três das vinte cartas dela,**
     sorteadas a cada visita. A lista fixa de cartas da entrada, pedida pelo
     Stefan em 14/11/2026, continua valendo só para as pesquisas de Política.
-15. **O que se diz sobre IA.** A foto não é editada: só é posicionada,
+16. **O que se diz sobre IA.** A foto não é editada: só é posicionada,
     recortada pela janela da moldura e redimensionada. O roteiro que desenha
     a moldura e monta a carta foi escrito por um agente de IA. A página de
     créditos e o manifesto dizem as duas coisas (`CREDITS.md`).
 
-Uma nota sobre o download: para arquivo mais largo que 1280 px foi baixada a
-miniatura de 1280 px que a própria Wikimedia gera. O servidor dela limita o
-download de originais e pede, na mensagem de erro, o uso das miniaturas.
+Uma nota sobre o download: o servidor da Wikimedia limita o download de
+originais e pede, na mensagem de erro, o uso das miniaturas. Depois desse
+aviso, para arquivo mais largo que 1280 px foi baixada a miniatura de 1280 px
+que a própria Wikimedia gera. O arquivo de Iza, de 1441 px, tinha sido
+baixado antes do aviso e está no repositório como original.
 
 ## O que muda
 

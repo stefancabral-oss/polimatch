@@ -6,7 +6,7 @@ import CARDS from "./celebrity-cards.json" with { type: "json" };
 import CLOTHES from "./clothes-cards.json" with { type: "json" };
 import ARTS from "./political-chromas.json" with { type: "json" };
 import { PHOTO_SURVEYS } from "../../shared/photo-survey.js";
-import { STAGE, creditLine, creditsPage, licenseAddress, placement, workTitle } from "../scripts/celebrity-cards-lib.mjs";
+import { STAGE, cardSvg, creditLine, creditsPage, licenseAddress, placement, workTitle } from "../scripts/celebrity-cards-lib.mjs";
 
 // As cartas da pesquisa de famosos (ICM 74, #348) são fotografias de licença
 // livre dentro de uma moldura desenhada por código. Este teste prende, uns aos
@@ -22,7 +22,13 @@ import { STAGE, creditLine, creditsPage, licenseAddress, placement, workTitle } 
 //   - que cada WebP é o desenho do seu SVG. Quem trocar dois WebP e, junto,
 //     os hashes deles no manifesto passa por aqui; quem vê é a revisão do PR;
 //   - que uma miniatura de 1280 px é a da Wikimedia: dela só há o hash do
-//     arquivo baixado, não o do original.
+//     arquivo baixado, não o do original;
+//   - que o que foi visto e anotado é verdade: o autor, a revisão de licença
+//     e o aviso da Commons, o vídeo ou a foto de origem e a licença vista
+//     nela, a data de nascimento. Quem mudar uma dessas anotações na lista
+//     de origem e no manifesto, juntas, passa por aqui;
+//   - que uma `authorNote` justifica de fato o crédito diferente do campo de
+//     atribuição da Commons: o teste só exige que a nota exista.
 
 const at = (path) => new URL(`../../${path}`, import.meta.url);
 const evidence = JSON.parse(readFileSync(at(`${STAGE}/output/manifest.json`), "utf8"));
@@ -164,7 +170,10 @@ test("as cartas de famosos batem com a pesquisa, com as fotos de origem e com os
     assert.ok(drawing.includes(`<image href="../sources/${origin.file}" x="${place.x}" y="${place.y}" width="${place.width}" height="${place.height}" `), `${card.id}: o desenho usa a foto desta carta, no lugar certo`);
     assert.ok(drawing.includes(` font-size="${proof.textSizes.name}" font-weight="800" fill="#111418" text-anchor="middle" letter-spacing="-2.5">${escapeHtml(card.name)}</text>`), `${card.id}: nome na placa`);
     assert.ok(drawing.includes(` font-size="${proof.textSizes.credit}" font-weight="700" fill="#5B6470" text-anchor="middle" letter-spacing="3">${escapeHtml(proof.credit.toUpperCase())}</text>`), `${card.id}: crédito da foto na carta`);
-    assert.ok(proof.textSizes.name >= 60 && proof.textSizes.credit >= 17, `${card.id}: o texto não encolheu demais`);
+    assert.ok(Number.isInteger(proof.textSizes.name) && proof.textSizes.name >= 60 && proof.textSizes.name <= 112, `${card.id}: tamanho do nome`);
+    assert.ok(Number.isInteger(proof.textSizes.credit) && proof.textSizes.credit >= 17 && proof.textSizes.credit <= 26, `${card.id}: tamanho do crédito`);
+    // O desenho inteiro é o que o roteiro gera para esta carta: a moldura é a mesma em todas, sem nada a mais nem a menos.
+    assert.equal(drawing, cardSvg(origin, place, proof.textSizes, `../sources/${origin.file}`), `${card.id}: o desenho de origem é exatamente a moldura comum com a foto, o nome e o crédito desta carta`);
     // A foto cobre a janela inteira da moldura.
     assert.ok(place.x <= 70 && place.y <= 150 && place.x + place.width >= 990 && place.y + place.height >= 1150, `${card.id}: a foto cobre a janela`);
     // A foto não é editada, e o manifesto diz como a carta foi montada.

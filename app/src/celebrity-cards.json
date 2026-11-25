@@ -194,12 +194,12 @@
   {
     "id": "rodrigo-santoro",
     "name": "Rodrigo Santoro",
-    "src": "/chromas/famosos/rodrigo-santoro-v01-c479f28b-530.webp",
-    "srcset": "/chromas/famosos/rodrigo-santoro-v01-c479f28b-530.webp 530w, /chromas/famosos/rodrigo-santoro-v01-c479f28b-1060.webp 1060w",
+    "src": "/chromas/famosos/rodrigo-santoro-v01-b2727265-530.webp",
+    "srcset": "/chromas/famosos/rodrigo-santoro-v01-b2727265-530.webp 530w, /chromas/famosos/rodrigo-santoro-v01-b2727265-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "c479f28b",
+    "stamp": "b2727265",
     "photo": {
       "author": "David Shankbone",
       "license": "CC BY 3.0",
@@ -226,12 +226,12 @@
   {
     "id": "selton-mello",
     "name": "Selton Mello",
-    "src": "/chromas/famosos/selton-mello-v01-255bc03e-530.webp",
-    "srcset": "/chromas/famosos/selton-mello-v01-255bc03e-530.webp 530w, /chromas/famosos/selton-mello-v01-255bc03e-1060.webp 1060w",
+    "src": "/chromas/famosos/selton-mello-v01-af51f42c-530.webp",
+    "srcset": "/chromas/famosos/selton-mello-v01-af51f42c-530.webp 530w, /chromas/famosos/selton-mello-v01-af51f42c-1060.webp 1060w",
     "width": 1060,
     "height": 1484,
     "edition": "famosos-v1",
-    "stamp": "255bc03e",
+    "stamp": "af51f42c",
     "photo": {
       "author": "Harald Krichel",
       "license": "CC BY-SA 4.0",

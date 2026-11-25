@@ -38,15 +38,17 @@
     "enlarged": "14 das 20 fotos são ampliadas na carta de 1060 px; a maior ampliação é de 2,64 vezes (Ana Maria Braga)",
     "adults": "data de nascimento da Wikidata registrada para as 20; a mais nova nasceu em 1998; nenhuma com registro de falecimento na Wikidata em 24/11/2026",
     "creditOnCard": "a linha \"Foto: autor · licença\" está em cada carta, mas não se lê nos tamanhos em que o aplicativo mostra a carta; o crédito legível está na página de créditos e no pé da imagem do compartilhar",
-    "pinnedBy": "app/src/celebrity-cards.test.js: código, nome, foto, hash e tamanho da foto, SHA-1 e tamanho do original quando o arquivo é o original, 1280 px e endereço de miniatura quando não é, página e endereço de origem batendo com o título, crédito igual ao campo de atribuição da Commons salvo nota, endereço da licença derivado da licença, origem fora da Commons, data de nascimento, enquadramento recalculado, lugar da foto e textos no desenho de origem, carimbo, os dois tamanhos, a página de créditos inteira; nenhum arquivo sobrando nas quatro pastas; nenhum código repetido com as outras pesquisas",
-    "notPinned": "que a foto é da pessoa; que a licença declarada é verdadeira; que cada WebP é o desenho do seu SVG; que uma miniatura é a da Wikimedia",
-    "reproducible": "gerado mais de uma vez na mesma máquina com os mesmos nomes e hashes; a leitura independente gerou de novo numa cópia o conjunto do primeiro commit, igual byte a byte",
-    "tools": "Chromium headless shell 1187 e cwebp 1.6.0"
+    "pinnedBy": "app/src/celebrity-cards.test.js: código, nome, foto, hash e tamanho da foto, SHA-1 e tamanho do original quando o arquivo é o original, 1280 px e endereço de miniatura quando não é, página e endereço de origem batendo com o título, crédito igual ao campo de atribuição da Commons salvo nota, endereço da licença derivado da licença, origem fora da Commons, data de nascimento, enquadramento recalculado, o desenho de origem inteiro igual ao que o roteiro gera, carimbo, os dois tamanhos, a página de créditos inteira; nenhum arquivo sobrando nas quatro pastas; nenhum código repetido com as outras pesquisas",
+    "notPinned": "que a foto é da pessoa; que a licença declarada é verdadeira; que cada WebP é o desenho do seu SVG; que uma miniatura é a da Wikimedia; que as anotações do que foi visto (autor, revisão de licença, origem e licença vista nela, data de nascimento) são verdadeiras quando mudadas na lista de origem e no manifesto juntas; que uma authorNote justifica o crédito diferente",
+    "reproducible": "gerado mais de uma vez na mesma máquina com os mesmos nomes e hashes; a leitura independente gerou de novo numa cópia os conjuntos do primeiro e do segundo commit, iguais byte a byte",
+    "tools": "Chromium headless shell 1187 e cwebp 1.6.0",
+    "seenByMainAgent": "as vinte cartas no tamanho de 530 px e duas (Rodrigo Santoro e Selton Mello) no de 1060 px: nenhuma com rosto de outra pessoa",
+    "publicCommits": "os commits do PR, públicos, têm as fotos e as cartas de Luan Santana, Luciano Huck, Bianca Andrade e Marina Ruy Barbosa (bc37f7c) e os recortes anteriores de Rodrigo Santoro e Selton Mello (a448cba)"
   },
   "originChecks": {
     "date": "2026-11-24, por leitura de páginas, sem baixar imagem",
     "commons": "página, autor, licença e SHA-1 do original das 20, pela API",
-    "youtube": "as 15 páginas de vídeo dadas como origem mostravam \"License: Creative Commons Attribution license (reuse allowed)\"; um vídeo de controle sem essa licença não mostrava a linha; canais: Multishow (12), Record Goiás (1), TNT Sports Brasil (1), Attractive Mindset Network (1)",
+    "youtube": "as 15 páginas de vídeo dadas como origem mostravam \"License: Creative Commons Attribution license (reuse allowed)\"; um vídeo de controle sem essa licença não mostrava a linha; canais: Multishow (12), Record Goiás (1), TNT Sports Brasil (1), Attractive Mindset Network (1); a leitura independente abriu as mesmas 15 páginas e viu o mesmo",
     "flickr": "a página da foto de Alok mostra CC BY 2.0",
     "ownWork": "Juliette, Rodrigo Santoro, Selton Mello e Wagner Moura: obra própria declarada na Commons, sem origem fora dela",
     "commonsLicenseReview": {
@@ -54,7 +56,7 @@
       "pede revisão": 4,
       "sem categoria de revisão": 7
     },
-    "commonsFlags": "Bruna Marquezine: a Commons avisa que a licença do modelo da página (CC BY 4.0) difere da dos dados estruturados; 11 dos 20 arquivos trazem o aviso de direitos de personalidade",
+    "commonsFlags": "Bruna Marquezine: a Commons avisa que a licença do modelo da página (CC BY 4.0) difere da dos dados estruturados; o arquivo de Anitta está entre os revisados e também numa categoria de envios que pedem revisão; 11 dos 20 arquivos trazem o aviso de direitos de personalidade",
     "wikidata": "nenhuma das 20 com falecimento, cargo, partido ou candidatura registrados"
   },
   "download": {
@@ -68,7 +70,7 @@
     "ranByMainAgent": {
       "when": "no estado final dos arquivos do commit, no macOS",
       "npm run test:shared": "121/121",
-      "npm test --prefix app": "228/228",
+      "npm test --prefix app": "229/229",
       "npm test --prefix back": "306/306",
       "npm run build --prefix app": "sem erro, três páginas",
       "app/e2e/site-shell.mjs em Chromium, execução inteira": "53/53",
@@ -89,6 +91,7 @@
     "localBrowsers": "Chromium 1187, mais antigo que o 1193 que o Playwright do projeto pede, por um roteiro auxiliar fora do repositório; WebKit 2203, direto",
     "ci": {
       "bc37f7c": "primeiro commit do PR: os nove trabalhos passaram, entre eles os roteiros de navegador em Chromium e em WebKit e a integração com PostgreSQL",
+      "a448cba": "segundo commit: os nove trabalhos passaram",
       "commitDesteRegistro": "pendente quando este arquivo foi escrito"
     }
   },
@@ -113,7 +116,7 @@
     "owner": "Stefan",
     "start": "Sim, começa",
     "cards": "Sim, baixa",
-    "toAskInFull": "as escolhas 1 a 9 da decisão 0006"
+    "toAskInFull": "as escolhas 1 a 11 da decisão 0006"
   },
   "independentReview": {
     "first": {
@@ -121,7 +124,13 @@
       "result": "segurou a pergunta do merge por achados de registro e de procedência das fotos; código, testes e CI se sustentaram",
       "adjusted": "registro; quatro cartas trocadas; conferência da licença no YouTube e no Flickr; crédito pelo campo de atribuição; título da obra na página de créditos; crédito na imagem do compartilhar; caminho para os créditos na entrada; teste das cartas mais apertado"
     },
-    "delta": "pendente quando este arquivo foi escrito",
-    "by": "agente que não escreveu o código, somente leitura"
+    "second": {
+      "on": "a448cba",
+      "result": "segurou de novo, por um ponto: duas das quatro cartas novas deixavam ver, no tamanho maior, parte do rosto de outra pessoa ao fundo; dos nove achados da primeira, seis resolvidos e três em parte",
+      "checked": "campos das vinte na API da Commons; as 15 páginas do YouTube, abertas pelo próprio revisor; geração das cartas numa cópia, igual byte a byte; imagem do compartilhar de Política e de roupas igual byte a byte antes e depois; entrada com o caminho para os créditos em 320 a 390 px; testes de unidade, build e roteiros em WebKit; 47 alterações no teste das cartas, 12 passando sem ele notar",
+      "adjusted": "os dois recortes; o teste compara o desenho de origem inteiro; crédito da imagem do compartilhar em duas linhas equilibradas, com teste sobre o catálogo; registro"
+    },
+    "third": "pendente quando este arquivo foi escrito",
+    "by": "agente que não escreveu o código, somente leitura; o mesmo nas passadas"
   }
 }
