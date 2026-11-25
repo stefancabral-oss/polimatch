@@ -35,14 +35,14 @@
     "edits": "nenhuma edição na foto: posicionada, recortada pela janela da moldura e redimensionada; nenhum retrato gerado ou editado por IA",
     "frame": "desenhada por código; o roteiro foi escrito por agente de IA, e o manifesto e a página de créditos dizem isso",
     "font": "texto desenhado com a Helvetica Neue do macOS da máquina que gerou; a fonte não vai para o repositório nem para o site",
-    "enlarged": "14 das 20 fotos são ampliadas na carta de 1060 px; a maior ampliação é de 2,64 vezes (Ana Maria Braga)",
+    "enlarged": "15 das 20 fotos são ampliadas na carta de 1060 px; a maior ampliação é de 2,64 vezes (Ana Maria Braga)",
     "adults": "data de nascimento da Wikidata registrada para as 20; a mais nova nasceu em 1998; nenhuma com registro de falecimento na Wikidata em 24/11/2026",
     "creditOnCard": "a linha \"Foto: autor · licença\" está em cada carta, mas não se lê nos tamanhos em que o aplicativo mostra a carta; o crédito legível está na página de créditos e no pé da imagem do compartilhar",
     "pinnedBy": "app/src/celebrity-cards.test.js: código, nome, foto, hash e tamanho da foto, SHA-1 e tamanho do original quando o arquivo é o original, 1280 px e endereço de miniatura quando não é, página e endereço de origem batendo com o título, crédito igual ao campo de atribuição da Commons salvo nota, endereço da licença derivado da licença, origem fora da Commons, data de nascimento, enquadramento recalculado, o desenho de origem inteiro igual ao que o roteiro gera, carimbo, os dois tamanhos, a página de créditos inteira; nenhum arquivo sobrando nas quatro pastas; nenhum código repetido com as outras pesquisas",
-    "notPinned": "que a foto é da pessoa; que a licença declarada é verdadeira; que cada WebP é o desenho do seu SVG; que uma miniatura é a da Wikimedia; que as anotações do que foi visto (autor, revisão de licença, origem e licença vista nela, data de nascimento) são verdadeiras quando mudadas na lista de origem e no manifesto juntas; que uma authorNote justifica o crédito diferente",
+    "notPinned": "que a foto é da pessoa; que a licença declarada é verdadeira; que cada WebP é o desenho do seu SVG; que uma miniatura é a da Wikimedia; que as anotações do que foi visto (autor, revisão de licença, origem e licença vista nela, data de nascimento) são verdadeiras quando mudadas na lista de origem e no manifesto juntas; que uma authorNote justifica o crédito diferente; o tamanho da letra do nome e do crédito, quando mudado no desenho e no manifesto juntos dentro da faixa aceita",
     "reproducible": "gerado mais de uma vez na mesma máquina com os mesmos nomes e hashes; a leitura independente gerou de novo numa cópia os conjuntos do primeiro e do segundo commit, iguais byte a byte",
     "tools": "Chromium headless shell 1187 e cwebp 1.6.0",
-    "seenByMainAgent": "as vinte cartas no tamanho de 530 px e duas (Rodrigo Santoro e Selton Mello) no de 1060 px: nenhuma com rosto de outra pessoa",
+    "seenByMainAgent": "dezoito cartas no tamanho de 530 px e duas (Rodrigo Santoro e Selton Mello) no de 1060 px: nenhuma com rosto de outra pessoa; a leitura independente viu as vinte no de 1060 px",
     "publicCommits": "os commits do PR, públicos, têm as fotos e as cartas de Luan Santana, Luciano Huck, Bianca Andrade e Marina Ruy Barbosa (bc37f7c) e os recortes anteriores de Rodrigo Santoro e Selton Mello (a448cba)"
   },
   "originChecks": {
@@ -68,7 +68,7 @@
   "tests": {
     "date": "2026-11-24",
     "ranByMainAgent": {
-      "when": "no estado final dos arquivos do commit, no macOS",
+      "when": "no estado dos arquivos do terceiro commit (dfc142c), no macOS; a tabela foi escrita antes de as últimas execuções terminarem e conferida depois, sem mudança",
       "npm run test:shared": "121/121",
       "npm test --prefix app": "229/229",
       "npm test --prefix back": "306/306",
@@ -90,9 +90,10 @@
     },
     "localBrowsers": "Chromium 1187, mais antigo que o 1193 que o Playwright do projeto pede, por um roteiro auxiliar fora do repositório; WebKit 2203, direto",
     "ci": {
-      "bc37f7c": "primeiro commit do PR: os nove trabalhos passaram, entre eles os roteiros de navegador em Chromium e em WebKit e a integração com PostgreSQL",
-      "a448cba": "segundo commit: os nove trabalhos passaram",
-      "commitDesteRegistro": "pendente quando este arquivo foi escrito"
+      "bc37f7c": "os nove trabalhos passaram, entre eles os roteiros de navegador em Chromium e em WebKit e a integração com PostgreSQL",
+      "a448cba": "os nove trabalhos passaram",
+      "dfc142c": "os nove trabalhos passaram, pelo que a leitura independente viu",
+      "quartoCommit": "só acertos de texto; pendente quando este arquivo foi escrito"
     }
   },
   "screens": {
@@ -127,10 +128,16 @@
     "second": {
       "on": "a448cba",
       "result": "segurou de novo, por um ponto: duas das quatro cartas novas deixavam ver, no tamanho maior, parte do rosto de outra pessoa ao fundo; dos nove achados da primeira, seis resolvidos e três em parte",
-      "checked": "campos das vinte na API da Commons; as 15 páginas do YouTube, abertas pelo próprio revisor; geração das cartas numa cópia, igual byte a byte; imagem do compartilhar de Política e de roupas igual byte a byte antes e depois; entrada com o caminho para os créditos em 320 a 390 px; testes de unidade, build e roteiros em WebKit; 47 alterações no teste das cartas, 12 passando sem ele notar",
+      "checked": "campos das vinte na API da Commons; as 15 páginas do YouTube, abertas pelo próprio revisor; geração das cartas numa cópia, igual byte a byte; imagem do compartilhar de Política e de roupas igual byte a byte antes e depois; entrada com o caminho para os créditos em 320 a 390 px; testes de unidade, build e roteiros em WebKit; 50 alterações no teste das cartas, 12 passando sem ele notar",
       "adjusted": "os dois recortes; o teste compara o desenho de origem inteiro; crédito da imagem do compartilhar em duas linhas equilibradas, com teste sobre o catálogo; registro"
     },
-    "third": "pendente quando este arquivo foi escrito",
-    "by": "agente que não escreveu o código, somente leitura; o mesmo nas passadas"
+    "third": {
+      "on": "dfc142c",
+      "result": "não segurou; o ponto das duas cartas resolvido (as vinte vistas no tamanho de 1060 px, nenhuma com rosto de outra pessoa); acertos pequenos de texto pedidos",
+      "checked": "as vinte cartas no tamanho maior; os achados B a F da segunda passada; 52 alterações no teste das cartas, dez passando sem ele notar; imagem do compartilhar em 5.860 combinações de créditos, sem corte, e a de Política e de roupas igual byte a byte à da main; geração das cartas numa cópia, igual byte a byte; testes de unidade e build",
+      "adjusted": "quarto commit, só texto: quinze fotos ampliadas; 50 alterações na segunda passada; o que cada um viu em que tamanho; a frase sobre reescrever o histórico; o tamanho da letra na lista do que o teste não prova"
+    },
+    "by": "agente que não escreveu o código, somente leitura; o mesmo nas passadas",
+    "fourthCommit": "só acertos de texto pedidos na terceira passada; sem nova leitura"
   }
 }

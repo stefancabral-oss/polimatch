@@ -125,8 +125,8 @@ que são públicos: as de Luan Santana, Luciano Huck, Bianca Andrade e Marina
 Ruy Barbosa no primeiro (`bc37f7c`), e os recortes anteriores de Rodrigo
 Santoro e de Selton Mello no segundo (`a448cba`). Um merge que junta os
 commits as deixa fora da `main`; os commits do PR continuam alcançáveis no
-GitHub. Reescrever o histórico do branch antes do merge é possível e pede o
-sim do Stefan.
+GitHub. Reescrever o histórico do branch antes do merge pede o sim do
+Stefan e, sozinho, não torna os commits antigos inalcançáveis no GitHub.
 
 ## O que foi conferido na origem
 
@@ -162,12 +162,14 @@ O que a própria Commons marcava nesse dia:
 
 ## O que aparece nas fotos além da pessoa
 
-O agente olhou as vinte cartas no tamanho publicado de 530 px e, no de 1060
+O agente olhou dezoito cartas no tamanho publicado de 530 px e, no de 1060
 px, as de Rodrigo Santoro e de Selton Mello. Não viu rosto de outra pessoa
-em nenhuma. Viu:
+em nenhuma. A leitura independente olhou as vinte no tamanho de 1060 px e
+também não viu. O que se vê:
 
-- microfone em Anitta, Xuxa, Iza e Alok;
-- parte de um letreiro atrás de Gusttavo Lima;
+- microfone em Anitta (com parte de uma etiqueta), Xuxa, Iza e Alok;
+- parte de um letreiro atrás de Gusttavo Lima, e uma tatuagem com texto;
+- uma forma escura e desfocada no canto de baixo da carta de Wagner Moura;
 - atrás de Rodrigo Santoro, o cabelo de uma mulher num cartaz desfocado, sem
   o rosto dela;
 - fundo desfocado atrás de Selton Mello, sem rosto;
@@ -197,8 +199,8 @@ Santoro, de 2012.
 
 ## Testes
 
-Em 24/11/2026, no macOS, no estado final dos arquivos deste commit, rodados
-pelo agente principal:
+Em 24/11/2026, no macOS, no estado dos arquivos do terceiro commit
+(`dfc142c`), rodados pelo agente principal:
 
 | O quê | Resultado |
 |---|---|
@@ -220,9 +222,9 @@ máquina, a execução inteira em WebKit para nele por estouro de tempo ao abrir
 a página, e ele passa quando roda sozinho. A leitura independente viu o mesmo
 num build da `main`. Em 23/11/2026 a mesma execução inteira passou nesta
 máquina (HANDOFF do estágio 73): o comportamento é instável aqui, não um
-defeito fixo. No CI dos dois primeiros commits deste PR (`bc37f7c` e
-`a448cba`) os nove trabalhos passaram, entre eles os roteiros de navegador em
-Chromium e em WebKit.
+defeito fixo. No CI dos três primeiros commits deste PR (`bc37f7c`,
+`a448cba` e `dfc142c`) os nove trabalhos passaram, entre eles os roteiros de
+navegador em Chromium e em WebKit.
 
 O Chromium local é o 1187, mais antigo que o 1193 que o Playwright do projeto
 pede. Os roteiros rodaram nele por um roteiro auxiliar fora do repositório.
@@ -244,10 +246,10 @@ feitas depois da leitura independente; o CI os roda a cada commit.
 - **Candidaturas.** Nenhuma das vinte está registrada como candidata no
   catálogo eleitoral do repositório, e a Wikidata não registrava cargo,
   partido nem candidatura para nenhuma. O registro do TSE não foi consultado.
-- **Qualidade no tamanho maior.** Catorze fotos são ampliadas na carta de
+- **Qualidade no tamanho maior.** Quinze fotos são ampliadas na carta de
   1060 px; a de Ana Maria Braga, 2,64 vezes. Na carta de 530 px a ampliação
-  cai pela metade. O agente viu as vinte no tamanho de 530 px e só duas no
-  de 1060 px.
+  cai pela metade. O agente viu dezoito cartas no tamanho de 530 px e duas
+  no de 1060 px; a leitura independente viu as vinte no de 1060 px.
 - **Se o crédito na imagem do compartilhar basta para cada licença.** Ele traz
   autor e licença das fotos da imagem e o endereço da página de créditos; o
   título e o endereço de cada foto ficam só na página.
@@ -336,8 +338,26 @@ compara o desenho de origem inteiro; o crédito na imagem do compartilhar
 passa a usar duas linhas equilibradas, com um teste sobre o catálogo; e o
 registro.
 
-A conferência do terceiro commit estava pendente quando este texto foi
-escrito.
+**Terceira passada,** sobre o terceiro commit (`dfc142c`), pelo mesmo
+revisor: **não segurou.** O ponto das duas cartas estava resolvido: ele olhou
+as vinte no tamanho de 1060 px e não viu rosto de outra pessoa. Os outros
+pontos da segunda passada estavam resolvidos, salvo acertos pequenos de
+texto, feitos no quarto commit: uma contagem que mudou com o recorte novo
+(quinze fotos ampliadas, não catorze), o número de alterações do teste na
+segunda passada (50, não 47, erro do próprio revisor), o que cada um viu em
+que tamanho e a frase sobre reescrever o histórico. Ele refez as alterações
+no teste das cartas: de 52, dez passam sem o teste notar, e nove delas
+estão na lista do que o teste não prova; a décima (o tamanho da letra
+mudado no desenho e no manifesto juntos, dentro da faixa aceita) entrou na
+lista no quarto commit.
+
+O quarto commit só tem esses acertos de texto e não passou por nova
+leitura.
+
+Uma observação do revisor sobre o registro: a tabela de testes do terceiro
+commit foi escrita antes de as últimas execuções terminarem. Os números
+escritos foram conferidos depois com o resultado das execuções e não
+mudaram.
 
 ## Gate humano
 

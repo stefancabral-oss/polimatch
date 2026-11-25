@@ -29,6 +29,8 @@ import { STAGE, cardSvg, creditLine, creditsPage, licenseAddress, placement, wor
 //     de origem e no manifesto, juntas, passa por aqui;
 //   - que uma `authorNote` justifica de fato o crédito diferente do campo de
 //     atribuição da Commons: o teste só exige que a nota exista.
+//   - que o tamanho da letra do nome e do crédito é o que o navegador mediu:
+//     mudado no desenho e no manifesto juntos, dentro da faixa aceita, passa.
 
 const at = (path) => new URL(`../../${path}`, import.meta.url);
 const evidence = JSON.parse(readFileSync(at(`${STAGE}/output/manifest.json`), "utf8"));
