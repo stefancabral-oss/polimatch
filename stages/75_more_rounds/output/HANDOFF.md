@@ -15,9 +15,9 @@ diferentes, até cada carta ter enfrentado todas as outras. As palavras dele e
 a pergunta estão na decisão 0007
 (`docs/decisions/0007-rodadas-enquanto-houver-confrontos.md`).
 
-O resto é escolha do agente e está listado lá: dez escolhas de regra e de
-dado (1 a 10), que a pergunta do merge leva por extenso, e três de desenho
-(11 a 13).
+O resto é escolha do agente e está listado lá: onze escolhas de regra e de
+dado (1 a 11), que a pergunta do merge leva por extenso, e três de desenho
+(12 a 14).
 
 ## O que foi feito
 
@@ -202,7 +202,19 @@ O que mudou por causa dela:
   escolhas por extenso (9 e 10); saiu "por voz", que as fontes não trazem; as
   decisões 0004 e 0006 ganharam nota.
 
+Uma segunda leitura, sobre as correções, não segurou o merge. Dela vieram a
+escolha 11 por extenso, o primeiro e o último risco da lista abaixo e
+acertos de texto. As correções de texto dessa segunda leitura não passaram
+por nova leitura.
+
 ## Riscos conhecidos
+
+- **Aba com o app antigo e rodada nova aberta.** A pessoa abre uma rodada
+  nova no app novo, não confirma, e usa uma aba que ainda está com o app
+  antigo. Essa aba mostra as telas da rodada aberta e, ao confirmar, recebe
+  a recusa de quem já respondeu, com a escolha da primeira rodada. Nada
+  errado é gravado. Recarregar a página traz o app novo. Só acontece com aba
+  aberta desde antes da publicação do app.
 
 - **Carta retirada com rodada aberta.** Se uma carta sair do catálogo do app
   enquanto alguém tem uma rodada emitida e não respondida, a tela pede para
@@ -217,6 +229,13 @@ O que mudou por causa dela:
 - **`:has()` no CSS.** A regra que esconde a barra de etapas em tela muito
   baixa não funciona em Safari anterior ao 15.4; nesses, a tela de 320×480
   com três botões pode precisar de rolagem.
+- **Ligar um jogador antigo à conta pode mudar a contagem.** Vale a resposta
+  mais antiga de cada rodada na identidade: se o jogador ligado tem uma
+  primeira rodada mais antiga, é ela que passa a valer, e o número de
+  confrontos vistos pode diminuir.
+- **O desempate entre dois jogadores com a mesma rodada não tem teste
+  automático.** Pelo código atual o caso não se alcança da segunda rodada em
+  diante; a segunda leitura o reproduziu à mão no banco em memória.
 - **O jogo antigo continua ligado na API.** O caso da troca de jogador ativo
   só se alcança chamando a API direto; pela tela atual não há caminho.
 
@@ -226,8 +245,8 @@ Pede o sim do Stefan, depois do merge.
 
 1. Cópia do banco, como nas publicações anteriores.
 2. **API primeiro.** Ao subir, ela cria as duas tabelas novas e grava a
-   migração. Com a API nova e o app antigo, nada muda para ninguém: o app
-   antigo não pede rodada.
+   migração. Com a API nova e o app antigo, ninguém recebe rodada nova: o
+   app antigo não pede.
 3. **App depois.**
 4. Voltar atrás: publicar de novo o commit anterior dos dois serviços. As
    tabelas novas ficam no banco, sem uso; nenhuma linha antiga é alterada.
@@ -235,7 +254,7 @@ Pede o sim do Stefan, depois do merge.
 
 ## Gate humano
 
-- [ ] Merge: sim do Stefan, com as dez escolhas de regra e de dado por
+- [ ] Merge: sim do Stefan, com as onze escolhas de regra e de dado por
       extenso na pergunta.
 - [ ] Publicação (75d): outro sim, depois do merge.
 - [ ] Fechamento da issue #350: outro sim.

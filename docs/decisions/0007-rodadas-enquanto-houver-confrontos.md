@@ -55,8 +55,8 @@ Ele respondeu:
 A resposta do Stefan cobre o item acima. Tudo o que vem abaixo é escolha do
 agente, e ele pode mudar qualquer uma.
 
-As escolhas 1 a 10 não são de desenho: são de regra e de dado. Por isso a
-pergunta do gate do merge as apresenta por extenso. As escolhas 11 a 13 são
+As escolhas 1 a 11 não são de desenho: são de regra e de dado. Por isso a
+pergunta do gate do merge as apresenta por extenso. As escolhas 12 a 14 são
 de desenho e se apoiam no pedido dele de não ser parado por detalhes de
 desenho (decisão 0003, item 5).
 
@@ -71,8 +71,8 @@ desenho (decisão 0003, item 5).
    agente ficou com "fica aberto": depois de cada rodada a pessoa pode parar,
    e o que ela respondeu vale.
 3. **Uma pessoa, um peso.** Na frase que estava na mensagem a que ele
-   respondeu: no
-   resultado, cada pessoa vale uma só, com todas as rodadas dela somadas.
+   respondeu: no resultado, cada pessoa vale uma só, com todas as rodadas
+   dela somadas.
    Este estágio não calcula soma nenhuma (#177); a regra fica registrada
    para quando a soma existir, e a política de integridade do voto passa a
    dizer isso.
@@ -93,9 +93,13 @@ desenho (decisão 0003, item 5).
 8. **As rodadas novas seguem a regra de identidade da primeira.** A
    identidade é a conta mais os jogadores ligados a ela. As rodadas de uma
    pessoa são procuradas em todos eles: se o jogador ativo da conta muda, a
-   conta continua de onde parou e não ganha uma segunda resposta para a
-   mesma rodada. Uma resposta que não diz a rodada, como a de um aplicativo
-   antigo, é sempre da primeira rodada.
+   conta continua de onde parou, da segunda rodada em diante, e não ganha
+   uma segunda resposta para a mesma rodada. Havendo mais de uma resposta
+   para a mesma rodada na identidade, vale a mais antiga; ao ligar um
+   jogador antigo à conta, a primeira rodada que vale pode passar a ser a
+   dele, e a contagem de confrontos vistos pode mudar. Uma resposta que não
+   diz a rodada, como a de um aplicativo antigo, é sempre da primeira
+   rodada.
 9. **O total de confrontos é o das cartas atuais da pesquisa.** Se uma
    pesquisa ganhar cartas, o total cresce e quem já tinha visto tudo volta a
    ter rodada para jogar. Se perder uma carta, as duplas dela deixam de
@@ -105,15 +109,20 @@ desenho (decisão 0003, item 5).
     uma pessoa, um peso, e por isso não a alterou nem pediu novo aceite a
     quem já se cadastrou. É leitura do agente sobre um texto que as pessoas
     aceitaram: cabe na revisão jurídica (#283).
+11. **Uma rodada só começa depois de a anterior ser respondida, e a rodada
+    aberta não vence.** Quem abandona uma rodada no meio encontra a mesma
+    rodada ao voltar, com as mesmas cartas, e só recebe outra depois de
+    confirmar essa.
 
 ### De desenho
 
-11. **Depois de registrar, a tela oferece "Mais uma rodada",** enquanto houver
+12. **Depois de registrar, a tela oferece "Mais uma rodada",** enquanto houver
     confronto por ver, e mostra quantos confrontos a pessoa já viu.
     "Compartilhar" continua na tela, abaixo dele.
-12. **Na capa,** a pesquisa que ainda tem confrontos por ver entra na fila do
-    destaque depois das pesquisas que a pessoa ainda não respondeu.
-13. **Os textos de tela que diziam "um voto" ou "uma vez"** mudam: "Como
+13. **Na capa,** a pesquisa que ainda tem confrontos por ver entra na fila do
+    destaque depois das pesquisas que a pessoa ainda não respondeu. "Suas
+    escolhas" mostra a escolhida da última rodada respondida.
+14. **Os textos de tela que diziam "um voto" ou "uma vez"** mudam: "Como
     funciona" deixa de dizer "responde uma vez em cada pesquisa", as telas
     de entrada e de cadastro passam a dizer "Um CPF, uma pessoa." e a
     confirmação passa a falar da escolha da rodada.

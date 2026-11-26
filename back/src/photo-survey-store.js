@@ -203,7 +203,8 @@ export function photoSurveyStore({
   }
 
   // A identidade é o jogador mais os anônimos incorporados a ele no login
-  // Google. Vale a resposta mais antiga. Só a rodada 1 segue esta regra.
+  // Google. Vale a resposta mais antiga. As rodadas seguintes usam a mesma
+  // identidade, em personRounds.
   async function identityResponse(client, surveyId, playerId) {
     const result = await client.query(`SELECT answer_id, shown_ids, pick_ids, champion_id, responded_at
       FROM photo_survey_responses

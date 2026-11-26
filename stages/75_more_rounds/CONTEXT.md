@@ -73,7 +73,8 @@ outras (decisão 0007).
 ## Contrato da API
 
 As rotas são as mesmas. O que muda é aditivo: um aplicativo antigo, que não
-manda os campos novos, se comporta exatamente como hoje.
+manda os campos novos, se comporta como hoje enquanto a pessoa não tiver
+uma rodada nova aberta (ver os riscos no HANDOFF).
 
 `POST /api/photo-surveys/:surveyId/draw`
 
@@ -196,4 +197,4 @@ rodadas.
 ## Gate humano
 
 Merge e publicação pedem o sim do Stefan, um a um. A pergunta do merge leva
-por extenso as escolhas de regra e de dado da decisão 0007 (1 a 10).
+por extenso as escolhas de regra e de dado da decisão 0007 (1 a 11).

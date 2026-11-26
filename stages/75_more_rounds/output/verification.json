@@ -15,12 +15,13 @@
       7,
       8,
       9,
-      10
+      10,
+      11
     ],
     "design": [
-      11,
       12,
-      13
+      13,
+      14
     ],
     "where": "docs/decisions/0007-rodadas-enquanto-houver-confrontos.md"
   },
@@ -113,6 +114,17 @@
         "a aba parada numa rodada antiga busca a rodada no servidor quando outra aba já está na seguinte",
         "escolhas 9 e 10 por extenso na decisão 0007; notas nas decisões 0004 e 0006; saiu 'por voz'; riscos e link do PR no handoff"
       ]
+    },
+    "second": {
+      "when": "2026-11-26",
+      "by": "outro agente à parte, somente leitura",
+      "verdict": "não segurou o merge",
+      "changed": [
+        "escolha 11 por extenso (a rodada aberta não vence)",
+        "riscos: aba com o app antigo e rodada nova aberta; contagem ao ligar jogador antigo; desempate sem teste",
+        "acertos de texto na decisão, na política, no contexto e num comentário do código"
+      ],
+      "note": "as correções de texto feitas depois desta leitura não passaram por nova leitura"
     }
   }
 }
