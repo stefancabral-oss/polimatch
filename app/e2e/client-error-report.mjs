@@ -1,6 +1,7 @@
 // Erros forçados no navegador chegam à API como relatos pequenos, sem dados do
 // jogador: erro de execução, rejeição não tratada e falha de import dinâmico,
-// em cada página do site (a capa, que é a pesquisa, e "Como funciona").
+// em cada página do site (a capa, que é a pesquisa, "Como funciona" e
+// "Créditos das fotos").
 import assert from "node:assert/strict";
 import { chromium, webkit } from "playwright";
 import { PHOTO_SURVEYS, publicPhotoSurvey } from "../../shared/photo-survey.js";
@@ -18,6 +19,7 @@ const SURVEY = PHOTO_SURVEYS[0];
 const pages = [
   { file: "", path: "/", ready: "#ps-action:not([disabled])" },
   { file: "como-funciona.html", path: "/como-funciona.html", ready: "h1" },
+  { file: "creditos.html", path: "/creditos.html", ready: "h1" },
 ];
 
 const browser = await browserType.launch();

@@ -29,6 +29,7 @@ import {
 
 const PHOTO_SURVEY_ID = "politica-2026-01";
 const SECOND_SURVEY_ID = "politica-2026-02";
+const CELEBRITY_SURVEY_ID = "famosos-01";
 const CLOTHES_SURVEY_ID = "roupas-demo-01";
 
 const GROUPS = [
@@ -77,12 +78,40 @@ test("as pesquisas de política ilustram a entrada só com a lista fixa; a de ou
   assert.deepEqual(entryCardIdsFor(null), []);
 });
 
-test("a final pergunta \"quem fica\" nas pesquisas de política e \"qual fica\" nas outras", () => {
-  for (const id of [PHOTO_SURVEY_ID, SECOND_SURVEY_ID]) {
+test("a pesquisa de famosos ilustra a entrada com as próprias cartas, não com a lista de política", () => {
+  const celebrities = photoSurveyById(CELEBRITY_SURVEY_ID);
+  const entry = entryCardIdsFor(celebrities);
+  // A lista fixa vale pelo assunto "Política", não por as cartas serem pessoas.
+  assert.equal(celebrities.people, true);
+  assert.notEqual(entry, ENTRY_CARD_IDS);
+  assert.deepEqual(entry, celebrities.cardIds);
+  assert.notEqual(entry, celebrities.cardIds, "devolve uma cópia");
+  assert.ok(entry.length > 3, "sobra carta para o sorteio variar");
+  for (const id of entry) {
+    assert.ok(!ENTRY_CARD_IDS.includes(id), `${id} não é da lista de política`);
+    assert.ok(!ARTS.some((art) => art.id === id), `${id} não é carta de política`);
+    assert.ok(!CLOTHES.some((art) => art.id === id), `${id} não é carta de roupa`);
+  }
+  assert.deepEqual(entryCardIdsFor({ subject: "Famosos", people: true, cardIds: ["x", "y", "z", "w"] }), ["x", "y", "z", "w"]);
+});
+
+test("a final pergunta \"quem fica\" quando as cartas são pessoas e \"qual fica\" nas outras", () => {
+  // Os três tipos de pesquisa: política e famosos, com pessoas; roupas, com peças.
+  for (const id of [PHOTO_SURVEY_ID, SECOND_SURVEY_ID, CELEBRITY_SURVEY_ID]) {
     assert.equal(finalTitleFor(photoSurveyById(id)), "Entre elas, quem fica?", id);
   }
   assert.equal(finalTitleFor(photoSurveyById(CLOTHES_SURVEY_ID)), "Entre elas, qual fica?");
+  for (const survey of PHOTO_SURVEYS) {
+    assert.equal(finalTitleFor(survey), survey.people ? "Entre elas, quem fica?" : "Entre elas, qual fica?", survey.id);
+  }
+  // Quem decide é `people`, não o assunto.
+  assert.equal(finalTitleFor({ subject: "Outro assunto", people: true }), "Entre elas, quem fica?");
+  assert.equal(finalTitleFor({ subject: "Política", people: false }), "Entre elas, qual fica?");
+  assert.equal(finalTitleFor({ subject: "Política" }), "Entre elas, qual fica?", "sem `people`, as cartas não são pessoas");
   assert.equal(finalTitleFor({ subject: "Outro assunto" }), "Entre elas, qual fica?");
+  // Só o valor verdadeiro conta: um texto não vira "pessoas" por engano.
+  for (const value of ["true", 1, "sim", {}]) assert.equal(finalTitleFor({ people: value }), "Entre elas, qual fica?", JSON.stringify(value));
+  for (const empty of [null, undefined, {}]) assert.equal(finalTitleFor(empty), "Entre elas, qual fica?");
 });
 
 test("a chave de armazenamento é fixa", () => {
@@ -93,6 +122,7 @@ test("o endereço diz qual pesquisa abrir, e um código desconhecido cai na capa
   assert.equal(surveyIdFromSearch("?p=politica-2026-02"), SECOND_SURVEY_ID);
   assert.equal(surveyIdFromSearch("?x=1&p=politica-2026-01"), PHOTO_SURVEY_ID);
   assert.equal(surveyIdFromSearch("?p=roupas-demo-01"), CLOTHES_SURVEY_ID);
+  assert.equal(surveyIdFromSearch("?p=famosos-01"), CELEBRITY_SURVEY_ID);
   for (const search of ["", "?", "?p=", "?p=nao-existe", "?p=politica-2026-02%20", "?q=politica-2026-01", "?p=__proto__"]) {
     assert.equal(surveyIdFromSearch(search), "", search);
   }
@@ -124,11 +154,23 @@ test("o aparelho sabe quais pesquisas esta identidade respondeu e qual está em 
   }
   text = savedProgressText(text, SECOND_SURVEY_ID, { identity: tag, answered: true });
   assert.deepEqual(answeredSurveyIds(text, tag), [PHOTO_SURVEY_ID, SECOND_SURVEY_ID]);
+  // A de roupas respondida antes da de famosos: a lista sai na ordem da capa, não na de resposta.
   text = savedProgressText(text, CLOTHES_SURVEY_ID, { identity: tag, answered: true });
+  assert.deepEqual(answeredSurveyIds(text, tag), [PHOTO_SURVEY_ID, SECOND_SURVEY_ID, CLOTHES_SURVEY_ID]);
+  text = savedProgressText(text, CELEBRITY_SURVEY_ID, { identity: tag, answered: true });
+  assert.deepEqual(answeredSurveyIds(text, tag), [PHOTO_SURVEY_ID, SECOND_SURVEY_ID, CELEBRITY_SURVEY_ID, CLOTHES_SURVEY_ID]);
   assert.deepEqual(answeredSurveyIds(text, tag), PHOTO_SURVEYS.map((survey) => survey.id), "todas, na ordem da capa");
 });
 
 test("o destaque da capa é a primeira pesquisa aberta que a pessoa ainda não respondeu", () => {
+  // Com as quatro pesquisas abertas: política, política, famosos e roupas, nessa ordem.
+  const open = PHOTO_SURVEYS.map((survey) => ({ id: survey.id, status: "open" }));
+  assert.equal(featuredSurveyId(open, []), PHOTO_SURVEY_ID);
+  assert.equal(featuredSurveyId(open, [PHOTO_SURVEY_ID]), SECOND_SURVEY_ID);
+  assert.equal(featuredSurveyId(open, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID]), CELEBRITY_SURVEY_ID, "respondidas as de política, a de famosos");
+  assert.equal(featuredSurveyId(open, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID, CLOTHES_SURVEY_ID]), CELEBRITY_SURVEY_ID, "quem já respondeu a de roupas ainda vê a de famosos");
+  assert.equal(featuredSurveyId(open, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID, CELEBRITY_SURVEY_ID]), CLOTHES_SURVEY_ID, "depois da de famosos, a de roupas");
+  assert.equal(featuredSurveyId(open, PHOTO_SURVEYS.map((survey) => survey.id)), "");
   const views = [{ id: "a", status: "open" }, { id: "b", status: "open" }, { id: "c", status: "closed" }];
   assert.equal(featuredSurveyId(views, []), "a");
   assert.equal(featuredSurveyId(views, ["a"]), "b");
@@ -142,10 +184,16 @@ test("depois de responder, a próxima é a primeira pesquisa sem resposta, fora 
   assert.equal(nextSurveyId(PHOTO_SURVEY_ID, []), SECOND_SURVEY_ID);
   assert.equal(nextSurveyId(PHOTO_SURVEY_ID, [PHOTO_SURVEY_ID]), SECOND_SURVEY_ID);
   assert.equal(nextSurveyId(SECOND_SURVEY_ID, [SECOND_SURVEY_ID]), PHOTO_SURVEY_ID);
-  // Respondidas as duas de política, a próxima é a de roupas; respondidas as três, não há próxima.
-  assert.equal(nextSurveyId(SECOND_SURVEY_ID, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID]), CLOTHES_SURVEY_ID);
+  // Respondidas as duas de política, a próxima é a de famosos; depois, a de roupas;
+  // respondidas as quatro, não há próxima.
+  assert.equal(nextSurveyId(SECOND_SURVEY_ID, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID]), CELEBRITY_SURVEY_ID);
+  assert.equal(nextSurveyId(CELEBRITY_SURVEY_ID, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID, CELEBRITY_SURVEY_ID]), CLOTHES_SURVEY_ID);
+  assert.equal(nextSurveyId(CELEBRITY_SURVEY_ID, [CELEBRITY_SURVEY_ID]), PHOTO_SURVEY_ID);
   assert.equal(nextSurveyId(CLOTHES_SURVEY_ID, [CLOTHES_SURVEY_ID]), PHOTO_SURVEY_ID);
-  assert.equal(nextSurveyId(CLOTHES_SURVEY_ID, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID, CLOTHES_SURVEY_ID]), "");
+  // Quem já tinha respondido as de política e a de roupas ainda tem a de famosos para responder.
+  assert.equal(nextSurveyId(CLOTHES_SURVEY_ID, [PHOTO_SURVEY_ID, SECOND_SURVEY_ID, CLOTHES_SURVEY_ID]), CELEBRITY_SURVEY_ID);
+  assert.equal(nextSurveyId(CLOTHES_SURVEY_ID, PHOTO_SURVEYS.map((survey) => survey.id)), "");
+  assert.equal(nextSurveyId(CELEBRITY_SURVEY_ID, PHOTO_SURVEYS.map((survey) => survey.id)), "");
   assert.equal(nextSurveyId("a", [], [{ id: "a" }]), "");
 });
 

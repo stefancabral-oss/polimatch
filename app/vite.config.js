@@ -4,7 +4,7 @@ import { releaseIdentity } from "./scripts/release-identity.mjs";
 export default defineConfig({
   base: "./",
   plugins: [releaseIdentity()],
-  build: {rollupOptions: {input: {main: "index.html", howItWorks: "como-funciona.html"}}},
+  build: {rollupOptions: {input: {main: "index.html", howItWorks: "como-funciona.html", credits: "creditos.html"}}},
   server: {
     host: true,
     port: 5174,

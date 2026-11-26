@@ -1,0 +1,322 @@
+[
+  {
+    "id": "anitta",
+    "name": "Anitta",
+    "src": "/chromas/famosos/anitta-v01-d36f9fbf-530.webp",
+    "srcset": "/chromas/famosos/anitta-v01-d36f9fbf-530.webp 530w, /chromas/famosos/anitta-v01-d36f9fbf-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "d36f9fbf",
+    "photo": {
+      "author": "Attractive Mindset",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Anitta_for_Attractive_Mindset_podcast_02.jpg"
+    }
+  },
+  {
+    "id": "ivete-sangalo",
+    "name": "Ivete Sangalo",
+    "src": "/chromas/famosos/ivete-sangalo-v01-b858a64e-530.webp",
+    "srcset": "/chromas/famosos/ivete-sangalo-v01-b858a64e-530.webp 530w, /chromas/famosos/ivete-sangalo-v01-b858a64e-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "b858a64e",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ivete_Sangalo_(Jul_2024).png"
+    }
+  },
+  {
+    "id": "ludmilla",
+    "name": "Ludmilla",
+    "src": "/chromas/famosos/ludmilla-v01-dc354a67-530.webp",
+    "srcset": "/chromas/famosos/ludmilla-v01-dc354a67-530.webp 530w, /chromas/famosos/ludmilla-v01-dc354a67-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "dc354a67",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ludmilla_at_Rock_in_Rio_in_September_2022_(1).png"
+    }
+  },
+  {
+    "id": "luisa-sonza",
+    "name": "Luísa Sonza",
+    "src": "/chromas/famosos/luisa-sonza-v01-64636b87-530.webp",
+    "srcset": "/chromas/famosos/luisa-sonza-v01-64636b87-530.webp 530w, /chromas/famosos/luisa-sonza-v01-64636b87-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "64636b87",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lu%C3%ADsa_Sonza_in_2022.jpg"
+    }
+  },
+  {
+    "id": "xuxa",
+    "name": "Xuxa",
+    "src": "/chromas/famosos/xuxa-v01-33066c1e-530.webp",
+    "srcset": "/chromas/famosos/xuxa-v01-33066c1e-530.webp 530w, /chromas/famosos/xuxa-v01-33066c1e-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "33066c1e",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Xuxa_on_the_Pr%C3%AAmio_Multishow_de_M%C3%BAsica_Brasileira_2021_red_carpet.png"
+    }
+  },
+  {
+    "id": "tata-werneck",
+    "name": "Tatá Werneck",
+    "src": "/chromas/famosos/tata-werneck-v01-c2e538b3-530.webp",
+    "srcset": "/chromas/famosos/tata-werneck-v01-c2e538b3-530.webp 530w, /chromas/famosos/tata-werneck-v01-c2e538b3-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "c2e538b3",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tat%C3%A1_Werneck_at_Lady_Night_in_2023.jpg"
+    }
+  },
+  {
+    "id": "ana-maria-braga",
+    "name": "Ana Maria Braga",
+    "src": "/chromas/famosos/ana-maria-braga-v01-0275f667-530.webp",
+    "srcset": "/chromas/famosos/ana-maria-braga-v01-0275f667-530.webp 530w, /chromas/famosos/ana-maria-braga-v01-0275f667-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "0275f667",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ana_Maria_Braga_in_2019_01.jpg"
+    }
+  },
+  {
+    "id": "juliette",
+    "name": "Juliette",
+    "src": "/chromas/famosos/juliette-v01-1c7e65e1-530.webp",
+    "srcset": "/chromas/famosos/juliette-v01-1c7e65e1-530.webp 530w, /chromas/famosos/juliette-v01-1c7e65e1-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "1c7e65e1",
+    "photo": {
+      "author": "Felipe.bzra",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Juliette_at_Web_Summit_Rio_2026_(cropped).jpg"
+    }
+  },
+  {
+    "id": "bruna-marquezine",
+    "name": "Bruna Marquezine",
+    "src": "/chromas/famosos/bruna-marquezine-v01-a11027f0-530.webp",
+    "srcset": "/chromas/famosos/bruna-marquezine-v01-a11027f0-530.webp 530w, /chromas/famosos/bruna-marquezine-v01-a11027f0-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "a11027f0",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bruna_Marquezine_2025.png"
+    }
+  },
+  {
+    "id": "iza",
+    "name": "Iza",
+    "src": "/chromas/famosos/iza-v01-abc30c74-530.webp",
+    "srcset": "/chromas/famosos/iza-v01-abc30c74-530.webp 530w, /chromas/famosos/iza-v01-abc30c74-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "abc30c74",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Iza_at_the_Pr%C3%AAmio_Multishow_2020_(02).png"
+    }
+  },
+  {
+    "id": "pabllo-vittar",
+    "name": "Pabllo Vittar",
+    "src": "/chromas/famosos/pabllo-vittar-v01-6cc198e1-530.webp",
+    "srcset": "/chromas/famosos/pabllo-vittar-v01-6cc198e1-530.webp 530w, /chromas/famosos/pabllo-vittar-v01-6cc198e1-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "6cc198e1",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pabllo_Vittar_-_TVZ_2024_(1).png"
+    }
+  },
+  {
+    "id": "gusttavo-lima",
+    "name": "Gusttavo Lima",
+    "src": "/chromas/famosos/gusttavo-lima-v01-30d95e9a-530.webp",
+    "srcset": "/chromas/famosos/gusttavo-lima-v01-30d95e9a-530.webp 530w, /chromas/famosos/gusttavo-lima-v01-30d95e9a-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "30d95e9a",
+    "photo": {
+      "author": "Record TV Goiás",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gustavo_Lima_2021.jpg"
+    }
+  },
+  {
+    "id": "rodrigo-santoro",
+    "name": "Rodrigo Santoro",
+    "src": "/chromas/famosos/rodrigo-santoro-v01-b2727265-530.webp",
+    "srcset": "/chromas/famosos/rodrigo-santoro-v01-b2727265-530.webp 530w, /chromas/famosos/rodrigo-santoro-v01-b2727265-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "b2727265",
+    "photo": {
+      "author": "David Shankbone",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rodrigo_Santoro_WE_2012_Shankbone_3.JPG"
+    }
+  },
+  {
+    "id": "alok",
+    "name": "Alok",
+    "src": "/chromas/famosos/alok-v01-c1a5d4f0-530.webp",
+    "srcset": "/chromas/famosos/alok-v01-c1a5d4f0-530.webp 530w, /chromas/famosos/alok-v01-c1a5d4f0-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "c1a5d4f0",
+    "photo": {
+      "author": "Renato Alves/Agência Brasília",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:19_03_2024_-_Anivers%C3%A1rio_de_Bras%C3%ADlia_ter%C3%A1_mega_show_do_DJ_Alok_na_Esplanada_dos_Minist%C3%A9rios_(53596862497)_(cropped).jpg"
+    }
+  },
+  {
+    "id": "selton-mello",
+    "name": "Selton Mello",
+    "src": "/chromas/famosos/selton-mello-v01-af51f42c-530.webp",
+    "srcset": "/chromas/famosos/selton-mello-v01-af51f42c-530.webp 530w, /chromas/famosos/selton-mello-v01-af51f42c-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "af51f42c",
+    "photo": {
+      "author": "Harald Krichel",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Selton_Mello-68509.jpg"
+    }
+  },
+  {
+    "id": "whindersson-nunes",
+    "name": "Whindersson Nunes",
+    "src": "/chromas/famosos/whindersson-nunes-v01-c9cf2a4d-530.webp",
+    "srcset": "/chromas/famosos/whindersson-nunes-v01-c9cf2a4d-530.webp 530w, /chromas/famosos/whindersson-nunes-v01-c9cf2a4d-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "c9cf2a4d",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Whindersson_Nunes_em_2019.png"
+    }
+  },
+  {
+    "id": "felipe-neto",
+    "name": "Felipe Neto",
+    "src": "/chromas/famosos/felipe-neto-v01-22c0f59e-530.webp",
+    "srcset": "/chromas/famosos/felipe-neto-v01-22c0f59e-530.webp 530w, /chromas/famosos/felipe-neto-v01-22c0f59e-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "22c0f59e",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Felipe_Neto_at_the_Lady_Night_in_2022_(01).png"
+    }
+  },
+  {
+    "id": "casimiro",
+    "name": "Casimiro",
+    "src": "/chromas/famosos/casimiro-v01-ec04d198-530.webp",
+    "srcset": "/chromas/famosos/casimiro-v01-ec04d198-530.webp 530w, /chromas/famosos/casimiro-v01-ec04d198-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "ec04d198",
+    "photo": {
+      "author": "TNT Sports Brasil",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Casimiro_Miguel.jpg"
+    }
+  },
+  {
+    "id": "wagner-moura",
+    "name": "Wagner Moura",
+    "src": "/chromas/famosos/wagner-moura-v01-29d91959-530.webp",
+    "srcset": "/chromas/famosos/wagner-moura-v01-29d91959-530.webp 530w, /chromas/famosos/wagner-moura-v01-29d91959-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "29d91959",
+    "photo": {
+      "author": "Harald Krichel / WikiPortraits",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Wagner_Moura-6546.jpg"
+    }
+  },
+  {
+    "id": "gil-do-vigor",
+    "name": "Gil do Vigor",
+    "src": "/chromas/famosos/gil-do-vigor-v01-88f15800-530.webp",
+    "srcset": "/chromas/famosos/gil-do-vigor-v01-88f15800-530.webp 530w, /chromas/famosos/gil-do-vigor-v01-88f15800-1060.webp 1060w",
+    "width": 1060,
+    "height": 1484,
+    "edition": "famosos-v1",
+    "stamp": "88f15800",
+    "photo": {
+      "author": "Multishow",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:GilDoVigor1.jpg"
+    }
+  }
+]

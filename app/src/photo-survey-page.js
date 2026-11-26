@@ -1,6 +1,7 @@
 import "./install-error-reporter.js";
 import "./photo-survey.css";
 import "./site-menu.css";
+import CELEBRITIES from "./celebrity-cards.json" with { type: "json" };
 import CLOTHES from "./clothes-cards.json" with { type: "json" };
 import ARTS from "./political-chromas.json" with { type: "json" };
 import { PHOTO_SURVEYS, photoSurveyById } from "../../shared/photo-survey.js";
@@ -40,7 +41,7 @@ import {
   signInMarkup,
 } from "./registration-view.js";
 import { shareChoice, shareImage, sharePlan, sharePreviewMarkup } from "./share-choice.js";
-import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingMarkup } from "./site-menu.js";
+import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingSectionMarkup } from "./site-menu.js";
 
 // Pesquisa por foto (ICM 68, #324), que desde a ICM 69 (#331) é a capa do
 // site. Abrir esta página não grava nada: o sorteio nasce no toque em
@@ -64,8 +65,10 @@ const ADVANCE_MS = 220;
 const GRID_TIMEOUT_MS = 12000;
 
 const root = document.querySelector("#photo-survey");
-// As cartas de todas as pesquisas: as de política e as de roupas (ICM 73, #345).
-const artById = new Map([...ARTS, ...CLOTHES].map((art) => [art.id, art]));
+// As cartas de todas as pesquisas: as de política, as de famosos (ICM 74, #348)
+// e as de roupas (ICM 73, #345). Dos três catálogos a página só lê o que os
+// três têm: `id`, `name`, `src`, `srcset`, `width` e `height`.
+const artById = new Map([...ARTS, ...CELEBRITIES, ...CLOTHES].map((art) => [art.id, art]));
 
 // A pesquisa na tela. Na capa é a pesquisa em destaque; "" quando não há uma.
 let surveyId = "";
@@ -125,8 +128,11 @@ const inWords = (number) => WORDS[number] || String(number);
 const subject = () => (typeof survey?.subject === "string" && survey.subject) || definition.subject;
 const kicker = () => `${subject()} · ${drawSize()} cartas`;
 const question = () => (typeof survey?.question === "string" && survey.question) || definition.question;
-// A observação da pesquisa, quando ela tem uma. As de política não têm.
+// A observação da pesquisa, quando ela tem uma. As de política não têm; as de
+// famosos e de roupas têm.
 const surveyNote = () => (typeof survey?.note === "string" && survey.note) || definition.note;
+// As cartas desta pesquisa levam foto com crédito? Então a entrada aponta para a página de créditos.
+const hasPhotoCredits = () => definition.cardIds.some((id) => Boolean(artById.get(id)?.photo));
 
 /**
  * Lê direto do navegador. O safeStorage devolve primeiro o que esta aba
@@ -242,7 +248,8 @@ function shell({ step, filled = null, mainClass = "", body, focus = false, fit =
 // Os avisos ficam logo abaixo do título: aparecem sem rolar, em qualquer tela.
 // O título leva a etapa como descrição, para o leitor de tela dizer "Tela 2 de 4".
 // `note` é a observação da pesquisa, só na entrada: um texto discreto sob o texto de apoio.
-const heading = (eyebrow, title, hint, note = "") => `<p class="ps-kicker">${escapeText(eyebrow)}</p><h1 class="ps-title" id="ps-title" tabindex="-1" aria-describedby="ps-step">${escapeText(title)}</h1><p class="ps-hint">${escapeText(hint)}</p>${note ? `<p class="ps-note">${escapeText(note)}</p>` : ""}${noticeMarkup()}${offlineMarkup()}`;
+// `credits` põe, ao lado da nota, o caminho para a página de créditos das fotos (ICM 74, #348).
+const heading = (eyebrow, title, hint, note = "", credits = false) => `<p class="ps-kicker">${escapeText(eyebrow)}</p><h1 class="ps-title" id="ps-title" tabindex="-1" aria-describedby="ps-step">${escapeText(title)}</h1><p class="ps-hint">${escapeText(hint)}</p>${note || credits ? `<p class="ps-note">${escapeText(note)}${credits ? `${note ? " " : ""}<a href="./creditos.html">Ver os créditos</a>` : ""}</p>` : ""}${noticeMarkup()}${offlineMarkup()}`;
 
 const MENU_LINK = '<button class="ps-link" data-action="menu" type="button">Abrir o menu</button>';
 const ALL_SURVEYS_LINK = '<a class="ps-btn ps-btn--ghost" href="./">Ver pesquisas</a>';
@@ -279,13 +286,19 @@ function choiceRow(id) {
   return `<a class="ps-pick" href="${surveyHref(id)}" data-survey="${escapeText(id)}">${champion ? staticCard(champion, "44px") : '<span class="ps-card" aria-hidden="true"></span>'}<span class="ps-survey-text"><small>${escapeText(base.subject)} · ${escapeText(base.question)}</small><b>${champion ? escapeText(cardName(champion)) : "Ver a sua escolha"}</b></span><i aria-hidden="true">›</i></a>`;
 }
 
-/** As listas da capa: o que a pessoa já escolheu, as outras pesquisas e as que vêm. */
+/**
+ * As listas da capa: o que a pessoa já escolheu, as outras pesquisas e, quando
+ * há anúncio, as que vêm. Cada bloco só sai se tem o que mostrar; sem nenhum,
+ * o texto é vazio e a área das listas some (`.ps-home:empty`).
+ */
 function homeSections() {
   const chosen = homeViews.filter((view) => homeChoices.has(view.id));
   const others = homeViews.filter((view) => view.id !== surveyId && !homeChoices.has(view.id));
-  return `${chosen.length ? `<p class="ps-label ps-home-label">Suas escolhas</p>${chosen.map((view) => choiceRow(view.id)).join("")}` : ""}
-    ${others.length ? `<p class="ps-label ps-home-label">Mais pesquisas</p>${others.map(surveyRow).join("")}` : ""}
-    <p class="ps-label ps-home-label">Em breve</p>${upcomingMarkup()}`;
+  return [
+    chosen.length ? `<p class="ps-label ps-home-label">Suas escolhas</p>${chosen.map((view) => choiceRow(view.id)).join("")}` : "",
+    others.length ? `<p class="ps-label ps-home-label">Mais pesquisas</p>${others.map(surveyRow).join("")}` : "",
+    upcomingSectionMarkup(),
+  ].join("");
 }
 
 /**
@@ -295,7 +308,7 @@ function homeSections() {
  */
 function renderEntry({ pending = "", action = "start", label = atHome && homeResume ? "Continuar" : "Começar", focus = false } = {}) {
   const featured = surveyId
-    ? `${heading(kicker(), question(), atHome && homeResume ? "Você parou no meio. Continue de onde parou." : "Leva menos de um minuto.", surveyNote())}
+    ? `${heading(kicker(), question(), atHome && homeResume ? "Você parou no meio. Continue de onde parou." : "Leva menos de um minuto.", surveyNote(), hasPhotoCredits())}
       <div class="ps-fan" aria-hidden="true">${entryCards().map((id) => staticCard(id, "176px")).join("")}</div>
       <div class="ps-cta"><button class="ps-btn" id="ps-action" data-action="${action}" type="button"${pending ? " disabled" : ""}>${escapeText(pending || label)}</button>
         <p class="ps-muted ps-cta-note">${signedIn() ? "Sua escolha só é registrada quando você confirmar." : "Para responder, entre com Google e cadastre o CPF."}</p></div>`
@@ -431,6 +444,7 @@ function prepareShare(champion, others = shareOthers) {
     name: art.name,
     question: question(),
     others: others.map((id) => ({ src: artById.get(id).src })),
+    photos: [art, ...others.map((id) => artById.get(id))].map((card) => card.photo).filter(Boolean),
   }).then((file) => {
     window.clearTimeout(timer);
     if (!current()) return;

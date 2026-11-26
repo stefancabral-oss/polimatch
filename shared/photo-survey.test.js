@@ -3,6 +3,7 @@ import { randomInt } from "node:crypto";
 import test from "node:test";
 import {
   PHOTO_SURVEYS,
+  definePhotoSurvey,
   drawCards,
   drawGroups,
   photoSurveyById,
@@ -38,6 +39,7 @@ test("a primeira pesquisa tem 20 cartas de política, sorteio de 16 e telas de 4
   assert.equal(SURVEY.subject, "Política");
   assert.equal(SURVEY.question, "Quem você prefere?");
   assert.equal(SURVEY.note, "", "as pesquisas de política não têm observação");
+  assert.equal(SURVEY.people, true, "as cartas de política são pessoas");
   assert.equal(SURVEY.cardIds.length, 20);
   assert.equal(new Set(SURVEY.cardIds).size, 20);
   assert.deepEqual(SURVEY.cardIds, [...SURVEY.cardIds].sort());
@@ -54,6 +56,7 @@ test("a segunda pesquisa faz outra pergunta sobre as mesmas 20 cartas", () => {
   assert.equal(second.subject, "Política");
   assert.equal(second.question, "Em quem você confia mais?");
   assert.equal(second.note, "");
+  assert.equal(second.people, true);
   assert.deepEqual(second.cardIds, SURVEY.cardIds);
   assert.equal(second.drawSize, 16);
   assert.equal(second.groupSize, 4);
@@ -62,13 +65,57 @@ test("a segunda pesquisa faz outra pergunta sobre as mesmas 20 cartas", () => {
   assert.ok(Object.isFrozen(second) && Object.isFrozen(second.cardIds));
 });
 
-test("a terceira pesquisa é a demonstração de roupas, com 16 cartas que todo mundo vê", () => {
+test("a terceira pesquisa é a de famosos, com 20 cartas de pessoas e sorteio de 16", () => {
+  const celebrities = photoSurveyById("famosos-01");
+  assert.equal(PHOTO_SURVEYS.length, 4);
+  assert.deepEqual(PHOTO_SURVEYS.map((survey) => survey.id), ["politica-2026-01", "politica-2026-02", "famosos-01", "roupas-demo-01"], "a ordem é a da capa");
+  assert.equal(PHOTO_SURVEYS[2], celebrities, "depois das duas de política e antes da de roupas");
+  assert.equal(celebrities.subject, "Famosos");
+  assert.equal(celebrities.question, "De quem você é mais fã?");
+  assert.equal(celebrities.note, "Fotos de licença livre.");
+  assert.equal(celebrities.people, true, "as cartas de famosos são pessoas");
+  // Quem está na lista pode mudar; o que não muda é a forma dela.
+  assert.equal(celebrities.cardIds.length, 20);
+  assert.equal(new Set(celebrities.cardIds).size, 20, "nenhuma carta repetida");
+  assert.deepEqual(celebrities.cardIds, [...celebrities.cardIds].sort());
+  for (const id of celebrities.cardIds) assert.match(id, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, id);
+  assert.equal(celebrities.drawSize, 16);
+  assert.equal(celebrities.groupSize, 4);
+  assert.equal(celebrities.opensAt, null);
+  assert.equal(celebrities.closesAt, null, "sem data para fechar");
+  assert.ok(Object.isFrozen(celebrities) && Object.isFrozen(celebrities.cardIds));
+  for (const other of PHOTO_SURVEYS.filter((survey) => survey !== celebrities)) {
+    assert.ok(celebrities.cardIds.every((id) => !other.cardIds.includes(id)), `nenhuma carta em comum com ${other.id}`);
+  }
+
+  // Sorteio de 16 em 20, como na política. Vale também com o gerador que o servidor usa.
+  for (const generator of [seededRandomInt(74), (limit) => randomInt(limit)]) {
+    const shown = drawCards(celebrities, generator);
+    assert.equal(shown.length, 16);
+    assert.equal(new Set(shown).size, 16);
+    assert.ok(shown.every((id) => celebrities.cardIds.includes(id)));
+    const groups = drawGroups(shown, celebrities.groupSize);
+    assert.deepEqual(groups.map((group) => group.length), [4, 4, 4, 4]);
+    const pickIds = groups.map((group) => group[2]);
+    assert.equal(validateBracket(celebrities, shown, { pickIds, championId: pickIds[0] }).ok, true);
+    // Uma carta de outra pesquisa não entra numa resposta desta.
+    const foreign = [SURVEY.cardIds[0], ...pickIds.slice(1)];
+    assert.equal(validateBracket(celebrities, shown, { pickIds: foreign, championId: pickIds[1] }).reason, "pick-outside-group");
+  }
+  // Em muitos sorteios, as 20 cartas aparecem: nenhuma fica sempre de fora.
+  const generator = seededRandomInt(2026);
+  const seen = new Set();
+  for (let round = 0; round < 200; round += 1) for (const id of drawCards(celebrities, generator)) seen.add(id);
+  assert.equal(seen.size, 20);
+});
+
+test("a quarta pesquisa é a demonstração de roupas, com 16 cartas que todo mundo vê", () => {
   const clothes = photoSurveyById("roupas-demo-01");
-  assert.equal(PHOTO_SURVEYS.length, 3);
-  assert.equal(PHOTO_SURVEYS[2], clothes, "depois das duas de política: a ordem é a da capa");
+  assert.equal(PHOTO_SURVEYS[3], clothes, "depois das de política e da de famosos: a ordem é a da capa");
   assert.equal(clothes.subject, "Roupas");
   assert.equal(clothes.question, "Qual você usaria?");
   assert.equal(clothes.note, "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
+  assert.equal(clothes.people, false, "as cartas de roupa não são pessoas");
   assert.deepEqual(clothes.cardIds, [
     "camiseta-cacto", "camiseta-chama", "camiseta-flor", "camiseta-montanha", "camiseta-olho", "camiseta-onda",
     "camiseta-pipa", "camiseta-planeta", "camiseta-raio", "camiseta-sem-pressa", "camiseta-sol", "camiseta-xadrez",
@@ -92,6 +139,30 @@ test("a terceira pesquisa é a demonstração de roupas, com 16 cartas que todo 
   }
 });
 
+test("a definição diz se as cartas são pessoas: verdadeiro em política e famosos, falso em roupas", () => {
+  assert.deepEqual(
+    PHOTO_SURVEYS.map((survey) => [survey.id, survey.people]),
+    [["politica-2026-01", true], ["politica-2026-02", true], ["famosos-01", true], ["roupas-demo-01", false]],
+  );
+  const base = { id: "teste-01", subject: "Teste", question: "Qual?", cardIds: ["a", "b", "c", "d"], drawSize: 4, groupSize: 4 };
+  // Sem dizer nada, as cartas não são pessoas.
+  const plain = definePhotoSurvey(base);
+  assert.equal(plain.people, false);
+  assert.equal(plain.note, "");
+  assert.ok(Object.isFrozen(plain));
+  assert.equal(definePhotoSurvey({ ...base, people: true }).people, true);
+  assert.equal(definePhotoSurvey({ ...base, people: false }).people, false);
+  // Só verdadeiro ou falso: um texto ou um número não viram "pessoas" por engano.
+  for (const value of ["sim", "true", 1, 0, null, {}, []]) {
+    assert.throws(() => definePhotoSurvey({ ...base, people: value }), /pesquisa teste-01: "people" precisa ser verdadeiro ou falso/, JSON.stringify(value));
+  }
+  // As outras conferências da definição continuam valendo.
+  assert.throws(() => definePhotoSurvey({ ...base, note: 7 }), /a observação precisa ser texto/);
+  assert.throws(() => definePhotoSurvey({ ...base, cardIds: ["a", "a", "b", "c"] }), /carta repetida/);
+  assert.throws(() => definePhotoSurvey({ ...base, drawSize: 3 }), /não fecha em telas de 4/);
+  assert.throws(() => definePhotoSurvey({ ...base, question: "" }), /falta o assunto ou a pergunta/);
+});
+
 test("cada pesquisa tem código, assunto e pergunta próprios", () => {
   assert.equal(new Set(PHOTO_SURVEYS.map((survey) => survey.id)).size, PHOTO_SURVEYS.length);
   assert.equal(new Set(PHOTO_SURVEYS.map((survey) => survey.question)).size, PHOTO_SURVEYS.length);
@@ -99,6 +170,7 @@ test("cada pesquisa tem código, assunto e pergunta próprios", () => {
     assert.match(survey.id, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, survey.id);
     assert.ok(survey.subject.length > 0 && survey.question.endsWith("?"), survey.id);
     assert.equal(typeof survey.note, "string", survey.id);
+    assert.equal(typeof survey.people, "boolean", survey.id);
   }
 });
 
@@ -232,6 +304,12 @@ test("a visão pública traz só a definição e o estado, sem contagem de respo
   assert.equal(view.subject, "Política");
   assert.equal(view.note, "");
   assert.equal(publicPhotoSurvey(photoSurveyById("roupas-demo-01"), new Date("2026-11-23T12:00:00Z")).note, "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
+  const celebrities = publicPhotoSurvey(photoSurveyById("famosos-01"), new Date("2026-11-24T12:00:00Z"));
+  assert.equal(celebrities.note, "Fotos de licença livre.");
+  assert.deepEqual([celebrities.subject, celebrities.cardIds.length, celebrities.drawSize, celebrities.screens, celebrities.status], ["Famosos", 20, 16, 4, "open"]);
+  // `people` fica na definição: a visão pública não muda de formato por causa dele.
+  assert.deepEqual(Object.keys(celebrities).sort(), Object.keys(view).sort());
+  assert.ok(!("people" in view) && !("people" in celebrities));
   // Uma definição montada à mão, sem observação, sai com a observação vazia.
   assert.equal(publicPhotoSurvey({ ...SURVEY, note: undefined }, new Date("2026-11-13T12:00:00Z")).note, "");
   assert.equal(view.screens, 4);

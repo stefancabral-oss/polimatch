@@ -56,11 +56,12 @@ jobs:
             design:
               - 'app/**'
               - 'shared/**'
-              # Testes do app leem fontes do back e evidências dos estágios 23, 29 e 73.
+              # Testes do app leem fontes do back e evidências dos estágios 23, 29, 73 e 74.
               - 'back/src/**'
               - 'stages/23_chromas_104/output/artwork/**'
               - 'stages/29_political_chromas/output/**'
               - 'stages/73_clothes_demo/output/**'
+              - 'stages/74_celebrity_survey/output/**'
               - '.dockerignore'
               # edge-delivery.test.js confere que os ícones do PWA não estão ignorados.
               - '.gitignore'

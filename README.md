@@ -169,7 +169,7 @@ Backup externo do PostgreSQL, ensaio de restauração e reconstrução do ambien
 Decisões e estado da reconstrução:
 
 - `CONTEXT.md`
-- `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md` e as decisões seguintes da mesma pasta (0002 a 0005)
+- `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md` e as decisões seguintes da mesma pasta (0002 a 0006)
 - `stages/67_photo_survey_direction/CONTEXT.md`
 - `stages/10_rebuild_eleicoes_2026/CONTEXT.md`
 - `stages/10_rebuild_eleicoes_2026/output/HANDOFF.md`

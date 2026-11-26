@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { UPCOMING_SURVEYS, accountKind, menuButtonMarkup, menuMarkup, upcomingMarkup } from "./site-menu.js";
+import { readFileSync } from "node:fs";
+import { PHOTO_SURVEYS } from "../../shared/photo-survey.js";
+import { UPCOMING_SURVEYS, accountKind, menuButtonMarkup, menuMarkup, upcomingMarkup, upcomingSectionMarkup } from "./site-menu.js";
 
 test("o tipo de conta sai do prefixo da chave guardada no aparelho", () => {
   assert.equal(accountKind("pms_sessaoGoogle"), "google");
@@ -9,36 +11,79 @@ test("o tipo de conta sai do prefixo da chave guardada no aparelho", () => {
   for (const empty of ["", "   ", null, undefined]) assert.equal(accountKind(empty), "none");
 });
 
-test("a próxima pesquisa é só anúncio, e Roupas não está mais entre as que vêm", () => {
-  assert.deepEqual([...UPCOMING_SURVEYS], ["Famosos e influenciadores"]);
+test("não há pesquisa anunciada: sem anúncio, não sai item nem o rótulo \"Em breve\"", () => {
+  assert.deepEqual([...UPCOMING_SURVEYS], [], "Famosos e Roupas viraram pesquisas abertas");
   assert.ok(Object.isFrozen(UPCOMING_SURVEYS));
-  const markup = upcomingMarkup();
-  assert.match(markup, /Famosos e influenciadores/);
-  assert.doesNotMatch(markup, /Roupas/);
-  assert.equal(markup.match(/Em breve/g).length, 1);
-  assert.doesNotMatch(markup, /<a\b|href=/);
+  // Texto vazio de verdade, sem nem espaço: a capa esconde a área das listas quando ela fica vazia.
+  assert.equal(upcomingMarkup(), "");
+  assert.equal(upcomingSectionMarkup(), "", "a capa não mostra o rótulo sem ter o que anunciar");
+  assert.equal(upcomingMarkup([]), "");
+  assert.equal(upcomingSectionMarkup([]), "");
 });
 
-test("o menu leva cada pesquisa ao endereço dela e não dá link às próximas", () => {
+test("quando houver pesquisa anunciada, ela aparece sem link, e a capa ganha o rótulo", () => {
+  const names = ["Futebol", "Séries & filmes"];
+  const markup = upcomingMarkup(names);
+  assert.equal(markup, '<div class="pm-item is-soon"><span>Futebol</span><em class="pm-tag">Em breve</em></div><div class="pm-item is-soon"><span>Séries &amp; filmes</span><em class="pm-tag">Em breve</em></div>');
+  assert.doesNotMatch(markup, /<a\b|href=/);
+  assert.equal(upcomingSectionMarkup(names), `<p class="ps-label ps-home-label">Em breve</p>${markup}`);
+  const menu = menuMarkup({ upcoming: names });
+  assert.ok(menu.includes(markup), "o menu mostra os anúncios");
+  assert.ok(menu.indexOf("roupas-demo-01") < menu.indexOf("Futebol") && menu.indexOf("Futebol") < menu.indexOf(">PoliMatch<"), "depois das pesquisas abertas, no mesmo grupo");
+  assert.equal(menu.match(/Em breve/g).length, 2);
+});
+
+test("a capa monta o bloco das próximas pesquisas pelo menu: sem anúncio, sem rótulo", () => {
+  // A capa (photo-survey-page.js) não escreve o rótulo "Em breve" por conta
+  // própria: usa `upcomingSectionMarkup`, que devolve vazio sem anúncio.
+  const page = readFileSync(new URL("./photo-survey-page.js", import.meta.url), "utf8");
+  const sections = page.slice(page.indexOf("function homeSections()"), page.indexOf("function renderEntry("));
+  assert.ok(sections.length > 0 && sections.length < 1500, "o trecho das listas da capa foi encontrado");
+  assert.match(sections, /upcomingSectionMarkup\(\)/);
+  assert.doesNotMatch(sections, /Em breve|upcomingMarkup\(/);
+  assert.doesNotMatch(page, /ps-home-label">Em breve/);
+  // "Suas escolhas" e "Mais pesquisas" também só saem com conteúdo, e os blocos são unidos sem espaço.
+  assert.match(sections, /chosen\.length \? `<p class="ps-label ps-home-label">Suas escolhas<\/p>/);
+  assert.match(sections, /others\.length \? `<p class="ps-label ps-home-label">Mais pesquisas<\/p>/);
+  assert.match(sections, /\]\.join\(""\)/);
+  const css = readFileSync(new URL("./photo-survey.css", import.meta.url), "utf8");
+  assert.match(css, /\.ps-home:empty \{\s*display: none;\s*\}/);
+});
+
+test("o menu leva cada pesquisa ao endereço dela, na ordem da capa, sem nenhum \"Em breve\"", () => {
   const markup = menuMarkup();
   assert.match(markup, /<a class="pm-item" href="\.\/\?p=politica-2026-01"><span>Quem você prefere\?<\/span><small class="pm-sub">Política<\/small><\/a>/);
   assert.match(markup, /<a class="pm-item" href="\.\/\?p=politica-2026-02"><span>Em quem você confia mais\?<\/span><small class="pm-sub">Política<\/small><\/a>/);
+  assert.match(markup, /<a class="pm-item" href="\.\/\?p=famosos-01"><span>De quem você é mais fã\?<\/span><small class="pm-sub">Famosos<\/small><\/a>/);
   assert.match(markup, /<a class="pm-item" href="\.\/\?p=roupas-demo-01"><span>Qual você usaria\?<\/span><small class="pm-sub">Roupas<\/small><\/a>/);
   assert.ok(markup.indexOf("politica-2026-01") < markup.indexOf("politica-2026-02"), "na ordem da capa");
-  assert.ok(markup.indexOf("politica-2026-02") < markup.indexOf("roupas-demo-01"), "a de roupas vem depois das de política");
-  assert.equal(markup.match(/Em breve/g).length, 1, "Roupas é pesquisa aberta, não anúncio");
+  assert.ok(markup.indexOf("politica-2026-02") < markup.indexOf("famosos-01"), "a de famosos vem depois das de política");
+  assert.ok(markup.indexOf("famosos-01") < markup.indexOf("roupas-demo-01"), "a de roupas vem depois da de famosos");
+  // Famosos é pesquisa aberta, não anúncio: nenhum item "Em breve", nem bloco vazio no lugar.
+  assert.doesNotMatch(markup, /Em breve|is-soon|pm-tag|Famosos e influenciadores/);
+  assert.equal(markup.match(/class="pm-item"/g).length, PHOTO_SURVEYS.length + 3, "as pesquisas, Início, Como funciona e Créditos das fotos");
+  assert.doesNotMatch(markup, /<(div|p|ul)[^>]*>\s*<\/\1>/, "sem bloco vazio");
+  assert.match(markup, /<\/a>\s*<p class="pm-group">PoliMatch<\/p>/, "depois da última pesquisa vem direto o grupo seguinte");
   assert.match(markup, /<a class="pm-item" href="\.\/"><span>Início<\/span>/);
   assert.match(markup, /<a class="pm-item" href="\.\/como-funciona\.html"><span>Como funciona<\/span>/);
-  for (const name of UPCOMING_SURVEYS) {
-    assert.match(markup, new RegExp(`<div class="pm-item is-soon"><span>${name}</span><em class="pm-tag">Em breve</em></div>`));
-  }
   assert.doesNotMatch(markup, /Privacidade/);
+});
+
+test("o menu tem o link dos créditos das fotos, logo depois de Como funciona", () => {
+  const markup = menuMarkup();
+  assert.match(markup, /<a class="pm-item" href="\.\/creditos\.html"><span>Créditos das fotos<\/span><i aria-hidden="true">›<\/i><\/a>/);
+  assert.match(markup, /<a class="pm-item" href="\.\/como-funciona\.html"><span>Como funciona<\/span><i aria-hidden="true">›<\/i><\/a>\s*<a class="pm-item" href="\.\/creditos\.html">/);
+  assert.equal(markup.match(/creditos\.html/g).length, 1);
+  // O link não depende da conta nem do Google.
+  for (const account of ["none", "anonymous", "google"]) {
+    assert.match(menuMarkup({ account, googleReady: true }), /href="\.\/creditos\.html"/, account);
+  }
 });
 
 test("o menu lista as pesquisas que recebe, com o texto escapado", () => {
   const markup = menuMarkup({ surveys: [{ id: "x-1", subject: "A & B", question: "<b>Qual?</b>" }] });
   assert.match(markup, /href="\.\/\?p=x-1"><span>&lt;b&gt;Qual\?&lt;\/b&gt;<\/span><small class="pm-sub">A &amp; B<\/small>/);
-  assert.doesNotMatch(markup, /politica-2026|roupas-demo/);
+  assert.doesNotMatch(markup, /politica-2026|famosos-01|roupas-demo/);
   assert.match(menuMarkup({ surveys: [{ id: "a b&c", subject: "S", question: "Q?" }] }), /href="\.\/\?p=a%20b%26c"/);
 });
 
@@ -46,9 +91,12 @@ test("o menu marca a página em que a pessoa está", () => {
   const marked = (markup) => [...markup.matchAll(/href="([^"]+)" aria-current="page"/g)].map((match) => match[1]);
   assert.deepEqual(marked(menuMarkup({ current: "home" })), ["./"]);
   assert.deepEqual(marked(menuMarkup({ current: "politica-2026-02" })), ["./?p=politica-2026-02"]);
+  assert.deepEqual(marked(menuMarkup({ current: "famosos-01" })), ["./?p=famosos-01"]);
   assert.deepEqual(marked(menuMarkup({ current: "roupas-demo-01" })), ["./?p=roupas-demo-01"]);
   assert.deepEqual(marked(menuMarkup({ current: "how" })), ["./como-funciona.html"]);
+  assert.deepEqual(marked(menuMarkup({ current: "credits" })), ["./creditos.html"]);
   assert.deepEqual(marked(menuMarkup()), []);
+  assert.deepEqual(marked(menuMarkup({ current: "outra-pagina" })), []);
 });
 
 test("sem conta e com o Google configurado, o menu reserva o lugar do botão de entrada", () => {

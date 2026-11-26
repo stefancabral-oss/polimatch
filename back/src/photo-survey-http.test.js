@@ -51,7 +51,7 @@ test("a definição da pesquisa é pública e não aceita cache", async () => {
   assert.deepEqual(calls, [["photoSurvey", "politica-2026-01", { now: NOW }]]);
 });
 
-test("as três pesquisas saem pela API como estão em shared, e a de roupas leva a observação", async () => {
+test("as quatro pesquisas saem pela API como estão em shared; a de famosos e a de roupas levam a observação", async () => {
   // O store de verdade: a definição de uma pesquisa não lê o banco.
   const { photoSurvey } = photoSurveyStore({ pool: null, findPlayer: null });
   const { app } = harness({ photoSurvey });
@@ -60,19 +60,36 @@ test("as três pesquisas saem pela API como estão em shared, e a de roupas leva
       const response = await fetch(`${base}/api/photo-surveys/${id}`);
       return { status: response.status, body: await response.json() };
     };
-    assert.deepEqual(PHOTO_SURVEYS.map((survey) => survey.id), ["politica-2026-01", "politica-2026-02", "roupas-demo-01"]);
+    assert.deepEqual(PHOTO_SURVEYS.map((survey) => survey.id), ["politica-2026-01", "politica-2026-02", "famosos-01", "roupas-demo-01"]);
     for (const survey of PHOTO_SURVEYS) {
       assert.deepEqual(await read(survey.id), { status: 200, body: publicPhotoSurvey(survey, NOW) }, survey.id);
     }
+    const { body: celebrities } = await read("famosos-01");
+    assert.equal(celebrities.subject, "Famosos");
+    assert.equal(celebrities.question, "De quem você é mais fã?");
+    assert.equal(celebrities.note, "Fotos de licença livre.");
+    assert.deepEqual([celebrities.cardIds.length, celebrities.drawSize, celebrities.groupSize, celebrities.screens, celebrities.status], [20, 16, 4, 4, "open"]);
+    assert.deepEqual([celebrities.opensAt, celebrities.closesAt], [null, null], "sem data para abrir nem para fechar");
+    assert.deepEqual(celebrities.cardIds, [...PHOTO_SURVEYS[2].cardIds]);
     const { body: clothes } = await read("roupas-demo-01");
     assert.equal(clothes.subject, "Roupas");
     assert.equal(clothes.question, "Qual você usaria?");
     assert.equal(clothes.note, "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
     assert.deepEqual([clothes.cardIds.length, clothes.drawSize, clothes.groupSize, clothes.screens, clothes.status], [16, 16, 4, 4, "open"]);
     for (const id of ["politica-2026-01", "politica-2026-02"]) assert.equal((await read(id)).body.note, "", id);
-    const missing = await read("roupas-demo-02");
-    assert.equal(missing.status, 404);
-    assert.equal(missing.body.code, "PHOTO_SURVEY_NOT_FOUND");
+    // `people` é da definição que a tela importa: não sai pela API em nenhuma pesquisa.
+    for (const survey of PHOTO_SURVEYS) {
+      const { body } = await read(survey.id);
+      assert.ok(!("people" in body), survey.id);
+      assert.deepEqual(Object.keys(body).sort(), [
+        "cardIds", "closesAt", "drawSize", "groupSize", "id", "note", "opensAt", "question", "screens", "status", "subject",
+      ], survey.id);
+    }
+    for (const id of ["roupas-demo-02", "famosos-02", "famosos"]) {
+      const missing = await read(id);
+      assert.equal(missing.status, 404, id);
+      assert.equal(missing.body.code, "PHOTO_SURVEY_NOT_FOUND", id);
+    }
   });
 });
 
