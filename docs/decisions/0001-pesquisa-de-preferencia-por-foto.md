@@ -11,7 +11,8 @@
   (estágio 73, decisão 0005). Em 23/11/2026 não estavam em produção,
   entre outros pontos: os cinco primeiros e o resultado somado (itens 4 e 5),
   os outros assuntos de abertura do item 6 (famosos e influenciadores,
-  futebol) e o som.
+  futebol) e o som. Desde 26/11/2026 está em produção também a pesquisa
+  de famosos e influenciadores (estágio 74, decisão 0006).
 - Alterada em quatro pontos pela [decisão 0002](0002-ordem-de-construcao-e-cartas-com-moldura.md), de 13/11/2026. Cada ponto está marcado abaixo.
 - Alterada no item 7 pela [decisão 0003](0003-a-pesquisa-vira-a-capa.md), de 14/11/2026: os jogos de leitura e a capa do jogo saem do site.
 - Alterada no item 3 pela [decisão 0004](0004-cadastro-obrigatorio-com-cpf.md), de 16/11/2026: só responde quem entrou com Google e tem cadastro com CPF.

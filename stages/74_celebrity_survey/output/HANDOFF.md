@@ -365,7 +365,7 @@ mudaram.
 ## Merge — 26/11/2026
 
 O PR #349 foi mesclado em 26/11/2026, às 19:35 UTC (16:35 de Brasília), no
-commit `6e38d32`. A árvore do merge é a mesma do último commit conferido,
+commit `6e38d32`. A árvore do merge é a mesma do último commit do PR,
 `aa4739d`. A instrução do Stefan está transcrita no PR, com a pergunta que
 ele respondeu.
 
@@ -377,24 +377,25 @@ ele respondeu.
 - **CI do push do merge na `main`:** terminou verde, com todos os
   trabalhos, por volta de 19:40 UTC, antes do primeiro deploy.
 - **Produção logo depois do merge:** lida de fora menos de um minuto depois,
-  seguia no build de 23/11, sem a pesquisa de famosos.
+  seguia no build da publicação de 23/11 (`builtAt` 2026-11-24T02:57:49Z),
+  sem a pesquisa de famosos.
 
 ## Publicação (74d) — 26/11/2026
 
 À pergunta "Faço a cópia do banco e publico a API e o app?", o Stefan
 respondeu "Sim, publica". O painel de deploy estava sem sessão, e o agente
-não digita senha: a publicação só começou depois que ele entrou no painel e
-avisou. Um sim para os três passos.
+não digita senha: a publicação só começou depois que o Stefan entrou no
+painel e avisou. Um sim para os três passos.
 
 | Passo | O que foi visto |
 |---|---|
-| Cópia do banco | `/tmp/pre-deploy-20261126.dump` no contêiner do banco, às 19:52 UTC: 612.473 bytes, 31 tabelas. A contagem de linhas de cada tabela foi guardada num arquivo de texto ao lado, antes e depois da API. |
-| API | Deploy concluído no commit `6e38d32`, em 31 s, pelo que o painel registra. No log do contêiner novo: `database_ready` com `resetApplied` falso e `listening`, os dois às 19:55:56 UTC. A busca do painel por "error" e por "fail", nas 100 linhas que ele mostrava, não achou nenhuma. De fora, a saúde respondeu 200 em todas as leituras, e a rota da pesquisa de famosos passou de 404 a 200 às 19:56:03 UTC. |
+| Cópia do banco | `/tmp/pre-deploy-20261126.dump` no contêiner do banco, às 19:52 UTC: 612.473 bytes, 31 tabelas. A contagem de linhas de cada tabela foi guardada em dois arquivos de texto ao lado, um antes e um depois da API. |
+| API | Deploy concluído no commit `6e38d32`, em 31 s, pelo que o painel registra. No log do contêiner novo: `database_ready` com `resetApplied` falso e `listening`, os dois às 19:55:56 UTC. A busca do painel por "error" e por "fail", nas linhas que ele mostrava (o limite do painel era de 100), não achou nenhuma. De fora, a saúde respondeu 200 em todas as leituras, e a rota da pesquisa de famosos passou de 404 a 200 às 19:56:03 UTC. |
 | Banco depois da API | As mesmas 31 tabelas. Trinta com a mesma contagem; `abuse_quota_counters` de 1 para 0 (pelo código, a poda de contadores antigos que a API faz ao subir). Nenhuma tabela nova. Sorteios da pesquisa de famosos: 0. |
 | App | Deploy concluído no commit `6e38d32`, em 33 s. De fora, a capa respondeu 200 em todas as leituras; `/creditos.html` passou de 404 a 200 às 19:59:52 UTC; `builtAt` 2026-11-26T19:59:30Z. |
 
-O commit de cada deploy é o que o painel registrou; o `version.json` segue
-com `sha` desconhecido (#287).
+O commit de cada deploy é o que o painel registrou; em 26/11/2026 o
+`version.json` seguia com `sha` desconhecido (#287).
 
 **Lido de fora, só por GET, às 20:00 UTC:**
 
@@ -406,10 +407,11 @@ com `sha` desconhecido (#287).
   `people`;
 - as 40 imagens das cartas de famosos 200, com o hash do manifesto;
 - a página de créditos com 20 linhas;
-- os arquivos de script servidos trazem, juntos, `famosos-01`, a pergunta, a
-  nota, "Entre elas, quem fica?", "Créditos das fotos", "Ver os créditos" e
-  o texto do crédito da imagem do compartilhar, e não trazem mais "Famosos e
-  influenciadores".
+- os três arquivos de script servidos (`main-wf85QvEV.js`,
+  `site-menu-Cmzwml1w.js` e `sw.js`) trazem, juntos, `famosos-01`, a
+  pergunta, a nota, "Entre elas, quem fica?", "Créditos das fotos", "Ver os
+  créditos" e o trecho "Créditos completos em", do crédito da imagem do
+  compartilhar, e não trazem mais "Famosos e influenciadores".
 
 **Vigia.** Um roteiro do agente leu a capa e a saúde da API, só por GET, de
 19:51 a 20:16 UTC: 467 rodadas de leitura, com três segundos de pausa entre
@@ -443,7 +445,7 @@ testou na pesquisa de famosos (celular ou computador, se respondeu até o
 fim, se o Compartilhar saiu com o crédito das fotos no pé da imagem)". Ele
 citou esse trecho e respondeu: "Deu certo."
 
-É o que se sabe do teste dele: duas respostas curtas, as duas positivas. Ele
+É o que se sabe do teste pedido a ele: duas respostas curtas, as duas positivas. Ele
 não disse em que aparelho. O registro não afirma que houve teste em celular
 nem descreve o que apareceu na tela.
 
