@@ -13,6 +13,7 @@ import { candidatePublicPayload } from "./editorial-gate.js";
 import { EMBEDDED_RELEASE_REVISION } from "./release-identity.js";
 import { DAILY_SESSION_RULESET } from "./daily-session.js";
 import { cpfPseudonym } from "./registration-store.js";
+import { isPhotoSurveyNext, isPhotoSurveyRound } from "./photo-survey-store.js";
 import { validateRegistration } from "../../shared/registration.js";
 import { isTransientDatabaseError } from "./database-resilience.js";
 import { CLIENT_ERROR_MAX_BYTES, createClientErrorLimiter, normalizeClientErrorReport } from "./client-error-report.js";
@@ -565,13 +566,31 @@ export function createHttpApp({
     }
   });
 
+  // Rodadas (ICM 75, #350). As duas respostas ganham `round`, `progress` e
+  // `lastAnswered` (a última rodada que a pessoa respondeu), sem mudar os
+  // campos que já existiam. Os dois campos novos do pedido são opcionais: quem
+  // não os manda tem o comportamento de antes das rodadas, e o store nem os
+  // recebe.
+  // `next` no sorteio pede a rodada seguinte e só pode ser verdadeiro ou
+  // falso; `round` na resposta diz a que rodada ela pertence e só pode ser
+  // um inteiro a partir de 1. Fora disso o pedido é recusado sem chegar ao
+  // store.
+  const photoSurveyRefusal = (message, code, reason) => Object.assign(new Error(message), {
+    status: 400,
+    code,
+    current: { reason },
+  });
+
   app.post("/api/photo-surveys/:surveyId/draw", async (req, res) => {
     if (!requirePhotoSurveys(req, res)) return;
+    const { next } = req.body || {};
     try {
+      const recoveryKey = requiredRecoveryKey(req);
+      if (!isPhotoSurveyNext(next)) throw photoSurveyRefusal("pedido de sorteio inválido", "PHOTO_SURVEY_DRAW_INVALID", "next");
       noStore(res).json(await store.photoSurveyDraw(
-        requiredRecoveryKey(req),
+        recoveryKey,
         String(req.params.surveyId),
-        { now: clock() },
+        { now: clock(), ...(next === undefined ? {} : { next }) },
       ));
     } catch (error) {
       sendError(req, res, error);
@@ -580,14 +599,17 @@ export function createHttpApp({
 
   app.post("/api/photo-surveys/:surveyId/response", async (req, res) => {
     if (!requirePhotoSurveys(req, res)) return;
-    const { answerId, pickIds, championId } = req.body || {};
+    const { answerId, pickIds, championId, round } = req.body || {};
     try {
+      const recoveryKey = requiredRecoveryKey(req);
+      if (!isPhotoSurveyRound(round)) throw photoSurveyRefusal("resposta não corresponde ao sorteio", "PHOTO_SURVEY_RESPONSE_INVALID", "round");
       noStore(res).json(await store.photoSurveyRespond({
-        recoveryKey: requiredRecoveryKey(req),
+        recoveryKey,
         surveyId: String(req.params.surveyId),
         answerId,
         pickIds,
         championId,
+        ...(round === undefined ? {} : { round }),
         now: clock(),
       }));
     } catch (error) {

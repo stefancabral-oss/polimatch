@@ -142,6 +142,102 @@ test("a resposta repassa só o recibo, as escolhas e a escolhida", async () => {
   }]]);
 });
 
+// --- Rodadas (ICM 75, #350): `next` no sorteio e `round` na resposta ---
+
+test("o sorteio repassa next só quando ele vem no corpo, e nada mais do corpo", async () => {
+  const { app, calls } = harness();
+  await withServer(app, async (base) => {
+    for (const body of [{ next: true, shownIds: ["forjado"], round: 7 }, { next: false }, {}, { next: undefined }]) {
+      const response = await post(`${base}/api/photo-surveys/politica-2026-01/draw`, body, BEARER);
+      assert.equal(response.status, 200, JSON.stringify(body));
+    }
+  });
+  assert.deepEqual(calls, [
+    ["photoSurveyDraw", "pm2_jogador", "politica-2026-01", { now: NOW, next: true }],
+    ["photoSurveyDraw", "pm2_jogador", "politica-2026-01", { now: NOW, next: false }],
+    ["photoSurveyDraw", "pm2_jogador", "politica-2026-01", { now: NOW }],
+    ["photoSurveyDraw", "pm2_jogador", "politica-2026-01", { now: NOW }],
+  ]);
+});
+
+test("next que não é verdadeiro nem falso é recusado antes do store", async () => {
+  const { app, calls } = harness();
+  await withServer(app, async (base) => {
+    for (const next of ["true", "false", 1, 0, null, {}, []]) {
+      const response = await post(`${base}/api/photo-surveys/politica-2026-01/draw`, { next }, BEARER);
+      assert.equal(response.status, 400, JSON.stringify(next));
+      const { requestId, ...body } = await response.json();
+      assert.ok(requestId);
+      assert.deepEqual(body, { error: "pedido de sorteio inválido", code: "PHOTO_SURVEY_DRAW_INVALID", current: { reason: "next" } });
+    }
+    // A sessão é conferida primeiro: sem ela, a recusa é a de sempre.
+    const anonymous = await post(`${base}/api/photo-surveys/politica-2026-01/draw`, { next: "true" });
+    assert.equal(anonymous.status, 401);
+    assert.equal((await anonymous.json()).code, "PLAYER_SESSION_REQUIRED");
+  });
+  assert.deepEqual(calls, []);
+});
+
+test("a resposta repassa round só quando ele vem no corpo", async () => {
+  const { app, calls } = harness();
+  const answer = { answerId: "5f0c2c0e-8a55-4a52-9d6c-0d2b8a1f3c11", pickIds: ["a", "b", "c", "d"], championId: "c" };
+  await withServer(app, async (base) => {
+    for (const body of [{ ...answer, round: 2, next: true, shownIds: ["forjado"] }, { ...answer, round: 1 }, answer]) {
+      const response = await post(`${base}/api/photo-surveys/politica-2026-01/response`, body, BEARER);
+      assert.equal(response.status, 200, JSON.stringify(body));
+    }
+  });
+  const expected = { recoveryKey: "pm2_jogador", surveyId: "politica-2026-01", ...answer, now: NOW };
+  assert.deepEqual(calls, [
+    ["photoSurveyRespond", { ...expected, round: 2 }],
+    ["photoSurveyRespond", { ...expected, round: 1 }],
+    ["photoSurveyRespond", expected],
+  ]);
+});
+
+test("round que não é um inteiro a partir de 1 é recusado antes do store", async () => {
+  const { app, calls } = harness();
+  const answer = { answerId: "5f0c2c0e-8a55-4a52-9d6c-0d2b8a1f3c11", pickIds: ["a", "b", "c", "d"], championId: "c" };
+  await withServer(app, async (base) => {
+    for (const round of [0, -1, 1.5, "2", null, true, [2], {}, 1e21]) {
+      const response = await post(`${base}/api/photo-surveys/politica-2026-01/response`, { ...answer, round }, BEARER);
+      assert.equal(response.status, 400, JSON.stringify(round));
+      const { requestId, ...body } = await response.json();
+      assert.ok(requestId);
+      assert.deepEqual(body, { error: "resposta não corresponde ao sorteio", code: "PHOTO_SURVEY_RESPONSE_INVALID", current: { reason: "round" } });
+    }
+    const anonymous = await post(`${base}/api/photo-surveys/politica-2026-01/response`, { ...answer, round: 0 });
+    assert.equal(anonymous.status, 401);
+    assert.equal((await anonymous.json()).code, "PLAYER_SESSION_REQUIRED");
+  });
+  assert.deepEqual(calls, []);
+});
+
+test("o que o store devolve sobre a rodada, o progresso e a última resposta sai inteiro pela rota", async () => {
+  const progress = { answeredRounds: 2, seenPairs: 58, totalPairs: 190, canContinue: true };
+  const previous = { answerId: "w", pickIds: ["b"], championId: "b", respondedAt: NOW.toISOString() };
+  const response = { answerId: "x", pickIds: ["a"], championId: "a", respondedAt: NOW.toISOString() };
+  // Rodada 3 aberta: sem resposta, e a última respondida é a rodada 2.
+  const drawn = {
+    survey: SURVEY_VIEW, draw: { groups: [["a", "b", "c", "d"]] }, response: null, round: 3,
+    progress: { ...progress, canContinue: false }, lastAnswered: { round: 2, response: previous },
+  };
+  const answered = { status: "created", survey: SURVEY_VIEW, draw: drawn.draw, response, round: 3, progress, lastAnswered: { round: 3, response } };
+  const { app } = harness({ photoSurveyDraw: async () => drawn, photoSurveyRespond: async () => answered });
+  await withServer(app, async (base) => {
+    assert.deepEqual(await (await post(`${base}/api/photo-surveys/politica-2026-01/draw`, { next: true }, BEARER)).json(), drawn);
+    assert.deepEqual(await (await post(`${base}/api/photo-surveys/politica-2026-01/response`, { round: 3 }, BEARER)).json(), answered);
+  });
+  // Sem rodada respondida o campo sai como null, não some do corpo.
+  const empty = { survey: SURVEY_VIEW, draw: { groups: [] }, response: null, round: 1, progress: { answeredRounds: 0, seenPairs: 0, totalPairs: 190, canContinue: false }, lastAnswered: null };
+  const { app: fresh } = harness({ photoSurveyDraw: async () => empty });
+  await withServer(fresh, async (base) => {
+    const body = await (await post(`${base}/api/photo-surveys/politica-2026-01/draw`, {}, BEARER)).json();
+    assert.deepEqual(body, empty);
+    assert.ok(Object.hasOwn(body, "lastAnswered"));
+  });
+});
+
 test("erros da pesquisa chegam com status, código e a resposta já gravada", async () => {
   const current = { answerId: "x", pickIds: ["a", "b", "c", "d"], championId: "a", respondedAt: NOW.toISOString() };
   const { app } = harness({
