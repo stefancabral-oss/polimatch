@@ -9,7 +9,7 @@
     "74a": "decisão 0006, contexto do estágio, notas no AGENTS.md, no CONTEXT.md, no README.md e no CREDITS.md",
     "74b": "20 cartas montadas por app/scripts/build-celebrity-cards.mjs: fotos de origem, lista de origem, desenhos, arquivos publicados, catálogo, manifesto, página de créditos e teste",
     "74c": "pesquisa famosos-01 em shared/, na tela, no menu e nos testes; campo people; Em breve vazio; Créditos das fotos no menu e na entrada; crédito na imagem do compartilhar; filtro do CI",
-    "74d": "pendente: publicação pede o sim do Stefan"
+    "74d": "feita em 26/11/2026: cópia do banco, API e app publicados no commit 6e38d32 (ver publication)"
   },
   "cards": {
     "count": 20,
@@ -93,7 +93,7 @@
       "bc37f7c": "os nove trabalhos passaram, entre eles os roteiros de navegador em Chromium e em WebKit e a integração com PostgreSQL",
       "a448cba": "os nove trabalhos passaram",
       "dfc142c": "os nove trabalhos passaram, pelo que a leitura independente viu",
-      "quartoCommit": "só acertos de texto; pendente quando este arquivo foi escrito"
+      "quartoCommit": "aa4739d, só acertos de texto: os nove trabalhos passaram, vistos pelo agente antes do merge"
     }
   },
   "screens": {
@@ -110,14 +110,16 @@
     "se o crédito na imagem do compartilhar basta para cada licença",
     "a altura dos links da página de créditos com fontes que não as do macOS",
     "celular de verdade, o botão real do Google e o compartilhamento real do aparelho",
-    "produção: nada foi publicado"
+    "pelo agente, em produção: nenhuma tela, nenhum sorteio e nenhuma resposta",
+    "celular de verdade: do teste pedido ao Stefan só se sabem as respostas Funcionou e Deu certo, sem o aparelho nem o que apareceu"
   ],
   "humanGate": {
-    "decision": "pendente em 24/11/2026",
+    "decision": "aprovado para o merge e para a publicação; em 26/11/2026 o fechamento da issue seguia pendente",
     "owner": "Stefan",
     "start": "Sim, começa",
     "cards": "Sim, baixa",
-    "toAskInFull": "as escolhas 1 a 11 da decisão 0006"
+    "merge": "Sim, mescla, à pergunta \"Mesclo o PR 349 quando o CI do último commit ficar verde?\", que trazia por extenso as onze escolhas de regra e de dado; ele não pediu troca no elenco; transcrição no PR #349",
+    "publication": "Sim, publica"
   },
   "independentReview": {
     "first": {
@@ -139,5 +141,46 @@
     },
     "by": "agente que não escreveu o código, somente leitura; o mesmo nas passadas",
     "fourthCommit": "só acertos de texto pedidos na terceira passada; sem nova leitura"
+  },
+  "merge": {
+    "PR 349": "6e38d32, mesma árvore de aa4739d, em 2026-11-26 às 19:35 UTC",
+    "instruction": "Sim, mescla",
+    "mainCi": "o CI do push do merge na main terminou verde, com todos os trabalhos, por volta de 19:40 UTC, antes do primeiro deploy"
+  },
+  "publication": {
+    "date": "2026-11-26: cópia do banco às 19:52 UTC, API às 19:55, app às 19:59",
+    "instruction": "Sim, publica, à pergunta \"Faço a cópia do banco e publico a API e o app?\"; um sim para os três passos; o painel de deploy estava sem sessão e a publicação só começou depois que o Stefan entrou e avisou",
+    "databaseCopy": "/tmp/pre-deploy-20261126.dump no contêiner do banco, 612.473 bytes, 31 tabelas",
+    "api": {
+      "commit": "6e38d32",
+      "duration": "31 s",
+      "log": "database_ready com resetApplied false e listening, os dois às 19:55:56 UTC; a busca do painel por error e por fail, nas 100 linhas que ele mostrava, não achou nenhuma",
+      "fromOutside": "saúde 200 em todas as leituras; a rota da pesquisa de famosos passou de 404 a 200 às 19:56:03 UTC"
+    },
+    "databaseAfterApi": "as mesmas 31 tabelas; trinta com a mesma contagem; abuse_quota_counters de 1 para 0 (pelo código, a poda de contadores antigos que a API faz ao subir); nenhuma tabela nova; sorteios da pesquisa de famosos: 0",
+    "app": {
+      "commit": "6e38d32",
+      "duration": "33 s",
+      "builtAt": "2026-11-26T19:59:30Z",
+      "fromOutside": "capa 200 em todas as leituras; /creditos.html passou de 404 a 200 às 19:59:52 UTC"
+    },
+    "commitSource": "o commit é o que o painel de deploy registrou; version.json segue com sha unknown (#287)",
+    "watch": "capa e saúde da API, só por GET, de 19:51 a 20:16 UTC: 467 rodadas de leitura com três segundos de pausa entre elas; nenhuma leitura falhou",
+    "checkedByGet": [
+      "capa, Como funciona, /creditos.html, /?p=famosos-01 e /?p=roupas-demo-01: 200",
+      "as quatro pesquisas 200 na API; a de famosos com assunto, pergunta, nota, 20 cartas, sorteio de 16 e status open; nenhuma resposta traz o campo people",
+      "as 40 imagens das cartas de famosos 200, com o hash do manifesto",
+      "a página de créditos com 20 linhas",
+      "main-wf85QvEV.js e site-menu-Cmzwml1w.js trazem, juntos, famosos-01, a pergunta, a nota, \"Entre elas, quem fica?\", \"Créditos das fotos\", \"Ver os créditos\" e o texto do crédito da imagem do compartilhar, e não trazem mais \"Famosos e influenciadores\""
+    ],
+    "notDoneByAgent": [
+      "abrir o site em navegador ou tocar em carta em produção",
+      "pedido de escrita: nenhum sorteio, nenhuma resposta",
+      "abrir a aba de variáveis ou alterar configuração"
+    ],
+    "ownerReport": "a mensagem do agente dava o endereço da pesquisa de famosos e perguntava \"A pesquisa de famosos funcionou no seu celular? Abra o endereço, responda, toque em Compartilhar e me diga \\\"funcionou\\\" ou \\\"deu problema\\\", e o que apareceu.\"; menos de três minutos depois o Stefan respondeu \"Funcionou\", uma das duas respostas oferecidas; não disse o que testou, em que aparelho, nem o que apareceu; depois, ao pedido \"o que você testou na pesquisa de famosos (celular ou computador, se respondeu até o fim, se o Compartilhar saiu com o crédito das fotos no pé da imagem)\", ele citou o trecho e respondeu \"Deu certo.\", sem dizer o aparelho",
+    "seenInPassing": "durante a publicação a chave Autodeploy aparecia ligada nos dois serviços; vinte minutos depois do merge a produção ainda estava como antes, e disso o agente conclui que o merge não disparou deploy",
+    "images": "as imagens do app e da API foram construídas pelo painel de deploy; o agente não as construiu nem inspecionou",
+    "copiesInContainer": "seis cópias do banco em /tmp no contêiner, mais dois arquivos de contagem de linhas; as cópias têm dado pessoal; apagar ou guardar fora é decisão do Stefan (#279)"
   }
 }

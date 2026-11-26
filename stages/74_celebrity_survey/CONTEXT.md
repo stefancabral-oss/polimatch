@@ -87,7 +87,7 @@ licença livre.
 | 74a — Registro | Decisão 0006, este contexto, notas no `AGENTS.md`, no `CONTEXT.md` e no `CREDITS.md` |
 | 74b — Cartas | As 20 cartas, as fotos de origem, a lista de origem, o manifesto, a página de créditos e o teste que prende uns aos outros |
 | 74c — Pesquisa | `famosos-01` nas regras, no servidor e na tela; o campo `people`; "Em breve" vazio; "Créditos das fotos" no menu e na entrada; crédito na imagem do compartilhar; filtro do CI |
-| 74d — Publicação | API e app, com o sim do Stefan |
+| 74d — Publicação | API e app, com o sim do Stefan. Feita em 26/11/2026, com um sim para os três passos (ver o HANDOFF) |
 
 ## Critérios de aceite
 

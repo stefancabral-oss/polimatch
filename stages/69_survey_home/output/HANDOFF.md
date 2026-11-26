@@ -158,7 +158,7 @@ Da segunda passada ficaram anotados, sem mudança:
 - **A pesquisa fica à vista de qualquer visitante.** As condições de publicação que o estágio 68 listou para antes de divulgar a pessoas de fora (privacidade, #283; backup, #279) seguem abertas. Publicar com elas abertas é decisão do Stefan.
 - **A frase "Não é pesquisa eleitoral" sai com a capa antiga.** O site novo não exibe enquadramento nenhum; o texto que a substitui depende da revisão jurídica.
 - **Quem jogava o jogo anterior perde a interface dele.** Rodada diária, ranking, coleção e quizzes saem do site. Os dados ficam no banco e as rotas seguem respondendo.
-- **Anúncio de pesquisas futuras.** "Famosos e influenciadores" e "Roupas" aparecem como "em breve" sem data. São a ordem da decisão 0002, não um compromisso de prazo. (Desde 23/11/2026, com o estágio 73, "Roupas" tem pesquisa própria e saiu de "em breve"; a ordem mudou na decisão 0005.)
+- **Anúncio de pesquisas futuras.** "Famosos e influenciadores" e "Roupas" aparecem como "em breve" sem data. São a ordem da decisão 0002, não um compromisso de prazo. (Desde 23/11/2026, com o estágio 73, "Roupas" tem pesquisa própria e saiu de "em breve"; a ordem mudou na decisão 0005.) (Desde 26/11/2026, com o estágio 74, "Famosos e influenciadores" também tem pesquisa própria, e "em breve" ficou sem itens.)
 - **A entrada ilustra com dez das 20 cartas** (estágio 68). Com a troca, essa ilustração passa a ser a primeira tela do site.
 
 ## Decisões tomadas

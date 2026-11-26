@@ -55,7 +55,7 @@ Depois da publicação o Stefan escreveu: "Compartilhar: Deve gerar uma imagem c
 
 ## Não entregue / pendente
 
-- Cartas novas e pesquisas de outros assuntos. "Famosos e influenciadores" e "Roupas" seguem como "em breve". (Desde 23/11/2026, com o estágio 73, "Roupas" tem pesquisa própria e saiu de "em breve".)
+- Cartas novas e pesquisas de outros assuntos. "Famosos e influenciadores" e "Roupas" seguem como "em breve". (Desde 23/11/2026, com o estágio 73, "Roupas" tem pesquisa própria e saiu de "em breve". Desde 26/11/2026, com o estágio 74, "Famosos e influenciadores" também tem, e "em breve" ficou sem itens.)
 - Resultado somado, top 5, comparação com a maioria (#177 e revisão jurídica).
 - Som e háptica.
 - Rota só de leitura para a resposta da pessoa: a capa usa o pedido de sorteio, que para quem já respondeu só devolve a resposta.

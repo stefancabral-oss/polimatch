@@ -4,8 +4,9 @@
 - Quem decidiu: Stefan
 - Registrado por: agente (Claude)
 - Issue: #348 ([ICM 74])
-- Estado: em 24/11/2026, em construção no estágio 74, sem merge e sem
-  publicação.
+- Estado: em produção desde 26/11/2026, quando a pesquisa de famosos
+  (estágio 74) foi publicada, com API e app no commit `6e38d32`. O que foi e
+  o que não foi conferido está no HANDOFF do estágio.
 - Não altera decisão anterior. Segue a ordem da
   [decisão 0005](0005-roupas-antes-de-celebridades.md): política, roupas,
   celebridades e influenciadores.

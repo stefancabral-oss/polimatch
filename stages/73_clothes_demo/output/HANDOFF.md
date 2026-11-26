@@ -5,7 +5,10 @@
 - Estado: `publicado`. As partes 73a, 73b e 73c foram mescladas (PR #346,
   commit `2cfa3e9`) e a 73d aconteceu em 23/11/2026, com API e app publicados
   nesse commit (ver "Publicação (73d)"). Em 24/11/2026, quando este registro
-  foi escrito, a issue seguia aberta: fechar pede o sim do Stefan.
+  foi escrito, a issue seguia aberta: fechar pede o sim do Stefan. (A issue
+  foi fechada no fim desse dia, com o sim dele. Em 26/11/2026 API e app
+  foram publicados de novo, no commit `6e38d32`, com a pesquisa de famosos:
+  ver o HANDOFF do estágio 74.)
 - Issue: #345
 - Branch: `icm/73-clothes-demo`, feita sobre a `main` em `0b30d64`.
 - PR: #346
