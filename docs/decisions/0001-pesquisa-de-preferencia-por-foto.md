@@ -17,6 +17,7 @@
 - Alterada no item 7 pela [decisão 0003](0003-a-pesquisa-vira-a-capa.md), de 14/11/2026: os jogos de leitura e a capa do jogo saem do site.
 - Alterada no item 3 pela [decisão 0004](0004-cadastro-obrigatorio-com-cpf.md), de 16/11/2026: só responde quem entrou com Google e tem cadastro com CPF.
 - A ordem de construção citada no item 6 foi alterada pela [decisão 0005](0005-roupas-antes-de-celebridades.md), de 23/11/2026: roupas passam à frente de celebridades e influenciadores.
+- O item 2 ("não se repete para a mesma pessoa") foi alterado pela [decisão 0007](0007-rodadas-enquanto-houver-confrontos.md), de 26/11/2026: rodadas novas enquanto houver confrontos por ver.
 
 ## Contexto
 
@@ -31,6 +32,9 @@ o arquivo, ou pausa. O Stefan respondeu com um quarto caminho.
 2. **Como funciona.** Cada pesquisa é um conjunto de fotos e uma pergunta curta.
    Tem começo e fim, não se repete para a mesma pessoa e permite desfazer a
    escolha. Só foto e nome, sem texto para ler. Rápido, com som.
+   (Alterado pela decisão 0007, de 26/11/2026: a pesquisa se repete para a
+   mesma pessoa, em rodadas, enquanto houver confronto entre cartas que ela
+   ainda não viu. Cada rodada tem começo e fim.)
 3. **Quem conta.** Qualquer pessoa joga. A escolha só entra na pesquisa com
    cadastro por CPF, que passa a ser o único identificador que faz a escolha
    contar. O cadastro pede faixa de idade, gênero e estado. A pessoa joga
