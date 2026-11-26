@@ -5,9 +5,12 @@ import ARTS from "./political-chromas.json" with { type: "json" };
 import { PHOTO_SURVEYS, photoSurveyById } from "../../shared/photo-survey.js";
 import {
   ENTRY_CARD_IDS,
+  NO_ROUNDS,
   PHOTO_SURVEY_STORAGE_KEY,
+  answeredElsewhere,
   answeredSurveyIds,
   chooseChampion,
+  coverFeature,
   entryCardIdsFor,
   featuredSurveyId,
   finalTitleFor,
@@ -15,12 +18,15 @@ import {
   goBack,
   identityTag,
   inProgressSurveyId,
+  nextRoundNumber,
   nextSurveyId,
   pickCard,
   progressView,
   readSavedProgress,
+  registeredCopy,
   responseBody,
   restoreProgress,
+  roundState,
   sameGroups,
   sampleCards,
   savedProgressText,
@@ -400,4 +406,241 @@ test("depois de registrada, o aparelho guarda que respondeu, não em quem", () =
     const forged = JSON.stringify({ [PHOTO_SURVEY_ID]: { identity: "x", progress: null, answered: value } });
     assert.equal(readSavedProgress(forged, PHOTO_SURVEY_ID).answered, false);
   }
+});
+
+// Rodadas (ICM 75, #350) ----------------------------------------------------
+
+const ANSWER = { answerId: UUID, pickIds: ["a1", "b2", "c3", "d4"], championId: "c3", respondedAt: "2026-11-26T12:00:00.000Z" };
+const EARLIER = { ...ANSWER, championId: "a1" };
+// O que o servidor devolve depois de a pessoa responder a primeira rodada, com confronto por ver.
+const afterFirst = (changes = {}) => ({
+  survey: { id: PHOTO_SURVEY_ID, status: "open" },
+  draw: { groups: GROUPS },
+  response: ANSWER,
+  round: 1,
+  progress: { answeredRounds: 1, seenPairs: 30, totalPairs: 190, canContinue: true },
+  lastAnswered: { round: 1, response: ANSWER },
+  ...changes,
+});
+// Uma rodada nova emitida e ainda sem resposta: a última respondida é a anterior.
+const openSecond = (changes = {}) => afterFirst({
+  response: null,
+  round: 2,
+  progress: { answeredRounds: 1, seenPairs: 30, totalPairs: 190, canContinue: false },
+  lastAnswered: { round: 1, response: EARLIER },
+  ...changes,
+});
+const LEGACY_HINT = "Obrigado por participar. Sua resposta está registrada e não pode ser trocada nesta pesquisa.";
+const ROUND_HINT = "A escolha desta rodada está registrada e não pode ser trocada.";
+
+test("o que o servidor diz das rodadas é conferido campo a campo", () => {
+  assert.deepEqual(roundState(afterFirst()), {
+    round: 1,
+    progress: { answeredRounds: 1, seenPairs: 30, totalPairs: 190, canContinue: true },
+    lastAnswered: { round: 1, response: ANSWER },
+    open: false,
+  });
+  assert.deepEqual(roundState(openSecond()), {
+    round: 2,
+    progress: { answeredRounds: 1, seenPairs: 30, totalPairs: 190, canContinue: false },
+    lastAnswered: { round: 1, response: EARLIER },
+    open: true,
+  });
+  // Ninguém respondeu ainda: rodada 1 aberta, sem última respondida.
+  assert.deepEqual(roundState(openSecond({ round: 1, lastAnswered: null, progress: { answeredRounds: 0, seenPairs: 0, totalPairs: 190, canContinue: false } })), {
+    round: 1,
+    progress: { answeredRounds: 0, seenPairs: 0, totalPairs: 190, canContinue: false },
+    lastAnswered: null,
+    open: true,
+  });
+  // Só o valor verdadeiro libera outra rodada.
+  for (const value of ["true", 1, {}, null, undefined]) {
+    assert.equal(roundState(afterFirst({ progress: { answeredRounds: 1, seenPairs: 30, totalPairs: 190, canContinue: value } })).progress.canContinue, false, JSON.stringify(value));
+  }
+  // Progresso torto vale como não dito; a rodada continua valendo.
+  for (const progress of [null, undefined, "x", 7, {}, { answeredRounds: 1, seenPairs: 30 }, { answeredRounds: -1, seenPairs: 30, totalPairs: 190 }, { answeredRounds: 1, seenPairs: 1.5, totalPairs: 190 }, { answeredRounds: 1, seenPairs: 30, totalPairs: 0 }, { answeredRounds: "1", seenPairs: 30, totalPairs: 190 }]) {
+    const state = roundState(afterFirst({ progress }));
+    assert.equal(state.progress, null, JSON.stringify(progress));
+    assert.equal(state.round, 1);
+  }
+  // Mais confrontos vistos do que existem não passa do total.
+  assert.equal(roundState(afterFirst({ progress: { answeredRounds: 9, seenPairs: 500, totalPairs: 190, canContinue: false } })).progress.seenPairs, 190);
+  for (const lastAnswered of [null, undefined, "x", {}, { round: 0, response: ANSWER }, { round: 1 }, { round: 1, response: "x" }, { round: "1", response: ANSWER }]) {
+    assert.equal(roundState(afterFirst({ lastAnswered })).lastAnswered, null, JSON.stringify(lastAnswered));
+  }
+});
+
+test("um servidor de antes das rodadas não diz nada delas, e a tela fica como era", () => {
+  const legacy = { survey: { id: PHOTO_SURVEY_ID, status: "open" }, draw: { groups: GROUPS }, response: ANSWER };
+  assert.equal(roundState(legacy), NO_ROUNDS);
+  assert.deepEqual(NO_ROUNDS, { round: 0, progress: null, lastAnswered: null, open: false });
+  assert.ok(Object.isFrozen(NO_ROUNDS));
+  // Sem número de rodada, o resto não vale: progresso solto não liga o botão.
+  for (const round of [undefined, null, 0, -1, 1.5, "1", "2", true]) {
+    assert.equal(roundState(afterFirst({ round })), NO_ROUNDS, JSON.stringify(round));
+  }
+  for (const empty of [null, undefined, {}, "x", 7]) assert.equal(roundState(empty), NO_ROUNDS);
+  assert.equal(nextRoundNumber(NO_ROUNDS, "open"), 0);
+  assert.deepEqual(registeredCopy(NO_ROUNDS, "open"), { hint: LEGACY_HINT, line: "", next: 0 });
+  assert.deepEqual(registeredCopy(roundState(legacy), "open"), { hint: LEGACY_HINT, line: "", next: 0 });
+  // E a resposta vai com o corpo de sempre, sem `round`.
+  const confirmed = chooseChampion(atFinal(), "c3");
+  assert.deepEqual(responseBody(confirmed, roundState(legacy).round), { answerId: UUID, pickIds: ["a1", "b2", "c3", "d4"], championId: "c3" });
+});
+
+test("\"Mais uma rodada\" só aparece com a pesquisa aberta e rodada por jogar", () => {
+  // Respondida a última rodada, com confronto por ver: a próxima é a seguinte.
+  assert.equal(nextRoundNumber(roundState(afterFirst()), "open"), 2);
+  assert.equal(nextRoundNumber(roundState(afterFirst({ round: 4, progress: { answeredRounds: 4, seenPairs: 110, totalPairs: 190, canContinue: true } })), "open"), 5);
+  // Fora da janela não há rodada nova, diga o servidor o que disser.
+  for (const status of ["closed", "scheduled", "", undefined, null, "constructor"]) {
+    assert.equal(nextRoundNumber(roundState(afterFirst()), status), 0, String(status));
+  }
+  // O servidor disse que não cabe outra.
+  assert.equal(nextRoundNumber(roundState(afterFirst({ progress: { answeredRounds: 1, seenPairs: 30, totalPairs: 190, canContinue: false } })), "open"), 0);
+  // Vistos todos os confrontos, não cabe outra, mesmo com `canContinue` verdadeiro por engano.
+  assert.equal(nextRoundNumber(roundState(afterFirst({ round: 10, progress: { answeredRounds: 10, seenPairs: 190, totalPairs: 190, canContinue: false } })), "open"), 0);
+  assert.equal(nextRoundNumber(roundState(afterFirst({ round: 10, progress: { answeredRounds: 10, seenPairs: 190, totalPairs: 190, canContinue: true } })), "open"), 0);
+  // Uma rodada nova já emitida e ainda sem resposta é a que continua.
+  assert.equal(nextRoundNumber(roundState(openSecond()), "open"), 2);
+  assert.equal(nextRoundNumber(roundState(openSecond({ round: 7 })), "open"), 7);
+  assert.equal(nextRoundNumber(roundState(openSecond()), "closed"), 0);
+  // A primeira rodada emitida e sem resposta não é "mais uma": a pessoa ainda não respondeu nenhuma.
+  assert.equal(nextRoundNumber(roundState(openSecond({ round: 1, lastAnswered: null })), "open"), 0);
+  // Sem progresso (a recusa de resposta repetida não o traz), sem botão.
+  assert.equal(nextRoundNumber({ ...NO_ROUNDS, round: 2 }, "open"), 0);
+  for (const empty of [null, undefined, {}]) assert.equal(nextRoundNumber(empty, "open"), 0);
+});
+
+test("a resposta registrada conta os confrontos com os números do servidor", () => {
+  assert.deepEqual(registeredCopy(roundState(afterFirst()), "open"), {
+    hint: ROUND_HINT,
+    line: "Você já viu 30 de 190 confrontos.",
+    next: 2,
+  });
+  // Os números são os que o servidor mandou: outra pesquisa, outro total.
+  assert.equal(
+    registeredCopy(roundState(afterFirst({ round: 3, progress: { answeredRounds: 3, seenPairs: 83, totalPairs: 120, canContinue: true } })), "open").line,
+    "Você já viu 83 de 120 confrontos.",
+  );
+  // Vistos todos: a tela diz isso, sem botão.
+  assert.deepEqual(registeredCopy(roundState(afterFirst({ round: 10, progress: { answeredRounds: 10, seenPairs: 190, totalPairs: 190, canContinue: false } })), "open"), {
+    hint: ROUND_HINT,
+    line: "Você viu todos os confrontos desta pesquisa.",
+    next: 0,
+  });
+  // Pesquisa fora da janela: o texto de antes das rodadas, sem contagem e sem botão,
+  // tenha a pessoa visto tudo ou não.
+  for (const status of ["closed", "scheduled", undefined]) {
+    assert.deepEqual(registeredCopy(roundState(afterFirst()), status), { hint: LEGACY_HINT, line: "", next: 0 }, String(status));
+    assert.deepEqual(registeredCopy(roundState(afterFirst({ progress: { answeredRounds: 10, seenPairs: 190, totalPairs: 190, canContinue: false } })), status), { hint: LEGACY_HINT, line: "", next: 0 });
+  }
+  // Aberta, sem rodada por jogar e sem ter visto tudo (o servidor não deixou continuar): o texto de sempre.
+  assert.deepEqual(registeredCopy(roundState(afterFirst({ progress: { answeredRounds: 1, seenPairs: 30, totalPairs: 190, canContinue: false } })), "open"), { hint: LEGACY_HINT, line: "", next: 0 });
+  // Sem progresso, o texto de sempre.
+  assert.deepEqual(registeredCopy({ ...NO_ROUNDS, round: 2 }, "open"), { hint: LEGACY_HINT, line: "", next: 0 });
+});
+
+test("o destaque da capa: pela metade, depois sem resposta, depois com rodada por jogar", () => {
+  const open = PHOTO_SURVEYS.map((survey) => ({ id: survey.id, status: "open" }));
+  const all = PHOTO_SURVEYS.map((survey) => survey.id);
+  const more = roundState(afterFirst());
+  const done = roundState(afterFirst({ round: 10, progress: { answeredRounds: 10, seenPairs: 190, totalPairs: 190, canContinue: false } }));
+  const NONE = { id: "", mode: "", round: 0 };
+  // Sem nada respondido, a primeira aberta; não importa o que o servidor diga das outras.
+  assert.deepEqual(coverFeature(open), { id: PHOTO_SURVEY_ID, mode: "start", round: 0 });
+  assert.deepEqual(coverFeature(open, { answeredIds: [PHOTO_SURVEY_ID], rounds: new Map([[PHOTO_SURVEY_ID, more]]) }), { id: SECOND_SURVEY_ID, mode: "start", round: 0 }, "uma pesquisa por responder vem antes de outra rodada da já respondida");
+  // A que ficou pela metade vem antes de todas, inclusive de uma ainda sem resposta.
+  assert.deepEqual(coverFeature(open, { pendingId: CLOTHES_SURVEY_ID, answeredIds: [PHOTO_SURVEY_ID] }), { id: CLOTHES_SURVEY_ID, mode: "resume", round: 0 });
+  // Uma rodada nova pela metade numa pesquisa já respondida também.
+  assert.deepEqual(coverFeature(open, { pendingId: PHOTO_SURVEY_ID, answeredIds: all, rounds: new Map([[SECOND_SURVEY_ID, more]]) }), { id: PHOTO_SURVEY_ID, mode: "resume", round: 0 });
+  // Pela metade e fechada não prende a capa.
+  const secondClosed = open.map((view) => (view.id === SECOND_SURVEY_ID ? { ...view, status: "closed" } : view));
+  assert.deepEqual(coverFeature(secondClosed, { pendingId: SECOND_SURVEY_ID }), { id: PHOTO_SURVEY_ID, mode: "start", round: 0 });
+  // Respondidas todas: a primeira, na ordem da capa, em que ainda há rodada por jogar.
+  assert.deepEqual(coverFeature(open, { answeredIds: all, rounds: new Map(all.map((id) => [id, more])) }), { id: PHOTO_SURVEY_ID, mode: "more", round: 2 });
+  assert.deepEqual(
+    coverFeature(open, { answeredIds: all, rounds: new Map([[PHOTO_SURVEY_ID, done], [SECOND_SURVEY_ID, done], [CELEBRITY_SURVEY_ID, roundState(afterFirst({ round: 3, progress: { answeredRounds: 3, seenPairs: 80, totalPairs: 190, canContinue: true } }))], [CLOTHES_SURVEY_ID, more]]) }),
+    { id: CELEBRITY_SURVEY_ID, mode: "more", round: 4 },
+  );
+  // Uma rodada emitida e não tocada conta como rodada por jogar, com o número dela.
+  assert.deepEqual(coverFeature(open, { answeredIds: all, rounds: new Map([[SECOND_SURVEY_ID, roundState(openSecond({ round: 5 }))]]) }), { id: SECOND_SURVEY_ID, mode: "more", round: 5 });
+  // Fechada não entra, mesmo com confronto por ver.
+  assert.deepEqual(coverFeature(secondClosed, { answeredIds: all, rounds: new Map([[SECOND_SURVEY_ID, more], [CLOTHES_SURVEY_ID, more]]) }), { id: CLOTHES_SURVEY_ID, mode: "more", round: 2 });
+  // Vistos todos os confrontos de todas, ou sem notícia do servidor (servidor antigo, pedido que falhou): nenhuma.
+  assert.deepEqual(coverFeature(open, { answeredIds: all, rounds: new Map(all.map((id) => [id, done])) }), NONE);
+  assert.deepEqual(coverFeature(open, { answeredIds: all, rounds: new Map(all.map((id) => [id, NO_ROUNDS])) }), NONE);
+  assert.deepEqual(coverFeature(open, { answeredIds: all }), NONE);
+  assert.deepEqual(coverFeature([], {}), NONE);
+  assert.deepEqual(coverFeature([{ id: "a", status: "closed" }]), NONE);
+});
+
+test("a resposta leva a rodada que o servidor numerou no sorteio", () => {
+  const confirmed = chooseChampion(atFinal(), "c3");
+  const base = { answerId: UUID, pickIds: ["a1", "b2", "c3", "d4"], championId: "c3" };
+  assert.deepEqual(responseBody(confirmed, 1), { ...base, round: 1 }, "a primeira rodada também vai numerada");
+  assert.deepEqual(responseBody(confirmed, 2), { ...base, round: 2 });
+  assert.deepEqual(responseBody(confirmed, 11), { ...base, round: 11 });
+  // Sem número do servidor, o corpo de sempre.
+  assert.deepEqual(responseBody(confirmed), base);
+  for (const round of [0, -1, 1.5, "2", null, undefined, Number.NaN]) assert.deepEqual(responseBody(confirmed, round), base, String(round));
+  // Faltando escolha não há corpo, com rodada ou sem.
+  assert.equal(responseBody(fresh(), 2), null);
+  assert.equal(responseBody(atFinal(), 2), null);
+});
+
+test("o que se guarda de uma rodada não passa para outra", () => {
+  const next = "0b0f6f0a-1111-4222-8333-444455556666";
+  // A primeira rodada é guardada como antes das rodadas: sem número.
+  assert.deepEqual(freshProgress(GROUPS, uuid, 1), fresh());
+  assert.equal(Object.hasOwn(freshProgress(GROUPS, uuid, 1), "round"), false);
+  for (const round of [0, undefined, null, "2", 1.5, -3]) assert.equal(Object.hasOwn(freshProgress(GROUPS, uuid, round), "round"), false, String(round));
+  // Da segunda em diante o número vai junto, e as escolhas o mantêm.
+  const second = freshProgress(GROUPS, uuid, 2);
+  assert.deepEqual(second, { ...fresh(), round: 2 });
+  const played = chooseChampion(play(second, "a1", "b2", "c3", "d4"), "c3");
+  assert.equal(played.round, 2);
+  assert.equal(goBack(played).round, 2);
+  const saved = JSON.parse(JSON.stringify(played));
+  // O mesmo sorteio, na mesma rodada: volta tudo, com o mesmo recibo.
+  assert.deepEqual(restoreProgress(saved, GROUPS, () => next, 2), played);
+  // Os mesmos grupos em outra rodada não trazem as escolhas nem o recibo.
+  assert.deepEqual(restoreProgress(saved, GROUPS, () => next, 3), { ...freshProgress(GROUPS, () => next), round: 3 });
+  assert.deepEqual(restoreProgress(saved, GROUPS, () => next, 1), freshProgress(GROUPS, () => next));
+  assert.deepEqual(restoreProgress(saved, GROUPS, () => next), freshProgress(GROUPS, () => next), "sem rodada dita, vale a primeira");
+  // O que ficou da primeira rodada não entra na segunda.
+  const first = JSON.parse(JSON.stringify(chooseChampion(atFinal(), "c3")));
+  assert.deepEqual(restoreProgress(first, GROUPS, () => next, 2), { ...freshProgress(GROUPS, () => next), round: 2 });
+  assert.deepEqual(restoreProgress(first, GROUPS, () => next, 1), chooseChampion(atFinal(), "c3"), "e continua voltando na primeira");
+  // Outro sorteio, na mesma rodada, começa do zero, como sempre.
+  const other = [GROUPS[3], GROUPS[2], GROUPS[1], GROUPS[0]];
+  assert.deepEqual(restoreProgress(saved, other, () => next, 2), { ...freshProgress(other, () => next), round: 2 });
+  // Número de rodada adulterado no que foi guardado não vale como a rodada pedida.
+  for (const round of ["2", 2.5, null, 0]) {
+    assert.deepEqual(restoreProgress({ ...saved, round }, GROUPS, () => next, 2), { ...freshProgress(GROUPS, () => next), round: 2 }, String(round));
+  }
+});
+
+test("uma rodada nova pela metade conta como pesquisa em andamento, e outra aba só confirma quando não sobra escolha guardada", () => {
+  const tag = identityTag("pms_ana");
+  const second = play(freshProgress(GROUPS, uuid, 2), "a1");
+  // Respondida a primeira rodada e com escolhas da segunda: está em andamento, e continua contando como respondida.
+  let text = savedProgressText(null, PHOTO_SURVEY_ID, { identity: tag, progress: second, answered: true });
+  assert.equal(inProgressSurveyId(text, tag), PHOTO_SURVEY_ID);
+  assert.deepEqual(answeredSurveyIds(text, tag), [PHOTO_SURVEY_ID]);
+  assert.equal(inProgressSurveyId(text, identityTag("pms_bia")), "", "de outra identidade, não");
+  // A segunda rodada emitida e não tocada não puxa a pessoa de volta.
+  text = savedProgressText(null, PHOTO_SURVEY_ID, { identity: tag, progress: freshProgress(GROUPS, uuid, 2), answered: true });
+  assert.equal(inProgressSurveyId(text, tag), "");
+  // Escolhas sem número de rodada num registro respondido são resto da primeira rodada: não contam.
+  text = savedProgressText(null, PHOTO_SURVEY_ID, { identity: tag, progress: play(fresh(), "a1"), answered: true });
+  assert.equal(inProgressSurveyId(text, tag), "");
+
+  // Outra aba confirmou: o registro diz que respondeu e não guarda mais escolha.
+  assert.equal(answeredElsewhere({ identity: tag, progress: null, answered: true }), true);
+  // Rodada nova em andamento: já respondeu antes, mas as escolhas estão lá. Ninguém confirmou nada.
+  assert.equal(answeredElsewhere({ identity: tag, progress: second, answered: true }), false);
+  assert.equal(answeredElsewhere({ identity: tag, progress: play(fresh(), "a1"), answered: false }), false);
+  assert.equal(answeredElsewhere({ identity: tag, progress: null, answered: false }), false);
+  for (const empty of [null, undefined, {}]) assert.equal(answeredElsewhere(empty), false);
 });

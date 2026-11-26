@@ -389,6 +389,20 @@ button.ps-card[aria-pressed="true"]::after {
   }
 }
 
+/* Rodadas (ICM 75, #350). Com "Mais uma rodada" a resposta registrada tem
+   três botões: o principal em cima e, abaixo, os outros dois lado a lado, com
+   a altura de sempre. */
+.ps-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Sem carta para compartilhar sobra um botão, que ocupa a largura toda. */
+.ps-pair > :only-child {
+  grid-column: 1 / -1;
+}
+
 /* Rodapé e botões --------------------------------------------------------- */
 
 .ps-foot {
@@ -600,6 +614,22 @@ button.ps-card[aria-pressed="true"]::after {
 
   .ps-row {
     grid-template-columns: repeat(3, 44px);
+  }
+
+  /* Com os três botões da resposta registrada, a barra de etapas, que ali já
+     está toda preenchida, cede a altura, e os botões ficam mais juntos: a
+     escolhida e as finalistas continuam à vista. */
+  .ps-shell:has(.ps-stack--more) .ps-bar {
+    display: none;
+  }
+
+  .ps-stack--more {
+    gap: 8px;
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  }
+
+  .ps-stack--more .ps-pair {
+    gap: 8px;
   }
 }
 

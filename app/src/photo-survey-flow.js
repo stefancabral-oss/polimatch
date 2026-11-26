@@ -1,7 +1,8 @@
 // Pesquisa por foto (ICM 68, #324): o caminho da pessoa dentro da pesquisa.
 // Funções puras. A página (photo-survey-page.js) cuida da tela, da rede e do
 // armazenamento; aqui ficam as regras de escolher, voltar, trocar e retomar,
-// e, desde a ICM 70 (#334), as da capa com várias pesquisas.
+// desde a ICM 70 (#334) as da capa com várias pesquisas e, desde a ICM 75
+// (#350), as das rodadas.
 
 import { PHOTO_SURVEYS } from "../../shared/photo-survey.js";
 
@@ -56,14 +57,22 @@ export function sameGroups(left, right) {
       && group.every((id, position) => id === right[index][position]));
 }
 
+// A rodada de um progresso: da segunda em diante o número vai guardado junto
+// das escolhas; sem ele, é a primeira. Assim o que se guarda da primeira
+// rodada é o mesmo de antes das rodadas (ICM 75, #350).
+const laterRound = (round) => (Number.isInteger(round) && round >= 2 ? round : 1);
+const roundMark = (round) => (laterRound(round) >= 2 ? { round: laterRound(round) } : {});
+
 // `step`: 0 até n-1 são as telas de voto, n é a final e n+1 a confirmação.
-export function freshProgress(groups, uuid = newUuid) {
+// `round` é a rodada a que o sorteio pertence.
+export function freshProgress(groups, uuid = newUuid, round = 1) {
   return {
     groups: groups.map((group) => [...group]),
     picks: groups.map(() => null),
     championId: null,
     answerId: uuid(),
     step: 0,
+    ...roundMark(round),
   };
 }
 
@@ -117,18 +126,27 @@ export function goBack(progress) {
   return progress.step > 0 ? { ...progress, step: progress.step - 1 } : progress;
 }
 
-/** O corpo da resposta, ou null enquanto faltar escolha. */
-export function responseBody(progress) {
+/**
+ * O corpo da resposta, ou null enquanto faltar escolha. `round` é o número que
+ * o servidor deu à rodada no sorteio: vai junto sempre que ele disse um. Um
+ * servidor de antes das rodadas não diz, e recebe o corpo de sempre.
+ */
+export function responseBody(progress, round = 0) {
   if (progress.picks.includes(null) || !progress.picks.includes(progress.championId)) return null;
-  return { answerId: progress.answerId, pickIds: [...progress.picks], championId: progress.championId };
+  const body = { answerId: progress.answerId, pickIds: [...progress.picks], championId: progress.championId };
+  return Number.isInteger(round) && round >= 1 ? { ...body, round } : body;
 }
 
 /**
- * Retoma o que estava salvo no aparelho quando o sorteio é o mesmo. O que foi
- * salvo é texto que qualquer um edita: cada campo é conferido contra o sorteio.
+ * Retoma o que estava salvo no aparelho quando o sorteio é o mesmo, da mesma
+ * rodada. O que foi salvo é texto que qualquer um edita: cada campo é
+ * conferido contra o sorteio. As escolhas de uma rodada não passam para outra,
+ * nem o recibo.
  */
-export function restoreProgress(saved, groups, uuid = newUuid) {
-  if (!saved || typeof saved !== "object" || !sameGroups(saved.groups, groups)) return freshProgress(groups, uuid);
+export function restoreProgress(saved, groups, uuid = newUuid, round = 1) {
+  if (!saved || typeof saved !== "object" || !sameGroups(saved.groups, groups) || laterRound(saved.round) !== laterRound(round)) {
+    return freshProgress(groups, uuid, round);
+  }
   const screens = groups.length;
   const savedPicks = Array.isArray(saved.picks) ? saved.picks : [];
   const picks = groups.map((group, index) => (group.includes(savedPicks[index]) ? savedPicks[index] : null));
@@ -144,6 +162,7 @@ export function restoreProgress(saved, groups, uuid = newUuid) {
     championId,
     answerId: typeof saved.answerId === "string" && UUID_PATTERN.test(saved.answerId) ? saved.answerId : uuid(),
     step,
+    ...roundMark(round),
   };
 }
 
@@ -173,7 +192,9 @@ function parseSaved(text) {
 /**
  * O registro de uma pesquisa no armazenamento, ou null. Depois de registrada,
  * o aparelho guarda só que a pessoa respondeu (`answered`), nunca a escolha:
- * quem mostra a escolha é o servidor.
+ * quem mostra a escolha é o servidor. Numa rodada nova em andamento o registro
+ * tem as duas coisas: `answered`, das rodadas anteriores, e as escolhas da
+ * rodada que ainda não foi confirmada.
  */
 export function readSavedProgress(text, surveyId) {
   const record = parseSaved(text)[surveyId];
@@ -211,17 +232,28 @@ export function answeredSurveyIds(text, tag, surveys = PHOTO_SURVEYS) {
 }
 
 /**
+ * Outra aba registrou a resposta da rodada que estava em andamento: o registro
+ * diz que a pessoa respondeu e não guarda mais escolha pela metade. Durante
+ * uma rodada nova `answered` já é verdadeiro, e as escolhas continuam lá.
+ */
+export function answeredElsewhere(record) {
+  return Boolean(record?.answered && !record.progress);
+}
+
+/**
  * A pesquisa que esta identidade deixou pela metade neste aparelho, ou "".
  * Só conta quem já escolheu ao menos uma carta: um sorteio emitido e não
- * tocado não tira a pessoa da capa.
+ * tocado não tira a pessoa da capa. Numa pesquisa já respondida, só contam as
+ * escolhas de uma rodada nova (da segunda em diante).
  */
 export function inProgressSurveyId(text, tag, surveys = PHOTO_SURVEYS) {
-  const pending = savedRecords(text, tag, surveys).find(({ record }) => !record.answered
-    && Array.isArray(record.progress?.picks) && record.progress.picks.some(Boolean));
+  const pending = savedRecords(text, tag, surveys).find(({ record }) => Array.isArray(record.progress?.picks)
+    && record.progress.picks.some(Boolean)
+    && (!record.answered || laterRound(record.progress.round) >= 2));
   return pending ? pending.id : "";
 }
 
-/** O destaque da capa: a primeira pesquisa aberta que a pessoa ainda não respondeu. */
+/** A primeira pesquisa aberta que a pessoa ainda não respondeu, ou "". */
 export function featuredSurveyId(views, answeredIds) {
   const featured = views.find((view) => view.status === "open" && !answeredIds.includes(view.id));
   return featured ? featured.id : "";
@@ -231,4 +263,96 @@ export function featuredSurveyId(views, answeredIds) {
 export function nextSurveyId(currentId, answeredIds, surveys = PHOTO_SURVEYS) {
   const next = surveys.find((survey) => survey.id !== currentId && !answeredIds.includes(survey.id));
   return next ? next.id : "";
+}
+
+// Rodadas (ICM 75, #350) ----------------------------------------------------
+
+const isCount = (value) => Number.isInteger(value) && value >= 0;
+
+/** O estado de quem não tem notícia de rodadas: é o de um servidor de antes delas. */
+export const NO_ROUNDS = Object.freeze({ round: 0, progress: null, lastAnswered: null, open: false });
+
+/**
+ * O que o servidor disse sobre as rodadas, no sorteio ou na resposta: o número
+ * da rodada devolvida (`round`), o progresso da pessoa (`progress`), a última
+ * rodada que ela respondeu (`lastAnswered`) e se a rodada devolvida ainda está
+ * sem resposta (`open`). Cada campo é conferido; o que vier torto vale como
+ * não dito. Um servidor de antes das rodadas não manda nenhum deles: aí o
+ * resultado é NO_ROUNDS e as telas ficam como eram.
+ */
+export function roundState(result) {
+  const round = Number.isInteger(result?.round) && result.round >= 1 ? result.round : 0;
+  if (!round) return NO_ROUNDS;
+  const raw = result.progress;
+  const progress = raw && typeof raw === "object" && isCount(raw.answeredRounds) && isCount(raw.seenPairs)
+    && Number.isInteger(raw.totalPairs) && raw.totalPairs > 0
+    ? {
+      answeredRounds: raw.answeredRounds,
+      seenPairs: Math.min(raw.seenPairs, raw.totalPairs),
+      totalPairs: raw.totalPairs,
+      canContinue: raw.canContinue === true,
+    }
+    : null;
+  const last = result.lastAnswered;
+  const lastAnswered = last && typeof last === "object" && Number.isInteger(last.round) && last.round >= 1
+    && last.response && typeof last.response === "object"
+    ? { round: last.round, response: last.response }
+    : null;
+  return { round, progress, lastAnswered, open: !result.response };
+}
+
+/**
+ * A rodada que a pessoa pode jogar agora nesta pesquisa, ou 0 quando não há
+ * uma. Há quando a pesquisa está aberta (`status`) e o servidor disse que cabe
+ * outra rodada, ou quando ele já emitiu uma rodada nova que ainda não tem
+ * resposta. É o que decide se "Mais uma rodada" aparece, na resposta
+ * registrada e na capa.
+ */
+export function nextRoundNumber(state, status) {
+  const progress = state?.progress;
+  if (status !== "open" || !progress) return 0;
+  if (progress.canContinue && progress.seenPairs < progress.totalPairs) return progress.answeredRounds + 1;
+  return state.open && state.lastAnswered ? state.round : 0;
+}
+
+const REGISTERED_HINT = "Obrigado por participar. Sua resposta está registrada e não pode ser trocada nesta pesquisa.";
+const ROUND_REGISTERED_HINT = "A escolha desta rodada está registrada e não pode ser trocada.";
+
+/**
+ * Os textos da resposta registrada: o texto de apoio (`hint`), a linha dos
+ * confrontos (`line`) e a rodada que "Mais uma rodada" abre (`next`, 0 sem o
+ * botão). Com rodada por jogar, a linha conta quantos confrontos a pessoa já
+ * viu, com os números do servidor; vistos todos, diz isso. Sem notícia de
+ * rodadas, ou com a pesquisa fora da janela, o texto é o de antes das
+ * rodadas, sem linha e sem botão.
+ */
+export function registeredCopy(state, status) {
+  const progress = state?.progress;
+  const next = nextRoundNumber(state, status);
+  const allSeen = Boolean(progress) && progress.seenPairs >= progress.totalPairs;
+  if (!progress || status !== "open" || (!next && !allSeen)) return { hint: REGISTERED_HINT, line: "", next: 0 };
+  return {
+    hint: ROUND_REGISTERED_HINT,
+    line: allSeen ? "Você viu todos os confrontos desta pesquisa." : `Você já viu ${progress.seenPairs} de ${progress.totalPairs} confrontos.`,
+    next: allSeen ? 0 : next,
+  };
+}
+
+/**
+ * O destaque da capa, nesta ordem: a pesquisa que ficou pela metade neste
+ * aparelho (`resume`); a primeira aberta que a pessoa ainda não respondeu
+ * (`start`); a primeira em que ainda há rodada por jogar (`more`, com o número
+ * da rodada); nenhuma. `rounds` é o que o servidor disse de cada pesquisa, por
+ * código (um Map de roundState): a capa só o tem para as pesquisas que este
+ * aparelho sabe respondidas.
+ */
+export function coverFeature(views, { pendingId = "", answeredIds = [], rounds = new Map() } = {}) {
+  if (pendingId && views.some((view) => view.id === pendingId && view.status === "open")) return { id: pendingId, mode: "resume", round: 0 };
+  const unanswered = featuredSurveyId(views, answeredIds);
+  if (unanswered) return { id: unanswered, mode: "start", round: 0 };
+  for (const view of views) {
+    const round = nextRoundNumber(rounds.get(view.id), view.status);
+    if (round) return { id: view.id, mode: "more", round };
+  }
+  return { id: "", mode: "", round: 0 };
 }
