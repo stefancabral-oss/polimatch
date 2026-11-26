@@ -145,7 +145,7 @@
       "copiesInContainer": 7
     },
     "api": {
-      "commit": "e0914ae",
+      "commit": "e0914ae, pelo título do commit no painel (o hash não apareceu) e pela migração nova no banco",
       "seconds": 27,
       "tablesAfter": 33,
       "newTables": [
@@ -157,10 +157,11 @@
       "otherCountsChanged": false
     },
     "app": {
-      "commit": "e0914ae",
+      "commit": "e0914ae4a91eeb7b2e12f5d77080f2defad73fe1, mostrado no painel",
       "seconds": 29,
       "builtAt": "2026-11-26T22:26:52.914Z",
-      "mainScript": "main-C1UIVA4d.js"
+      "mainScript": "main-C1UIVA4d.js",
+      "versionJsonSha": "unknown (não identifica o commit, #287)"
     },
     "readFromOutside": [
       "version.json",
@@ -171,7 +172,18 @@
       "capa",
       "/creditos.html"
     ],
-    "watch": {"from": "22:23Z, antes do deploy da API", "to": "22:48:55Z", "reads": 1626, "failures": 0, "urls": ["/api/health", "capa", "/api/photo-surveys/politica-2026-01"]},
+    "watch": {
+      "from": "22:23:41Z, depois da cópia do banco e da consulta ao CI, antes do deploy da API",
+      "to": "22:48:55Z",
+      "reads": 1626,
+      "failures": 0,
+      "failureMeans": "código diferente de 200, inclusive tempo esgotado ou erro de rede",
+      "urls": [
+        "/api/health",
+        "capa",
+        "/api/photo-surveys/politica-2026-01"
+      ]
+    },
     "notDone": [
       "navegador contra a produção",
       "pedido de escrita",

@@ -262,23 +262,30 @@ Começou depois de o CI da `main` terminar.
    formato próprio do PostgreSQL, 612.693 bytes, e a contagem de linhas das
    31 tabelas, num arquivo à parte, também no contêiner. Com ela são sete
    cópias guardadas no contêiner.
-2. **API** no commit `e0914ae`. O painel mostrou o deploy concluído em
-   27 s. Depois dele, uma nova contagem no mesmo terminal: 33 tabelas.
+2. **API**, no commit do merge: o painel mostrou o deploy concluído em
+   27 s, com o título do commit `e0914ae` ("[ICM 75] Rodadas novas enquanto
+   houver confrontos por ver (#352)"); o hash não apareceu na tela. A
+   migração nova no banco confirma que a API publicada é a deste commit. Depois dele, uma nova contagem no mesmo terminal: 33 tabelas.
    Entraram `photo_survey_round_draws` e `photo_survey_round_responses`,
    vazias; `schema_migrations` passou de 5 para 6 linhas, com
    `2026-11-26-photo-survey-rounds-v1`. Nenhuma outra contagem mudou.
-3. **App** no mesmo commit. O painel mostrou o deploy concluído em 29 s.
+3. **App** no mesmo commit. O painel mostrou o deploy concluído em 29 s,
+   com o hash `e0914ae4a91eeb7b2e12f5d77080f2defad73fe1`.
 
 Lido de fora, só por GET, depois dos dois deploys:
 
-- `version.json` com `builtAt` `2026-11-26T22:26:52.914Z`.
+- `version.json` com `builtAt` `2026-11-26T22:26:52.914Z`. Ele traz `sha`
+  `unknown`: não identifica o commit (#287); o commit publicado se lê no
+  painel.
 - O script principal publicado (`main-C1UIVA4d.js`) traz "Mais uma rodada"
   e não traz "Um CPF, um voto". "Como funciona" traz a frase nova do item 5.
 - `/api/health`, as quatro pesquisas, a capa e `/creditos.html` respondem
   200.
 - Um roteiro do agente leu `/api/health`, a capa e uma pesquisa a cada
-  poucos segundos, de pouco antes do deploy da API (22:23 UTC) até
-  22:48:55 UTC: 1.626 leituras, nenhuma com resposta diferente de 200.
+  poucos segundos, de 22:23:41 UTC (depois da cópia do banco e da consulta
+  ao CI, antes do deploy da API) até 22:48:55 UTC: 1.626 leituras e nenhuma
+  falha. Pelo roteiro, falha é qualquer leitura cujo código não seja 200,
+  inclusive tempo esgotado ou erro de rede.
 
 O que o agente não fez nem viu em produção:
 
@@ -294,7 +301,7 @@ fechada. O registro na issue #350 é o comentário da publicação.
 ### Voltar atrás
 
 Publicar de novo o commit anterior (`835614a`, que tem o mesmo código de
-`6e38d32`) nos dois serviços, app primeiro. As tabelas novas ficam no banco,
+`6e38d32`, o último publicado antes deste) nos dois serviços, app primeiro. As tabelas novas ficam no banco,
 sem uso; nenhuma linha antiga é alterada. Rodadas já respondidas ficam
 gravadas e deixam de ser mostradas.
 
