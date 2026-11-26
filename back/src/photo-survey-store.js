@@ -28,8 +28,9 @@ import { requireCpfRegistration } from "./registration-store.js";
 //   regra de identidade: o jogador mais os anônimos ligados a ele no login
 //   Google, valendo a resposta mais antiga.
 // - As rodadas 2 em diante ficam em photo_survey_round_draws e
-//   photo_survey_round_responses e pertencem só ao jogador da conta
-//   cadastrada: não são procuradas nos jogadores ligados a ele.
+//   photo_survey_round_responses e seguem a mesma regra de identidade: são
+//   procuradas no jogador e nos ligados a ele, e a rodada nova é gravada no
+//   nome do jogador ativo.
 // - Nenhuma rota soma respostas. O progresso e a última rodada respondida
 //   devolvidos são os da própria pessoa.
 
@@ -222,21 +223,29 @@ export function photoSurveyStore({
 
   // As rodadas da pessoa na pesquisa, em ordem: o número, as cartas do
   // sorteio e a resposta gravada, ou null enquanto a rodada está aberta.
-  // A rodada 1 respondida usa as cartas da resposta da identidade; as rodadas
-  // seguintes são só as do próprio jogador.
+  // A rodada 1 respondida usa as cartas da resposta da identidade. As rodadas
+  // seguintes seguem a mesma identidade: o jogador mais os incorporados a ele.
+  // Quando dois jogadores da mesma identidade têm a mesma rodada, vale a
+  // respondida mais antiga e, sem resposta, o sorteio mais antigo. `ownerId`
+  // é o jogador em cujo nome o sorteio da rodada foi gravado: a resposta dela
+  // é gravada no mesmo nome.
   async function personRounds(client, survey, playerId) {
     const first = await identityResponse(client, survey.id, playerId);
     const firstShown = first ? first.shown_ids : await playerDraw(client, survey.id, playerId);
-    const rounds = firstShown ? [{ round: 1, shownIds: firstShown, response: first }] : [];
-    const later = await client.query(`SELECT d.round, d.shown_ids AS draw_ids,
+    const rounds = firstShown ? [{ round: 1, shownIds: firstShown, response: first, ownerId: playerId }] : [];
+    const later = await client.query(`SELECT d.round, d.player_id AS owner_id, d.shown_ids AS draw_ids,
         r.answer_id, r.shown_ids, r.pick_ids, r.champion_id, r.responded_at
       FROM photo_survey_round_draws d
       LEFT JOIN photo_survey_round_responses r
         ON r.survey_id = d.survey_id AND r.player_id = d.player_id AND r.round = d.round
-      WHERE d.survey_id = $1 AND d.player_id = $2
-      ORDER BY d.round`, [survey.id, playerId]);
+      WHERE d.survey_id = $1
+        AND d.player_id IN (SELECT $2::uuid UNION ALL SELECT source_player_id FROM player_history_links WHERE player_id = $2)
+      ORDER BY d.round, (r.answer_id IS NULL), r.responded_at, d.issued_at, d.player_id`, [survey.id, playerId]);
     for (const row of later.rows) {
-      rounds.push({ round: Number(row.round), shownIds: row.draw_ids, response: row.answer_id ? row : null });
+      const round = Number(row.round);
+      // A ordem da consulta põe primeiro a linha que vale em cada rodada.
+      if (rounds.some((entry) => entry.round === round)) continue;
+      rounds.push({ round, shownIds: row.draw_ids, response: row.answer_id ? row : null, ownerId: row.owner_id });
     }
     return rounds;
   }
@@ -311,7 +320,7 @@ export function photoSurveyStore({
             "INSERT INTO photo_survey_draws(survey_id, player_id, shown_ids, issued_at) VALUES($1, $2, $3, $4)",
             [survey.id, player.id, shownIds, at],
           );
-          rounds.push({ round: 1, shownIds, response: null });
+          rounds.push({ round: 1, shownIds, response: null, ownerId: player.id });
         } else if (next === true && last.response && view.status === "open") {
           const seen = seenPairKeys(survey, answeredRounds(rounds));
           if (seen.size < totalPairCount(survey)) {
@@ -322,16 +331,16 @@ export function photoSurveyStore({
               "INSERT INTO photo_survey_round_draws(survey_id, player_id, round, shown_ids, issued_at) VALUES($1, $2, $3, $4, $5)",
               [survey.id, player.id, last.round + 1, shownIds, at],
             );
-            rounds.push({ round: last.round + 1, shownIds, response: null });
+            rounds.push({ round: last.round + 1, shownIds, response: null, ownerId: player.id });
           }
         }
         return roundView(view, survey, rounds, rounds.at(-1));
       });
     },
 
-    // Sem `round`, a resposta vale para a rodada aberta e, sem rodada aberta,
-    // para a rodada 1. Com `round`, a rodada precisa existir: a aberta ou uma
-    // já respondida.
+    // Sem `round`, a resposta é da rodada 1: é o que manda um aplicativo de
+    // antes das rodadas, que só conhece essa. Com `round`, a rodada precisa
+    // existir: a aberta ou uma já respondida.
     async photoSurveyRespond({ recoveryKey, surveyId, answerId, pickIds, championId, round, now } = {}) {
       const survey = requiredSurvey(surveyId);
       if (typeof answerId !== "string" || !UUID_PATTERN.test(answerId)) throw invalidResponse("answer-id");
@@ -341,9 +350,7 @@ export function photoSurveyStore({
       const view = publicPhotoSurvey(survey, at);
       return transaction(recoveryKey, async (client, player) => {
         const rounds = await personRounds(client, survey, player.id);
-        const target = round === undefined
-          ? rounds.find((entry) => !entry.response) || rounds.find((entry) => entry.round === 1)
-          : rounds.find((entry) => entry.round === round);
+        const target = rounds.find((entry) => entry.round === (round === undefined ? 1 : round));
         if (!target) {
           if (round !== undefined) throw invalidResponse("round");
           throw surveyError("sorteio ainda não emitido", 409, "PHOTO_SURVEY_DRAW_REQUIRED");
@@ -367,7 +374,8 @@ export function photoSurveyStore({
         // Se o recibo já foi usado, por qualquer pessoa e em qualquer rodada,
         // nada é gravado aqui.
         if (!(await receiptIsFree(client, receipt))) throw invalidResponse("answer-id");
-        const values = [survey.id, player.id, receipt, target.shownIds, bracket.pickIds, bracket.championId, at];
+        // A resposta de uma rodada nova vai no nome de quem recebeu o sorteio dela.
+        const values = [survey.id, target.round === 1 ? player.id : target.ownerId, receipt, target.shownIds, bracket.pickIds, bracket.championId, at];
         const inserted = target.round === 1
           ? await client.query(`INSERT INTO photo_survey_responses
               (survey_id, player_id, answer_id, shown_ids, pick_ids, champion_id, responded_at)

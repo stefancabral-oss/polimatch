@@ -435,18 +435,27 @@ test("uma resposta por rodada: grava, repete sem gravar e recusa outra escolha",
   assert.deepEqual(db.counts(), { draws: 1, responses: 1, roundDraws: 1, roundResponses: 1 });
 });
 
-test("sem round, a resposta vale para a rodada aberta e, sem rodada aberta, para a rodada 1", async () => {
+test("sem round, a resposta é sempre da rodada 1, mesmo com uma rodada nova aberta", async () => {
   const { db, store } = setup();
   const ana = db.addPlayer();
   const first = await store.photoSurveyDraw(ana.key, POLITICS.id);
   const firstAnswer = await answer(store, ana, POLITICS.id, first, { withRound: false });
   const second = await store.photoSurveyDraw(ana.key, POLITICS.id, { next: true });
-  // Rodada 2 aberta: a resposta sem round é dela.
-  const secondAnswer = await answer(store, ana, POLITICS.id, second, { offset: 1, withRound: false });
+  // Rodada 2 aberta: uma resposta sem round não é dela. É o que manda uma
+  // aba antiga, que só conhece a rodada 1: a recusa é a de antes das rodadas,
+  // e nada é gravado na rodada 2, mesmo que as escolhas coubessem no sorteio dela.
+  const fitsSecond = second.draw.groups.map((group) => group[1]);
+  await assert.rejects(store.photoSurveyRespond(body(ana, POLITICS.id, { pickIds: fitsSecond, championId: fitsSecond[0] })), (error) => {
+    assert.deepEqual([error.status, error.code], [409, "PHOTO_SURVEY_ALREADY_ANSWERED"]);
+    assert.deepEqual(error.current, firstAnswer.response);
+    return true;
+  });
+  assert.equal(db.counts().roundResponses, 0);
+  const secondAnswer = await answer(store, ana, POLITICS.id, second, { offset: 1 });
   assert.equal(secondAnswer.status, "created");
   assert.equal(secondAnswer.round, 2);
   assert.equal(db.counts().roundResponses, 1);
-  // Sem rodada aberta: a resposta sem round é comparada com a rodada 1.
+  // Sem rodada aberta: a resposta sem round também é comparada com a rodada 1.
   const sameAsFirst = await store.photoSurveyRespond(body(ana, POLITICS.id, { pickIds: firstAnswer.response.pickIds, championId: firstAnswer.response.championId }));
   assert.equal(sameAsFirst.status, "alreadyProcessed");
   assert.equal(sameAsFirst.round, 1);
@@ -745,24 +754,44 @@ test("quem responde todas as rodadas vê todos os confrontos, e a pesquisa fecha
   }
 });
 
-test("as rodadas 2 em diante são só do jogador da conta: não são procuradas nos jogadores ligados", async () => {
+test("as rodadas 2 em diante valem pela identidade, como a rodada 1: a conta não recomeça quando o jogador ativo muda", async () => {
   const { db, store } = setup();
   const previous = db.addPlayer();
   const first = await store.photoSurveyDraw(previous.key, POLITICS.id);
   const firstAnswer = await answer(store, previous, POLITICS.id, first);
   const second = await store.photoSurveyDraw(previous.key, POLITICS.id, { next: true });
-  await answer(store, previous, POLITICS.id, second);
+  const secondAnswer = await answer(store, previous, POLITICS.id, second);
+  const third = await store.photoSurveyDraw(previous.key, POLITICS.id, { next: true });
+  assert.equal(third.round, 3);
   // O jogador ativo da conta muda, e o anterior passa a ser um histórico ligado a ele.
   const active = db.addPlayer();
   db.link(previous, active);
   const seen = await store.photoSurveyDraw(active.key, POLITICS.id);
-  assert.equal(seen.round, 1, "a rodada 1 vale pela identidade");
-  assert.deepEqual(seen.response, firstAnswer.response);
-  assert.deepEqual(seen.progress, { answeredRounds: 1, seenPairs: 30, totalPairs: 190, canContinue: true });
-  const own = await store.photoSurveyDraw(active.key, POLITICS.id, { next: true });
-  assert.equal(own.round, 2);
-  assert.equal(own.response, null);
-  assert.equal(db.rows("roundDraws").filter((row) => row.player_id === active.id).length, 1);
+  assert.equal(seen.round, 3, "a rodada aberta da conta continua sendo a mesma");
+  assert.equal(seen.response, null);
+  assert.deepEqual(seen.draw, third.draw);
+  assert.deepEqual(seen.lastAnswered, { round: 2, response: secondAnswer.response });
+  assert.equal(seen.progress.answeredRounds, 2);
+  assert.equal(seen.progress.seenPairs, secondAnswer.progress.seenPairs);
+  // Pedir outra rodada não emite uma segunda rodada 2 nem uma segunda rodada 3.
+  assert.deepEqual(await store.photoSurveyDraw(active.key, POLITICS.id, { next: true }), seen);
+  assert.equal(db.rows("roundDraws").filter((row) => row.player_id === active.id).length, 0);
+  // A rodada 2 da conta não aceita outra escolha do jogador ativo novo.
+  const otherPicks = second.draw.groups.map((group) => group[3]);
+  await assert.rejects(store.photoSurveyRespond(body(active, POLITICS.id, { pickIds: otherPicks, championId: otherPicks[0], round: 2 })), (error) => {
+    assert.deepEqual([error.status, error.code], [409, "PHOTO_SURVEY_ALREADY_ANSWERED"]);
+    return true;
+  });
+  // A resposta da rodada aberta é gravada no nome de quem recebeu o sorteio
+  // dela, e a rodada seguinte já sai no nome do jogador ativo.
+  const thirdAnswer = await answer(store, active, POLITICS.id, seen);
+  assert.equal(thirdAnswer.status, "created");
+  assert.equal(thirdAnswer.round, 3);
+  assert.equal(db.rows("roundResponses").filter((row) => row.round === 3)[0].player_id, previous.id);
+  const fourth = await store.photoSurveyDraw(active.key, POLITICS.id, { next: true });
+  assert.equal(fourth.round, 4);
+  assert.equal(db.rows("roundDraws").filter((row) => row.round === 4)[0].player_id, active.id);
+  assert.deepEqual(firstAnswer.response, (await store.photoSurveyRespond(body(active, POLITICS.id, { pickIds: firstAnswer.response.pickIds, championId: firstAnswer.response.championId, round: 1 }))).response);
 });
 
 test("carta que sai da pesquisa deixa de contar no progresso e de entrar nas rodadas novas", async () => {

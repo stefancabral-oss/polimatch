@@ -18,7 +18,7 @@ para ela. A página "Como funciona" diz: "Um CPF, um voto: cada pessoa
 responde uma vez em cada pesquisa."
 
 Em 26/11/2026, enquanto a publicação da pesquisa de famosos esperava o acesso
-dele ao painel, o Stefan escreveu, por voz:
+dele ao painel, o Stefan escreveu:
 
 > "Depois builda e publica uma correção a onde a pessoa precisa ou fica
 > aberto para votar enquanto houverem possibilidades de enfrentyamentos que a
@@ -55,8 +55,8 @@ Ele respondeu:
 A resposta do Stefan cobre o item acima. Tudo o que vem abaixo é escolha do
 agente, e ele pode mudar qualquer uma.
 
-As escolhas 1 a 8 não são de desenho: são de regra e de dado. Por isso a
-pergunta do gate do merge as apresenta por extenso. As escolhas 9 a 11 são
+As escolhas 1 a 10 não são de desenho: são de regra e de dado. Por isso a
+pergunta do gate do merge as apresenta por extenso. As escolhas 11 a 13 são
 de desenho e se apoiam no pedido dele de não ser parado por detalhes de
 desenho (decisão 0003, item 5).
 
@@ -70,7 +70,8 @@ desenho (decisão 0003, item 5).
 2. **Continuar é opcional.** A frase dele admite "precisa" e "fica aberto". O
    agente ficou com "fica aberto": depois de cada rodada a pessoa pode parar,
    e o que ela respondeu vale.
-3. **Uma pessoa, um peso.** Na frase que ele leu antes de responder: no
+3. **Uma pessoa, um peso.** Na frase que estava na mensagem a que ele
+   respondeu: no
    resultado, cada pessoa vale uma só, com todas as rodadas dela somadas.
    Este estágio não calcula soma nenhuma (#177); a regra fica registrada
    para quando a soma existir, e a política de integridade do voto passa a
@@ -89,24 +90,33 @@ desenho (decisão 0003, item 5).
 7. **Vale para todas as pesquisas,** as de Política, a de famosos e a de
    roupas, inclusive para quem já respondeu: essa pessoa passa a poder
    continuar.
-8. **As rodadas novas são da conta com cadastro.** A primeira rodada
-   continua valendo com a regra de identidade de hoje: a conta mais os
-   jogadores anônimos ligados a ela. Da segunda em diante, a rodada pertence
-   só ao jogador da conta com cadastro. Uma contagem futura precisa juntar
-   as duas coisas por pessoa, e a política de integridade do voto diz isso.
+8. **As rodadas novas seguem a regra de identidade da primeira.** A
+   identidade é a conta mais os jogadores ligados a ela. As rodadas de uma
+   pessoa são procuradas em todos eles: se o jogador ativo da conta muda, a
+   conta continua de onde parou e não ganha uma segunda resposta para a
+   mesma rodada. Uma resposta que não diz a rodada, como a de um aplicativo
+   antigo, é sempre da primeira rodada.
+9. **O total de confrontos é o das cartas atuais da pesquisa.** Se uma
+   pesquisa ganhar cartas, o total cresce e quem já tinha visto tudo volta a
+   ter rodada para jogar. Se perder uma carta, as duplas dela deixam de
+   contar, como vistas e como total.
+10. **O texto do consentimento do cadastro não muda.** Ele continua dizendo
+    "garantir um voto por pessoa". O agente leu essa frase como a regra de
+    uma pessoa, um peso, e por isso não a alterou nem pediu novo aceite a
+    quem já se cadastrou. É leitura do agente sobre um texto que as pessoas
+    aceitaram: cabe na revisão jurídica (#283).
 
 ### De desenho
 
-9. **Depois de registrar, a tela oferece "Mais uma rodada",** enquanto houver
-   confronto por ver, e mostra quantos confrontos a pessoa já viu.
-   "Compartilhar" continua na tela, abaixo dele.
-10. **Na capa,** a pesquisa que ainda tem confrontos por ver entra na fila do
+11. **Depois de registrar, a tela oferece "Mais uma rodada",** enquanto houver
+    confronto por ver, e mostra quantos confrontos a pessoa já viu.
+    "Compartilhar" continua na tela, abaixo dele.
+12. **Na capa,** a pesquisa que ainda tem confrontos por ver entra na fila do
     destaque depois das pesquisas que a pessoa ainda não respondeu.
-11. **Os textos que diziam "um voto" ou "uma vez"** mudam: "Como funciona"
-    deixa de dizer "responde uma vez em cada pesquisa", as telas de entrada
-    e de cadastro passam a dizer "Um CPF, uma pessoa." e a confirmação passa
-    a falar da escolha da rodada. O texto do consentimento do cadastro não
-    muda.
+13. **Os textos de tela que diziam "um voto" ou "uma vez"** mudam: "Como
+    funciona" deixa de dizer "responde uma vez em cada pesquisa", as telas
+    de entrada e de cadastro passam a dizer "Um CPF, uma pessoa." e a
+    confirmação passa a falar da escolha da rodada.
 
 ## O que muda
 
@@ -116,6 +126,9 @@ desenho (decisão 0003, item 5).
 | "Como funciona", item 5 | "Um CPF, um voto: cada pessoa responde uma vez em cada pesquisa." | Um CPF, uma pessoa: ela pode jogar várias rodadas, e todas contam como a resposta de uma pessoa só. |
 | Política de integridade do voto, "Resposta de pesquisa por foto" | Uma resposta por identidade e por pesquisa. | Uma resposta por identidade, por pesquisa e por rodada; qualquer contagem conta por pessoa. |
 | Tela de resposta registrada | "Sua resposta está registrada e não pode ser trocada nesta pesquisa." | A escolha da rodada está registrada e não pode ser trocada; há "Mais uma rodada" enquanto houver confronto por ver. |
+
+Outras decisões dizem "uma resposta por pessoa" e ganharam nota apontando
+para esta: a 0004 ("O que não muda") e a 0006 (escolha 3).
 
 ## O que não muda
 

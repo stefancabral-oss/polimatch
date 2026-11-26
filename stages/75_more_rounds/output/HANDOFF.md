@@ -2,18 +2,22 @@
 
 Estado: `aguardando gate do merge`. Nada deste estágio está em produção.
 
+PR: https://github.com/stefancabral-oss/polimatch/pull/352, branch
+`icm/75-more-rounds`. Os commits são os do PR; este arquivo não lista os
+hashes porque eles mudam a cada correção.
+
 ## O que foi pedido e o que é escolha do agente
 
-Em 26/11/2026 o Stefan pediu, por voz, que a pesquisa fique aberta para
+Em 26/11/2026 o Stefan pediu que a pesquisa fique aberta para
 votar enquanto houver confrontos que a pessoa ainda não votou, e respondeu
 "É isso." à leitura do agente: rodadas novas da mesma pesquisa, com grupos
 diferentes, até cada carta ter enfrentado todas as outras. As palavras dele e
 a pergunta estão na decisão 0007
 (`docs/decisions/0007-rodadas-enquanto-houver-confrontos.md`).
 
-O resto é escolha do agente e está listado lá: oito escolhas de regra e de
-dado (1 a 8), que a pergunta do merge leva por extenso, e três de desenho
-(9 a 11).
+O resto é escolha do agente e está listado lá: dez escolhas de regra e de
+dado (1 a 10), que a pergunta do merge leva por extenso, e três de desenho
+(11 a 13).
 
 ## O que foi feito
 
@@ -50,10 +54,11 @@ dado (1 a 8), que a pergunta do merge leva por extenso, e três de desenho
   HTTP 400 `PHOTO_SURVEY_DRAW_INVALID`, motivo `next`; e o motivo `round` em
   `PHOTO_SURVEY_RESPONSE_INVALID`.
 - Um aplicativo que não manda `next` nem `round` tem o comportamento de
-  antes, inclusive a recusa ao tentar responder de novo.
-- As rodadas de 2 em diante pertencem só ao jogador da conta com cadastro. A
-  regra de identidade da rodada 1 (a conta mais os anônimos ligados a ela)
-  não se estende a elas (escolha 8 da decisão 0007).
+  antes, inclusive a recusa ao tentar responder de novo. Uma resposta sem
+  `round` é sempre da rodada 1, mesmo com uma rodada nova aberta.
+- As rodadas de 2 em diante seguem a regra de identidade da rodada 1: são
+  procuradas no jogador da conta e nos ligados a ele (escolha 8 da decisão
+  0007). Se o jogador ativo da conta muda, a conta continua de onde parou.
 - Testes: `shared/photo-survey.test.js`, `back/src/photo-survey-store.test.js`
   (novo, com um banco em memória em `back/test-support/`),
   `back/src/photo-survey-http.test.js` e os roteiros
@@ -114,9 +119,11 @@ dado (1 a 8), que a pergunta do merge leva por extenso, e três de desenho
   registrada.
 - **Dois aparelhos na mesma rodada.** Vale a primeira resposta; o segundo
   aparelho vê a resposta que valeu, com aviso.
-- **O texto do consentimento do cadastro** continua dizendo "um voto por
-  pessoa". Não foi alterado: é o texto que as pessoas aceitaram, e a regra
-  que ele descreve (uma pessoa, um peso) é a mesma.
+- **O texto do consentimento do cadastro** continua dizendo "garantir um
+  voto por pessoa". Não foi alterado, e ninguém é chamado a aceitar de novo.
+  O agente leu a frase como a regra de uma pessoa, um peso; é leitura dele
+  sobre um texto que as pessoas aceitaram, e cabe na revisão jurídica (#283).
+  É a escolha 10 da decisão 0007.
 
 ## Quantas rodadas
 
@@ -131,8 +138,9 @@ folga. Toda rodada nova traz pelo menos uma dupla que a pessoa ainda não viu.
 ## Verificação
 
 Tudo abaixo foi rodado pelo agente que escreve este handoff, em 26/11/2026,
-neste computador (macOS), no código deste PR antes de trazer a `main` mais
-nova, que só difere em documentação. O CI do GitHub (Linux) é a referência.
+neste computador (macOS), duas vezes: antes da leitura independente e de
+novo depois das correções que ela pediu. Os números são os da segunda vez. O
+CI do GitHub (Linux) é a referência.
 
 - `npm run test:shared`: 137 de 137.
 - `npm test --prefix back`: 335 de 335.
@@ -142,12 +150,13 @@ nova, que só difere em documentação. O CI do GitHub (Linux) é a referência.
 - Roteiros de banco, na ordem do `back-shared.yml`, contra um PostgreSQL 16
   local descartável: os nove passaram (integração, escolhas ordenadas, duelos
   presidenciais, abuso, progresso do jogo, esquema cívico, resiliência,
-  pesquisa por foto e cadastro). Não rodei o ensaio de backup e restauração
-  nem a restauração parcial.
+  pesquisa por foto e cadastro). O do esquema cívico pede um banco sem uso
+  e rodou num banco próprio. Não rodei o ensaio de backup e restauração nem
+  a restauração parcial.
 - Roteiros de navegador, com `vite preview` local e o servidor simulado dos
   próprios roteiros, depois do build:
-  - WebKit: `photo-survey.mjs`, 42 cenários; `site-shell.mjs`, 56;
-    `client-error-report.mjs` passou.
+  - WebKit: `photo-survey.mjs`, 42 cenários; `site-shell.mjs`, 56.
+    `client-error-report.mjs` passou na primeira vez e não foi repetido.
   - Chromium: `photo-survey.mjs`, 42; `site-shell.mjs`, 56. O Chromium usado
     é o que já estava nesta máquina (revisão 1187), aberto por um roteiro
     auxiliar fora do repositório; o Playwright do projeto pede a revisão
@@ -175,6 +184,42 @@ WebKit, com servidor simulado; não estão no repositório.
 - Quanto tempo leva uma rodada nova para montar no servidor com muitas
   pessoas ao mesmo tempo não foi medido.
 
+## Leitura independente
+
+Um agente à parte, somente leitura, leu o PR em 26/11/2026 e segurou o merge.
+O que mudou por causa dela:
+
+- **Rodadas e identidade.** As rodadas de 2 em diante eram só do jogador
+  ativo da conta: quando ele mudava (um anônimo com voto no jogo antigo
+  entrando na mesma conta), a conta podia jogar de novo as rodadas 2 em
+  diante. Agora as rodadas são procuradas pela identidade, como a rodada 1.
+- **Resposta sem `round`.** Valia para a rodada aberta: uma aba antiga, ainda
+  na confirmação da rodada 1, podia ter a resposta gravada numa rodada nova
+  cujas telas não mostrou. Agora é sempre da rodada 1.
+- **Aba parada numa rodada antiga.** Quando outra aba já estava na rodada
+  seguinte, a aba parada não percebia. Agora ela busca a rodada no servidor.
+- **Registro.** Duas regras que estavam só no contexto do estágio viraram
+  escolhas por extenso (9 e 10); saiu "por voz", que as fontes não trazem; as
+  decisões 0004 e 0006 ganharam nota.
+
+## Riscos conhecidos
+
+- **Carta retirada com rodada aberta.** Se uma carta sair do catálogo do app
+  enquanto alguém tem uma rodada emitida e não respondida, a tela pede para
+  atualizar a página e a pessoa não consegue terminar a rodada nem abrir
+  outra. Já valia para a rodada 1; agora vale para qualquer rodada aberta.
+  Não mexer nas cartas de uma pesquisa aberta sem tratar isso.
+- **Mudança nas cartas de uma pesquisa.** O total de confrontos acompanha as
+  cartas atuais (escolha 9): acrescentar cartas reabre a pesquisa para quem
+  já tinha visto tudo.
+- **Duas abas.** A correção da aba parada foi coberta por teste de unidade,
+  não reproduzida em navegador.
+- **`:has()` no CSS.** A regra que esconde a barra de etapas em tela muito
+  baixa não funciona em Safari anterior ao 15.4; nesses, a tela de 320×480
+  com três botões pode precisar de rolagem.
+- **O jogo antigo continua ligado na API.** O caso da troca de jogador ativo
+  só se alcança chamando a API direto; pela tela atual não há caminho.
+
 ## Publicação (75d)
 
 Pede o sim do Stefan, depois do merge.
@@ -190,7 +235,7 @@ Pede o sim do Stefan, depois do merge.
 
 ## Gate humano
 
-- [ ] Merge: sim do Stefan, com as oito escolhas de regra e de dado por
+- [ ] Merge: sim do Stefan, com as dez escolhas de regra e de dado por
       extenso na pergunta.
 - [ ] Publicação (75d): outro sim, depois do merge.
 - [ ] Fechamento da issue #350: outro sim.

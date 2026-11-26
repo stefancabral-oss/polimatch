@@ -232,12 +232,14 @@ export function answeredSurveyIds(text, tag, surveys = PHOTO_SURVEYS) {
 }
 
 /**
- * Outra aba registrou a resposta da rodada que estava em andamento: o registro
- * diz que a pessoa respondeu e não guarda mais escolha pela metade. Durante
- * uma rodada nova `answered` já é verdadeiro, e as escolhas continuam lá.
+ * Outra aba registrou a resposta da rodada que esta aba tem na tela (`round`):
+ * o registro diz que a pessoa respondeu e não guarda mais escolha pela metade,
+ * ou já guarda as escolhas de uma rodada mais nova. Durante uma rodada nova
+ * `answered` já é verdadeiro, e as escolhas dessa mesma rodada continuam lá.
  */
-export function answeredElsewhere(record) {
-  return Boolean(record?.answered && !record.progress);
+export function answeredElsewhere(record, round = 1) {
+  if (!record?.answered) return false;
+  return !record.progress || laterRound(record.progress.round) > laterRound(round);
 }
 
 /**

@@ -639,7 +639,12 @@ test("uma rodada nova pela metade conta como pesquisa em andamento, e outra aba 
   // Outra aba confirmou: o registro diz que respondeu e não guarda mais escolha.
   assert.equal(answeredElsewhere({ identity: tag, progress: null, answered: true }), true);
   // Rodada nova em andamento: já respondeu antes, mas as escolhas estão lá. Ninguém confirmou nada.
-  assert.equal(answeredElsewhere({ identity: tag, progress: second, answered: true }), false);
+  assert.equal(answeredElsewhere({ identity: tag, progress: second, answered: true }, 2), false);
+  // A outra aba confirmou a rodada desta e já está na seguinte: esta precisa buscar a resposta.
+  assert.equal(answeredElsewhere({ identity: tag, progress: second, answered: true }, 1), true);
+  assert.equal(answeredElsewhere({ identity: tag, progress: { ...second, round: 3 }, answered: true }, 2), true);
+  // Um servidor de antes das rodadas não diz a rodada: vale como a primeira.
+  assert.equal(answeredElsewhere({ identity: tag, progress: play(fresh(), "a1"), answered: true }, 0), false);
   assert.equal(answeredElsewhere({ identity: tag, progress: play(fresh(), "a1"), answered: false }), false);
   assert.equal(answeredElsewhere({ identity: tag, progress: null, answered: false }), false);
   for (const empty of [null, undefined, {}]) assert.equal(answeredElsewhere(empty), false);

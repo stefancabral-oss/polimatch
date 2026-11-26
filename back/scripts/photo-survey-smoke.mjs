@@ -614,13 +614,21 @@ try {
     survey: first.survey, draw: aliceTwo.draw, response: createdTwo.response, round: 2, progress: createdTwo.progress,
     lastAnswered: { round: 2, response: createdTwo.response },
   });
-  // Sem round, a resposta vale para a rodada aberta.
+  // Sem round, a resposta é da rodada 1, mesmo com uma rodada nova aberta: a
+  // recusa é a de antes das rodadas e nada é gravado na rodada aberta.
   const aliceThree = await nextRound(alice);
   assert.equal(aliceThree.round, 3);
   assert.equal(aliceThree.response, null);
   assert.deepEqual(aliceThree.lastAnswered, { round: 2, response: createdTwo.response });
   const threePicks = picksOf(aliceThree.draw, 0);
-  const createdThree = await respond(alice, { pickIds: threePicks, championId: threePicks[2] });
+  await assert.rejects(respond(alice, { pickIds: threePicks, championId: threePicks[2] }), (error) => {
+    assert.equal(error.status, 409);
+    assert.equal(error.code, "PHOTO_SURVEY_ALREADY_ANSWERED");
+    assert.deepEqual(error.current, created.response);
+    return true;
+  });
+  assert.deepEqual(await roundRows(), [2, 1]);
+  const createdThree = await respond(alice, { pickIds: threePicks, championId: threePicks[2], round: 3 });
   assert.equal(createdThree.status, "created");
   assert.equal(createdThree.round, 3);
   assert.deepEqual(createdThree.lastAnswered, { round: 3, response: createdThree.response });
@@ -765,9 +773,9 @@ try {
   assert.deepEqual(lateSeen.progress, { answeredRounds: 0, seenPairs: 0, totalPairs: 190, canContinue: false });
   assert.equal(lateSeen.lastAnswered, null, "a última respondida é da própria pessoa");
 
-  // A rodada 1 vale pela identidade; as rodadas 2 em diante são só do jogador
-  // da conta. Quando o jogador ativo da conta muda, a rodada 1 continua valendo
-  // e as rodadas seguintes do jogador anterior não são procuradas.
+  // Todas as rodadas valem pela identidade. Quando o jogador ativo da conta
+  // muda, as rodadas respondidas pelo anterior continuam valendo: a conta não
+  // recomeça nem ganha uma segunda resposta para a mesma rodada.
   const subjectFour = `photo-survey-smoke-${randomUUID()}`;
   const seedFour = await newPlayer();
   const accountFour = await store.signInWithGoogle({
@@ -780,7 +788,7 @@ try {
   });
   const fourTwo = await store.photoSurveyDraw(accountFour.sessionToken, SURVEY.id, { next: true });
   const fourTwoPicks = picksOf(fourTwo.draw, 1);
-  await store.photoSurveyRespond({
+  const fourTwoAnswer = await store.photoSurveyRespond({
     recoveryKey: accountFour.sessionToken, surveyId: SURVEY.id, answerId: randomUUID(), pickIds: fourTwoPicks, championId: fourTwoPicks[0], round: 2,
   });
   const karen = await newPlayer();
@@ -795,15 +803,27 @@ try {
   assert.equal(karenLogin.merge.activeDaily, "anonymous");
   for (const token of [karenLogin.sessionToken, accountFour.sessionToken]) {
     const seen = await store.photoSurveyDraw(token, SURVEY.id);
-    assert.equal(seen.round, 1);
-    assert.deepEqual(seen.response, fourAnswer.response, "a rodada 1 da conta vale para o jogador que passou a ser o ativo");
-    assert.deepEqual(seen.progress, { answeredRounds: 1, seenPairs: 30, totalPairs: 190, canContinue: true });
-    assert.deepEqual(seen.lastAnswered, { round: 1, response: fourAnswer.response });
+    assert.equal(seen.round, 2);
+    assert.deepEqual(seen.response, fourTwoAnswer.response, "as rodadas da conta valem para o jogador que passou a ser o ativo");
+    assert.deepEqual(seen.progress, fourTwoAnswer.progress);
+    assert.deepEqual(seen.lastAnswered, { round: 2, response: fourTwoAnswer.response });
+    // A rodada 1 continua respondendo por ela.
+    const replay = await store.photoSurveyRespond({
+      recoveryKey: token, surveyId: SURVEY.id, answerId: randomUUID(), pickIds: fourPicks, championId: fourPicks[0], round: 1,
+    });
+    assert.deepEqual(replay.response, fourAnswer.response);
+    // A rodada 2 da conta não aceita outra escolha.
+    const otherFour = picksOf(fourTwo.draw, 3);
+    await assert.rejects(store.photoSurveyRespond({
+      recoveryKey: token, surveyId: SURVEY.id, answerId: randomUUID(), pickIds: otherFour, championId: otherFour[0], round: 2,
+    }), (error) => error.status === 409 && error.code === "PHOTO_SURVEY_ALREADY_ANSWERED");
   }
+  const roundsBeforeSwitch = await roundRows();
   const switchedTwo = await store.photoSurveyDraw(karenLogin.sessionToken, SURVEY.id, { next: true });
-  assert.equal(switchedTwo.round, 2);
-  assert.equal(switchedTwo.response, null, "o jogador ativo novo começa as rodadas seguintes dele");
-  assert.deepEqual(switchedTwo.lastAnswered, { round: 1, response: fourAnswer.response });
+  assert.equal(switchedTwo.round, 3, "o jogador ativo novo continua de onde a conta parou");
+  assert.equal(switchedTwo.response, null);
+  assert.deepEqual(switchedTwo.lastAnswered, { round: 2, response: fourTwoAnswer.response });
+  assert.deepEqual(await roundRows(), [roundsBeforeSwitch[0] + 1, roundsBeforeSwitch[1]]);
 
   // Um boot a mais, agora com rodadas gravadas: nada se perde e a rodada aberta continua lá.
   const roundRowsBefore = [await roundOneFingerprint(), await roundRows()];

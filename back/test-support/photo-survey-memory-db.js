@@ -65,15 +65,22 @@ export function createPhotoSurveyMemoryDb() {
       return result([receiptRow(row)]);
     }
 
-    if (sql.startsWith("SELECT d.round, d.shown_ids AS draw_ids, r.answer_id, r.shown_ids, r.pick_ids, r.champion_id, r.responded_at FROM photo_survey_round_draws d LEFT JOIN photo_survey_round_responses r")) {
+    if (sql.startsWith("SELECT d.round, d.player_id AS owner_id, d.shown_ids AS draw_ids, r.answer_id, r.shown_ids, r.pick_ids, r.champion_id, r.responded_at FROM photo_survey_round_draws d LEFT JOIN photo_survey_round_responses r") && sql.includes("player_history_links")) {
       const [surveyId, playerId] = values;
+      const identity = new Set([playerId, ...tables.links.filter((link) => link.player_id === playerId).map((link) => link.source_player_id)]);
       const rows = tables.roundDraws
-        .filter((row) => row.survey_id === surveyId && row.player_id === playerId)
-        .sort((left, right) => left.round - right.round)
-        .map((draw) => {
-          const response = tables.roundResponses.find((row) => sameRound(row, surveyId, playerId, draw.round));
+        .filter((row) => row.survey_id === surveyId && identity.has(row.player_id))
+        .map((draw) => ({ draw, response: tables.roundResponses.find((row) => sameRound(row, surveyId, draw.player_id, draw.round)) || null }))
+        // A ordem do banco: rodada; respondida antes de aberta; a resposta mais
+        // antiga; o sorteio mais antigo; o jogador.
+        .sort((left, right) => left.draw.round - right.draw.round
+          || Number(!left.response) - Number(!right.response)
+          || (left.response && right.response ? left.response.responded_at - right.response.responded_at : 0)
+          || left.draw.issued_at - right.draw.issued_at
+          || left.draw.player_id.localeCompare(right.draw.player_id))
+        .map(({ draw, response }) => {
           const empty = { answer_id: null, shown_ids: null, pick_ids: null, champion_id: null, responded_at: null };
-          return { round: draw.round, draw_ids: draw.shown_ids, ...(response ? receiptRow(response) : empty) };
+          return { round: draw.round, owner_id: draw.player_id, draw_ids: draw.shown_ids, ...(response ? receiptRow(response) : empty) };
         });
       return result(rows);
     }

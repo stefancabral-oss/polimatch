@@ -3,10 +3,25 @@
   "issue": 350,
   "stage": "75_more_rounds",
   "base": "main em 835614a; construído e testado sobre 6e38d32, que só difere dela em documentação",
-  "instruction": "Stefan, 26/11/2026, por voz: \"Depois builda e publica uma correção a onde a pessoa precisa ou fica aberto para votar enquanto houverem possibilidades de enfrentyamentos que a pessoa ainda não votou.\" À pergunta \"A pessoa joga rodadas novas até ter visto todas as duplas de cartas, é isso? Responda \\\"é isso\\\" ou \\\"só as que faltaram\\\".\", respondeu \"É isso.\". A resposta cobre a pesquisa ficar aberta, em rodadas novas, até a pessoa ter visto todas as duplas. O resto é escolha do agente (decisão 0007).",
+  "instruction": "Stefan, 26/11/2026: \"Depois builda e publica uma correção a onde a pessoa precisa ou fica aberto para votar enquanto houverem possibilidades de enfrentyamentos que a pessoa ainda não votou.\" À pergunta \"A pessoa joga rodadas novas até ter visto todas as duplas de cartas, é isso?\" (seguida de: Responda \"é isso\" ou \"só as que faltaram\".), respondeu \"É isso.\". A resposta cobre a pesquisa ficar aberta, em rodadas novas, até a pessoa ter visto todas as duplas. O resto é escolha do agente (decisão 0007).",
   "agentChoices": {
-    "ruleAndData": [1, 2, 3, 4, 5, 6, 7, 8],
-    "design": [9, 10, 11],
+    "ruleAndData": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "design": [
+      11,
+      12,
+      13
+    ],
     "where": "docs/decisions/0007-rodadas-enquanto-houver-confrontos.md"
   },
   "parts": {
@@ -16,7 +31,10 @@
     "75d": "publicação: não feita; pede o sim do Stefan depois do merge"
   },
   "database": {
-    "newTables": ["photo_survey_round_draws", "photo_survey_round_responses"],
+    "newTables": [
+      "photo_survey_round_draws",
+      "photo_survey_round_responses"
+    ],
     "migration": "2026-11-26-photo-survey-rounds-v1",
     "existingTablesChanged": false,
     "receiptUniqueness": "trava no código (pg_advisory_xact_lock) antes de gravar, não restrição do banco"
@@ -26,11 +44,14 @@
     "rounds20Cards": "8 a 10",
     "rounds16Cards": "5 a 7",
     "pairsPerRound": 30,
-    "totalPairs": { "20 cartas": 190, "16 cartas": 120 },
+    "totalPairs": {
+      "20 cartas": 190,
+      "16 cartas": 120
+    },
     "where": "shared/photo-survey.test.js"
   },
   "tests": {
-    "ranBy": "o agente que escreve o handoff, em 26/11/2026, em macOS, depois da revisão",
+    "ranBy": "o agente que escreve o handoff, em 26/11/2026, em macOS; números da segunda execução, depois das correções da leitura independente",
     "shared": "137 de 137",
     "back": "335 de 335",
     "app": "239 de 239",
@@ -48,12 +69,23 @@
         "npm run test:photo-survey --prefix back",
         "npm run test:registration --prefix back"
       ],
-      "notRun": ["ensaio de backup e restauração", "back/scripts/partial-restore-smoke.mjs"]
+      "notRun": [
+        "ensaio de backup e restauração",
+        "back/scripts/partial-restore-smoke.mjs"
+      ]
     },
     "browser": {
       "server": "simulado pelos próprios roteiros, com vite preview local",
-      "webkit": { "photo-survey.mjs": "42 cenários", "site-shell.mjs": "56 cenários", "client-error-report.mjs": "passou" },
-      "chromium": { "photo-survey.mjs": "42 cenários", "site-shell.mjs": "56 cenários", "note": "revisão 1187 já instalada, aberta por roteiro auxiliar fora do repositório; client-error-report.mjs não rodado" }
+      "webkit": {
+        "photo-survey.mjs": "42 cenários",
+        "site-shell.mjs": "56 cenários",
+        "client-error-report.mjs": "passou antes das correções; não repetido depois"
+      },
+      "chromium": {
+        "photo-survey.mjs": "42 cenários",
+        "site-shell.mjs": "56 cenários",
+        "note": "revisão 1187 já instalada, aberta por roteiro auxiliar fora do repositório; client-error-report.mjs não rodado"
+      }
     }
   },
   "notVerified": [
@@ -68,5 +100,19 @@
     "merge": "pendente",
     "publication": "pendente",
     "issueClosing": "pendente"
+  },
+  "pullRequest": 352,
+  "independentReview": {
+    "first": {
+      "when": "2026-11-26",
+      "by": "agente à parte, somente leitura",
+      "verdict": "segurou o merge",
+      "changed": [
+        "rodadas de 2 em diante passam a valer pela identidade, como a rodada 1",
+        "resposta sem round é sempre da rodada 1",
+        "a aba parada numa rodada antiga busca a rodada no servidor quando outra aba já está na seguinte",
+        "escolhas 9 e 10 por extenso na decisão 0007; notas nas decisões 0004 e 0006; saiu 'por voz'; riscos e link do PR no handoff"
+      ]
+    }
   }
 }

@@ -1663,8 +1663,9 @@ function followOtherTab() {
   if (!saved || saved.identity !== identityTag(identity)) return;
   // Outra aba confirmou a resposta: esta busca a resposta no servidor em vez
   // de seguir com a tela de voto. Numa rodada nova o registro já diz que a
-  // pessoa respondeu antes: o sinal é ele não guardar mais escolha pela metade.
-  if (answeredElsewhere(saved)) {
+  // pessoa respondeu antes: o sinal é ele não guardar mais escolha pela
+  // metade, ou já guardar as escolhas de uma rodada mais nova que a desta aba.
+  if (answeredElsewhere(saved, rounds.round)) {
     epoch += 1;
     busy = false;
     uncertain = false;

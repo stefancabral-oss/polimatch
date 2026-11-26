@@ -14,7 +14,7 @@ outras (decisão 0007).
 
 ## Entradas
 
-- Issue #350. Em 26/11/2026 o Stefan pediu, por voz, que a pesquisa fique
+- Issue #350. Em 26/11/2026 o Stefan pediu que a pesquisa fique
   aberta para votar enquanto houver confrontos que a pessoa ainda não votou,
   e respondeu "É isso." à leitura do agente: rodadas novas, com grupos
   diferentes, até cada carta ter enfrentado todas as outras. As palavras dele
@@ -103,8 +103,9 @@ manda os campos novos, se comporta exatamente como hoje.
 `POST /api/photo-surveys/:surveyId/response`
 
 - Corpo: os campos de hoje mais `round`, opcional.
-- Sem `round`: vale a rodada aberta; sem rodada aberta, a rodada 1, com o
-  comportamento de hoje.
+- Sem `round`: a resposta é da rodada 1, com o comportamento de hoje, mesmo
+  quando há uma rodada nova aberta. É o que manda um aplicativo de antes das
+  rodadas.
 - Com `round`: precisa ser a rodada aberta ou uma já respondida. Rodada que
   não existe é recusada (HTTP 400, `PHOTO_SURVEY_RESPONSE_INVALID`, motivo
   `round`).
@@ -126,10 +127,11 @@ rodadas.
   sorteio da mesma rodada.
 - Nenhuma linha existente é alterada ou apagada. Voltar ao commit anterior
   deixa as tabelas novas sem uso.
-- As rodadas de 2 em diante pertencem ao jogador da conta com cadastro. A
-  regra de identidade da rodada 1 (anônimos ligados à conta) não se estende
-  a elas; a política de integridade do voto diz o que isso significa para
-  uma contagem futura.
+- As rodadas de 2 em diante seguem a regra de identidade da rodada 1: são
+  procuradas no jogador da conta e nos ligados a ele. Havendo a mesma rodada
+  em mais de um deles, vale a respondida mais antiga. A rodada nova é
+  gravada no nome do jogador ativo, e a resposta, no nome de quem recebeu o
+  sorteio dela.
 - O recibo único entre as duas tabelas de resposta é garantido por uma trava
   tomada no código antes de gravar, não por restrição do banco.
 
@@ -138,8 +140,9 @@ rodadas.
 1. **Resposta registrada.** O texto passa a falar da rodada. Com
    `canContinue`, o botão principal é "Mais uma rodada"; "Compartilhar" e o
    caminho para as outras pesquisas continuam. Uma linha diz quantos
-   confrontos a pessoa já viu e quantos existem. Sem `canContinue`, a tela
-   diz que ela viu todos os confrontos.
+   confrontos a pessoa já viu e quantos existem. Vistos todos, a tela diz
+   que ela viu todos os confrontos. Com a pesquisa fora da janela, a tela é
+   a de antes das rodadas.
 2. **Rodada nova.** O toque em "Mais uma rodada" pede o sorteio com `next` e
    leva às telas de voto, iguais às de hoje. O indicador mostra a rodada.
 3. **Capa.** Ordem do destaque: a pesquisa pela metade; a primeira aberta
@@ -193,4 +196,4 @@ rodadas.
 ## Gate humano
 
 Merge e publicação pedem o sim do Stefan, um a um. A pergunta do merge leva
-por extenso as escolhas de regra e de dado da decisão 0007 (1 a 8).
+por extenso as escolhas de regra e de dado da decisão 0007 (1 a 10).
