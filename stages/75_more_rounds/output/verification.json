@@ -90,7 +90,8 @@
     }
   },
   "notVerified": [
-    "nada em produção: o estágio não está publicado",
+    "em produção, só leitura por GET: ninguém jogou rodada nova nem viu a tela com a contagem de confrontos",
+    "o log de início da API em produção",
     "celular de verdade e conta Google de verdade",
     "o aplicativo no navegador contra o servidor de verdade",
     "as telas com as fontes do Linux do CI, vistas pelo agente que escreve o handoff",
@@ -98,8 +99,9 @@
     "a conta que transforma as rodadas de uma pessoa numa preferência só (#177): não existe"
   ],
   "humanGate": {
-    "merge": "pendente",
-    "publication": "pendente",
+    "merge": "feito, \"Sim, mescla\", 26/11/2026",
+    "publication": "feita, \"Sim, publica\", 26/11/2026",
+    "phoneTest": "do Stefan, pendente",
     "issueClosing": "pendente"
   },
   "pullRequest": 352,
@@ -126,5 +128,67 @@
       ],
       "note": "as correções de texto feitas depois desta leitura não passaram por nova leitura"
     }
+  },
+  "merge": {
+    "instruction": "\"Sim, mescla\", à pergunta \"Mesclo o PR 352 quando o CI do último commit ficar verde?\", que levava as onze escolhas de regra e de dado por extenso",
+    "mergedAt": "2026-11-26T22:17:45Z",
+    "commit": "e0914ae4a91eeb7b2e12f5d77080f2defad73fe1",
+    "treeEqualsPrHead": "af03864",
+    "mainCi": "aprovado às 22:22:47Z"
+  },
+  "publication": {
+    "instruction": "\"Sim, publica\", à pergunta \"Faço a cópia do banco e publico a API e o app das rodadas?\"",
+    "by": "o agente, pelo painel de deploy, com sessão já aberta",
+    "dump": {
+      "bytes": 612693,
+      "tablesBefore": 31,
+      "copiesInContainer": 7
+    },
+    "api": {
+      "commit": "e0914ae, pelo título do commit no painel (o hash não apareceu) e pela migração nova no banco",
+      "seconds": 27,
+      "tablesAfter": 33,
+      "newTables": [
+        "photo_survey_round_draws",
+        "photo_survey_round_responses"
+      ],
+      "newTableRows": 0,
+      "migration": "2026-11-26-photo-survey-rounds-v1",
+      "otherCountsChanged": false
+    },
+    "app": {
+      "commit": "e0914ae4a91eeb7b2e12f5d77080f2defad73fe1, mostrado no painel",
+      "seconds": 29,
+      "builtAt": "2026-11-26T22:26:52.914Z",
+      "mainScript": "main-C1UIVA4d.js",
+      "versionJsonSha": "unknown (não identifica o commit, #287)"
+    },
+    "readFromOutside": [
+      "version.json",
+      "texto do script principal",
+      "como-funciona.html",
+      "/api/health",
+      "as quatro pesquisas",
+      "capa",
+      "/creditos.html"
+    ],
+    "watch": {
+      "from": "22:23:41Z, depois da cópia do banco e da consulta ao CI, antes do deploy da API",
+      "to": "22:48:55Z",
+      "reads": 1626,
+      "failures": 0,
+      "failureMeans": "código diferente de 200, inclusive tempo esgotado ou erro de rede",
+      "urls": [
+        "/api/health",
+        "capa",
+        "/api/photo-surveys/politica-2026-01"
+      ]
+    },
+    "notDone": [
+      "navegador contra a produção",
+      "pedido de escrita",
+      "rodada nova de verdade",
+      "log de início da API"
+    ]
   }
 }

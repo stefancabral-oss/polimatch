@@ -299,5 +299,5 @@ rodada; o servidor monta as rodadas seguintes com prioridade para as duplas
 que a pessoa ainda não viu; as respostas já gravadas valem como primeira
 rodada, e as rodadas seguintes vão para tabelas novas; no resultado, cada
 pessoa vale uma só, com todas as rodadas dela. Nenhuma soma é calculada
-neste estágio. Em 26/11/2026 o estágio aguardava o gate do
-merge, sem publicação.
+neste estágio. Mesclado e publicado em 26/11/2026, com API e app no commit
+`e0914ae`.

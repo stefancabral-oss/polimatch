@@ -1,6 +1,7 @@
 # HANDOFF — ICM 75 — Rodadas novas enquanto houver confrontos por ver — #350
 
-Estado: `aguardando gate do merge`. Nada deste estágio está em produção.
+Estado: `publicado`. Em 26/11/2026 o PR #352 foi mesclado e a API e o app
+foram publicados no commit `e0914ae`. A issue #350 continua aberta.
 
 PR: https://github.com/stefancabral-oss/polimatch/pull/352, branch
 `icm/75-more-rounds`. Os commits são os do PR; este arquivo não lista os
@@ -171,7 +172,8 @@ WebKit, com servidor simulado; não estão no repositório.
 
 ## O que não foi conferido
 
-- Nada foi visto em produção: o estágio não está publicado.
+- Antes do merge, nada foi visto em produção. O que foi lido depois da
+  publicação está em "Publicação (75d) — 26/11/2026", abaixo.
 - Celular de verdade e conta Google de verdade. As telas foram vistas em
   WebKit e em Chromium neste computador, com servidor simulado.
 - O servidor de verdade com PostgreSQL foi exercitado só pelos roteiros de
@@ -239,22 +241,74 @@ por nova leitura.
 - **O jogo antigo continua ligado na API.** O caso da troca de jogador ativo
   só se alcança chamando a API direto; pela tela atual não há caminho.
 
-## Publicação (75d)
+## Merge — 26/11/2026
 
-Pede o sim do Stefan, depois do merge.
+À pergunta "Mesclo o PR 352 quando o CI do último commit ficar verde?", que
+levava por extenso as onze escolhas de regra e de dado, o Stefan respondeu
+"Sim, mescla". A resposta está transcrita no PR (comentário de 22:17 UTC).
+O merge foi por squash às 22:17:45 UTC, no commit
+`e0914ae4a91eeb7b2e12f5d77080f2defad73fe1`. A árvore desse commit é igual à
+do último commit do PR (`af03864`), que teve o CI aprovado. O CI do push na
+`main` terminou aprovado às 22:22:47 UTC.
 
-1. Cópia do banco, como nas publicações anteriores.
-2. **API primeiro.** Ao subir, ela cria as duas tabelas novas e grava a
-   migração. Com a API nova e o app antigo, ninguém recebe rodada nova: o
-   app antigo não pede.
-3. **App depois.**
-4. Voltar atrás: publicar de novo o commit anterior dos dois serviços. As
-   tabelas novas ficam no banco, sem uso; nenhuma linha antiga é alterada.
-   Rodadas já respondidas ficam gravadas e deixam de ser mostradas.
+## Publicação (75d) — 26/11/2026
+
+À pergunta "Faço a cópia do banco e publico a API e o app das rodadas?", o
+Stefan respondeu "Sim, publica". Quem publicou foi o agente, pelo painel de
+deploy, com uma sessão que já estava aberta; o agente não digitou senha.
+Começou depois de o CI da `main` terminar.
+
+1. **Cópia do banco**, no terminal do contêiner do banco: `pg_dump` em
+   formato próprio do PostgreSQL, 612.693 bytes, e a contagem de linhas das
+   31 tabelas, num arquivo à parte, também no contêiner. Com ela são sete
+   cópias guardadas no contêiner.
+2. **API**, no commit do merge: o painel mostrou o deploy concluído em
+   27 s, com o título do commit `e0914ae` ("[ICM 75] Rodadas novas enquanto
+   houver confrontos por ver (#352)"); o hash não apareceu na tela. A
+   migração nova no banco confirma que a API publicada é a deste commit. Depois dele, uma nova contagem no mesmo terminal: 33 tabelas.
+   Entraram `photo_survey_round_draws` e `photo_survey_round_responses`,
+   vazias; `schema_migrations` passou de 5 para 6 linhas, com
+   `2026-11-26-photo-survey-rounds-v1`. Nenhuma outra contagem mudou.
+3. **App** no mesmo commit. O painel mostrou o deploy concluído em 29 s,
+   com o hash `e0914ae4a91eeb7b2e12f5d77080f2defad73fe1`.
+
+Lido de fora, só por GET, depois dos dois deploys:
+
+- `version.json` com `builtAt` `2026-11-26T22:26:52.914Z`. Ele traz `sha`
+  `unknown`: não identifica o commit (#287); o commit publicado se lê no
+  painel.
+- O script principal publicado (`main-C1UIVA4d.js`) traz "Mais uma rodada"
+  e não traz "Um CPF, um voto". "Como funciona" traz a frase nova do item 5.
+- `/api/health`, as quatro pesquisas, a capa e `/creditos.html` respondem
+  200.
+- Um roteiro do agente leu `/api/health`, a capa e uma pesquisa a cada
+  poucos segundos, de 22:23:41 UTC (depois da cópia do banco e da consulta
+  ao CI, antes do deploy da API) até 22:48:55 UTC: 1.626 leituras e nenhuma
+  falha. Pelo roteiro, falha é qualquer leitura cujo código não seja 200,
+  inclusive tempo esgotado ou erro de rede.
+
+O que o agente não fez nem viu em produção:
+
+- Não abriu navegador contra o site e não fez nenhum pedido de escrita.
+- Não jogou rodada nova nem viu a tela de resposta registrada com a
+  contagem de confrontos.
+- Não leu o log de início da API. Que ela subiu e migrou se vê pelo banco e
+  pelas leituras de fora.
+
+Ao sair, o painel voltou para a organização em que abre e a aba foi
+fechada. O registro na issue #350 é o comentário da publicação.
+
+### Voltar atrás
+
+Publicar de novo o commit anterior (`835614a`, que tem o mesmo código de
+`6e38d32`, o último publicado antes deste) nos dois serviços, app primeiro. As tabelas novas ficam no banco,
+sem uso; nenhuma linha antiga é alterada. Rodadas já respondidas ficam
+gravadas e deixam de ser mostradas.
 
 ## Gate humano
 
-- [ ] Merge: sim do Stefan, com as onze escolhas de regra e de dado por
-      extenso na pergunta.
-- [ ] Publicação (75d): outro sim, depois do merge.
+- [x] Merge: "Sim, mescla", 26/11/2026, com as onze escolhas de regra e de
+      dado por extenso na pergunta.
+- [x] Publicação (75d): "Sim, publica", 26/11/2026.
+- [ ] Teste em celular de verdade, com conta Google: do Stefan.
 - [ ] Fechamento da issue #350: outro sim.
