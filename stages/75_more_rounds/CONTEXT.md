@@ -165,7 +165,7 @@ rodadas.
 | 75a — Registro | Decisão 0007, este contexto, nota na decisão 0001, versão nova da política de integridade do voto, notas no `AGENTS.md` e no `CONTEXT.md` |
 | 75b — Regras e servidor | Confrontos, montagem da rodada e progresso em `shared/`; tabelas novas, sorteio e resposta por rodada no servidor; testes |
 | 75c — Tela | Resposta registrada, rodada nova, capa, "Como funciona"; testes e roteiros de navegador |
-| 75d — Publicação | API e app, com o sim do Stefan. A API vai antes do app |
+| 75d — Publicação | API e app, com o sim do Stefan. A API vai antes do app. Feita em 26/11/2026, no commit `e0914ae` |
 
 ## Critérios de aceite
 

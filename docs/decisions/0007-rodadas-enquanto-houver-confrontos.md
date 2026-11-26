@@ -4,8 +4,8 @@
 - Quem decidiu: Stefan
 - Registrado por: agente (Claude)
 - Issue: #350 ([ICM 75])
-- Estado: em 26/11/2026, construído no estágio 75, à espera do gate do
-  merge; sem publicação.
+- Estado: em produção desde 26/11/2026 (estágio 75, PR #352, API e app no
+  commit `e0914ae`).
 - Altera a [decisão 0001](0001-pesquisa-de-preferencia-por-foto.md) no item 2
   ("não se repete para a mesma pessoa"). O resto dela continua valendo.
 
