@@ -285,5 +285,5 @@ do compartilhar leva o crédito. Nenhum retrato é gerado ou editado por IA. A
 pesquisa de famosos vem depois das duas de Política e antes da de roupas.
 "Em breve" fica sem itens. A licença livre trata do direito de quem fez a
 foto, não do direito da pessoa retratada; como o agente lê a resposta à Q3
-da #277 para estas fotos é uma das escolhas listadas na decisão 0006. Em
-24/11/2026 o estágio estava em construção, sem merge e sem publicação.
+da #277 para estas fotos é uma das escolhas listadas na decisão 0006.
+Publicado em 26/11/2026, com API e app no commit `6e38d32`.

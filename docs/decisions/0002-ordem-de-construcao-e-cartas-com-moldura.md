@@ -8,7 +8,8 @@
   da ordem, a pesquisa de Política com cartas de moldura (estágio 68, #324).
   Em 23/11/2026 entrou a pesquisa de roupas de demonstração (estágio 73,
   #345), a segunda pela ordem da decisão 0005. Nessa data, a de celebridades
-  e influenciadores não tinha sido construída.
+  e influenciadores não tinha sido construída. Em 26/11/2026 entrou a de
+  celebridades e influenciadores (estágio 74, #348).
 - Altera a [decisão 0001](0001-pesquisa-de-preferencia-por-foto.md) nos pontos
   listados em "O que muda na decisão 0001". O resto dela continua valendo.
 - Alterada no item 1 pela [decisão 0005](0005-roupas-antes-de-celebridades.md),

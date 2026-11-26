@@ -1,6 +1,8 @@
 # HANDOFF — ICM 74 — Pesquisa de famosos e influenciadores — #348
 
-Estado: `aguardando gate do merge`. Nada deste estágio está em produção.
+Estado: `publicado`. As partes 74a, 74b e 74c foram mescladas (PR #349,
+commit `6e38d32`) e a 74d aconteceu em 26/11/2026: API e app foram
+publicados nesse commit. Em 26/11/2026 faltava fechar a issue #348.
 
 ## O que foi feito
 
@@ -258,7 +260,8 @@ feitas depois da leitura independente; o CI os roda a cada commit.
   nome da licença depende de `rel="noopener license"` na página gerada.
 - **Celular de verdade, o botão real do Google e o compartilhamento real do
   aparelho.**
-- **Produção.** Nada foi publicado.
+- **Produção, na tela.** A publicação foi conferida de fora, por leitura. O
+  agente não viu nenhuma tela em produção (ver "Publicação (74d)").
 
 ## Riscos
 
@@ -359,26 +362,109 @@ commit foi escrita antes de as últimas execuções terminarem. Os números
 escritos foram conferidos depois com o resultado das execuções e não
 mudaram.
 
+## Merge — 26/11/2026
+
+O PR #349 foi mesclado em 26/11/2026, às 19:35 UTC (16:35 de Brasília), no
+commit `6e38d32`. A árvore do merge é a mesma do último commit do PR,
+`aa4739d`. A instrução do Stefan está transcrita no PR, com a pergunta que
+ele respondeu.
+
+- **CI do commit final do PR (`aa4739d`):** os nove trabalhos aprovados, nos
+  dois navegadores, vistos pelo agente antes do merge. Quando a pergunta do
+  merge foi feita, em 25/11, esse CI ainda rodava.
+- **Revisão automática (Codex):** leu o primeiro commit, sem apontamentos;
+  nenhuma conversa aberta no PR.
+- **CI do push do merge na `main`:** terminou verde, com todos os
+  trabalhos, por volta de 19:40 UTC, antes do primeiro deploy.
+- **Produção logo depois do merge:** lida de fora menos de um minuto depois,
+  seguia no build da publicação de 23/11 (`builtAt` 2026-11-24T02:57:49Z),
+  sem a pesquisa de famosos.
+
+## Publicação (74d) — 26/11/2026
+
+À pergunta "Faço a cópia do banco e publico a API e o app?", o Stefan
+respondeu "Sim, publica". O painel de deploy estava sem sessão, e o agente
+não digita senha: a publicação só começou depois que o Stefan entrou no
+painel e avisou. Um sim para os três passos.
+
+| Passo | O que foi visto |
+|---|---|
+| Cópia do banco | `/tmp/pre-deploy-20261126.dump` no contêiner do banco, às 19:52 UTC: 612.473 bytes, 31 tabelas. A contagem de linhas de cada tabela foi guardada em dois arquivos de texto ao lado, um antes e um depois da API. |
+| API | Deploy concluído no commit `6e38d32`, em 31 s, pelo que o painel registra. No log do contêiner novo: `database_ready` com `resetApplied` falso e `listening`, os dois às 19:55:56 UTC. A busca do painel por "error" e por "fail", nas linhas que ele mostrava (o limite do painel era de 100), não achou nenhuma. De fora, a saúde respondeu 200 em todas as leituras, e a rota da pesquisa de famosos passou de 404 a 200 às 19:56:03 UTC. |
+| Banco depois da API | As mesmas 31 tabelas. Trinta com a mesma contagem; `abuse_quota_counters` de 1 para 0 (pelo código, a poda de contadores antigos que a API faz ao subir). Nenhuma tabela nova. Sorteios da pesquisa de famosos: 0. |
+| App | Deploy concluído no commit `6e38d32`, em 33 s. De fora, a capa respondeu 200 em todas as leituras; `/creditos.html` passou de 404 a 200 às 19:59:52 UTC; `builtAt` 2026-11-26T19:59:30Z. |
+
+O commit de cada deploy é o que o painel registrou; em 26/11/2026 o
+`version.json` seguia com `sha` desconhecido (#287).
+
+**Lido de fora, só por GET, às 20:00 UTC:**
+
+- capa, "Como funciona", `/creditos.html`, `/?p=famosos-01` e
+  `/?p=roupas-demo-01`: 200;
+- as quatro pesquisas 200 na API; a de famosos com assunto "Famosos", a
+  pergunta "De quem você é mais fã?", a nota "Fotos de licença livre.", 20
+  cartas, sorteio de 16 e status `open`; nenhuma resposta traz o campo
+  `people`;
+- as 40 imagens das cartas de famosos 200, com o hash do manifesto;
+- a página de créditos com 20 linhas;
+- os três arquivos de script servidos (`main-wf85QvEV.js`,
+  `site-menu-Cmzwml1w.js` e `sw.js`) trazem, juntos, `famosos-01`, a
+  pergunta, a nota, "Entre elas, quem fica?", "Créditos das fotos", "Ver os
+  créditos" e o trecho "Créditos completos em", do crédito da imagem do
+  compartilhar, e não trazem mais "Famosos e influenciadores".
+
+**Vigia.** Um roteiro do agente leu a capa e a saúde da API, só por GET, de
+19:51 a 20:16 UTC: 467 rodadas de leitura, com três segundos de pausa entre
+elas. Nenhuma leitura falhou.
+
+**O que o agente não fez em produção:** não abriu o site em navegador, não
+tocou em carta, não fez pedido de escrita (nenhum sorteio, nenhuma
+resposta), não abriu a aba de variáveis nem alterou configuração.
+
+**Visto de passagem:** a chave Autodeploy aparecia ligada nos dois serviços
+durante a publicação; vinte minutos depois do merge a produção ainda estava
+como antes, e disso o agente conclui que o merge não disparou deploy. No
+contêiner do banco havia seis cópias do banco e os dois arquivos de
+contagem; o destino deles é decisão do Stefan (#279). As imagens da API e do
+app foram construídas pelo painel de deploy; o agente não as construiu nem
+inspecionou.
+
+## Depois da publicação
+
+O agente deu ao Stefan o endereço da pesquisa de famosos e perguntou: "A
+pesquisa de famosos funcionou no seu celular? Abra o endereço, responda,
+toque em Compartilhar e me diga "funcionou" ou "deu problema", e o que
+apareceu."
+
+Menos de três minutos depois ele respondeu: "Funcionou". Era uma das duas
+respostas oferecidas. Ele não disse o que testou, em que aparelho, nem o que
+apareceu.
+
+O agente então pediu, sem ser em forma de pergunta com opções: "o que você
+testou na pesquisa de famosos (celular ou computador, se respondeu até o
+fim, se o Compartilhar saiu com o crédito das fotos no pé da imagem)". Ele
+citou esse trecho e respondeu: "Deu certo."
+
+É o que se sabe do teste pedido a ele: duas respostas curtas, as duas positivas. Ele
+não disse em que aparelho. O registro não afirma que houve teste em celular
+nem descreve o que apareceu na tela.
+
 ## Gate humano
 
-Pendente em 24/11/2026.
+Aprovado para o merge e para a publicação. Em 26/11/2026 o fechamento da
+issue seguia pendente.
 
-O que o Stefan já respondeu: "Sim, começa" e "Sim, baixa" (decisão 0006).
+As instruções do Stefan, na ordem:
 
-A pergunta do merge leva por extenso as escolhas de regra e de dado, as onze
-primeiras da decisão 0006:
+1. "Sim, começa", em 24/11/2026, à pergunta "Começo a pesquisa de famosos e
+   influenciadores?".
+2. "Sim, baixa", em 24/11/2026, à pergunta "Baixo as fotos e monto as cartas
+   dos famosos?" (decisão 0006).
+3. "Sim, mescla", em 26/11/2026, à pergunta "Mesclo o PR 349 quando o CI do
+   último commit ficar verde?". A mensagem trazia por extenso as onze
+   escolhas de regra e de dado da decisão 0006, com os vinte nomes, e dava a
+   opção "troca o elenco". Ele não pediu troca. Transcrição no PR #349.
+4. "Sim, publica", em 26/11/2026, à pergunta "Faço a cópia do banco e
+   publico a API e o app?".
 
-1. quem aparece (os vinte nomes, com as quatro trocas);
-2. oito das vinte estão no catálogo do jogo eleitoral anterior;
-3. é uma pesquisa de verdade, com respostas gravadas sobre pessoas reais;
-4. o sorteio de 16 entre 20;
-5. a ordem na capa, com o que muda para quem já respondeu;
-6. a leitura do agente de que a resposta à Q3 da #277 cobre estas fotos;
-7. as fotos entram no repositório público, com o crédito, e as que foram
-   trocadas continuam nos commits do PR;
-8. três cartas ficam sob a mesma licença da foto;
-9. a página de créditos é pública e pode ser achada por buscador;
-10. onde o crédito aparece;
-11. ficam quatro fotos cuja licença a Commons ainda não revisou.
-
-Merge e publicação pedem o sim dele, um a um.
+Fechar a issue #348 pede outro sim.
