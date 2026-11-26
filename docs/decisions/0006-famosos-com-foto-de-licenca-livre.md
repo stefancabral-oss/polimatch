@@ -110,7 +110,8 @@ do estágio.
    dele.
 3. **É uma pesquisa de verdade, sobre pessoas reais.** O código é
    `famosos-01` e a pergunta é "De quem você é mais fã?". Valem o cadastro da
-   decisão 0004 e uma resposta por pessoa. As respostas ficam gravadas como
+   decisão 0004 e uma resposta por pessoa (por rodada, desde a decisão 0007,
+   de 26/11/2026). As respostas ficam gravadas como
    as de qualquer pesquisa, ligadas à conta de quem respondeu. A pesquisa não
    tem data para fechar. A pergunta é positiva; nenhuma pergunta negativa
    sobre pessoa real.

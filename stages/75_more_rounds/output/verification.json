@@ -1,0 +1,130 @@
+{
+  "checkedAt": "2026-11-26",
+  "issue": 350,
+  "stage": "75_more_rounds",
+  "base": "main em 835614a; construído e testado sobre 6e38d32, que só difere dela em documentação",
+  "instruction": "Stefan, 26/11/2026: \"Depois builda e publica uma correção a onde a pessoa precisa ou fica aberto para votar enquanto houverem possibilidades de enfrentyamentos que a pessoa ainda não votou.\" À pergunta \"A pessoa joga rodadas novas até ter visto todas as duplas de cartas, é isso?\" (seguida de: Responda \"é isso\" ou \"só as que faltaram\".), respondeu \"É isso.\". A resposta cobre a pesquisa ficar aberta, em rodadas novas, até a pessoa ter visto todas as duplas. O resto é escolha do agente (decisão 0007).",
+  "agentChoices": {
+    "ruleAndData": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "design": [
+      12,
+      13,
+      14
+    ],
+    "where": "docs/decisions/0007-rodadas-enquanto-houver-confrontos.md"
+  },
+  "parts": {
+    "75a": "registro: decisão 0007, contexto do estágio, nota na decisão 0001, política de integridade do voto versão 6, notas no AGENTS.md, no CONTEXT.md e no README.md",
+    "75b": "regras em shared/ e servidor em back/: confrontos, progresso, montagem da rodada, duas tabelas novas, campos novos nas duas rotas",
+    "75c": "tela em app/: resposta registrada com Mais uma rodada, rodada nova, capa, Como funciona, entrada, cadastro e confirmação",
+    "75d": "publicação: não feita; pede o sim do Stefan depois do merge"
+  },
+  "database": {
+    "newTables": [
+      "photo_survey_round_draws",
+      "photo_survey_round_responses"
+    ],
+    "migration": "2026-11-26-photo-survey-rounds-v1",
+    "existingTablesChanged": false,
+    "receiptUniqueness": "trava no código (pg_advisory_xact_lock) antes de gravar, não restrição do banco"
+  },
+  "simulation": {
+    "seeds": 500,
+    "rounds20Cards": "8 a 10",
+    "rounds16Cards": "5 a 7",
+    "pairsPerRound": 30,
+    "totalPairs": {
+      "20 cartas": 190,
+      "16 cartas": 120
+    },
+    "where": "shared/photo-survey.test.js"
+  },
+  "tests": {
+    "ranBy": "o agente que escreve o handoff, em 26/11/2026, em macOS; números da segunda execução, depois das correções da leitura independente",
+    "shared": "137 de 137",
+    "back": "335 de 335",
+    "app": "239 de 239",
+    "build": "passou, com VITE_GOOGLE_CLIENT_ID de teste",
+    "databaseSmokes": {
+      "database": "PostgreSQL 16 local descartável",
+      "passed": [
+        "npm run test:integration --prefix back",
+        "back/scripts/ordered-choices-smoke.mjs",
+        "back/scripts/presidential-duels-smoke.mjs",
+        "npm run test:abuse --prefix back",
+        "back/scripts/game-progress-smoke.mjs",
+        "back/scripts/civic-schema-smoke.mjs",
+        "npm run test:resilience --prefix back",
+        "npm run test:photo-survey --prefix back",
+        "npm run test:registration --prefix back"
+      ],
+      "notRun": [
+        "ensaio de backup e restauração",
+        "back/scripts/partial-restore-smoke.mjs"
+      ]
+    },
+    "browser": {
+      "server": "simulado pelos próprios roteiros, com vite preview local",
+      "webkit": {
+        "photo-survey.mjs": "42 cenários",
+        "site-shell.mjs": "56 cenários",
+        "client-error-report.mjs": "passou antes das correções; não repetido depois"
+      },
+      "chromium": {
+        "photo-survey.mjs": "42 cenários",
+        "site-shell.mjs": "56 cenários",
+        "note": "revisão 1187 já instalada, aberta por roteiro auxiliar fora do repositório; client-error-report.mjs não rodado"
+      }
+    }
+  },
+  "notVerified": [
+    "nada em produção: o estágio não está publicado",
+    "celular de verdade e conta Google de verdade",
+    "o aplicativo no navegador contra o servidor de verdade",
+    "as telas com as fontes do Linux do CI, vistas pelo agente que escreve o handoff",
+    "o tempo de montagem de uma rodada nova no servidor com muitas pessoas ao mesmo tempo",
+    "a conta que transforma as rodadas de uma pessoa numa preferência só (#177): não existe"
+  ],
+  "humanGate": {
+    "merge": "pendente",
+    "publication": "pendente",
+    "issueClosing": "pendente"
+  },
+  "pullRequest": 352,
+  "independentReview": {
+    "first": {
+      "when": "2026-11-26",
+      "by": "agente à parte, somente leitura",
+      "verdict": "segurou o merge",
+      "changed": [
+        "rodadas de 2 em diante passam a valer pela identidade, como a rodada 1",
+        "resposta sem round é sempre da rodada 1",
+        "a aba parada numa rodada antiga busca a rodada no servidor quando outra aba já está na seguinte",
+        "escolhas 9 e 10 por extenso na decisão 0007; notas nas decisões 0004 e 0006; saiu 'por voz'; riscos e link do PR no handoff"
+      ]
+    },
+    "second": {
+      "when": "2026-11-26",
+      "by": "outro agente à parte, somente leitura",
+      "verdict": "não segurou o merge",
+      "changed": [
+        "escolha 11 por extenso (a rodada aberta não vence)",
+        "riscos: aba com o app antigo e rodada nova aberta; contagem ao ligar jogador antigo; desempate sem teste",
+        "acertos de texto na decisão, na política, no contexto e num comentário do código"
+      ],
+      "note": "as correções de texto feitas depois desta leitura não passaram por nova leitura"
+    }
+  }
+}

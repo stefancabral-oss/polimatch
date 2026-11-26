@@ -82,6 +82,8 @@ item 5). Estas escolhas respondem à pendência "Login Google e CPF" da decisão
 - App online-only, mesma exposição para todas as opções de uma tela, nenhum
   resultado manipulado, compartilhamento por iniciativa da pessoa.
 - Uma resposta por pessoa em cada pesquisa, sem troca depois de confirmar.
+  (Alterado pela decisão 0007, de 26/11/2026: uma resposta por rodada, em
+  rodadas novas enquanto houver confronto por ver.)
 - O fluxo ICM e o gate humano do `AGENTS.md`. Merge e publicação pedem o sim
   do Stefan, um a um. (Em 16/11/2026 a pergunta listou os dois merges e os
   deploys de uma vez e teve um sim para o conjunto; está no HANDOFF do

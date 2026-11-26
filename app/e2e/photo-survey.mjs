@@ -13,9 +13,10 @@
  * Cenários:
  *   1. Abrir a página da pesquisa não cria jogador nem sorteio.
  *   2. Caminho direto: um toque por tela, final, confirmação e uma gravação.
- *   3. As quatro cartas têm o mesmo tamanho e cabem na tela em seis tamanhos,
+ *   3. As quatro cartas têm o mesmo tamanho e cabem na tela em sete tamanhos,
  *      e em dois deles com o texto mais largo e mais alto; a confirmação e a
- *      resposta registrada cabem sem cobrir a escolhida nem as finalistas.
+ *      resposta registrada, com os três botões e a frase dos confrontos,
+ *      cabem sem cobrir a escolhida nem as finalistas.
  *   4. Voltar e trocar, inclusive a carta que era a escolhida.
  *   5. Recarregar no meio retoma o mesmo sorteio e as mesmas escolhas.
  *   6. Segunda aba: retoma o mesmo ponto e vê a resposta quando a outra confirma.
@@ -38,6 +39,25 @@
  *      observação (as pesquisas de famosos e de roupas, que têm, são do
  *      roteiro site-shell.mjs, com a final de cada uma: "quem fica?" na de
  *      famosos, como aqui, e "qual fica?" na de roupas).
+ *
+ * Rodadas (ICM 75, #350). O servidor simulado segue o contrato das rodadas,
+ * com as funções de shared/photo-survey.js; `legacy` o faz responder como o
+ * de antes delas. A capa com rodadas é do roteiro site-shell.mjs.
+ *  22. Duas rodadas seguidas: "Mais uma rodada" abre outros grupos, a etapa
+ *      mostra a rodada, a resposta leva `round: 2` e a tela conta os
+ *      confrontos; dois toques no botão pedem uma rodada só.
+ *  23. Recarregar no meio da rodada 2 retoma a rodada 2; sem conexão, ou com
+ *      a resposta do servidor perdida, "Mais uma rodada" avisa e a nova
+ *      tentativa abre a mesma rodada.
+ *  24. Sem confronto por ver: a última rodada fecha a pesquisa para a
+ *      pessoa, e a tela diz isso, sem o botão; e o toque em "Mais uma
+ *      rodada" que chega tarde volta para a última rodada respondida.
+ *  25. Servidor de antes das rodadas: a resposta registrada fica como era.
+ *  26. Pesquisa fechada depois da primeira rodada: sem o botão; fechada com
+ *      a rodada 2 pela metade, vale a rodada anterior.
+ *  27. Dois aparelhos na rodada 2: vale a primeira resposta da rodada.
+ *  28. Segunda aba na rodada 2: acompanha as escolhas sem pedir sorteio de
+ *      novo, e vê a resposta quando a outra confirma.
  */
 import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
@@ -46,7 +66,11 @@ import {
   PHOTO_SURVEYS,
   drawCards,
   drawGroups,
+  drawRound,
   publicPhotoSurvey,
+  seenPairKeys,
+  surveyProgress,
+  totalPairCount,
   validateBracket,
 } from "../../shared/photo-survey.js";
 import ARTS from "../src/political-chromas.json" with { type: "json" };
@@ -88,6 +112,8 @@ function createServer() {
     down: false,
     quota: false,
     dropAfterApply: 0,
+    // O sorteio é atendido (a rodada nasce) e a resposta se perde no caminho.
+    dropDrawAfterApply: 0,
     // Falhas programadas: cada entrada é o status HTTP da próxima chamada.
     failDraw: [],
     failResponse: [],
@@ -99,9 +125,16 @@ function createServer() {
     unregistered: new Set(),
     // A conta que a próxima entrada com Google devolve.
     nextAccount: "",
+    // Um servidor de antes das rodadas (ICM 75): não lê `next` nem `round` e
+    // não manda `round`, `progress` nem `lastAnswered`.
+    legacy: false,
     requests: [],
+    // A rodada 1 de cada identidade: o sorteio e a resposta, como antes das
+    // rodadas. As rodadas seguintes ficam em `later`, por identidade, cada uma
+    // com o número, as cartas e a resposta (null enquanto está aberta).
     draws: new Map(),
     responses: new Map(),
+    later: new Map(),
     issued: 0,
     count(method, suffix) {
       return server.requests.filter((request) => request.method === method && request.pathname.endsWith(suffix)).length;
@@ -109,12 +142,57 @@ function createServer() {
     bodies(suffix) {
       return server.requests.filter((request) => request.method === "POST" && request.pathname.endsWith(suffix)).map((request) => request.body);
     },
-    groupsFor(key) {
-      return drawGroups(server.draws.get(key), SURVEY.groupSize);
+    /** As rodadas da identidade, em ordem, como o servidor de verdade as lê. */
+    roundsOf(key) {
+      const first = server.responses.get(key);
+      const shownIds = first ? first.shownIds : server.draws.get(key);
+      const rounds = shownIds ? [{ round: 1, shownIds, response: first?.response || null }] : [];
+      return server.legacy ? rounds : [...rounds, ...(server.later.get(key) || [])];
+    },
+    groupsFor(key, round = 1) {
+      return drawGroups(server.roundsOf(key).find((entry) => entry.round === round).shownIds, SURVEY.groupSize);
+    },
+    /**
+     * Deixa a identidade a uma rodada do fim: joga no servidor, sem tela, as
+     * rodadas que faltam até não sobrar confronto, e deixa a última aberta.
+     * Devolve as escolhas com que essa última rodada fecha todos os confrontos.
+     */
+    playUntilLastRound(key) {
+      for (;;) {
+        const rounds = server.roundsOf(key);
+        const seen = seenPairKeys(SURVEY, answeredRounds(rounds));
+        if (seen.size >= totalPairCount(SURVEY)) throw new Error("não sobrou rodada para deixar aberta");
+        const shownIds = drawRound(SURVEY, seen, (limit) => randomInt(limit));
+        const pickIds = drawGroups(shownIds, SURVEY.groupSize).map((group) => group[randomInt(group.length)]);
+        const entry = { round: rounds.at(-1).round + 1, shownIds, response: null };
+        server.later.set(key, [...(server.later.get(key) || []), entry]);
+        const after = seenPairKeys(SURVEY, [...answeredRounds(rounds), { shownIds, pickIds }]);
+        if (after.size >= totalPairCount(SURVEY)) return { round: entry.round, pickIds };
+        entry.response = { answerId: crypto.randomUUID(), pickIds, championId: pickIds[0], respondedAt: new Date().toISOString() };
+      }
+    },
+    /** Quantos confrontos a identidade já viu, pela conta do servidor. */
+    seenPairs(key) {
+      return seenPairKeys(SURVEY, answeredRounds(server.roundsOf(key))).size;
     },
     view() {
       return { ...publicPhotoSurvey(SURVEY, new Date()), status: server.status };
     },
+  };
+  const answeredRounds = (rounds) => rounds.filter((entry) => entry.response).map((entry) => ({ shownIds: entry.shownIds, pickIds: entry.response.pickIds }));
+  // O que as duas rotas devolvem sobre uma rodada: os campos de antes das
+  // rodadas e, fora do servidor antigo, `round`, `progress` e `lastAnswered`.
+  const roundView = (rounds, entry) => {
+    const base = { survey: server.view(), draw: { groups: drawGroups(entry.shownIds, SURVEY.groupSize) }, response: entry.response };
+    if (server.legacy) return base;
+    const progress = surveyProgress(SURVEY, answeredRounds(rounds), server.status);
+    const last = rounds.findLast((item) => item.response);
+    return {
+      ...base,
+      round: entry.round,
+      progress: { ...progress, canContinue: progress.canContinue && rounds.every((item) => item.response) },
+      lastAnswered: last ? { round: last.round, response: last.response } : null,
+    };
   };
   server.handler = async (route) => {
     const request = route.request();
@@ -160,45 +238,83 @@ function createServer() {
       return send(403, { error: "cadastro com CPF obrigatório para responder", code: "CPF_REGISTRATION_REQUIRED" });
     }
 
-    const prior = server.responses.get(key);
     const failure = (status) => send(status, status === 429
       ? { error: "muitas requisições", code: "RATE_LIMITED", retryAfterSeconds: 30 }
       : { error: "erro interno", code: "INTERNAL_ERROR" });
+    const invalid = (reason) => send(400, { error: "resposta não corresponde ao sorteio", code: "PHOTO_SURVEY_RESPONSE_INVALID", current: { reason } });
+    const closed = () => send(409, { error: "pesquisa fechada", code: "PHOTO_SURVEY_CLOSED", current: { status: server.status } });
+    // Sem `next`: emite a rodada 1 para quem não tem nenhuma e, para os
+    // demais, devolve a última rodada, aberta ou respondida. Com `next`
+    // verdadeiro, emite a rodada seguinte quando a última está respondida, a
+    // pesquisa está aberta e sobra confronto por ver; senão, responde como
+    // sem `next`.
     if (action === "draw" && method === "POST") {
       if (server.failDraw.length) return failure(server.failDraw.shift());
-      if (prior) return send(200, { survey: server.view(), draw: { groups: drawGroups(prior.shownIds, SURVEY.groupSize) }, response: prior.response });
-      if (!server.draws.has(key)) {
-        if (server.status !== "open") return send(409, { error: "pesquisa fechada", code: "PHOTO_SURVEY_CLOSED", current: { status: server.status } });
-        server.draws.set(key, drawCards(SURVEY, (limit) => randomInt(limit)));
+      const next = server.legacy ? undefined : body?.next;
+      if (next !== undefined && typeof next !== "boolean") {
+        return send(400, { error: "pedido de sorteio inválido", code: "PHOTO_SURVEY_DRAW_INVALID", current: { reason: "next" } });
       }
-      return send(200, { survey: server.view(), draw: { groups: server.groupsFor(key) }, response: null });
+      const rounds = server.roundsOf(key);
+      const last = rounds.at(-1);
+      if (!last) {
+        if (server.status !== "open") return closed();
+        server.draws.set(key, drawCards(SURVEY, (limit) => randomInt(limit)));
+      } else if (next === true && last.response && server.status === "open") {
+        const seen = seenPairKeys(SURVEY, answeredRounds(rounds));
+        if (seen.size < totalPairCount(SURVEY)) {
+          const entry = { round: last.round + 1, shownIds: drawRound(SURVEY, seen, (limit) => randomInt(limit)), response: null };
+          server.later.set(key, [...(server.later.get(key) || []), entry]);
+        }
+      }
+      if (server.dropDrawAfterApply > 0) {
+        server.dropDrawAfterApply -= 1;
+        return route.abort("connectionreset");
+      }
+      const current = server.roundsOf(key);
+      return send(200, roundView(current, current.at(-1)));
     }
+    // Sem `round`, a resposta vale para a rodada aberta e, sem rodada aberta,
+    // para a rodada 1. Com `round`, a rodada precisa existir.
     if (action === "response" && method === "POST") {
       if (server.failResponse.length) return failure(server.failResponse.shift());
-      if (prior) {
-        const same = JSON.stringify(prior.response.pickIds) === JSON.stringify(body?.pickIds) && prior.response.championId === body?.championId;
-        if (same) return send(200, { status: "alreadyProcessed", survey: server.view(), draw: { groups: drawGroups(prior.shownIds, SURVEY.groupSize) }, response: prior.response });
-        return send(409, { error: "esta pesquisa já foi respondida", code: "PHOTO_SURVEY_ALREADY_ANSWERED", current: prior.response });
+      const round = server.legacy ? undefined : body?.round;
+      if (round !== undefined && !(Number.isInteger(round) && round >= 1)) return invalid("round");
+      const rounds = server.roundsOf(key);
+      const target = round === undefined
+        ? rounds.find((entry) => !entry.response) || rounds.find((entry) => entry.round === 1)
+        : rounds.find((entry) => entry.round === round);
+      if (!target) {
+        if (round !== undefined) return invalid("round");
+        return send(409, { error: "sorteio ainda não emitido", code: "PHOTO_SURVEY_DRAW_REQUIRED" });
       }
-      const shownIds = server.draws.get(key);
-      if (!shownIds) return send(409, { error: "sorteio ainda não emitido", code: "PHOTO_SURVEY_DRAW_REQUIRED" });
-      if (server.status !== "open") return send(409, { error: "pesquisa fechada", code: "PHOTO_SURVEY_CLOSED", current: { status: server.status } });
-      const bracket = validateBracket(SURVEY, shownIds, { pickIds: body?.pickIds, championId: body?.championId });
+      if (target.response) {
+        const same = JSON.stringify(target.response.pickIds) === JSON.stringify(body?.pickIds) && target.response.championId === body?.championId;
+        if (same) return send(200, { status: "alreadyProcessed", ...roundView(rounds, target) });
+        return send(409, {
+          error: target.round === 1 ? "esta pesquisa já foi respondida" : "esta rodada já foi respondida",
+          code: "PHOTO_SURVEY_ALREADY_ANSWERED",
+          current: target.response,
+        });
+      }
+      if (server.status !== "open") return closed();
+      const bracket = validateBracket(SURVEY, target.shownIds, { pickIds: body?.pickIds, championId: body?.championId });
       if (bracket.ok && server.refuseReceipt > 0) {
         server.refuseReceipt -= 1;
-        return send(400, { error: "resposta não corresponde ao sorteio", code: "PHOTO_SURVEY_RESPONSE_INVALID", current: { reason: "answer-id" } });
+        return invalid("answer-id");
       }
-      if (!bracket.ok || !UUID.test(String(body?.answerId))) {
-        return send(400, { error: "resposta não corresponde ao sorteio", code: "PHOTO_SURVEY_RESPONSE_INVALID", current: { reason: bracket.ok ? "answer-id" : bracket.reason } });
-      }
+      if (!bracket.ok || !UUID.test(String(body?.answerId))) return invalid(bracket.ok ? "answer-id" : bracket.reason);
+      // O recibo é único entre todas as respostas, de todas as rodadas.
+      if (rounds.some((entry) => entry.response?.answerId === body.answerId)) return invalid("answer-id");
       const response = { answerId: body.answerId, pickIds: bracket.pickIds, championId: bracket.championId, respondedAt: new Date().toISOString() };
-      server.responses.set(key, { shownIds, response });
+      if (target.round === 1) server.responses.set(key, { shownIds: target.shownIds, response });
+      else target.response = response;
       if (server.dropAfterApply > 0) {
         // O caso que importa: o servidor gravou e a resposta não chegou.
         server.dropAfterApply -= 1;
         return route.abort("connectionreset");
       }
-      return send(200, { status: "created", survey: server.view(), draw: { groups: server.groupsFor(key) }, response });
+      const current = server.roundsOf(key);
+      return send(200, { status: "created", ...roundView(current, current.find((entry) => entry.round === target.round)) });
     }
     return send(404, { error: "rota não simulada" });
   };
@@ -280,23 +396,54 @@ async function tap(page, cardId) {
   await page.locator(`.ps-grid[data-ready="true"] button[data-card="${cardId}"]:not([disabled])`).click();
 }
 
-/** Joga as telas de voto que faltam, escolhendo a carta na posição pedida. */
-async function playScreens(page, groups, positions, from = 0) {
+/**
+ * Joga as telas de voto que faltam, escolhendo a carta na posição pedida.
+ * `prefix` é o que a etapa traz antes, da segunda rodada em diante ("Rodada 2 · ").
+ */
+async function playScreens(page, groups, positions, from = 0, prefix = "") {
   const picks = [];
   for (let screen = from; screen < groups.length; screen += 1) {
-    await step(page, `Tela ${screen + 1} de ${groups.length}`);
+    await step(page, `${prefix}Tela ${screen + 1} de ${groups.length}`);
     const cards = await grid(page);
     assert.deepEqual(cards.map((card) => card.id), groups[screen], `tela ${screen + 1}: cartas na ordem do sorteio`);
     const pick = groups[screen][positions[screen]];
     await tap(page, pick);
     picks.push(pick);
   }
-  await step(page, "Final");
+  await step(page, `${prefix}Final`);
   return picks;
 }
 
 async function confirm(page) {
   await page.locator('[data-action="confirm"]:not([disabled])').click();
+}
+
+const ROUND_HINT = "A escolha desta rodada está registrada e não pode ser trocada.";
+const LEGACY_HINT = "Obrigado por participar. Sua resposta está registrada e não pode ser trocada nesta pesquisa.";
+const moreButton = (page) => page.locator('[data-action="next-round"]');
+const hint = (page) => page.locator(".ps-hint").first().innerText();
+const kickerText = (page) => page.locator(".ps-kicker").first().innerText();
+/** Os botões do pé da resposta registrada, na ordem da tela: texto e se é o principal (verde). */
+const doneActions = (page) => page.locator(".ps-stack .ps-btn").evaluateAll((nodes) => nodes.map((node) => `${node.textContent}${node.classList.contains("ps-btn--ghost") ? "" : " (principal)"}`));
+
+/** Joga uma rodada inteira e confirma. Devolve as escolhas e a escolhida. */
+async function playRound(page, groups, positions, champion, prefix = "") {
+  const picks = await playScreens(page, groups, positions, 0, prefix);
+  await tap(page, picks[champion]);
+  await step(page, `${prefix}Confirmar`);
+  await confirm(page);
+  await step(page, "Registrada");
+  return { picks, championId: picks[champion] };
+}
+
+/** Abre a pesquisa, toca em Começar e responde a primeira rodada. */
+async function answerFirstRound(server, context, positions = [0, 0, 0, 0], champion = 0) {
+  const page = await openSurvey(context);
+  await begin(page);
+  await step(page, "Tela 1 de 4");
+  const key = await storedKey(page);
+  const first = await playRound(page, server.groupsFor(key), positions, champion);
+  return { page, key, first };
 }
 
 const results = [];
@@ -400,13 +547,18 @@ try {
     assert.equal(await title(page), nameOf.get(picks[2]));
     const bodies = server.bodies("/response");
     assert.equal(bodies.length, 1);
-    assert.deepEqual(Object.keys(bodies[0]).sort(), ["answerId", "championId", "pickIds"]);
+    // A resposta leva a rodada que o sorteio numerou, e mais nada de novo.
+    assert.deepEqual(Object.keys(bodies[0]).sort(), ["answerId", "championId", "pickIds", "round"]);
+    assert.equal(bodies[0].round, 1);
     assert.match(bodies[0].answerId, UUID);
     assert.deepEqual(bodies[0].pickIds, picks);
     assert.equal(bodies[0].championId, picks[2]);
     assert.equal(server.responses.size, 1);
-    assert.equal(await page.locator(".ps-grid, [data-action=confirm], #ps-action").count(), 0, "depois de registrar não há como responder de novo");
+    assert.deepEqual(server.bodies("/draw"), [{}], "o sorteio da primeira rodada não pede rodada seguinte");
+    assert.equal(await page.locator(".ps-grid, [data-action=confirm], #ps-action").count(), 0, "depois de registrar não há como trocar a resposta");
     assert.equal(await page.getByRole("link", { name: "Próxima pesquisa" }).getAttribute("href"), "./", "a próxima é a que a capa puser em destaque");
+    // A primeira rodada não mostra número de rodada em lugar nenhum.
+    assert.equal(await page.locator(".ps-kicker").innerText(), "ESCOLHA REGISTRADA");
   });
 
   // A fonte do sistema muda de aparelho para aparelho, e com ela o número de
@@ -415,7 +567,7 @@ try {
   // do corpo por letra); na confirmação e na resposta registrada, fixa o texto
   // de apoio em quatro linhas. Assim a medida depende pouco da máquina.
   const WIDE_FONT = '.ps-shell, .ps-shell button, .ps-shell a { font-family: Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace !important; } .ps-main--summary .ps-hint { min-height: 5.4em; }';
-  for (const [width, height, wide = false] of [[390, 844], [375, 667], [360, 640], [375, 548], [320, 480], [667, 375], [360, 640, true], [320, 480, true]]) {
+  for (const [width, height, wide = false] of [[390, 844], [375, 667], [360, 640], [320, 568], [375, 548], [320, 480], [667, 375], [360, 640, true], [320, 480, true]]) {
     await scenario(`as quatro cartas têm o mesmo tamanho e cabem na tela em ${width}×${height}${wide ? " com fonte larga" : ""}`, async () => {
       const portrait = height > width;
       const minimum = height >= 640 ? 120 : 90;
@@ -424,13 +576,14 @@ try {
       const page = await openSurvey(context);
       if (wide) await page.addStyleTag({ content: WIDE_FONT });
       // A escolhida e as finalistas, na confirmação e na resposta registrada.
-      // `bottom` é o bloco do pé da tela: os botões, na confirmação, e as
-      // próximas pesquisas, na resposta registrada (que não tem botão).
-      const summary = async (label, action, bottom = ".ps-stack") => {
-        if (action) {
+      // `bottom` é o bloco do pé da tela, com os botões: dois na confirmação;
+      // na resposta registrada, três, com "Mais uma rodada" em cima.
+      const summary = async (label, actions, bottom = ".ps-stack") => {
+        for (const action of actions) {
           const button = await page.locator(action).boundingBox();
-          assert.ok(button.y >= 0 && button.y + button.height <= height + 0.5, `${label}: o botão principal fica à vista`);
-          assert.ok(button.height >= 44, `${label}: o botão principal tem altura de toque`);
+          assert.ok(button.y >= 0 && button.y + button.height <= height + 0.5, `${label}: o botão ${action} fica à vista`);
+          assert.ok(button.x >= 0 && button.x + button.width <= width + 0.5, `${label}: o botão ${action} cabe na largura`);
+          assert.ok(button.height >= 44 && button.height <= 80, `${label}: o botão ${action} tem altura de toque (${button.height})`);
         }
         const stack = await page.locator(bottom).boundingBox();
         const hero = await page.locator(".ps-hero .ps-card").boundingBox();
@@ -469,10 +622,16 @@ try {
       assert.ok(backLink.y >= 0 && backLink.y + backLink.height <= height + 0.5, "o voltar da final fica à vista");
       await tap(page, groups[0][0]);
       await step(page, "Confirmar");
-      await summary("confirmação", '[data-action="confirm"]');
+      await summary("confirmação", ['[data-action="confirm"]']);
       await confirm(page);
       await step(page, "Registrada");
-      await summary("resposta registrada", '[data-action="share"]');
+      // Com confronto por ver, a resposta registrada tem os três botões e a
+      // frase dos confrontos, e ainda cabe.
+      assert.equal(await page.locator("#ps-seen").innerText(), "Você já viu 30 de 190 confrontos.");
+      await summary("resposta registrada", ['[data-action="next-round"]', '[data-action="share"]', '.ps-stack a.ps-btn']);
+      const [more, share, others] = await Promise.all(['[data-action="next-round"]', '[data-action="share"]', ".ps-stack a.ps-btn"].map((selector) => page.locator(selector).boundingBox()));
+      assert.ok(more.y + more.height <= share.y && Math.abs(share.y - others.y) < 1 && share.x + share.width <= others.x, "Mais uma rodada em cima; compartilhar e as outras pesquisas lado a lado, abaixo");
+      assert.ok(Math.abs(more.height - share.height) < 1, "os botões têm a mesma altura");
     });
   }
 
@@ -1479,6 +1638,422 @@ try {
     assert.deepEqual((await grid(page)).filter((card) => card.pressed).map((card) => card.id), [groups[0][3]]);
     const faded = await page.locator('.ps-grid button[aria-pressed="false"]').first().evaluate((card) => Number(getComputedStyle(card).opacity));
     assert.ok(faded >= 0.55 && faded < 1, `as outras cartas ficam mais claras, sem parecer desligadas (${faded})`);
+  });
+
+  // Rodadas (ICM 75, #350) ---------------------------------------------------
+
+  await scenario("duas rodadas seguidas: Mais uma rodada abre outros grupos e a resposta leva a rodada", async () => {
+    const server = createServer();
+    const page = await openSurvey(await newContext(server));
+    await begin(page);
+    await step(page, "Tela 1 de 4");
+    const key = await storedKey(page);
+    const firstGroups = server.groupsFor(key);
+    assert.equal(await kickerText(page), "POLÍTICA · 16 CARTAS", "a primeira rodada não mostra número de rodada");
+    const picks = await playScreens(page, firstGroups, [0, 1, 2, 3]);
+    await tap(page, picks[1]);
+    await step(page, "Confirmar");
+    assert.equal(await hint(page), "Confira antes de registrar. Depois não dá para trocar a escolha desta rodada.");
+    await confirm(page);
+    await step(page, "Registrada");
+
+    // A resposta registrada fala da rodada, conta os confrontos e oferece outra.
+    assert.equal(await title(page), nameOf.get(picks[1]));
+    assert.equal(await kickerText(page), "ESCOLHA REGISTRADA");
+    assert.equal(await hint(page), `${ROUND_HINT} Você já viu 30 de 190 confrontos.`);
+    assert.equal(await page.locator("#ps-seen").innerText(), "Você já viu 30 de 190 confrontos.");
+    assert.equal(server.seenPairs(key), 30, "os números da tela são os do servidor");
+    assert.deepEqual(await doneActions(page), ["Mais uma rodada (principal)", "Compartilhar", "Próxima pesquisa"]);
+    assert.equal(await moreButton(page).evaluate((button) => button.tagName), "BUTTON");
+    assert.equal(await page.getByRole("button", { name: "Mais uma rodada" }).count(), 1);
+    assert.equal(await page.locator('.ps-top [data-action="menu"]').count(), 1, "o menu continua à mão");
+    let saved = await page.evaluate(([name, id]) => JSON.parse(localStorage.getItem(name))[id], [PROGRESS_KEY, SURVEY.id]);
+    assert.deepEqual({ progress: saved.progress, answered: saved.answered }, { progress: null, answered: true });
+
+    // Dois toques seguidos pedem uma rodada só.
+    const drawsBefore = server.count("POST", "/draw");
+    await page.evaluate(() => {
+      const button = document.querySelector('[data-action="next-round"]');
+      button.click();
+      button.click();
+    });
+    await step(page, "Rodada 2 · Tela 1 de 4");
+    assert.equal(server.count("POST", "/draw"), drawsBefore + 1);
+    assert.deepEqual(server.bodies("/draw").at(-1), { next: true });
+    assert.equal(server.roundsOf(key).length, 2);
+    const secondGroups = server.groupsFor(key, 2);
+    assert.notDeepEqual(secondGroups, firstGroups, "a rodada nova tem outros grupos");
+    assert.equal(await kickerText(page), "POLÍTICA · RODADA 2");
+    assert.equal(await title(page), "Quem você prefere?");
+    assert.equal(await page.locator('.ps-top [data-action="menu"]').count(), 0, "no voto não há menu, como na primeira rodada");
+    assert.ok((await grid(page)).every((card) => !card.pressed), "a rodada nova começa sem escolha");
+    // O aparelho guarda que a pessoa já respondeu e, à parte, as escolhas da rodada nova.
+    saved = await page.evaluate(([name, id]) => JSON.parse(localStorage.getItem(name))[id], [PROGRESS_KEY, SURVEY.id]);
+    assert.equal(saved.answered, true);
+    assert.equal(saved.progress.round, 2);
+    assert.deepEqual(saved.progress.groups, secondGroups);
+
+    const second = await playScreens(page, secondGroups, [3, 2, 1, 0], 0, "Rodada 2 · ");
+    assert.equal(await title(page), "Entre elas, quem fica?");
+    await tap(page, second[0]);
+    await step(page, "Rodada 2 · Confirmar");
+    assert.equal(await title(page), nameOf.get(second[0]));
+    assert.equal(server.count("POST", "/response"), 1, "a rodada nova só é gravada na confirmação");
+    await confirm(page);
+    await step(page, "Registrada");
+    assert.equal(await title(page), nameOf.get(second[0]));
+    assert.equal(await kickerText(page), "ESCOLHA REGISTRADA · RODADA 2");
+
+    // A resposta da rodada nova leva `round: 2`, com recibo próprio; a primeira fica como estava.
+    const bodies = server.bodies("/response");
+    assert.equal(bodies.length, 2);
+    assert.deepEqual(bodies.map((body) => body.round), [1, 2]);
+    assert.deepEqual(Object.keys(bodies[1]).sort(), ["answerId", "championId", "pickIds", "round"]);
+    assert.deepEqual(bodies[1].pickIds, second);
+    assert.equal(bodies[1].championId, second[0]);
+    assert.match(bodies[1].answerId, UUID);
+    assert.notEqual(bodies[1].answerId, bodies[0].answerId, "cada rodada tem o seu recibo");
+    assert.equal(server.responses.get(key).response.championId, picks[1], "a resposta da primeira rodada não muda");
+    assert.equal(server.roundsOf(key)[1].response.championId, second[0]);
+    // A contagem cresce com os números do servidor, e o botão continua.
+    const seen = server.seenPairs(key);
+    assert.ok(seen > 30 && seen <= 60, `duas rodadas mostram mais confrontos que uma (${seen})`);
+    assert.equal(await page.locator("#ps-seen").innerText(), `Você já viu ${seen} de 190 confrontos.`);
+    assert.deepEqual(await doneActions(page), ["Mais uma rodada (principal)", "Compartilhar", "Próxima pesquisa"]);
+
+    // Recarregar mostra a última rodada respondida, sem emitir outra.
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await step(page, "Registrada");
+    assert.equal(await title(page), nameOf.get(second[0]));
+    assert.equal(await kickerText(page), "ESCOLHA REGISTRADA · RODADA 2");
+    assert.equal(await page.locator("#ps-seen").innerText(), `Você já viu ${seen} de 190 confrontos.`);
+    assert.deepEqual(server.bodies("/draw").at(-1), {}, "abrir a página não pede rodada seguinte");
+    assert.equal(server.roundsOf(key).length, 2);
+    assert.equal(server.count("POST", "/response"), 2);
+  });
+
+  await scenario("recarregar no meio da rodada 2 retoma a rodada 2; sem conexão, Mais uma rodada avisa e tenta de novo", async () => {
+    const server = createServer();
+    const { page, key, first } = await answerFirstRound(server, await newContext(server), [1, 1, 1, 1], 2);
+    const notice = page.locator("#ps-notice:not([hidden])");
+
+    // Sem resposta do servidor: a resposta registrada continua na tela, com o aviso e o botão.
+    server.down = true;
+    await moreButton(page).click();
+    await notice.waitFor();
+    assert.equal(await notice.innerText(), "Não conseguimos abrir a rodada nova agora. Tente de novo em instantes.");
+    assert.equal(await page.locator("#ps-step").textContent(), "Registrada");
+    assert.equal(await title(page), nameOf.get(first.championId), "a escolha registrada continua na tela");
+    assert.equal(await page.evaluate(() => document.activeElement?.id), "ps-title", "o foco vai para o título, com o aviso logo abaixo");
+    assert.equal(server.roundsOf(key).length, 1);
+    // Com o aparelho sem rede, o aviso manda conferir a conexão.
+    await page.context().setOffline(true);
+    await moreButton(page).click();
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Confira a conexão" }).waitFor();
+    assert.equal(await notice.innerText(), "Não conseguimos abrir a rodada nova. Confira a conexão e tente de novo.");
+    await page.context().setOffline(false);
+    server.down = false;
+    // Limite de requisições: outro texto, mesma tela.
+    server.failDraw.push(429);
+    await moreButton(page).click();
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Muitas tentativas agora" }).waitFor();
+    assert.deepEqual(await doneActions(page), ["Mais uma rodada (principal)", "Compartilhar", "Próxima pesquisa"]);
+
+    // O servidor emite a rodada e a resposta se perde: a nova tentativa abre a mesma rodada, não outra.
+    server.dropDrawAfterApply = 1;
+    await moreButton(page).click();
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Não conseguimos abrir a rodada nova agora" }).waitFor();
+    assert.equal(server.roundsOf(key).length, 2, "a rodada nasceu no servidor");
+    await moreButton(page).click();
+    await step(page, "Rodada 2 · Tela 1 de 4");
+    assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+    assert.equal(server.roundsOf(key).length, 2, "a nova tentativa não emite uma terceira rodada");
+    const groups = server.groupsFor(key, 2);
+    assert.deepEqual((await grid(page)).map((card) => card.id), groups[0]);
+
+    await tap(page, groups[0][2]);
+    await step(page, "Rodada 2 · Tela 2 de 4");
+    await tap(page, groups[1][1]);
+    await step(page, "Rodada 2 · Tela 3 de 4");
+
+    // Recarregar no meio: a mesma rodada, as mesmas cartas e as mesmas escolhas.
+    let draws = server.count("POST", "/draw");
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await step(page, "Rodada 2 · Tela 3 de 4");
+    assert.deepEqual(server.bodies("/draw").slice(draws), [{}], "a retomada não pede rodada seguinte");
+    assert.equal(server.roundsOf(key).length, 2);
+    assert.deepEqual((await grid(page)).map((card) => card.id), groups[2]);
+    await page.locator('[data-action="back"]').click();
+    await step(page, "Rodada 2 · Tela 2 de 4");
+    assert.deepEqual((await grid(page)).filter((card) => card.pressed).map((card) => card.id), [groups[1][1]]);
+    await tap(page, groups[1][1]);
+
+    // Recarregar na confirmação volta para a confirmação da rodada 2.
+    const rest = await playScreens(page, groups, [0, 0, 3, 0], 2, "Rodada 2 · ");
+    await tap(page, rest[1]);
+    await step(page, "Rodada 2 · Confirmar");
+    draws = server.count("POST", "/draw");
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await step(page, "Rodada 2 · Confirmar");
+    assert.equal(await title(page), nameOf.get(rest[1]));
+    assert.deepEqual(server.bodies("/draw").slice(draws), [{}]);
+
+    // Confirmação sem resposta do servidor na rodada 2: a nova tentativa não duplica.
+    server.dropAfterApply = 1;
+    await confirm(page);
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Não deu para saber se a sua resposta chegou" }).waitFor();
+    await confirm(page);
+    await step(page, "Registrada");
+    assert.equal(await kickerText(page), "ESCOLHA REGISTRADA · RODADA 2");
+    const bodies = server.bodies("/response").filter((body) => body.round === 2);
+    assert.equal(bodies.length, 2);
+    assert.equal(bodies[0].answerId, bodies[1].answerId, "a nova tentativa usa o mesmo recibo");
+    assert.deepEqual(bodies[1].pickIds, [groups[0][2], groups[1][1], rest[0], rest[1]]);
+    assert.equal(server.roundsOf(key)[1].response.championId, rest[1]);
+    assert.equal(server.responses.get(key).response.championId, first.championId);
+  });
+
+  await scenario("sem confronto por ver: a tela diz e não oferece outra rodada", async () => {
+    const server = createServer();
+    const { page, key } = await answerFirstRound(server, await newContext(server), [2, 2, 2, 2], 1);
+    assert.equal(await moreButton(page).count(), 1);
+    // A pessoa jogou as outras rodadas (aqui, direto no servidor) e falta uma,
+    // já emitida: as escolhas dela fecham os confrontos que restam.
+    const last = server.playUntilLastRound(key);
+    assert.ok(last.round >= 3, `a última rodada é a ${last.round}`);
+    assert.ok(server.seenPairs(key) < 190);
+    await page.reload({ waitUntil: "domcontentloaded" });
+    const prefix = `Rodada ${last.round} · `;
+    await step(page, `${prefix}Tela 1 de 4`);
+    const groups = server.groupsFor(key, last.round);
+    await playScreens(page, groups, groups.map((group, index) => group.indexOf(last.pickIds[index])), 0, prefix);
+    await tap(page, last.pickIds[0]);
+    await step(page, `${prefix}Confirmar`);
+    await confirm(page);
+    await step(page, "Registrada");
+    assert.equal(server.seenPairs(key), 190, "a última rodada fechou todos os confrontos");
+    assert.equal(await kickerText(page), `ESCOLHA REGISTRADA · RODADA ${last.round}`);
+    assert.equal(await hint(page), `${ROUND_HINT} Você viu todos os confrontos desta pesquisa.`);
+    assert.equal(await page.locator("#ps-seen").innerText(), "Você viu todos os confrontos desta pesquisa.");
+    assert.equal(await moreButton(page).count(), 0, "sem confronto por ver não há outra rodada");
+    assert.deepEqual(await doneActions(page), ["Compartilhar (principal)", "Próxima pesquisa"]);
+    assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+    // Recarregar mostra a mesma tela, e o servidor não emite mais nada.
+    const rounds = server.roundsOf(key).length;
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await step(page, "Registrada");
+    assert.equal(await page.locator("#ps-seen").innerText(), "Você viu todos os confrontos desta pesquisa.");
+    assert.equal(await moreButton(page).count(), 0);
+    assert.equal(server.roundsOf(key).length, rounds);
+
+    // O toque que chega tarde: a tela ainda oferecia outra rodada, e a pessoa
+    // já viu tudo em outro aparelho. O servidor devolve a última rodada
+    // respondida, sem erro, e a tela diz que não sobrou confronto.
+    const late = createServer();
+    const other = await answerFirstRound(late, await newContext(late), [0, 0, 0, 0], 3);
+    const closing = late.playUntilLastRound(other.key);
+    late.roundsOf(other.key).at(-1).response = { answerId: crypto.randomUUID(), pickIds: closing.pickIds, championId: closing.pickIds[2], respondedAt: new Date().toISOString() };
+    assert.equal(late.seenPairs(other.key), 190);
+    assert.equal(await moreButton(other.page).count(), 1, "a tela ainda é a de antes");
+    const responses = late.count("POST", "/response");
+    await moreButton(other.page).click();
+    await other.page.locator(".ps-kicker", { hasText: `Escolha registrada · Rodada ${closing.round}` }).waitFor();
+    assert.equal(await other.page.locator("#ps-step").textContent(), "Registrada");
+    assert.equal(await title(other.page), nameOf.get(closing.pickIds[2]));
+    assert.deepEqual(late.bodies("/draw").at(-1), { next: true });
+    assert.equal(await kickerText(other.page), `ESCOLHA REGISTRADA · RODADA ${closing.round}`);
+    assert.equal(await other.page.locator("#ps-seen").innerText(), "Você viu todos os confrontos desta pesquisa.");
+    assert.equal(await moreButton(other.page).count(), 0);
+    assert.equal(await other.page.locator(".ps-grid, [data-action=confirm]").count(), 0);
+    assert.equal(await other.page.locator("#ps-notice:not([hidden])").count(), 0);
+    assert.equal(late.roundsOf(other.key).length, closing.round, "nenhuma rodada nova nasceu");
+    assert.equal(late.count("POST", "/response"), responses);
+  });
+
+  await scenario("servidor de antes das rodadas: a resposta registrada fica como era", async () => {
+    const server = createServer();
+    server.legacy = true;
+    const page = await openSurvey(await newContext(server));
+    await begin(page);
+    await step(page, "Tela 1 de 4");
+    const key = await storedKey(page);
+    assert.equal(await kickerText(page), "POLÍTICA · 16 CARTAS");
+    const picks = await playScreens(page, server.groupsFor(key), [1, 0, 1, 0]);
+    await tap(page, picks[3]);
+    await step(page, "Confirmar");
+    assert.equal(await hint(page), "Confira antes de registrar. Depois não dá para votar de novo nesta pesquisa.");
+    await confirm(page);
+    await step(page, "Registrada");
+    // O corpo da resposta é o de sempre: o servidor não disse rodada nenhuma.
+    assert.deepEqual(Object.keys(server.bodies("/response")[0]).sort(), ["answerId", "championId", "pickIds"]);
+    const check = async () => {
+      assert.equal(await title(page), nameOf.get(picks[3]));
+      assert.equal(await kickerText(page), "ESCOLHA REGISTRADA");
+      assert.equal(await hint(page), LEGACY_HINT);
+      assert.equal(await page.locator('[data-action="next-round"], #ps-seen, .ps-pair').count(), 0, "sem botão de rodada e sem contagem");
+      assert.deepEqual(await doneActions(page), ["Compartilhar (principal)", "Próxima pesquisa"]);
+      assert.equal(await page.locator(".ps-stack").evaluate((node) => node.className), "ps-stack ps-stack--pair");
+      assert.doesNotMatch(await page.locator(".ps-main").innerText(), /rodada|confrontos/i);
+    };
+    await check();
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await step(page, "Registrada");
+    await check();
+    assert.ok(server.bodies("/draw").every((body) => JSON.stringify(body) === "{}"), "nenhum sorteio leva campo novo");
+    const saved = await page.evaluate(([name, id]) => JSON.parse(localStorage.getItem(name))[id], [PROGRESS_KEY, SURVEY.id]);
+    assert.deepEqual({ progress: saved.progress, answered: saved.answered }, { progress: null, answered: true });
+  });
+
+  await scenario("pesquisa fechada depois da primeira rodada: sem Mais uma rodada; fechada no meio da rodada 2, vale a anterior", async () => {
+    // Fechada depois da primeira rodada: a resposta aparece, com o texto de sempre e sem o botão.
+    const server = createServer();
+    const { page, key, first } = await answerFirstRound(server, await newContext(server), [3, 3, 3, 3], 0);
+    assert.equal(await moreButton(page).count(), 1);
+    server.status = "closed";
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await step(page, "Registrada");
+    assert.equal(await title(page), nameOf.get(first.championId));
+    assert.equal(await hint(page), LEGACY_HINT);
+    assert.equal(await page.locator('[data-action="next-round"], #ps-seen').count(), 0);
+    assert.deepEqual(await doneActions(page), ["Compartilhar (principal)", "Próxima pesquisa"]);
+    assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+    assert.equal(server.roundsOf(key).length, 1);
+
+    // A tela ainda oferecia outra rodada quando a pesquisa fechou: o toque não
+    // abre rodada, e o aviso diz por quê.
+    const late = createServer();
+    const other = await answerFirstRound(late, await newContext(late), [0, 1, 0, 1], 1);
+    late.status = "closed";
+    await moreButton(other.page).click();
+    await other.page.locator("#ps-notice:not([hidden])").waitFor();
+    assert.equal(await other.page.locator("#ps-notice").innerText(), "Esta pesquisa fechou. Não dá para jogar outra rodada.");
+    assert.equal(await other.page.locator("#ps-step").textContent(), "Registrada");
+    assert.equal(await title(other.page), nameOf.get(other.first.championId));
+    assert.equal(await moreButton(other.page).count(), 0);
+    assert.equal(await hint(other.page), LEGACY_HINT);
+    assert.equal(late.roundsOf(other.key).length, 1, "fechada, nenhuma rodada nasce");
+
+    // Fechada com a rodada 2 pela metade, na hora de confirmar: a rodada não
+    // vale, e a tela volta para a rodada anterior, que continua registrada.
+    const mid = createServer();
+    const third = await answerFirstRound(mid, await newContext(mid), [2, 1, 2, 1], 3);
+    await moreButton(third.page).click();
+    await step(third.page, "Rodada 2 · Tela 1 de 4");
+    const picks = await playScreens(third.page, mid.groupsFor(third.key, 2), [0, 0, 0, 0], 0, "Rodada 2 · ");
+    await tap(third.page, picks[2]);
+    await step(third.page, "Rodada 2 · Confirmar");
+    mid.status = "closed";
+    await confirm(third.page);
+    await step(third.page, "Registrada");
+    assert.equal(await third.page.locator("#ps-notice:not([hidden])").innerText(), "A pesquisa fechou antes de a sua confirmação chegar. A escolha desta rodada não foi registrada.");
+    assert.equal(await title(third.page), nameOf.get(third.first.championId), "a tela mostra a rodada que vale");
+    assert.equal(await kickerText(third.page), "ESCOLHA REGISTRADA");
+    assert.equal(await moreButton(third.page).count(), 0);
+    assert.equal(mid.roundsOf(third.key)[1].response, null, "a rodada 2 não foi gravada");
+    await third.page.reload({ waitUntil: "domcontentloaded" });
+    await step(third.page, "Registrada");
+    assert.equal(await title(third.page), nameOf.get(third.first.championId));
+    assert.equal(await third.page.locator("#ps-notice:not([hidden])").count(), 0);
+    assert.equal(await third.page.locator(".ps-grid, [data-action=confirm], #ps-action").count(), 0);
+
+    // Fechada com escolhas da rodada 2 guardadas, e a pessoa volta depois: o
+    // aviso diz que a rodada nova não chegou a valer.
+    const gone = createServer();
+    const fourth = await answerFirstRound(gone, await newContext(gone), [1, 2, 3, 0], 2);
+    await moreButton(fourth.page).click();
+    await step(fourth.page, "Rodada 2 · Tela 1 de 4");
+    await tap(fourth.page, gone.groupsFor(fourth.key, 2)[0][0]);
+    await step(fourth.page, "Rodada 2 · Tela 2 de 4");
+    gone.status = "closed";
+    await fourth.page.reload({ waitUntil: "domcontentloaded" });
+    await step(fourth.page, "Registrada");
+    assert.equal(await fourth.page.locator("#ps-notice:not([hidden])").innerText(), "A pesquisa fechou antes de você confirmar a rodada nova. A escolha dela não foi registrada.");
+    assert.equal(await title(fourth.page), nameOf.get(fourth.first.championId));
+    assert.equal(await moreButton(fourth.page).count(), 0);
+    assert.equal(gone.count("POST", "/response"), 1);
+  });
+
+  await scenario("dois aparelhos na rodada 2: vale a primeira resposta da rodada", async () => {
+    const server = createServer();
+    const one = await answerFirstRound(server, await newContext(server, { storedKey: keyFor("dupla") }), [0, 0, 0, 0], 0);
+    const key = one.key;
+    // O segundo aparelho vê a resposta e também oferece outra rodada.
+    const two = await openSurvey(await newContext(server, { storedKey: key }));
+    await begin(two);
+    await step(two, "Registrada");
+    assert.equal(await title(two), nameOf.get(one.first.championId));
+    await moreButton(one.page).click();
+    await step(one.page, "Rodada 2 · Tela 1 de 4");
+    await moreButton(two).click();
+    await step(two, "Rodada 2 · Tela 1 de 4");
+    assert.equal(server.roundsOf(key).length, 2, "os dois aparelhos jogam a mesma rodada 2");
+    const groups = server.groupsFor(key, 2);
+    const picksOne = await playScreens(one.page, groups, [0, 0, 0, 0], 0, "Rodada 2 · ");
+    const picksTwo = await playScreens(two, groups, [1, 1, 1, 1], 0, "Rodada 2 · ");
+    await tap(one.page, picksOne[1]);
+    await tap(two, picksTwo[2]);
+    await step(one.page, "Rodada 2 · Confirmar");
+    await step(two, "Rodada 2 · Confirmar");
+    await confirm(one.page);
+    await step(one.page, "Registrada");
+    await confirm(two);
+    await step(two, "Registrada");
+    assert.equal(await title(two), nameOf.get(picksOne[1]), "o segundo aparelho mostra a resposta que valeu");
+    assert.equal(await two.locator("#ps-notice:not([hidden])").innerText(), "Você já tinha respondido esta rodada. Vale a primeira resposta, que é esta.");
+    assert.equal(await kickerText(two), "ESCOLHA REGISTRADA · RODADA 2");
+    assert.equal(server.roundsOf(key)[1].response.championId, picksOne[1]);
+    assert.equal(server.roundsOf(key).length, 2);
+    // A recusa não traz o progresso: a tela mostra a resposta sem oferecer
+    // outra rodada, e reabrir a página oferece.
+    assert.equal(await moreButton(two).count(), 0);
+    await two.reload({ waitUntil: "domcontentloaded" });
+    await step(two, "Registrada");
+    assert.equal(await title(two), nameOf.get(picksOne[1]));
+    assert.equal(await moreButton(two).count(), 1);
+    assert.equal(await two.locator("#ps-notice:not([hidden])").count(), 0);
+  });
+
+  await scenario("segunda aba na rodada 2: acompanha as escolhas sem pedir sorteio de novo e vê a resposta quando a outra confirma", async () => {
+    const server = createServer();
+    const context = await newContext(server);
+    const { page: first, key } = await answerFirstRound(server, context, [1, 0, 1, 0], 0);
+    await moreButton(first).click();
+    await step(first, "Rodada 2 · Tela 1 de 4");
+    const groups = server.groupsFor(key, 2);
+    await tap(first, groups[0][3]);
+    await step(first, "Rodada 2 · Tela 2 de 4");
+
+    // A segunda aba abre na mesma rodada, no mesmo ponto.
+    const second = await openSurvey(context);
+    await step(second, "Rodada 2 · Tela 2 de 4");
+    assert.deepEqual((await grid(second)).map((card) => card.id), groups[1]);
+    // Uma escolha numa aba aparece na outra, sem novo pedido de sorteio: o
+    // aparelho já guardava que a pessoa respondeu a rodada anterior, e isso
+    // não é sinal de que a outra aba confirmou.
+    const draws = server.count("POST", "/draw");
+    await tap(second, groups[1][0]);
+    await step(second, "Rodada 2 · Tela 3 de 4");
+    await step(first, "Rodada 2 · Tela 3 de 4");
+    await tap(first, groups[2][1]);
+    await step(first, "Rodada 2 · Tela 4 de 4");
+    await step(second, "Rodada 2 · Tela 4 de 4");
+    await first.waitForTimeout(300);
+    assert.equal(server.count("POST", "/draw"), draws, "acompanhar a outra aba não pede sorteio");
+
+    await tap(first, groups[3][2]);
+    await step(first, "Rodada 2 · Final");
+    await tap(first, groups[2][1]);
+    await step(first, "Rodada 2 · Confirmar");
+    await confirm(first);
+    await step(first, "Registrada");
+    // A outra aba busca a resposta e mostra a rodada 2 registrada.
+    await step(second, "Registrada");
+    assert.equal(await title(second), nameOf.get(groups[2][1]));
+    assert.equal(await kickerText(second), "ESCOLHA REGISTRADA · RODADA 2");
+    assert.equal(await second.locator(".ps-grid, [data-action=confirm]").count(), 0);
+    assert.deepEqual(server.bodies("/draw").at(-1), {}, "a outra aba não pede rodada seguinte");
+    assert.equal(server.count("POST", "/response"), 2);
+    assert.equal(server.roundsOf(key).length, 2);
   });
 
   assert.ok(results.length > 0, `nenhum cenário tem "${only}" no nome`);

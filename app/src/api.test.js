@@ -266,6 +266,23 @@ test("o sorteio da pesquisa vai com a identidade e não leva carta nenhuma", asy
   assert.deepEqual(JSON.parse(request.options.body), {});
 });
 
+test("o sorteio só pede a rodada seguinte quando quem chama pede, com verdadeiro", async () => {
+  const bodies = [];
+  await withFetch(
+    async (_url, options) => {
+      bodies.push(JSON.parse(options.body));
+      return { ok: true, status: 200, json: async () => ({ draw: { groups: [] }, response: null }) };
+    },
+    async () => {
+      await drawPhotoSurvey("politica-2026-01", "pms_private", { next: true });
+      for (const next of [false, undefined, null, "true", 1, {}]) await drawPhotoSurvey("politica-2026-01", "pms_private", { next });
+      await drawPhotoSurvey("politica-2026-01", "pms_private", {});
+      await drawPhotoSurvey("politica-2026-01", "pms_private", { next: true, cardIds: ["forjado"] });
+    },
+  );
+  assert.deepEqual(bodies, [{ next: true }, {}, {}, {}, {}, {}, {}, {}, { next: true }]);
+});
+
 test("a resposta da pesquisa leva o recibo recebido, as escolhas e a escolhida, e mais nada", async () => {
   const requests = [];
   const answer = {
@@ -291,4 +308,21 @@ test("a resposta da pesquisa leva o recibo recebido, as escolhas e a escolhida, 
     assert.equal(request.options.headers["Content-Type"], "application/json");
     assert.deepEqual(request.body, { answerId: answer.answerId, pickIds: ["a", "b", "c", "d"], championId: "c" });
   }
+});
+
+test("a resposta leva a rodada quando ela é um número de rodada, e só então", async () => {
+  const bodies = [];
+  const answer = { answerId: "5f0c2c0e-8a55-4a52-9d6c-0d2b8a1f3c11", pickIds: ["a", "b", "c", "d"], championId: "c" };
+  await withFetch(
+    async (_url, options) => {
+      bodies.push(JSON.parse(options.body));
+      return { ok: true, status: 200, json: async () => ({ status: "created" }) };
+    },
+    async () => {
+      for (const round of [1, 2, 11]) await respondPhotoSurvey("politica-2026-01", "pms_private", { ...answer, round });
+      for (const round of [0, -1, 1.5, "2", null, undefined]) await respondPhotoSurvey("politica-2026-01", "pms_private", { ...answer, round });
+    },
+  );
+  assert.deepEqual(bodies.slice(0, 3), [{ ...answer, round: 1 }, { ...answer, round: 2 }, { ...answer, round: 11 }]);
+  for (const body of bodies.slice(3)) assert.deepEqual(body, answer);
 });

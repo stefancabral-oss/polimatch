@@ -192,6 +192,27 @@
   position: static;
 }
 
+/* Em tela baixa os espaços de "Como funciona" encolhem, para a lista, a nota
+   e o botão caberem sem rolar também com uma fonte de sistema mais larga. */
+@media (max-height: 700px) {
+  .ps-shell[data-view="how"] .ps-main--entry {
+    padding-top: 10px;
+  }
+
+  .ps-shell[data-view="how"] .ps-list {
+    margin-top: 14px;
+    gap: 6px;
+  }
+
+  .ps-shell[data-view="how"] .pm-note {
+    margin-top: 14px;
+  }
+
+  .ps-shell[data-view="how"] .ps-stack {
+    padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+  }
+}
+
 .pm-note {
   margin: 22px 0 0;
   padding: 14px 16px;

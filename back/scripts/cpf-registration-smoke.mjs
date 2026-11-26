@@ -36,7 +36,10 @@ const rejectsWith = (promise, status, code) => assert.rejects(promise, (error) =
   return true;
 });
 const count = async (table, where = "", values = []) => Number((await audit.query(`SELECT count(*) AS total FROM ${table} ${where}`, values)).rows[0].total);
-const surveyRows = async () => [await count("photo_survey_draws"), await count("photo_survey_responses")];
+const surveyRows = async () => [
+  await count("photo_survey_draws"), await count("photo_survey_responses"),
+  await count("photo_survey_round_draws"), await count("photo_survey_round_responses"),
+];
 const picksOf = (draw, offset = 0) => draw.groups.map((group, index) => group[(index + offset) % group.length]);
 
 // CPFs válidos e novos a cada execução, por uma conta separada da de shared/.
@@ -83,6 +86,9 @@ try {
   for (const token of [visitor.recoveryKey, ana.token]) {
     await rejectsWith(store.photoSurveyDraw(token, SURVEY.id), 403, "CPF_REGISTRATION_REQUIRED");
     await rejectsWith(respond(token, { pickIds: ["a", "b", "c", "d"], championId: "a" }), 403, "CPF_REGISTRATION_REQUIRED");
+    // Rodadas (ICM 75, #350): pedir a rodada seguinte ou dizer a rodada não muda a recusa.
+    await rejectsWith(store.photoSurveyDraw(token, SURVEY.id, { next: true }), 403, "CPF_REGISTRATION_REQUIRED");
+    await rejectsWith(respond(token, { pickIds: ["a", "b", "c", "d"], championId: "a", round: 2 }), 403, "CPF_REGISTRATION_REQUIRED");
   }
   assert.deepEqual(await surveyRows(), rowsBefore, "a recusa não emite sorteio nem grava resposta");
   await rejectsWith(store.photoSurveyDraw("pm2_chave-que-nao-existe", SURVEY.id), 401, undefined);
@@ -151,6 +157,29 @@ try {
   await rejectsWith(register(bruno.token, anaCpf, { ageRange: "60+", gender: "homem", state: "RJ" }), 409, "CPF_ALREADY_REGISTERED");
   assert.equal((await register(bruno.token, newCpf(), { ageRange: "60+", gender: "nao-informado", state: "AC" })).status, "created");
   assert.equal((await store.photoSurveyDraw(bruno.token, SURVEY.id)).response, null);
+
+  // --- Rodadas (ICM 75, #350): com cadastro, a conta joga a rodada seguinte ---
+  const brunoOne = await store.photoSurveyDraw(bruno.token, SURVEY.id);
+  const brunoPicks = picksOf(brunoOne.draw, 0);
+  const brunoAnswer = await respond(bruno.token, { pickIds: brunoPicks, championId: brunoPicks[1] });
+  assert.deepEqual([brunoAnswer.status, brunoAnswer.round, brunoAnswer.progress.canContinue], ["created", 1, true]);
+  const brunoTwo = await store.photoSurveyDraw(bruno.token, SURVEY.id, { next: true });
+  assert.equal(brunoTwo.round, 2);
+  assert.equal(brunoTwo.response, null);
+  assert.deepEqual(brunoTwo.lastAnswered, { round: 1, response: brunoAnswer.response });
+  const brunoTwoPicks = picksOf(brunoTwo.draw, 3);
+  const brunoTwoAnswer = await respond(bruno.token, { pickIds: brunoTwoPicks, championId: brunoTwoPicks[0], round: 2 });
+  assert.equal(brunoTwoAnswer.status, "created");
+  assert.equal(brunoTwoAnswer.progress.answeredRounds, 2);
+  // Outra sessão da mesma conta, em outro aparelho, continua de onde a conta parou.
+  const brunoOtherDevice = await signIn(bruno.subject);
+  const brunoElsewhere = await store.photoSurveyDraw(brunoOtherDevice.sessionToken, SURVEY.id);
+  assert.equal(brunoElsewhere.round, 2);
+  assert.deepEqual(brunoElsewhere.response, brunoTwoAnswer.response);
+  assert.deepEqual(brunoElsewhere.lastAnswered, { round: 2, response: brunoTwoAnswer.response });
+  assert.equal((await store.photoSurveyDraw(brunoOtherDevice.sessionToken, SURVEY.id, { next: true })).round, 3);
+  // Sem cadastro, a rodada aberta de outra conta não muda nada para o visitante.
+  await rejectsWith(store.photoSurveyDraw(visitor.recoveryKey, SURVEY.id, { next: true }), 403, "CPF_REGISTRATION_REQUIRED");
 
   // --- Duas contas disputam o mesmo CPF ao mesmo tempo: uma grava, a outra recebe 409, nunca 500 ---
   for (let round = 0; round < 6; round += 1) {
@@ -282,7 +311,7 @@ try {
   }
   assert.equal(await count("schema_migrations", "WHERE id = '2026-11-16-cpf-registration-v1'"), 1);
 
-  console.log("Smoke do cadastro com CPF aprovado: sem cadastro nada é emitido nem gravado, cadastro só com conta Google, código no lugar do número, um CPF por conta e uma conta por CPF também em disputa simultânea, limite de tentativas por dia, resposta antiga preservada, cadastro acompanha a conta e segundo boot.");
+  console.log("Smoke do cadastro com CPF aprovado: sem cadastro nada é emitido nem gravado, cadastro só com conta Google, código no lugar do número, um CPF por conta e uma conta por CPF também em disputa simultânea, limite de tentativas por dia, resposta antiga preservada, cadastro acompanha a conta, rodada seguinte só com cadastro e segundo boot.");
 } finally {
   await audit.end();
   await legacy.close();

@@ -220,12 +220,18 @@ export function loadPhotoSurvey(surveyId) {
   return requestJson(photoSurveyPath(surveyId));
 }
 
-export function drawPhotoSurvey(surveyId, recoveryKey) {
-  return gameRequest(photoSurveyPath(surveyId, "/draw"), recoveryKey);
+// Rodadas (ICM 75, #350). `next` pede a rodada seguinte e só vai no corpo
+// quando é pedido; sem ele o servidor devolve a rodada em que a pessoa está.
+export function drawPhotoSurvey(surveyId, recoveryKey, { next = false } = {}) {
+  return gameRequest(photoSurveyPath(surveyId, "/draw"), recoveryKey, next === true ? { next: true } : {});
 }
 
-export function respondPhotoSurvey(surveyId, recoveryKey, { answerId, pickIds, championId } = {}) {
-  return gameRequest(photoSurveyPath(surveyId, "/response"), recoveryKey, { answerId, pickIds, championId });
+// `round` é a rodada a que a resposta pertence, como o sorteio a numerou. Só
+// vai no corpo quando o servidor disse o número: um servidor de antes das
+// rodadas recebe o corpo de sempre.
+export function respondPhotoSurvey(surveyId, recoveryKey, { answerId, pickIds, championId, round } = {}) {
+  const body = { answerId, pickIds, championId };
+  return gameRequest(photoSurveyPath(surveyId, "/response"), recoveryKey, Number.isInteger(round) && round >= 1 ? { ...body, round } : body);
 }
 
 // Cadastro com CPF (ICM 71, #336). O CPF só viaja neste pedido, no corpo:

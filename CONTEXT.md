@@ -287,3 +287,17 @@ pesquisa de famosos vem depois das duas de Política e antes da de roupas.
 foto, não do direito da pessoa retratada; como o agente lê a resposta à Q3
 da #277 para estas fotos é uma das escolhas listadas na decisão 0006.
 Publicado em 26/11/2026, com API e app no commit `6e38d32`.
+
+## Rodadas novas enquanto houver confrontos por ver — issue #350
+Em 26/11/2026 o Stefan pediu que a pesquisa fique aberta para votar enquanto
+houver confrontos que a pessoa ainda não votou, e respondeu "É isso." à
+leitura do agente: rodadas novas da mesma pesquisa, com grupos diferentes,
+até cada carta ter enfrentado todas as outras (decisão 0007, que altera o
+item 2 da decisão 0001). O resto é escolha do agente, listada na decisão
+0007 e detalhada em `stages/75_more_rounds/CONTEXT.md`: uma resposta por
+rodada; o servidor monta as rodadas seguintes com prioridade para as duplas
+que a pessoa ainda não viu; as respostas já gravadas valem como primeira
+rodada, e as rodadas seguintes vão para tabelas novas; no resultado, cada
+pessoa vale uma só, com todas as rodadas dela. Nenhuma soma é calculada
+neste estágio. Em 26/11/2026 o estágio aguardava o gate do
+merge, sem publicação.

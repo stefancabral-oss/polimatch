@@ -1,6 +1,6 @@
 # Política de integridade do voto público
 
-Status: política normativa da API do PoliMatch, versão 5, vinculada às issues #170, #179, #282, #324 e #336.
+Status: política normativa da API do PoliMatch, versão 6, vinculada às issues #170, #179, #282, #324, #336 e #350.
 
 Esta política existe para que o placar público seja um painel de preferências declaradas com limites conhecidos. Ela não transforma o resultado em pesquisa eleitoral nem prova que cada jogador corresponde a uma pessoa única.
 
@@ -44,16 +44,16 @@ Alterar qualquer número exige nova decisão versionada, teste e registro no han
 
 A versão 4 acrescenta a pesquisa por foto ([ICM 68] #324). Ela não muda nenhum número das seções acima.
 
-- A resposta de uma pesquisa é uma por identidade e por pesquisa. Identidade é o jogador mais os jogadores anônimos incorporados a ele no login Google.
-- O banco garante uma linha por jogador e pesquisa. Uma identidade pode acabar com mais de uma linha quando dois jogadores que já tinham respondido são ligados depois. Nesse caso vale a mais antiga, e qualquer contagem futura precisa contar por identidade, não por linha.
-- O servidor emite o sorteio das cartas uma vez por jogador e pesquisa. A resposta só é aceita se bater com esse sorteio: cada escolha na tela em que a carta foi mostrada, e a escolhida final entre as escolhidas. As cartas mostradas nunca vêm do cliente.
-- Repetir a mesma resposta é uma recuperação idempotente e devolve o recibo original. Outra escolha depois da primeira é recusada com HTTP 409, `PHOTO_SURVEY_ALREADY_ANSWERED`, e não regrava.
+- A resposta de uma pesquisa é uma por identidade e por pesquisa. Identidade é o jogador mais os jogadores anônimos incorporados a ele no login Google. (Versão 6: uma por identidade, por pesquisa e por rodada. Ver "Rodadas da pesquisa por foto", abaixo.)
+- O banco garante uma linha por jogador e pesquisa. Uma identidade pode acabar com mais de uma linha quando dois jogadores que já tinham respondido são ligados depois. Nesse caso vale a mais antiga, e qualquer contagem futura precisa contar por identidade, não por linha. (Versão 6: isto descreve a rodada 1. As rodadas seguintes ficam em tabelas próprias, com uma linha por jogador, pesquisa e rodada.)
+- O servidor emite o sorteio das cartas uma vez por jogador e pesquisa. A resposta só é aceita se bater com esse sorteio: cada escolha na tela em que a carta foi mostrada, e a escolhida final entre as escolhidas. As cartas mostradas nunca vêm do cliente. (Versão 6: o sorteio é emitido uma vez por jogador, pesquisa e rodada, e a resposta é conferida contra o sorteio da rodada dela.)
+- Repetir a mesma resposta é uma recuperação idempotente e devolve o recibo original. Outra escolha depois da primeira é recusada com HTTP 409, `PHOTO_SURVEY_ALREADY_ANSWERED`, e não regrava. (Versão 6: as duas regras valem por rodada.)
 - Sorteio e resposta são gravados em tabelas próprias, imutáveis como os votos. Não há troca depois de confirmar.
 - A resposta não consome a cota de 30 escolhas, não entra no limite de 8 escolhas por minuto e não altera o ranking nem o Elo. A emissão do sorteio também não consome cota.
-- Fora da janela da pesquisa, sorteio novo e resposta são recusados com HTTP 409, `PHOTO_SURVEY_CLOSED`.
+- Fora da janela da pesquisa, sorteio novo e resposta são recusados com HTTP 409, `PHOTO_SURVEY_CLOSED`. (Versão 6: o pedido de rodada nova fora da janela não é erro: devolve a última rodada respondida e não emite outra.)
 - Quem apaga os dados do aparelho vira outro jogador e pode responder de novo. O que limita isso é a cota de 3 jogos novos por rede descrita acima. O cadastro por CPF, previsto na decisão 0001, é o que fecha essa porta, e não faz parte desta versão. (Versão 5: essa porta fecha na pesquisa por foto. Ver "Cadastro com CPF", abaixo.)
 - Um jogador anônimo que recebeu o sorteio de uma pesquisa, com ou sem resposta, e depois entra numa conta Google já existente é ligado à conta mesmo sem ter escolhas no jogo. A chave anônima deixa de valer, então uma aba aberta com ela não grava outra resposta. Nesse caso nada do jogo é somado: ranking, versão e Chromas da conta ficam como estavam.
-- O recibo (`answerId`) é único entre todas as respostas. Um recibo já usado por outra pessoa é recusado com HTTP 400, mesmo em requisições simultâneas.
+- O recibo (`answerId`) é único entre todas as respostas. Um recibo já usado por outra pessoa é recusado com HTTP 400, mesmo em requisições simultâneas. (Versão 6: único entre as respostas de todas as rodadas; o recibo de uma rodada também não serve para outra rodada da mesma pessoa.)
 - Nenhuma rota devolve soma de respostas. O [gate de publicação agregada](../legal/AGGREGATE_PUBLICATION_GATE.md) continua valendo.
 - As rotas da pesquisa nascem desligadas. Só `PHOTO_SURVEYS_ENABLED=true` no ambiente da API as liga; sem isso respondem HTTP 404, `PHOTO_SURVEYS_DISABLED`, e nada é gravado.
 
@@ -73,8 +73,28 @@ A versão 5 acrescenta o cadastro obrigatório ([ICM 71] #336, decisão 0004). E
 - O cadastro pertence à conta (`provider + subject`), não ao jogador ativo: quando dois históricos são reunidos e o jogador ativo muda, o cadastro acompanha a conta.
 - O cadastro guarda faixa de idade, gênero, estado, a versão do texto de consentimento aceito e o instante do aceite. O consentimento é obrigatório (HTTP 400, `CONSENT_REQUIRED`), e um texto desatualizado é recusado (HTTP 400, `CONSENT_VERSION_MISMATCH`).
 - As respostas dadas por visitantes anônimos antes desta versão continuam no banco, imutáveis. Só voltam a ser lidas quando a pessoa entra com Google a partir do mesmo aparelho, o que liga o histórico à conta, e faz o cadastro.
-- O login Google não consome a cota de jogos novos por rede (versão 3). Com o cadastro obrigatório, o que limita a multiplicação de respostas na pesquisa por foto é um CPF por conta; a cota de rede segue valendo para o jogo anterior.
+- O login Google não consome a cota de jogos novos por rede (versão 3). Com o cadastro obrigatório, o que limita a multiplicação de respostas na pesquisa por foto é um CPF por conta; a cota de rede segue valendo para o jogo anterior. (Versão 6: uma conta passa a poder ter várias respostas na mesma pesquisa, uma por rodada. Elas contam como uma pessoa só; o que limita o número de pessoas continua sendo um CPF por conta.)
 - O smoke `back/scripts/cpf-registration-smoke.mjs` prova estas regras num PostgreSQL de verdade.
+
+## Rodadas da pesquisa por foto
+
+A versão 6 acrescenta as rodadas ([ICM 75] #350, decisão 0007). Ela não muda nenhum número das seções acima.
+
+- Depois de responder, a pessoa pode jogar rodadas novas da mesma pesquisa enquanto houver confronto que ela ainda não viu. Confronto é uma dupla de cartas que apareceu junta numa tela de uma rodada respondida: uma tela de voto ou a final. Continuar é opcional.
+- A resposta é uma por identidade, por pesquisa e por rodada. Uma rodada só começa depois de a anterior ser respondida, e só com a pesquisa dentro da janela.
+- A rodada 1 é o sorteio e a resposta que já existiam, nas mesmas tabelas e com a mesma regra de identidade: o jogador mais os anônimos incorporados a ele, valendo a resposta mais antiga. As respostas gravadas antes desta versão valem como rodada 1.
+- As rodadas 2 em diante seguem a mesma regra de identidade: são procuradas no jogador e nos incorporados a ele. Se o jogador ativo da conta muda quando dois históricos são reunidos, as rodadas respondidas pelo anterior continuam valendo, a rodada aberta continua a mesma (da rodada 2 em diante; a rodada 1 emitida e sem resposta é a do próprio jogador, como antes desta versão) e a conta não ganha uma segunda resposta para a mesma rodada. Quando dois jogadores reunidos depois já tinham a mesma rodada, vale a respondida mais antiga; as outras linhas continuam gravadas.
+- O servidor monta cada rodada nova com prioridade para as duplas que a pessoa ainda não viu. Enquanto houver dupla por ver, a rodada nova traz pelo menos uma numa tela de voto. Entre montagens equivalentes decide o sorteio, com a mesma fonte de acaso do servidor. As cartas mostradas nunca vêm do cliente, em rodada nenhuma.
+- Qualquer contagem futura conta por pessoa, com todas as rodadas dela, e não por rodada: uma pessoa, um peso. Ela precisa reunir as rodadas por identidade, como o servidor faz ao montar a rodada nova. Nenhuma soma é calculada nesta versão.
+- O sorteio e a resposta devolvem o progresso da própria pessoa: quantas rodadas ela respondeu e quantos confrontos já viu. Nenhuma rota devolve soma de respostas.
+- Repetir a mesma resposta da mesma rodada é uma recuperação idempotente e devolve o recibo original daquela rodada. Outra escolha para uma rodada já respondida é recusada com HTTP 409, `PHOTO_SURVEY_ALREADY_ANSWERED`. Resposta para uma rodada que não existe é recusada com HTTP 400, `PHOTO_SURVEY_RESPONSE_INVALID`.
+- O recibo (`answerId`) é único entre todas as respostas, de todas as rodadas e de todas as pessoas, também em requisições simultâneas. O recibo de uma rodada não serve para outra rodada da mesma pessoa.
+- O cadastro com CPF vale em toda rodada: sem sessão ou sem cadastro não há sorteio nem resposta, e a recusa é a mesma da versão 5.
+- Fora da janela não há rodada nova. A rodada emitida e ainda não respondida quando a pesquisa fecha continua visível e não aceita resposta (HTTP 409, `PHOTO_SURVEY_CLOSED`).
+- Um aplicativo que não conhece rodadas, e por isso não pede a rodada seguinte nem diz a rodada da resposta, tem o comportamento de antes desta versão, inclusive a recusa ao tentar responder de novo. Uma resposta que não diz a rodada é sempre da rodada 1, mesmo com uma rodada nova aberta: ela nunca é gravada numa rodada cujas telas a pessoa não viu naquele aplicativo. Consequência: uma aba com o aplicativo antigo, usada enquanto a pessoa tem uma rodada nova aberta, mostra as telas dessa rodada e recebe a recusa ao confirmar.
+- As rodadas 2 em diante são gravadas em duas tabelas novas, imutáveis como as da rodada 1. As tabelas e as linhas que já existiam não são alteradas.
+- A resposta e o sorteio de uma rodada nova, como os da rodada 1, não consomem cota e não alteram o ranking nem o Elo.
+- O smoke `back/scripts/photo-survey-smoke.mjs` prova estas regras num PostgreSQL de verdade.
 
 ## Origem e proxy
 
