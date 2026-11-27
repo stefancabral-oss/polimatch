@@ -5,6 +5,7 @@ import { sessionMirror, compareSessionWithCut } from "../../shared/session-mirro
 import { gameProgressStore, installGameSchema } from "./game-progress.js";
 import { installPhotoSurveySchema, photoSurveyParticipation, photoSurveyStore } from "./photo-survey-store.js";
 import { installRegistrationSchema, registrationStore } from "./registration-store.js";
+import { installProfileSchema, profileStore } from "./profile-store.js";
 import { AGGREGATE_PUBLIC_COPY_POLICY } from "../../shared/aggregate-publication-copy.js";
 import { eloTier, isZebra, ratingDeltas } from "../../shared/elo.js";
 import {
@@ -1959,6 +1960,8 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
         await installGameSchema(client);
         await installPhotoSurveySchema(client);
         await installRegistrationSchema(client);
+        // Perfil público (ICM 76, #354): depende de player_identities.
+        await installProfileSchema(client);
         await client.query("COMMIT");
         return migration;
       } catch (error) {
@@ -2910,6 +2913,7 @@ export function createTopicStore(connectionString = process.env.DATABASE_URL, {
   }));
   Object.assign(store, photoSurveyStore({ pool, findPlayer, clock, surveys: photoSurveys, requireRegistration: requirePhotoSurveyRegistration }));
   Object.assign(store, registrationStore({ pool, findPlayer, clock }));
+  Object.assign(store, profileStore({ pool, findPlayer, clock, surveys: photoSurveys }));
   return store;
 }
 

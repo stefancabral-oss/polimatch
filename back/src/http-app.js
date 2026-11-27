@@ -617,6 +617,60 @@ export function createHttpApp({
     }
   });
 
+  // Resultado da pessoa (ICM 76, #354): só leitura, com as mesmas recusas do
+  // sorteio. Devolve as escolhas da própria pessoa, nunca uma soma.
+  app.get("/api/photo-surveys/:surveyId/result", async (req, res) => {
+    if (!requirePhotoSurveys(req, res)) return;
+    try {
+      const recoveryKey = requiredRecoveryKey(req);
+      noStore(res).json(await store.photoSurveyResult(recoveryKey, String(req.params.surveyId)));
+    } catch (error) {
+      sendError(req, res, error);
+    }
+  });
+
+  // Perfil (ICM 76, #354, decisão 0008). As três rotas seguem o
+  // PHOTO_SURVEYS_ENABLED das pesquisas. Do corpo do PUT só passam os quatro
+  // campos do contrato; as recusas de forma saem do store antes do banco.
+  app.get("/api/me/profile", async (req, res) => {
+    if (!requirePhotoSurveys(req, res)) return;
+    try {
+      noStore(res).json(await store.myProfile(requiredRecoveryKey(req)));
+    } catch (error) {
+      noStore(res);
+      sendError(req, res, error);
+    }
+  });
+
+  app.put("/api/me/profile", async (req, res) => {
+    if (!requirePhotoSurveys(req, res)) return;
+    const { enabled, handle, surveys, consentVersion } = req.body || {};
+    try {
+      noStore(res).json(await store.updateProfile({
+        recoveryKey: requiredRecoveryKey(req),
+        enabled,
+        handle,
+        surveys,
+        consentVersion,
+        now: clock(),
+      }));
+    } catch (error) {
+      sendError(req, res, error);
+    }
+  });
+
+  // Pública, sem sessão. Perfil desligado e nome inexistente respondem igual.
+  app.get("/api/profiles/:handle", async (req, res) => {
+    if (!requirePhotoSurveys(req, res)) return;
+    try {
+      noStore(res).json(await store.publicProfile(String(req.params.handle)));
+    } catch (error) {
+      // Também a recusa: um 404 guardado em cache esconderia o perfil ligado depois.
+      noStore(res);
+      sendError(req, res, error);
+    }
+  });
+
   // Cadastro com CPF (ICM 71, #336). O número do CPF não passa desta rota:
   // ela confere o pedido com as regras de shared/ e entrega ao store só o
   // código. As recusas dizem o campo, nunca o que foi digitado.

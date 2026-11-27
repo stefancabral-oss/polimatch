@@ -4,6 +4,7 @@ import {
   drawCards,
   drawGroups,
   drawRound,
+  personalRanking,
   photoSurveyById,
   publicPhotoSurvey,
   seenPairKeys,
@@ -165,6 +166,68 @@ function publicResponse(row) {
   };
 }
 
+// A identidade é o jogador mais os anônimos incorporados a ele no login
+// Google. Vale a resposta mais antiga. As rodadas seguintes usam a mesma
+// identidade, em personRounds.
+async function identityResponse(client, surveyId, playerId) {
+  const result = await client.query(`SELECT answer_id, shown_ids, pick_ids, champion_id, responded_at
+    FROM photo_survey_responses
+    WHERE survey_id = $1
+      AND player_id IN (SELECT $2::uuid UNION ALL SELECT source_player_id FROM player_history_links WHERE player_id = $2)
+    ORDER BY responded_at, answer_id LIMIT 1`, [surveyId, playerId]);
+  return result.rows[0] || null;
+}
+
+async function playerDraw(client, surveyId, playerId) {
+  const result = await client.query(
+    "SELECT shown_ids FROM photo_survey_draws WHERE survey_id = $1 AND player_id = $2",
+    [surveyId, playerId],
+  );
+  return result.rows[0]?.shown_ids || null;
+}
+
+// As rodadas da pessoa na pesquisa, em ordem: o número, as cartas do
+// sorteio e a resposta gravada, ou null enquanto a rodada está aberta.
+// A rodada 1 respondida usa as cartas da resposta da identidade. As rodadas
+// seguintes seguem a mesma identidade: o jogador mais os incorporados a ele.
+// Quando dois jogadores da mesma identidade têm a mesma rodada, vale a
+// respondida mais antiga e, sem resposta, o sorteio mais antigo. `ownerId`
+// é o jogador em cujo nome o sorteio da rodada foi gravado: a resposta dela
+// é gravada no mesmo nome.
+export async function personRounds(client, survey, playerId) {
+  const first = await identityResponse(client, survey.id, playerId);
+  const firstShown = first ? first.shown_ids : await playerDraw(client, survey.id, playerId);
+  const rounds = firstShown ? [{ round: 1, shownIds: firstShown, response: first, ownerId: playerId }] : [];
+  const later = await client.query(`SELECT d.round, d.player_id AS owner_id, d.shown_ids AS draw_ids,
+      r.answer_id, r.shown_ids, r.pick_ids, r.champion_id, r.responded_at
+    FROM photo_survey_round_draws d
+    LEFT JOIN photo_survey_round_responses r
+      ON r.survey_id = d.survey_id AND r.player_id = d.player_id AND r.round = d.round
+    WHERE d.survey_id = $1
+      AND d.player_id IN (SELECT $2::uuid UNION ALL SELECT source_player_id FROM player_history_links WHERE player_id = $2)
+    ORDER BY d.round, (r.answer_id IS NULL), r.responded_at, d.issued_at, d.player_id`, [survey.id, playerId]);
+  for (const row of later.rows) {
+    const round = Number(row.round);
+    // A ordem da consulta põe primeiro a linha que vale em cada rodada.
+    if (rounds.some((entry) => entry.round === round)) continue;
+    rounds.push({ round, shownIds: row.draw_ids, response: row.answer_id ? row : null, ownerId: row.owner_id });
+  }
+  return rounds;
+}
+
+// As rodadas respondidas, no formato de seenPairKeys, surveyProgress e
+// personalRanking.
+export const answeredRounds = (rounds) => rounds
+  .filter((entry) => entry.response)
+  .map((entry) => ({ shownIds: entry.response.shown_ids, pickIds: entry.response.pick_ids, championId: entry.response.champion_id }));
+
+// Resultado da pessoa (ICM 76, #354, decisão 0008): as mesmas rodadas
+// respondidas que o progresso usa, pontuadas por personalRanking. Só lê.
+export async function personResult(client, survey, playerId) {
+  const answered = answeredRounds(await personRounds(client, survey, playerId));
+  return { answeredRounds: answered.length, ranking: personalRanking(survey, answered) };
+}
+
 export function photoSurveyStore({
   pool,
   findPlayer,
@@ -201,59 +264,6 @@ export function photoSurveyStore({
       client.release();
     }
   }
-
-  // A identidade é o jogador mais os anônimos incorporados a ele no login
-  // Google. Vale a resposta mais antiga. As rodadas seguintes usam a mesma
-  // identidade, em personRounds.
-  async function identityResponse(client, surveyId, playerId) {
-    const result = await client.query(`SELECT answer_id, shown_ids, pick_ids, champion_id, responded_at
-      FROM photo_survey_responses
-      WHERE survey_id = $1
-        AND player_id IN (SELECT $2::uuid UNION ALL SELECT source_player_id FROM player_history_links WHERE player_id = $2)
-      ORDER BY responded_at, answer_id LIMIT 1`, [surveyId, playerId]);
-    return result.rows[0] || null;
-  }
-
-  async function playerDraw(client, surveyId, playerId) {
-    const result = await client.query(
-      "SELECT shown_ids FROM photo_survey_draws WHERE survey_id = $1 AND player_id = $2",
-      [surveyId, playerId],
-    );
-    return result.rows[0]?.shown_ids || null;
-  }
-
-  // As rodadas da pessoa na pesquisa, em ordem: o número, as cartas do
-  // sorteio e a resposta gravada, ou null enquanto a rodada está aberta.
-  // A rodada 1 respondida usa as cartas da resposta da identidade. As rodadas
-  // seguintes seguem a mesma identidade: o jogador mais os incorporados a ele.
-  // Quando dois jogadores da mesma identidade têm a mesma rodada, vale a
-  // respondida mais antiga e, sem resposta, o sorteio mais antigo. `ownerId`
-  // é o jogador em cujo nome o sorteio da rodada foi gravado: a resposta dela
-  // é gravada no mesmo nome.
-  async function personRounds(client, survey, playerId) {
-    const first = await identityResponse(client, survey.id, playerId);
-    const firstShown = first ? first.shown_ids : await playerDraw(client, survey.id, playerId);
-    const rounds = firstShown ? [{ round: 1, shownIds: firstShown, response: first, ownerId: playerId }] : [];
-    const later = await client.query(`SELECT d.round, d.player_id AS owner_id, d.shown_ids AS draw_ids,
-        r.answer_id, r.shown_ids, r.pick_ids, r.champion_id, r.responded_at
-      FROM photo_survey_round_draws d
-      LEFT JOIN photo_survey_round_responses r
-        ON r.survey_id = d.survey_id AND r.player_id = d.player_id AND r.round = d.round
-      WHERE d.survey_id = $1
-        AND d.player_id IN (SELECT $2::uuid UNION ALL SELECT source_player_id FROM player_history_links WHERE player_id = $2)
-      ORDER BY d.round, (r.answer_id IS NULL), r.responded_at, d.issued_at, d.player_id`, [survey.id, playerId]);
-    for (const row of later.rows) {
-      const round = Number(row.round);
-      // A ordem da consulta põe primeiro a linha que vale em cada rodada.
-      if (rounds.some((entry) => entry.round === round)) continue;
-      rounds.push({ round, shownIds: row.draw_ids, response: row.answer_id ? row : null, ownerId: row.owner_id });
-    }
-    return rounds;
-  }
-
-  const answeredRounds = (rounds) => rounds
-    .filter((entry) => entry.response)
-    .map((entry) => ({ shownIds: entry.response.shown_ids, pickIds: entry.response.pick_ids }));
 
   // O progresso é só da pessoa que pede: rodadas respondidas e duplas vistas
   // por ela. Com rodada aberta não cabe outra, então `canContinue` é falso.
@@ -299,6 +309,17 @@ export function photoSurveyStore({
   return {
     async photoSurvey(surveyId, { now } = {}) {
       return publicPhotoSurvey(requiredSurvey(surveyId), instant(now));
+    },
+
+    // Resultado da pessoa (ICM 76, #354). As mesmas recusas do sorteio
+    // (sessão, cadastro, pesquisa inexistente) e nenhuma gravação: com a
+    // pesquisa fechada o resultado continua legível. Nada de outras pessoas.
+    async photoSurveyResult(recoveryKey, surveyId) {
+      const survey = requiredSurvey(surveyId);
+      return transaction(recoveryKey, async (client, player) => ({
+        surveyId: survey.id,
+        ...(await personResult(client, survey, player.id)),
+      }));
     },
 
     // Sem `next`: emite a rodada 1 para quem não tem rodada nenhuma e, para

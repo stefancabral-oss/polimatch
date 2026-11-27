@@ -13,7 +13,8 @@
     "test:abuse": "node scripts/vote-abuse-smoke.mjs",
     "test:resilience": "node scripts/api-resilience-smoke.mjs",
     "test:photo-survey": "node scripts/photo-survey-smoke.mjs",
-    "test:registration": "node scripts/cpf-registration-smoke.mjs"
+    "test:registration": "node scripts/cpf-registration-smoke.mjs",
+    "test:profile": "node scripts/profile-smoke.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",

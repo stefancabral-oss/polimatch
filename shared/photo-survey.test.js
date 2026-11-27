@@ -604,3 +604,47 @@ for (const [label, chooserFor] of [["escolhendo ao acaso", randomChooser], ["com
     });
   }
 }
+
+test("resultado da pessoa: 3 pontos pela final, 1 por tela, desempates em ordem", async () => {
+  const { personalRanking } = await import("./photo-survey.js");
+  const survey = { cardIds: ["a", "b", "c", "d", "e", "f", "g", "h"] };
+  assert.deepEqual(personalRanking(survey, []), []);
+  assert.deepEqual(personalRanking(survey, undefined), []);
+  const rounds = [
+    { pickIds: ["a", "c", "e", "g"], championId: "c" },
+    { pickIds: ["b", "c", "e", "h"], championId: "e" },
+    { pickIds: ["a", "d", "f", "g"], championId: "a" },
+  ];
+  assert.deepEqual(personalRanking(survey, rounds).map(({ cardId, points, finalWins, screenWins }) => [cardId, points, finalWins, screenWins]), [
+    ["a", 5, 1, 2],
+    ["c", 5, 1, 2],
+    ["e", 5, 1, 2],
+    ["g", 2, 0, 2],
+    ["b", 1, 0, 1],
+    ["d", 1, 0, 1],
+    ["f", 1, 0, 1],
+    ["h", 1, 0, 1],
+  ]);
+  // Empate em pontos: decide quem venceu mais finais.
+  const tie = personalRanking(survey, [
+    { pickIds: ["a", "b", "c", "d"], championId: "b" },
+    { pickIds: ["a", "e", "f", "g"], championId: "e" },
+    { pickIds: ["a", "e", "f", "h"], championId: "f" },
+    { pickIds: ["a", "c", "d", "h"], championId: "c" },
+  ]);
+  // c, e e f: 5 pontos, 1 final e 2 telas cada; decide a ordem das cartas.
+  // b e a: 4 pontos; b venceu uma final, a não. d e h: 2; g: 1.
+  assert.deepEqual(tie.map((entry) => [entry.cardId, entry.points]), [
+    ["c", 5], ["e", 5], ["f", 5], ["b", 4], ["a", 4], ["d", 2], ["h", 2], ["g", 1],
+  ]);
+});
+
+test("resultado da pessoa: carta que saiu da pesquisa e campeã fora das escolhidas não contam", async () => {
+  const { personalRanking } = await import("./photo-survey.js");
+  const survey = { cardIds: ["a", "b", "c", "d"] };
+  const ranking = personalRanking(survey, [
+    { pickIds: ["a", "saiu", "b", "b"], championId: "saiu" },
+    { pickIds: ["a", "b", "c", "d"], championId: "z" },
+  ]);
+  assert.deepEqual(ranking.map(({ cardId, points }) => [cardId, points]), [["a", 2], ["b", 2], ["c", 1], ["d", 1]]);
+});
