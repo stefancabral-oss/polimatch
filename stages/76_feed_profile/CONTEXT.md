@@ -23,12 +23,14 @@ que ela marcar.
 3. **Perfil.** Pertence à conta (provider + subject), como o cadastro. Só
    conta com cadastro com CPF liga perfil. Nasce desligado. Ligar exige
    `consentVersion` igual à versão atual do aceite do perfil, um nome de
-   perfil válido e livre, e grava a data do aceite. Desligar não exige nada
+   perfil válido e livre, e grava a data do aceite. Desligar não exige aceite nem cadastro (só a conta)
    e vale na hora. As marcações de pesquisa ficam guardadas mesmo com o
    perfil desligado.
 4. **Nome de perfil:** `^[a-z0-9_]{3,20}$` depois de passar para minúsculas;
    único; nomes reservados recusados (`admin`, `polimatch`, `perfil`,
-   `suporte`, `ajuda`, `api`, `www`). Trocar de nome libera o anterior.
+   `suporte`, `ajuda`, `api`, `www`). Depois de gravado, o nome não muda
+   (400 `PROFILE_INVALID`, motivo `handle-locked`) e não volta a ficar livre
+   enquanto a conta existir.
 5. **Perfil público:** só existe com perfil ligado. Mostra o nome de perfil
    e, para cada pesquisa marcada em que a pessoa tem ao menos uma rodada
    respondida, `{ surveyId, subject, question, cardId }` da primeira
@@ -143,5 +145,5 @@ política. Posso desmarcar pesquisas ou desligar o perfil quando quiser."
 ## Gate humano
 
 Merge e publicação pedem o sim do Stefan, um a um. A pergunta do merge leva
-as escolhas 1 a 9 da decisão 0008 por extenso. A publicação do perfil depende
+as escolhas 1 a 13 da decisão 0008 por extenso. A publicação do perfil depende
 da revisão jurídica que ele decidir fazer.

@@ -32,6 +32,7 @@ import {
   responseBody,
   restoreProgress,
   resultOnOpen,
+  resultRequested,
   resultSummary,
   roundState,
   sameGroups,
@@ -48,7 +49,7 @@ import {
   registrationRefusal,
   signInMarkup,
 } from "./registration-view.js";
-import { feedEntries, profileState } from "./profile-view.js";
+import { feedEntries, feedHref, profileState } from "./profile-view.js";
 import { CHOICE_LABELS, RESULT_LABELS, shareChoice, shareImage, sharePlan, sharePreviewMarkup } from "./share-choice.js";
 import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingSectionMarkup } from "./site-menu.js";
 
@@ -129,6 +130,10 @@ let response = null;
 // o número da rodada na tela, o progresso da pessoa e a última rodada que ela
 // respondeu. NO_ROUNDS quando ele não disse nada.
 let rounds = NO_ROUNDS;
+// O resultado aberto pelo cartão "Ver meu resultado" do feed, sem sorteio
+// (ICM 76, #354): a página não sabe das rodadas da pessoa até ela tocar em
+// "Continuar votando", e por isso o botão aparece com a pesquisa aberta.
+let resultFromFeed = false;
 // O resultado da pessoa na tela (ICM 76, #354): o que `GET …/result` devolveu,
 // ou null enquanto não chega; `resultFailed` quando a leitura falhou.
 let resultData = null;
@@ -491,7 +496,8 @@ function renderRegistered() {
 }
 
 /** Dá para seguir votando: a pesquisa está aberta e há rodada pela metade, emitida ou por emitir. */
-const canKeepVoting = () => survey?.status === "open" && (Boolean(progress) || Boolean(nextRoundNumber(rounds, survey.status)));
+const canKeepVoting = () => survey?.status === "open"
+  && (Boolean(progress) || Boolean(nextRoundNumber(rounds, survey.status)) || (resultFromFeed && !rounds.progress));
 
 /**
  * O resultado prévio da pessoa nesta pesquisa (ICM 76, #354): a primeira
@@ -854,6 +860,7 @@ function showLastAnswered(text = "") {
  * servidor devolveu a última respondida, não havia rodada para abrir.
  */
 function applyDraw(result, { next = false, auto = false } = {}) {
+  resultFromFeed = false;
   survey = result?.survey || survey;
   rounds = roundState(result);
   const groups = result?.draw?.groups;
@@ -939,6 +946,7 @@ function renderSwitched({ recorded = false } = {}) {
 /** A conta desta aba deixou de ser a que está salva: recomeça com a atual, com um toque. */
 function identityChanged() {
   const wasDone = view === "done" || view === "result" || view === "registered";
+  resultFromFeed = false;
   epoch += 1;
   busy = false;
   uncertain = false;
@@ -1136,7 +1144,7 @@ async function start({ auto = false, retried = false, fromGate = false, next = f
       return;
     }
     // Com a resposta na tela, a falha de "Mais uma rodada" não a tira de lá.
-    if (next && response) failNext(error);
+    if (next && (response || resultFromFeed)) failNext(error);
     else failStart(error);
     return;
   }
@@ -1168,7 +1176,7 @@ function failNext(error) {
   } else {
     notice = "Não conseguimos abrir a rodada nova agora. Tente de novo em instantes.";
   }
-  if (rounds.round) openResult();
+  if (rounds.round || resultFromFeed) openResult();
   else renderDone({ focus: true });
 }
 
@@ -1384,7 +1392,50 @@ function init() {
   atHome = !requested;
   if (!requested) return openHome();
   useSurvey(requested);
+  resultFromFeed = false;
+  // O cartão "Ver meu resultado" do feed: o resultado, só leitura, também
+  // noutro aparelho. Sem conta Google, a página de sempre.
+  if (resultRequested(window.location.search) && signedIn()) return openResultOnly();
   return openSurvey();
+}
+
+/**
+ * O resultado pedido pelo feed (`ver=resultado`). Lê a pesquisa e o resultado
+ * da pessoa (`GET …/result`); nada aqui sorteia nem grava. Lida a pesquisa, o
+ * pedido sai do endereço: recarregar volta à página de sempre, e quem tocou
+ * em "Continuar votando" não é levado de novo ao resultado.
+ */
+async function openResultOnly() {
+  view = "loading";
+  notice = "";
+  progress = null;
+  response = null;
+  rounds = NO_ROUNDS;
+  renderEntry({ pending: "Carregando…" });
+  const run = ++epoch;
+  const key = readStored(IDENTITY_KEY);
+  try {
+    survey = await loadPhotoSurvey(surveyId);
+  } catch (error) {
+    if (run !== epoch) return;
+    if (error.status === 404) {
+      renderStopped("unavailable");
+      return;
+    }
+    view = "entry";
+    notice = unreachableNotice(error);
+    renderEntry({ action: "init", label: "Tentar de novo" });
+    return;
+  }
+  if (run !== epoch) return;
+  try {
+    window.history.replaceState(null, "", surveyHref(surveyId));
+  } catch {
+    // Sem histórico, o pedido fica no endereço; o resultado abre igual.
+  }
+  identity = key;
+  resultFromFeed = true;
+  openResult();
 }
 
 const unreachableNotice = (error) => (error.status !== 0
@@ -1468,7 +1519,7 @@ function feedCard(entry) {
   const topic = (typeof remote.subject === "string" && remote.subject) || base.subject;
   const [tag, modifier] = Object.hasOwn(STATUS_TAG, entry.status) ? STATUS_TAG[entry.status] : STATUS_TAG.closed;
   const face = entry.firstCardId || feedFace(entry.id);
-  return `<a class="ps-feed-card" href="${surveyHref(entry.id)}" data-survey="${escapeText(entry.id)}">${face ? staticCard(face, "84px") : '<span class="ps-card" aria-hidden="true"></span>'}<span class="ps-feed-text"><small><span>${escapeText(topic)}</span><em class="pm-tag${modifier}">${tag}</em></small><b>${escapeText(title)}</b>${entry.firstCardId ? `<span class="ps-feed-first">Seu 1º lugar: <strong>${escapeText(cardName(entry.firstCardId))}</strong></span>` : ""}<span class="ps-feed-go">${escapeText(entry.label)} <i aria-hidden="true">›</i></span></span></a>`;
+  return `<a class="ps-feed-card" href="${escapeText(feedHref(entry))}" data-survey="${escapeText(entry.id)}">${face ? staticCard(face, "84px") : '<span class="ps-card" aria-hidden="true"></span>'}<span class="ps-feed-text"><small><span>${escapeText(topic)}</span><em class="pm-tag${modifier}">${tag}</em></small><b>${escapeText(title)}</b>${entry.firstCardId ? `<span class="ps-feed-first">Seu 1º lugar: <strong>${escapeText(cardName(entry.firstCardId))}</strong></span>` : ""}<span class="ps-feed-go">${escapeText(entry.label)} <i aria-hidden="true">›</i></span></span></a>`;
 }
 
 /**

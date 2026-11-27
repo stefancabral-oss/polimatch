@@ -8,7 +8,7 @@ import { PHOTO_SURVEYS } from "../../shared/photo-survey.js";
 import { PROFILE_CONSENT_TEXT, PROFILE_CONSENT_VERSION, normalizeHandle } from "../../shared/profile.js";
 import { IDENTITY_KEY, readIdentityKey } from "./account-session.js";
 import { loadMyProfile, saveMyProfile } from "./api.js";
-import { enableBody, enableProblem, profileLink, profileRefusal, profileState } from "./profile-view.js";
+import { HANDLE_CHOOSE_NOTE, HANDLE_LOCKED_NOTE, enableBody, enableProblem, profileLink, profileRefusal, profileState } from "./profile-view.js";
 import { accountKind, mountSiteMenu } from "./site-menu.js";
 
 // "Meu perfil" (ICM 76, #354, decisão 0008). A versão do perfil que só a
@@ -19,6 +19,10 @@ import { accountKind, mountSiteMenu } from "./site-menu.js";
 //
 // Abrir a página só lê. Só os toques em "Ligar meu perfil", "Salvar
 // marcações" e "Desligar" gravam.
+//
+// O nome de perfil, depois de gravado, não muda (o servidor recusa com
+// `handle-locked`): com um nome gravado o campo vem preenchido e travado.
+// Desligar não exige cadastro, só a conta.
 
 const main = document.querySelector("#pf-main");
 const artById = new Map([...ARTS, ...CELEBRITIES, ...CLOTHES].map((art) => [art.id, art]));
@@ -80,11 +84,17 @@ function render({ focus = false, target = "" } = {}) {
   } else if (!profile.enabled && !profile.canEnable) {
     main.innerHTML = `${head("Seu perfil está desligado", "Para ligar o perfil, falta o cadastro com CPF. Ele é feito na primeira vez que você responde uma pesquisa: abra uma e toque em Começar.")}<div class="ps-stack"><a class="ps-btn" href="${REGISTER_HREF}">Fazer o cadastro</a></div>`;
   } else if (!profile.enabled) {
+    // Com nome gravado, o campo vem preenchido e travado: o nome não muda.
+    const locked = Boolean(profile.handle);
+    const describedBy = locked ? "pf-handle-help" : "pf-handle-help pf-handle-care";
+    const help = locked
+      ? `<small id="pf-handle-help">${escapeText(HANDLE_LOCKED_NOTE)}</small>`
+      : `<small id="pf-handle-help">De 3 a 20 letras sem acento, números ou _. Aparece no link e no perfil.</small><small class="ps-handle-care" id="pf-handle-care">${escapeText(HANDLE_CHOOSE_NOTE)}</small>`;
     main.innerHTML = `${head("Seu perfil está desligado", "Ninguém vê as suas escolhas. Se você ligar, quem tiver o link vê a sua primeira colocada nas pesquisas que você marcar.")}
       <form class="ps-profile-form" id="pf-form" novalidate>
         <div class="ps-field"><label for="pf-handle">Nome de perfil</label>
-          <div class="ps-handle"${invalid === "handle" ? ' aria-invalid="true"' : ""}><span aria-hidden="true">@</span><input id="pf-handle" name="handle" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="20" value="${escapeText(form.handle)}"${busy ? " disabled" : ""}${invalid === "handle" ? ' aria-invalid="true" aria-describedby="pf-notice pf-handle-help"' : ' aria-describedby="pf-handle-help"'}></div>
-          <small id="pf-handle-help">De 3 a 20 letras sem acento, números ou _. Aparece no link e no perfil.</small></div>
+          <div class="ps-handle${locked ? " ps-handle--locked" : ""}"${invalid === "handle" ? ' aria-invalid="true"' : ""}><span aria-hidden="true">@</span><input id="pf-handle" name="handle" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="20" value="${escapeText(locked ? profile.handle : form.handle)}"${locked ? " readonly" : ""}${busy ? " disabled" : ""}${invalid === "handle" ? ` aria-invalid="true" aria-describedby="pf-notice ${describedBy}"` : ` aria-describedby="${describedBy}"`}></div>
+          ${help}</div>
         ${marksMarkup()}
         ${consentMarkup()}
         <div class="ps-stack"><button class="ps-btn" type="submit"${busy ? " disabled" : ""}>${busy ? "Ligando…" : "Ligar meu perfil"}</button></div>
@@ -96,7 +106,8 @@ function render({ focus = false, target = "" } = {}) {
       <div class="ps-link-box"><output id="pf-link">${escapeText(link)}</output>
         <button class="ps-btn ps-btn--ghost" type="button" data-action="copy">Copiar link</button>
         <p class="ps-muted" id="pf-copied" role="status"${copied ? "" : " hidden"}>${escapeText(copied)}</p>
-        <a class="ps-link" href="./perfil.html?u=${encodeURIComponent(profile.handle)}">Ver como os outros veem</a></div>
+        <a class="ps-link" href="./perfil.html?u=${encodeURIComponent(profile.handle)}">Ver como os outros veem</a>
+        <p class="ps-muted" id="pf-handle-help">${escapeText(HANDLE_LOCKED_NOTE)}</p></div>
       <form class="ps-profile-form" id="pf-form" novalidate>
         ${marksMarkup()}
         ${outdated ? consentMarkup() : ""}
@@ -172,10 +183,29 @@ async function save(body, doneText) {
     if (mine !== run) return;
     busy = false;
     const refusal = profileRefusal(error);
-    if (refusal.next === "register") profile = { ...profile, enabled: false, canEnable: false };
+    // Recusa não muda o que a tela diz do perfil: um "desligar" recusado não
+    // vira "desligado". Sem cadastro, só some a opção de ligar; quem está
+    // ligado continua vendo o perfil ligado e o botão "Desligar".
+    if (refusal.next === "register") profile = { ...profile, canEnable: false };
     notice = refusal.text;
     invalid = refusal.field;
+    if (refusal.next === "reload") await refreshKeepingForm(key, mine);
     render({ target: refusal.field === "handle" ? "#pf-handle" : refusal.field === "consent" ? "#pf-consent" : "#ps-title" });
+  }
+}
+
+// Busca o perfil de novo depois de uma recusa (o nome gravado mudou em outra
+// aba), sem perder as marcações e o aceite que a pessoa preencheu. Se a busca
+// falhar, a tela fica como estava, com o aviso da recusa.
+async function refreshKeepingForm(key, mine) {
+  try {
+    const raw = await loadMyProfile(key);
+    if (mine !== run) return;
+    const kept = form;
+    useProfile(raw);
+    form = { ...form, surveys: kept.surveys, consent: kept.consent };
+  } catch {
+    // Fica o aviso da recusa.
   }
 }
 
@@ -225,7 +255,7 @@ async function copyLink() {
 }
 
 main.addEventListener("input", (event) => {
-  if (event.target.id !== "pf-handle") return;
+  if (event.target.id !== "pf-handle" || event.target.readOnly) return;
   form = { ...form, handle: normalizeHandle(event.target.value) };
 });
 

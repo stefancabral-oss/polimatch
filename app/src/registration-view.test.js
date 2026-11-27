@@ -45,6 +45,10 @@ test("o formulário traz o CPF, as opções do protótipo, o consentimento e Con
   assert.match(markup, /<input type="checkbox" id="ps-consent" name="consent" aria-required="true">/);
   assert.match(markup, /<button class="ps-btn" type="submit">Concluir<\/button><a class="ps-btn ps-btn--ghost" href="\.\/">Voltar<\/a>/);
   assert.match(markup, /Não guardamos o número do CPF/);
+  // Desde o perfil (ICM 76, #354) a escolha de uma pessoa pode aparecer no
+  // perfil que ela ligar: a nota diz isso, e não "nunca a escolha".
+  assert.ok(markup.includes("<p class=\"ps-muted ps-form-note\">Não guardamos o número do CPF, só um código gerado a partir dele, para reconhecer um CPF repetido. Do PoliMatch só sai o resultado somado. A sua escolha só aparece no perfil que você ligar.</p>"));
+  assert.doesNotMatch(markup, /nunca a escolha de uma pessoa/);
 });
 
 test("o formulário volta com o que a pessoa já tinha preenchido", () => {

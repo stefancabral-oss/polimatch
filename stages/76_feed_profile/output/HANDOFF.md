@@ -11,8 +11,8 @@ aparece quando ela pede; quem entrou vê um feed das pesquisas; cada pessoa
 tem um perfil, visível a outras como no Instagram, que só aparece depois de
 ela ligar.
 
-O resto é escolha do agente e está listado lá: nove de regra e de dado (1 a
-9), que a pergunta do merge leva por extenso, e três de desenho (10 a 12).
+O resto é escolha do agente e está listado lá: treze de regra e de dado (1 a
+13), que a pergunta do merge leva por extenso, e três de desenho (14 a 16).
 
 ## O que foi feito
 
@@ -89,9 +89,9 @@ do agente que escreve este handoff.
 Rodado pelo agente que escreve este handoff, em 26/11/2026, neste computador
 (macOS). O CI do GitHub (Linux) é a referência.
 
-- `npm run test:shared`: 142 de 142.
-- `npm test --prefix back`: 353 de 353.
-- `npm test --prefix app`: 260 de 260.
+- `npm run test:shared`: 143 de 143.
+- `npm test --prefix back`: 354 de 354.
+- `npm test --prefix app`: 263 de 263.
 - `npm run editorial:verify --prefix back`: passou.
 - Roteiros de banco, na ordem do `back-shared.yml`, contra PostgreSQL 16
   local descartável: os dez passaram (integração, escolhas ordenadas, duelos
@@ -101,7 +101,7 @@ Rodado pelo agente que escreve este handoff, em 26/11/2026, neste computador
 - Build do app com o client id de teste do CI, e os três roteiros de
   navegador contra `vite preview` local, com o servidor simulado dos
   próprios roteiros: em WebKit e em Chromium, `photo-survey.mjs` com 42
-  cenários, `site-shell.mjs` com 58 e `client-error-report.mjs` com 5
+  cenários, `site-shell.mjs` com 60 e `client-error-report.mjs` com 5
   páginas, todos passando. O Chromium é o que já estava na máquina (revisão
   1187), aberto por um roteiro auxiliar fora do repositório.
 
@@ -116,7 +116,42 @@ Rodado pelo agente que escreve este handoff, em 26/11/2026, neste computador
 - As fontes do Linux do CI.
 - Os textos novos não passaram pela revisão jurídica (#283).
 
+## Leitura independente
+
+Um agente à parte, somente leitura, leu o PR em 26/11/2026 e segurou o merge.
+O que mudou por causa dela:
+
+- **Desligar pedia cadastro.** Uma conta que perdesse o cadastro não
+  conseguia desligar o perfil, e a tela dizia "desligado" com o perfil
+  ainda no ar. Agora desligar só exige a conta, e a tela só diz "desligado"
+  quando o servidor aceitou.
+- **Textos que ficaram falsos.** A tela do cadastro ainda dizia "nunca a
+  escolha de uma pessoa"; as decisões 0001, 0004 e 0007 ganharam nota
+  apontando para a 0008.
+- **Link antigo com as escolhas de outra pessoa.** Trocar de nome liberava o
+  nome anterior para outra conta. Agora o nome não muda depois de escolhido
+  (escolha 10).
+- **Feed noutro aparelho.** "Ver meu resultado" levava ao "Começar". Agora
+  leva ao resultado, só com leituras.
+- **Regras fora da lista.** Entraram por extenso as escolhas 10 a 13; a
+  decisão registra também "pra que seria tudo isso?" e "Sigo com tudo".
+- **Detalhes.** `no-store` nas recusas, `X-Robots-Tag: noindex` no perfil
+  público, e um teste que impede mudar o texto do aceite sem mudar a versão.
+
+O CI do primeiro envio falhou num teste de tela: "Como funciona" não cabia
+em 360×640 com a fonte do Linux. Os textos foram encurtados; com Verdana,
+para imitar a fonte larga, cabe nos dois navegadores neste computador.
+
+As correções foram feitas por um agente à parte e conferidas pelo agente que
+escreve este handoff, que repetiu os testes de unidade. Depois das correções
+rodaram, pelo agente das correções, os roteiros de banco do perfil, da
+pesquisa por foto e do cadastro e os três roteiros de navegador nos dois
+navegadores.
+
 ## Riscos conhecidos
+
+- **"Como funciona" com fonte monoespaçada** ainda não cabe em 360×640 sem
+  rolar. O CI usa a fonte do sistema; não é o caso dele.
 
 - **Dado sensível em público.** O perfil mostra a terceiros a escolha de uma
   pessoa sobre política. A base é o aceite próprio, pesquisa por pesquisa;
@@ -130,8 +165,8 @@ Rodado pelo agente que escreve este handoff, em 26/11/2026, neste computador
 - **A página pública do perfil não tem limite de pedidos por rede.**
 - **Recarregar logo depois de confirmar** leva ao resultado, não à rodada
   seguinte, se a pessoa ainda não tocou em nenhuma carta dela.
-- **Trocar o nome de perfil** com o perfil ligado não tem tela: é preciso
-  desligar e ligar de novo.
+- **O nome de perfil não muda** depois de escolhido (escolha 10): quem
+  errar o nome fica com ele.
 
 ## Publicação (76d)
 

@@ -171,14 +171,19 @@ export function profileStore({
       });
     },
 
-    /** Liga, desliga, troca o nome e as marcações. Exige conta com cadastro. */
+    /**
+     * Liga, desliga e muda as marcações. Ligar exige conta com cadastro;
+     * desligar só exige a conta, para que nada impeça desligar. O nome de
+     * perfil, depois de gravado, não muda: um link antigo nunca passa a
+     * mostrar as escolhas de outra pessoa.
+     */
     async updateProfile({ recoveryKey, now, ...body } = {}) {
       const change = checkProfileUpdate(body, surveys);
       const at = instant(now);
       return withClient(async (client) => {
         // findPlayer trava `player:<id>`.
         const player = await findPlayer(client, recoveryKey);
-        if (!(await hasRegistration(client, player.id))) throw registrationRequiredError();
+        if (change.enabled && !(await hasRegistration(client, player.id))) throw registrationRequiredError();
         const account = await googleAccount(client, player.id);
         if (!account) throw registrationRequiredError();
         // A conta pode estar em mais de um jogador ao longo do tempo: a trava
@@ -189,6 +194,8 @@ export function profileStore({
         if (change.enabled) {
           const handle = change.handle ?? current?.handle;
           if (!handle) throw invalidProfile("handle");
+          // O nome já gravado não muda.
+          if (current?.handle && handle !== current.handle) throw invalidProfile("handle-locked");
           if (handle !== current?.handle) {
             const taken = await client.query(
               "SELECT 1 FROM profile_settings WHERE lower(handle) = $1 AND NOT (provider = $2 AND subject = $3)",

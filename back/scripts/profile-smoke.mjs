@@ -149,6 +149,7 @@ try {
   before = await allRows();
   const anaHandle = handleOf("ana");
   await rejectsWith(enable(carla.token, handleOf("carla")), 403, "CPF_REGISTRATION_REQUIRED");
+  // Visitante sem conta Google não tem perfil: nem desligar ele pode.
   await rejectsWith(store.updateProfile({ recoveryKey: visitor.recoveryKey, enabled: false }), 403, "CPF_REGISTRATION_REQUIRED");
   await rejectsWith(enable(ana.token, anaHandle, { consentVersion: undefined }), 400, "PROFILE_CONSENT_REQUIRED");
   await rejectsWith(enable(ana.token, undefined), 400, "PROFILE_INVALID", { reason: "handle" });
@@ -211,14 +212,46 @@ try {
     raw.release();
   }
 
-  // --- Nome único sem diferença de caixa; trocar libera o anterior ---
+  // --- Desligar não exige cadastro: conta sem cadastro desliga; conta que
+  // perdeu o cadastro desliga e o perfil público some na hora ---
+  const carlaOff = await store.updateProfile({ recoveryKey: carla.token, enabled: false });
+  assert.deepEqual([carlaOff.enabled, carlaOff.handle, carlaOff.canEnable], [false, null, false]);
+  const elisa = await newAccount();
+  await play(elisa.token, POLITICS, 1);
+  const elisaHandle = handleOf("elisa");
+  await enable(elisa.token, elisaHandle, { surveys: [POLITICS.id] });
+  assert.equal((await store.publicProfile(elisaHandle)).surveys.length, 1);
+  // O banco é descartável: apagar o cadastro imita a conta que o perdeu.
+  await audit.query("DELETE FROM cpf_registrations WHERE provider = 'google' AND subject = $1", [elisa.subject]);
+  await rejectsWith(enable(elisa.token, undefined), 403, "CPF_REGISTRATION_REQUIRED");
+  assert.equal((await store.publicProfile(elisaHandle)).handle, elisaHandle, "a recusa de ligar não muda nada");
+  const elisaOff = await store.updateProfile({ recoveryKey: elisa.token, enabled: false });
+  assert.deepEqual([elisaOff.enabled, elisaOff.handle, elisaOff.canEnable], [false, elisaHandle, false]);
+  await rejectsWith(store.publicProfile(elisaHandle), 404, "PROFILE_NOT_FOUND");
+  assert.equal((await settingsRow(elisa.subject)).enabled, false);
+
+  // --- Nome único sem diferença de caixa; o nome gravado não muda e o link
+  // continua da mesma pessoa ---
   const bruno = await newAccount();
   await rejectsWith(enable(bruno.token, anaHandle.toUpperCase()), 409, "PROFILE_HANDLE_TAKEN");
+  const anaShown = await store.publicProfile(anaHandle);
   const anaSecond = handleOf("ana2");
-  await enable(ana.token, anaSecond);
-  assert.equal((await enable(bruno.token, anaHandle)).handle, anaHandle);
-  assert.deepEqual(await store.publicProfile(anaHandle), { handle: anaHandle, surveys: [] }, "bruno sem marcação");
-  assert.equal((await store.publicProfile(anaSecond)).surveys.length, 2);
+  before = await allRows();
+  const anaRow = await settingsRow(ana.subject);
+  await rejectsWith(enable(ana.token, anaSecond), 400, "PROFILE_INVALID", { reason: "handle-locked" });
+  assert.deepEqual(await allRows(), before, "a troca recusada não grava");
+  assert.deepEqual(await settingsRow(ana.subject), anaRow);
+  await rejectsWith(store.publicProfile(anaSecond), 404, "PROFILE_NOT_FOUND");
+  // Desligada, a troca continua recusada; o nome continua dela.
+  await store.updateProfile({ recoveryKey: ana.token, enabled: false });
+  await rejectsWith(enable(ana.token, anaSecond), 400, "PROFILE_INVALID", { reason: "handle-locked" });
+  await rejectsWith(enable(bruno.token, anaHandle), 409, "PROFILE_HANDLE_TAKEN");
+  // O mesmo nome em outra caixa não é troca.
+  assert.equal((await enable(ana.token, anaHandle.toUpperCase())).handle, anaHandle);
+  assert.deepEqual(await store.publicProfile(anaHandle), anaShown, "o link do nome original mostra a mesma pessoa");
+  // O nome que ela tentou continua livre para outra conta.
+  assert.equal((await enable(bruno.token, anaSecond)).handle, anaSecond);
+  assert.deepEqual(await store.publicProfile(anaSecond), { handle: anaSecond, surveys: [] }, "bruno sem marcação");
 
   // --- Duas contas disputam o mesmo nome ao mesmo tempo: uma grava, a outra 409, nunca 500 ---
   for (let round = 0; round < 6; round += 1) {
@@ -265,13 +298,17 @@ try {
     held.release();
   }
 
-  // --- A mesma conta em duas abas, com nomes diferentes: em fila, sem 500 ---
+  // --- A mesma conta em duas abas, com nomes diferentes: em fila, sem 500;
+  // o primeiro nome gravado fica e o segundo é recusado por estar travado ---
   const dora = await newAccount();
   const names = [handleOf("dora"), handleOf("dora")];
-  const both = await Promise.all(names.map((handle) => enable(dora.token, handle)));
-  assert.ok(both.every((profile) => profile.enabled));
+  const both = await Promise.allSettled(names.map((handle) => enable(dora.token, handle)));
+  assert.deepEqual(both.map((entry) => entry.status).sort(), ["fulfilled", "rejected"]);
+  const kept = both.find((entry) => entry.status === "fulfilled").value;
+  const lockedOut = both.find((entry) => entry.status === "rejected").reason;
+  assert.deepEqual([lockedOut.status, lockedOut.code, lockedOut.current], [400, "PROFILE_INVALID", { reason: "handle-locked" }], lockedOut.message);
   assert.equal(await count("profile_settings", "WHERE subject = $1", [dora.subject]), 1);
-  assert.ok(names.includes((await settingsRow(dora.subject)).handle));
+  assert.equal((await settingsRow(dora.subject)).handle, kept.handle);
 
   // --- O perfil é da conta: quando o jogador ativo muda, ele acompanha ---
   const hugo = await newAccount();
@@ -302,13 +339,13 @@ try {
   try {
     await restarted.init();
     assert.equal(await count("profile_settings"), profiles);
-    assert.equal((await restarted.publicProfile(anaSecond)).handle, anaSecond);
+    assert.equal((await restarted.publicProfile(anaHandle)).handle, anaHandle);
   } finally {
     await restarted.close();
   }
   assert.equal(await count("schema_migrations", "WHERE id = '2026-11-26-profiles-v1'"), 1);
 
-  console.log("Smoke do perfil aprovado: resultado só lê e bate com a regra de pontos, perfil nasce desligado, ligar exige cadastro, nome e aceite, desligar vale na hora, só pesquisas marcadas com rodada aparecem, desligado e inexistente respondem igual, nome único também em disputa simultânea e no índice, perfil acompanha a conta e segundo boot.");
+  console.log("Smoke do perfil aprovado: resultado só lê e bate com a regra de pontos, perfil nasce desligado, ligar exige cadastro, nome e aceite, desligar vale na hora e não exige cadastro, o nome gravado não muda, só pesquisas marcadas com rodada aparecem, desligado e inexistente respondem igual, nome único também em disputa simultânea e no índice, perfil acompanha a conta e segundo boot.");
 } finally {
   await audit.end();
   await store.close();

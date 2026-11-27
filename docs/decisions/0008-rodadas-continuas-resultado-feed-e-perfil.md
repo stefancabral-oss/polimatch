@@ -6,9 +6,13 @@
 - Issue: #354 ([ICM 76])
 - Estado: em 26/11/2026, em construção no estágio 76, sem merge e sem
   publicação.
-- Altera a [decisão 0007](0007-rodadas-enquanto-houver-confrontos.md) na
-  escolha 2 ("continuar é opcional") e o que a página "Como funciona" promete
-  sobre a escolha de uma pessoa.
+- Altera a [decisão 0007](0007-rodadas-enquanto-houver-confrontos.md) nas
+  escolhas 2 ("continuar é opcional"), 12 ("Mais uma rodada") e 13 ("Suas
+  escolhas" na capa); a [decisão 0001](0001-pesquisa-de-preferencia-por-foto.md)
+  no item 5 ("Nunca o dado de uma pessoa"); a
+  [decisão 0004](0004-cadastro-obrigatorio-com-cpf.md) em "O que não muda"; e o
+  que "Como funciona" e a tela do cadastro prometem sobre a escolha de uma
+  pessoa.
 
 ## Contexto
 
@@ -44,13 +48,23 @@ ligar, recomendando a segunda opção. Ele respondeu:
 
 > "Pessoa liga"
 
+Depois de o agente começar a construir, ele perguntou:
+
+> "pra que seria tudo isso?"
+
+O agente explicou o que cada um dos quatro pedidos faz e por que o perfil
+público pede aceite próprio e revisão jurídica, e perguntou: "Sigo com os
+quatro itens ou deixo o perfil público para depois?". Ele respondeu:
+
+> "Sigo com tudo"
+
 ## Decisão
 
 1. **As rodadas seguem sem perguntar.** Confirmada uma rodada, a seguinte
    começa enquanto houver confronto por ver.
 2. **O resultado prévio é o da própria pessoa, e aparece quando ela pede.**
-   A soma de todos não aparece enquanto quem contratou a pesquisa não a
-   fechar.
+   (Leitura do agente sobre a resposta dele, não promessa: a soma de todos
+   continua sem aparecer, pelo gate #177.)
 3. **Quem entrou vê na página inicial um feed das pesquisas.**
 4. **Cada pessoa tem um perfil, visível a outras pessoas como no Instagram,**
    com a foto de quem está em primeiro lugar nas escolhas dela em cada
@@ -63,8 +77,8 @@ ligar, recomendando a segunda opção. Ele respondeu:
 As respostas do Stefan cobrem os itens acima. O resto é escolha do agente, e
 ele pode mudar qualquer uma.
 
-As escolhas 1 a 9 não são de desenho: são de regra e de dado, e a pergunta do
-gate do merge as apresenta por extenso. As escolhas 10 a 12 são de desenho
+As escolhas 1 a 13 não são de desenho: são de regra e de dado, e a pergunta
+do gate do merge as apresenta por extenso. As escolhas 14 a 16 são de desenho
 (decisão 0003, item 5).
 
 ### De regra e de dado
@@ -76,18 +90,19 @@ gate do merge as apresenta por extenso. As escolhas 10 a 12 são de desenho
    pesquisa. Contam todas as rodadas respondidas pela pessoa, pela regra de
    identidade da decisão 0007. O resultado prévio mostra essa ordem.
 2. **Ligar o perfil pede um aceite próprio,** separado do cadastro, com
-   texto e versão gravados e a data do aceite. Desligar é a qualquer momento,
-   sem aceite, e vale na hora.
+   versão e data do aceite gravadas no banco (o texto de cada versão fica no
+   código, e um teste impede mudar o texto sem mudar a versão). Desligar é a
+   qualquer momento, sem aceite e sem exigir cadastro, e vale na hora.
 3. **A pessoa escolhe pesquisa por pesquisa o que mostra.** Ao ligar, nenhuma
    pesquisa vem marcada; ela marca as que quer mostrar. Pesquisa que ela não
    marcou não aparece, nem como "oculta".
 4. **O perfil mostra só um nome de perfil escolhido pela pessoa** (3 a 20
    letras, números ou sublinhado, único, sem diferença entre maiúsculas e
    minúsculas) e, para cada pesquisa marcada em que a pessoa já respondeu
-   uma rodada, o assunto, a pergunta e a carta em primeiro lugar. O nome
-   continua da conta com o perfil desligado: outra conta não pode pegá-lo,
-   e por isso quem tenta ligar com um nome usado descobre que ele existe. Não mostra nome da conta Google, foto da pessoa,
-   CPF, faixa de idade, gênero nem estado.
+   uma rodada, o assunto, a pergunta e a carta em primeiro lugar. Não mostra
+   nome da conta Google, foto da pessoa, CPF, faixa de idade, gênero nem
+   estado. Alguns nomes são reservados: admin, polimatch, perfil, suporte,
+   ajuda, api e www.
 5. **O perfil só se acha pelo link,** `polimatch.com.br/perfil.html?u=<nome>`.
    Não há busca, lista de perfis nem perfil no mapa do site, e a página pede
    para não ser indexada.
@@ -95,26 +110,38 @@ gate do merge as apresenta por extenso. As escolhas 10 a 12 são de desenho
    procura se um nome de perfil existe.
 7. **O primeiro lugar no perfil muda conforme a pessoa joga.** É o resultado
    prévio dela naquele momento.
-8. **Textos de privacidade mudam.** "Como funciona" passa a dizer que a
-   escolha de uma pessoa só aparece no perfil que ela mesma ligou, e só nas
-   pesquisas que ela marcou. O texto do cadastro não muda.
+8. **Textos de privacidade mudam.** "Como funciona" e a tela do cadastro
+   passam a dizer que a escolha da pessoa só aparece no perfil que ela
+   ligar, e só nas pesquisas que marcar. O texto do aceite do cadastro (o
+   que a pessoa aceitou) não muda.
 9. **Só quem tem cadastro com CPF liga perfil**, como só quem tem cadastro
    responde (decisão 0004). Salvar marcações com o perfil ligado manda de
    novo a versão atual do aceite; se o texto do aceite mudar um dia, a
    pessoa aceita de novo antes de mudar o perfil.
+10. **O nome de perfil não muda depois de escolhido, e não volta a ficar
+    livre enquanto a conta existir.** Assim um link antigo nunca passa a mostrar as escolhas de outra
+    pessoa. Consequência: o nome continua da conta com o perfil desligado, e
+    quem tenta ligar com um nome usado descobre que ele existe.
+11. **As marcações ficam guardadas com o perfil desligado,** e voltam ao
+    religar. Religar grava data de aceite nova.
+12. **O resultado da pessoa continua legível com a pesquisa fechada.** Só
+    ela vê.
+13. **As rotas do perfil e do resultado seguem a chave que liga as
+    pesquisas por foto** (`PHOTO_SURVEYS_ENABLED`): com as pesquisas
+    desligadas no servidor, o perfil também some.
 
 ### De desenho
 
-10. **Rodada contínua.** Ao confirmar, a tela diz "Rodada registrada" por um
+14. **Rodada contínua.** Ao confirmar, a tela diz "Rodada registrada" por um
     instante e abre a próxima. "Ver meu resultado" fica à mão durante o voto
     e na confirmação, depois da primeira rodada. Vistos todos os confrontos,
     a tela mostra o resultado. Abrir uma pesquisa já respondida mostra o
     resultado com "Continuar votando": abrir a página nunca começa rodada
     sem um toque da pessoa.
-11. **Feed.** Na página inicial de quem entrou, as pesquisas aparecem em
+15. **Feed.** Na página inicial de quem entrou, as pesquisas aparecem em
     cartões, uma embaixo da outra: as que a pessoa não começou, as que estão
     em andamento e as respondidas, com a primeira colocada dela.
-12. **Perfil.** Grade de fotos como no Instagram: uma por pesquisa marcada,
+16. **Perfil.** Grade de fotos como no Instagram: uma por pesquisa marcada,
     com o assunto embaixo. "Meu perfil" no menu mostra a versão da própria
     pessoa, com o botão de ligar e desligar e as marcações.
 

@@ -62,6 +62,18 @@ export function feedEntries(views, { firstPlaces = new Map(), answeredIds = [], 
     .filter((entry) => entry.label);
 }
 
+/**
+ * O endereço do cartão do feed. "Ver meu resultado" com a primeira colocada
+ * dada pelo servidor leva ao resultado (`ver=resultado`), também noutro
+ * aparelho, sem registro local. Sem ela (só este aparelho sabe que a pessoa
+ * respondeu, como com um servidor de antes das rodadas) e nos outros
+ * rótulos, a página da pesquisa, como sempre.
+ */
+export function feedHref(entry) {
+  const base = `./?p=${encodeURIComponent(entry.id)}`;
+  return entry.label === "Ver meu resultado" && entry.firstCardId ? `${base}&ver=resultado` : base;
+}
+
 /** A versão do perfil que vai para o servidor ao ligar ou ao salvar as marcações. */
 export function enableBody({ handle, surveys, consent, consentVersion }) {
   const body = { enabled: true, handle: normalizeHandle(handle), surveys: [...surveys] };
@@ -70,6 +82,12 @@ export function enableBody({ handle, surveys, consent, consentVersion }) {
 
 const HANDLE_TEXT = "Escolha um nome de perfil com 3 a 20 letras sem acento, números ou _. Alguns nomes são reservados.";
 const CONSENT_TEXT = "Para ligar o perfil, marque o aceite.";
+const HANDLE_LOCKED_TEXT = "Este perfil já tem um nome, e o nome de perfil não muda depois de escolhido. Confira o nome no campo e tente de novo.";
+
+/** A frase do campo travado, com um nome já gravado. */
+export const HANDLE_LOCKED_NOTE = "O nome de perfil não muda depois de escolhido.";
+/** O aviso embaixo do campo, antes de ligar pela primeira vez. */
+export const HANDLE_CHOOSE_NOTE = "Escolha com cuidado: o nome não muda depois.";
 
 /** O que falta antes de mandar o pedido de ligar, ou null. */
 export function enableProblem({ handle, consent }) {
@@ -81,13 +99,17 @@ export function enableProblem({ handle, consent }) {
 /**
  * O texto de uma recusa do servidor e o que fazer em seguida: `field` é o
  * campo que recebe o foco; `next` é "register" quando falta o cadastro com
- * CPF, e "signin" quando a sessão não vale mais.
+ * CPF, "signin" quando a sessão não vale mais, e "reload" quando a tela
+ * precisa buscar o perfil de novo (o nome gravado não muda).
  */
 export function profileRefusal(error) {
   const reason = error?.body?.current?.reason || error?.body?.reason || "";
   if (error?.status === 409 && error.code === "PROFILE_HANDLE_TAKEN") return { field: "handle", text: "Esse nome de perfil já está em uso. Escolha outro.", next: "" };
   if (error?.code === "PROFILE_CONSENT_REQUIRED") return { field: "consent", text: CONSENT_TEXT, next: "" };
   if (error?.code === "PROFILE_INVALID" && reason === "handle") return { field: "handle", text: HANDLE_TEXT, next: "" };
+  // O nome já gravado não muda (outra aba pode ter ligado com outro nome):
+  // a tela busca o perfil de novo e mostra o nome gravado.
+  if (error?.code === "PROFILE_INVALID" && reason === "handle-locked") return { field: "", text: HANDLE_LOCKED_TEXT, next: "reload" };
   if (error?.code === "PROFILE_INVALID") return { field: "", text: "Não deu para salvar o perfil assim. Atualize a página e tente de novo.", next: "" };
   if (error?.status === 403 && error.code === "CPF_REGISTRATION_REQUIRED") return { field: "", text: "Para ligar o perfil, falta o cadastro com CPF.", next: "register" };
   if (error?.status === 401) return { field: "", text: "Sua sessão venceu. Abra o menu, saia da conta e entre de novo.", next: "signin" };

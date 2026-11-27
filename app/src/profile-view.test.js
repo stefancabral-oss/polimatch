@@ -3,9 +3,12 @@ import test from "node:test";
 import { PHOTO_SURVEYS } from "../../shared/photo-survey.js";
 import { PROFILE_CONSENT_VERSION } from "../../shared/profile.js";
 import {
+  HANDLE_CHOOSE_NOTE,
+  HANDLE_LOCKED_NOTE,
   enableBody,
   enableProblem,
   feedEntries,
+  feedHref,
   handleFromSearch,
   profileLink,
   profileRefusal,
@@ -95,6 +98,12 @@ test("cada recusa do servidor tem o seu texto e o seu campo", () => {
   assert.deepEqual(refusal(409, "PROFILE_HANDLE_TAKEN"), { field: "handle", text: "Esse nome de perfil já está em uso. Escolha outro.", next: "" });
   assert.equal(refusal(400, "PROFILE_INVALID", "handle").field, "handle");
   assert.equal(refusal(400, "PROFILE_INVALID", "surveys").field, "");
+  // O nome gravado não muda: a tela explica e busca o perfil de novo.
+  assert.deepEqual(refusal(400, "PROFILE_INVALID", "handle-locked"), {
+    field: "",
+    text: "Este perfil já tem um nome, e o nome de perfil não muda depois de escolhido. Confira o nome no campo e tente de novo.",
+    next: "reload",
+  });
   assert.equal(refusal(400, "PROFILE_CONSENT_REQUIRED").field, "consent");
   assert.equal(refusal(403, "CPF_REGISTRATION_REQUIRED").next, "register");
   assert.equal(refusal(401, "PLAYER_SESSION_REQUIRED").next, "signin");
@@ -119,4 +128,25 @@ test("o perfil público: uma carta por pesquisa, só cartas do catálogo, e o te
     { surveyId: SECOND, cardId: "c", subject: "<b>x</b>", question: "" },
   ]);
   assert.deepEqual(publicProfileCards({}), []);
+});
+
+test("os avisos do nome de perfil: travado depois de gravado, e o cuidado antes de ligar", () => {
+  assert.equal(HANDLE_LOCKED_NOTE, "O nome de perfil não muda depois de escolhido.");
+  assert.equal(HANDLE_CHOOSE_NOTE, "Escolha com cuidado: o nome não muda depois.");
+});
+
+test("o endereço do cartão do feed: Ver meu resultado pede o resultado; os outros, a página da pesquisa", () => {
+  const entries = feedEntries(views(["open", "open", "open", "closed"]), {
+    firstPlaces: new Map([[FIRST, "a"], [FOURTH, "b"]]),
+    answeredIds: [THIRD],
+    pendingIds: [SECOND],
+  });
+  assert.deepEqual(entries.map((entry) => [entry.label, feedHref(entry)]), [
+    ["Ver meu resultado", `./?p=${FIRST}&ver=resultado`],
+    ["Continuar", `./?p=${SECOND}`],
+    // Só este aparelho sabe que respondeu: a página de sempre, que retoma e mostra o resultado.
+    ["Ver meu resultado", `./?p=${THIRD}`],
+    ["Ver meu resultado", `./?p=${FOURTH}&ver=resultado`],
+  ]);
+  assert.equal(feedHref({ id: FIRST, label: "Começar", firstCardId: "" }), `./?p=${FIRST}`);
 });

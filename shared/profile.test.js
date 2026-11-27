@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import { PROFILE_CONSENT_TEXT, PROFILE_CONSENT_VERSION, RESERVED_HANDLES, isValidHandle, normalizeHandle } from "./profile.js";
 
@@ -21,4 +22,20 @@ test("o aceite do perfil tem versão e diz o que fica público", () => {
   assert.match(PROFILE_CONSENT_TEXT, /primeiro lugar/);
   assert.match(PROFILE_CONSENT_TEXT, /inclusive de política/);
   assert.match(PROFILE_CONSENT_TEXT, /desligar/);
+});
+
+// O servidor guarda a versão aceita, não o texto. Cada versão fica presa aqui
+// ao texto exato que ela nomeia, como no aceite do cadastro: mudar o texto
+// pede versão nova e uma linha nova nesta lista, sem apagar as antigas.
+const PROFILE_CONSENT_TEXT_SHA256 = Object.freeze({
+  "2026-11-26": "c366a09090e9328e812f0eb4bc69d3522697bfc6ed58301b744d8782358fb13f",
+});
+
+test("a versão do aceite do perfil nomeia um texto exato: mudar o texto pede versão nova", () => {
+  assert.ok(Object.hasOwn(PROFILE_CONSENT_TEXT_SHA256, PROFILE_CONSENT_VERSION), "a versão em uso precisa estar na lista");
+  assert.equal(
+    createHash("sha256").update(PROFILE_CONSENT_TEXT).digest("hex"),
+    PROFILE_CONSENT_TEXT_SHA256[PROFILE_CONSENT_VERSION],
+    "o texto do aceite do perfil mudou: mudar o texto pede PROFILE_CONSENT_VERSION nova e uma linha nova nesta lista",
+  );
 });

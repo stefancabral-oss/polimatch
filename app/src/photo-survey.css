@@ -1417,3 +1417,17 @@ select.ps-input {
   font-weight: 600;
   line-height: 1.4;
 }
+
+/* Nome de perfil já gravado: preenchido e travado (ICM 76). */
+.ps-handle--locked {
+  background: #f3f4f6;
+}
+
+.ps-handle--locked input {
+  color: var(--ps-ink);
+}
+
+.ps-field .ps-handle-care {
+  color: var(--ps-ink);
+  font-weight: 600;
+}

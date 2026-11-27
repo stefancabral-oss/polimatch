@@ -35,6 +35,7 @@ import {
   sampleCards,
   savedProgressText,
   surveyIdFromSearch,
+  resultRequested,
 } from "./photo-survey-flow.js";
 
 const PHOTO_SURVEY_ID = "politica-2026-01";
@@ -732,4 +733,12 @@ test("todas as pesquisas pela metade neste aparelho, na ordem da capa", () => {
   assert.deepEqual(inProgressSurveyIds(text, tag), [PHOTO_SURVEYS[0].id, PHOTO_SURVEYS[3].id]);
   assert.equal(inProgressSurveyId(text, tag), PHOTO_SURVEYS[0].id);
   assert.deepEqual(inProgressSurveyIds(text, ""), []);
+});
+
+test("o pedido do resultado vindo do feed: só `ver=resultado` vale", () => {
+  assert.equal(resultRequested("?p=politica-2026-01&ver=resultado"), true);
+  assert.equal(resultRequested("?ver=resultado&p=politica-2026-01"), true);
+  for (const search of ["", "?p=politica-2026-01", "?p=politica-2026-01&ver=Resultado", "?ver=", "?ver=voto", undefined, null]) {
+    assert.equal(resultRequested(search), false, String(search));
+  }
 });

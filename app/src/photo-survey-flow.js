@@ -219,6 +219,15 @@ export function surveyIdFromSearch(search, surveys = PHOTO_SURVEYS) {
   return surveys.some((survey) => survey.id === requested) ? requested : "";
 }
 
+/**
+ * O cartão "Ver meu resultado" do feed pede o resultado (`ver=resultado`,
+ * ICM 76, #354): noutro aparelho, sem registro local, a página abriria a
+ * entrada com "Começar". O pedido só lê; nunca emite rodada.
+ */
+export function resultRequested(search) {
+  return new URLSearchParams(typeof search === "string" ? search : "").get("ver") === "resultado";
+}
+
 function savedRecords(text, tag, surveys) {
   if (!tag) return [];
   return surveys

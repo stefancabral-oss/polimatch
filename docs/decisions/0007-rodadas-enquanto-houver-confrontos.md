@@ -129,6 +129,12 @@ desenho (decisão 0003, item 5).
 
 ## O que muda
 
+As escolhas 2, 12 e 13 foram alteradas pela
+[decisão 0008](0008-rodadas-continuas-resultado-feed-e-perfil.md), de
+26/11/2026: as rodadas seguem sem perguntar, e quem entrou vê um feed em vez
+de "Mais uma rodada" e "Suas escolhas".
+
+
 | Onde estava | O que dizia | O que passa a valer |
 |---|---|---|
 | Decisão 0001, "Decisão", item 2 | "Tem começo e fim, não se repete para a mesma pessoa". | Cada rodada tem começo e fim. A pesquisa se repete para a mesma pessoa, em rodadas, até ela ter visto todos os confrontos. |

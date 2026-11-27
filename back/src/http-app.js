@@ -625,6 +625,8 @@ export function createHttpApp({
       const recoveryKey = requiredRecoveryKey(req);
       noStore(res).json(await store.photoSurveyResult(recoveryKey, String(req.params.surveyId)));
     } catch (error) {
+      // A recusa também não vai para cache: ela depende da sessão.
+      noStore(res);
       sendError(req, res, error);
     }
   });
@@ -655,12 +657,16 @@ export function createHttpApp({
         now: clock(),
       }));
     } catch (error) {
+      noStore(res);
       sendError(req, res, error);
     }
   });
 
   // Pública, sem sessão. Perfil desligado e nome inexistente respondem igual.
+  // `X-Robots-Tag: noindex` nas duas respostas: o perfil só se acha pelo link
+  // (decisão 0008, escolha 5), e a resposta da API também não é indexada.
   app.get("/api/profiles/:handle", async (req, res) => {
+    res.set("X-Robots-Tag", "noindex");
     if (!requirePhotoSurveys(req, res)) return;
     try {
       noStore(res).json(await store.publicProfile(String(req.params.handle)));

@@ -216,7 +216,8 @@ test("ligar exige cadastro, nome e o aceite atual; recusa não grava nada", asyn
   const visitor = db.addPlayer({ registered: false, account: false });
   await rejectsWith(enable(store, bruno), 403, "CPF_REGISTRATION_REQUIRED");
   await rejectsWith(enable(store, visitor), 403, "CPF_REGISTRATION_REQUIRED");
-  await rejectsWith(store.updateProfile({ recoveryKey: bruno.key, enabled: false }), 403, "CPF_REGISTRATION_REQUIRED");
+  // Visitante sem conta Google não tem perfil: nem desligar ele pode.
+  await rejectsWith(store.updateProfile({ recoveryKey: visitor.key, enabled: false }), 403, "CPF_REGISTRATION_REQUIRED");
   await rejectsWith(enable(store, ana, { consentVersion: undefined }), 400, "PROFILE_CONSENT_REQUIRED");
   await rejectsWith(enable(store, ana, { consentVersion: "2026-01-01" }), 400, "PROFILE_CONSENT_REQUIRED");
   await rejectsWith(enable(store, ana, { handle: undefined }), 400, "PROFILE_INVALID", { reason: "handle" });
@@ -262,6 +263,30 @@ test("desligar vale na hora, não exige nada e guarda nome, aceite e marcações
   assert.equal((await store.publicProfile("ANA_01")).handle, "ana_01");
 });
 
+test("desligar não exige cadastro: a conta que perdeu o cadastro desliga e o perfil público some na hora", async () => {
+  const { db, store } = setup();
+  const ana = db.addPlayer();
+  await play(store, ana, POLITICS.id, 1);
+  await enable(store, ana, { surveys: [POLITICS.id] });
+  assert.equal((await store.publicProfile("ana_01")).surveys.length, 1);
+  db.unregister(ana);
+  // Sem cadastro, ligar de novo é recusado e nada muda.
+  await rejectsWith(enable(store, ana), 403, "CPF_REGISTRATION_REQUIRED");
+  assert.equal((await store.publicProfile("ana_01")).handle, "ana_01");
+  // Desligar funciona e vale na hora.
+  const off = await store.updateProfile({ recoveryKey: ana.key, enabled: false });
+  assert.deepEqual([off.enabled, off.handle, off.canEnable], [false, "ana_01", false]);
+  await rejectsWith(store.publicProfile("ana_01"), 404, "PROFILE_NOT_FOUND");
+  // Conta sem cadastro que nunca ligou também pode gravar o desligado.
+  const bruno = db.addPlayer({ registered: false });
+  assert.equal((await store.updateProfile({ recoveryKey: bruno.key, enabled: false })).enabled, false);
+  // Visitante sem conta Google é recusado ao desligar, e nada é gravado para ele.
+  const counts = db.profileCounts();
+  const visitor = db.addPlayer({ registered: false, account: false });
+  await rejectsWith(store.updateProfile({ recoveryKey: visitor.key, enabled: false }), 403, "CPF_REGISTRATION_REQUIRED");
+  assert.deepEqual(db.profileCounts(), counts);
+});
+
 test("perfil público: só pesquisas marcadas com rodada respondida, na ordem das pesquisas, com assunto e pergunta", async () => {
   const { db, store } = setup();
   const ana = db.addPlayer();
@@ -305,27 +330,41 @@ test("perfil desligado, inexistente e nome inválido têm a mesma recusa", async
   assert.deepEqual(refusals[0], { status: 404, code: "PROFILE_NOT_FOUND", message: "perfil não encontrado", current: undefined });
 });
 
-test("nome de perfil é único sem diferença de caixa; trocar de nome libera o anterior", async () => {
+test("nome de perfil é único sem diferença de caixa; o nome gravado não muda e o link continua da mesma pessoa", async () => {
   const { db, store } = setup();
   const ana = db.addPlayer();
   const bruno = db.addPlayer();
-  await enable(store, ana, { handle: "ana_01" });
+  await play(store, ana, POLITICS.id, 1);
+  await enable(store, ana, { handle: "ana_01", surveys: [POLITICS.id] });
+  const shown = await store.publicProfile("ana_01");
   await rejectsWith(enable(store, bruno, { handle: "ANA_01" }), 409, "PROFILE_HANDLE_TAKEN");
-  // Desligado, o nome continua da conta.
+  // Ligado, trocar de nome é recusado e nada muda.
+  const before = await store.myProfile(ana.key);
+  await rejectsWith(enable(store, ana, { handle: "ana_02" }), 400, "PROFILE_INVALID", { reason: "handle-locked" });
+  assert.deepEqual(await store.myProfile(ana.key), before);
+  // O mesmo nome, em outra caixa, não é troca.
+  assert.equal((await enable(store, ana, { handle: "ANA_01" })).handle, "ana_01");
+  // Desligado, o nome continua da conta e continua travado.
   await store.updateProfile({ recoveryKey: ana.key, enabled: false });
   await rejectsWith(enable(store, bruno, { handle: "ana_01" }), 409, "PROFILE_HANDLE_TAKEN");
-  await enable(store, ana, { handle: "ana_02" });
-  assert.equal((await enable(store, bruno, { handle: "ana_01" })).handle, "ana_01");
-  assert.equal((await store.publicProfile("ana_02")).handle, "ana_02");
-  assert.equal((await store.publicProfile("ana_01")).handle, "ana_01");
+  await rejectsWith(enable(store, ana, { handle: "ana_02" }), 400, "PROFILE_INVALID", { reason: "handle-locked" });
+  await rejectsWith(store.publicProfile("ana_02"), 404, "PROFILE_NOT_FOUND");
+  // Religada, o link do nome original mostra a mesma pessoa.
+  await enable(store, ana, { handle: undefined });
+  assert.deepEqual(await store.publicProfile("ana_01"), shown);
+  await rejectsWith(store.publicProfile("ana_02"), 404, "PROFILE_NOT_FOUND");
+  // O nome travado de uma conta não afeta o nome livre de outra.
+  assert.equal((await enable(store, bruno, { handle: "ana_02" })).handle, "ana_02");
 });
 
 test("outra conta grava o mesmo nome entre a conferência e a gravação: 409, não 500, e nada muda", async () => {
   const { db, store } = setup();
   const ana = db.addPlayer();
   const bruno = db.addPlayer();
-  await enable(store, bruno, { handle: "bruno_1", surveys: [POLITICS.id] });
+  // Bruno ainda não tem nome gravado (só marcações), então pode escolher um.
+  await store.updateProfile({ recoveryKey: bruno.key, enabled: false, surveys: [POLITICS.id] });
   const before = await store.myProfile(bruno.key);
+  assert.equal(before.handle, null);
   db.onProfileUpsert((tables) => {
     tables.profileSettings.push({ provider: "google", subject: ana.subject, handle: "disputado", enabled: true, consent_version: PROFILE_CONSENT_VERSION, consented_at: NOW, updated_at: NOW });
   });
@@ -370,7 +409,7 @@ const call = async (url, { method = "GET", key, payload } = {}) => {
     ...(payload === undefined ? {} : { body: JSON.stringify(payload) }),
   });
   const { requestId, ...body } = await response.json();
-  return { status: response.status, cache: response.headers.get("cache-control"), body, requestId };
+  return { status: response.status, cache: response.headers.get("cache-control"), robots: response.headers.get("x-robots-tag"), body, requestId };
 };
 
 test("as quatro rotas seguem PHOTO_SURVEYS_ENABLED e nada chega ao store desligado", async () => {
@@ -385,7 +424,7 @@ test("as quatro rotas seguem PHOTO_SURVEYS_ENABLED e nada chega ao store desliga
   assert.deepEqual(calls, []);
 });
 
-test("pelas rotas: sessão exigida, corpo do PUT só com os quatro campos, respostas sem cache", async () => {
+test("pelas rotas: sessão exigida, corpo do PUT só com os quatro campos, respostas e recusas sem cache", async () => {
   const { db, store } = setup();
   const ana = db.addPlayer();
   const answers = await play(store, ana, POLITICS.id, 2);
@@ -394,7 +433,7 @@ test("pelas rotas: sessão exigida, corpo do PUT só com os quatro campos, respo
   await withApp(spied, { PHOTO_SURVEYS_ENABLED: "true" }, async (base) => {
     for (const [method, path] of [["GET", `/api/photo-surveys/${POLITICS.id}/result`], ["GET", "/api/me/profile"], ["PUT", "/api/me/profile"]]) {
       const response = await call(`${base}${path}`, { method, payload: method === "PUT" ? { enabled: false } : undefined });
-      assert.deepEqual([response.status, response.body.code], [401, "PLAYER_SESSION_REQUIRED"], path);
+      assert.deepEqual([response.status, response.body.code, response.cache], [401, "PLAYER_SESSION_REQUIRED", "no-store"], path);
     }
     assert.deepEqual(seen, []);
 
@@ -402,15 +441,18 @@ test("pelas rotas: sessão exigida, corpo do PUT só com os quatro campos, respo
     assert.deepEqual([result.status, result.cache], [200, "no-store"]);
     assert.deepEqual(result.body, { surveyId: POLITICS.id, answeredRounds: 2, ranking: expectedRanking(POLITICS, answers) });
     const missing = await call(`${base}/api/photo-surveys/nao-existe/result`, { key: ana.key });
-    assert.deepEqual([missing.status, missing.body.code], [404, "PHOTO_SURVEY_NOT_FOUND"]);
+    assert.deepEqual([missing.status, missing.body.code, missing.cache], [404, "PHOTO_SURVEY_NOT_FOUND", "no-store"]);
+    const noRegistration = db.addPlayer({ registered: false });
+    const notRegistered = await call(`${base}/api/photo-surveys/${POLITICS.id}/result`, { key: noRegistration.key });
+    assert.deepEqual([notRegistered.status, notRegistered.body.code, notRegistered.cache], [403, "CPF_REGISTRATION_REQUIRED", "no-store"]);
 
     const mine = await call(`${base}/api/me/profile`, { key: ana.key });
     assert.deepEqual([mine.status, mine.cache, mine.body.enabled, mine.body.firstPlaces.length], [200, "no-store", false, 1]);
 
     const refused = await call(`${base}/api/me/profile`, { method: "PUT", key: ana.key, payload: { enabled: true, handle: "ana_01" } });
-    assert.deepEqual([refused.status, refused.body.code], [400, "PROFILE_CONSENT_REQUIRED"]);
+    assert.deepEqual([refused.status, refused.body.code, refused.cache], [400, "PROFILE_CONSENT_REQUIRED", "no-store"]);
     const invalid = await call(`${base}/api/me/profile`, { method: "PUT", key: ana.key, payload: { enabled: "sim" } });
-    assert.deepEqual([invalid.status, invalid.body.code, invalid.body.current], [400, "PROFILE_INVALID", { reason: "enabled" }]);
+    assert.deepEqual([invalid.status, invalid.body.code, invalid.body.current, invalid.cache], [400, "PROFILE_INVALID", { reason: "enabled" }, "no-store"]);
 
     seen.length = 0;
     const on = await call(`${base}/api/me/profile`, {
@@ -423,7 +465,7 @@ test("pelas rotas: sessão exigida, corpo do PUT só com os quatro campos, respo
 
     // Pública, sem sessão.
     const shown = await call(`${base}/api/profiles/Ana_01`);
-    assert.deepEqual([shown.status, shown.cache], [200, "no-store"]);
+    assert.deepEqual([shown.status, shown.cache, shown.robots], [200, "no-store", "noindex"]);
     assert.deepEqual(shown.body, {
       handle: "ana_01",
       surveys: [{ surveyId: POLITICS.id, subject: POLITICS.subject, question: POLITICS.question, cardId: expectedRanking(POLITICS, answers)[0].cardId }],
@@ -431,10 +473,18 @@ test("pelas rotas: sessão exigida, corpo do PUT só com os quatro campos, respo
 
     const bruno = db.addPlayer();
     const taken = await call(`${base}/api/me/profile`, { method: "PUT", key: bruno.key, payload: { enabled: true, handle: "ANA_01", consentVersion: PROFILE_CONSENT_VERSION } });
-    assert.deepEqual([taken.status, taken.body.code], [409, "PROFILE_HANDLE_TAKEN"]);
+    assert.deepEqual([taken.status, taken.body.code, taken.cache], [409, "PROFILE_HANDLE_TAKEN", "no-store"]);
+    const locked = await call(`${base}/api/me/profile`, { method: "PUT", key: ana.key, payload: { enabled: true, handle: "ana_02", consentVersion: PROFILE_CONSENT_VERSION } });
+    assert.deepEqual([locked.status, locked.body.code, locked.body.current, locked.cache], [400, "PROFILE_INVALID", { reason: "handle-locked" }, "no-store"]);
     const unregistered = db.addPlayer({ registered: false });
-    const forbidden = await call(`${base}/api/me/profile`, { method: "PUT", key: unregistered.key, payload: { enabled: false } });
-    assert.deepEqual([forbidden.status, forbidden.body.code], [403, "CPF_REGISTRATION_REQUIRED"]);
+    const forbidden = await call(`${base}/api/me/profile`, { method: "PUT", key: unregistered.key, payload: { enabled: true, handle: "sem_cad", consentVersion: PROFILE_CONSENT_VERSION } });
+    assert.deepEqual([forbidden.status, forbidden.body.code, forbidden.cache], [403, "CPF_REGISTRATION_REQUIRED", "no-store"]);
+    // Desligar não exige cadastro, só a conta Google.
+    const offWithout = await call(`${base}/api/me/profile`, { method: "PUT", key: unregistered.key, payload: { enabled: false } });
+    assert.deepEqual([offWithout.status, offWithout.cache, offWithout.body.enabled, offWithout.body.canEnable], [200, "no-store", false, false]);
+    const visitor = db.addPlayer({ registered: false, account: false });
+    const visitorOff = await call(`${base}/api/me/profile`, { method: "PUT", key: visitor.key, payload: { enabled: false } });
+    assert.deepEqual([visitorOff.status, visitorOff.body.code, visitorOff.cache], [403, "CPF_REGISTRATION_REQUIRED", "no-store"]);
 
     // Desligado e inexistente: corpo, status e cabeçalho iguais.
     await call(`${base}/api/me/profile`, { method: "PUT", key: ana.key, payload: { enabled: false } });
@@ -442,8 +492,8 @@ test("pelas rotas: sessão exigida, corpo do PUT só com os quatro campos, respo
     const none = await call(`${base}/api/profiles/ninguem_aqui`);
     const bad = await call(`${base}/api/profiles/a`);
     for (const refusal of [off, none, bad]) {
-      assert.deepEqual({ status: refusal.status, cache: refusal.cache, body: refusal.body }, {
-        status: 404, cache: "no-store", body: { error: "perfil não encontrado", code: "PROFILE_NOT_FOUND" },
+      assert.deepEqual({ status: refusal.status, cache: refusal.cache, robots: refusal.robots, body: refusal.body }, {
+        status: 404, cache: "no-store", robots: "noindex", body: { error: "perfil não encontrado", code: "PROFILE_NOT_FOUND" },
       });
     }
   });

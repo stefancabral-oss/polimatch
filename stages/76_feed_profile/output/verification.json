@@ -5,12 +5,33 @@
   "base": "main em 5934e46",
   "instruction": "Stefan, 26/11/2026: \"única coisa é que fica perguntando se quero mais uma rodada. Basta ficar em aberto e dar o resultado prévio se solicitado.\"; \"Também coloca na página inicial de cada pessoa que fez login um Feed das pesquisas. E no perfil dela, assim como no instagram, aparece a foto de quem está em primeiro lugar na escolha dela daquela pesquisa.\"; sobre o resultado: \"De todos? não faz sentido, porque a pesquisa será prévia para todos que começarem enquanto não for fechada por quem a contratou.\"; sobre quem vê o perfil: \"Igual o instagram\"; sobre como o perfil nasce: \"Pessoa liga\"; à pergunta se seguia com os quatro itens ou deixava o perfil para depois: \"Sigo com tudo\". O resto é escolha do agente (decisão 0008).",
   "agentChoices": {
-    "ruleAndData": [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    "design": [10, 11, 12],
+    "ruleAndData": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "design": [
+      14,
+      15,
+      16
+    ],
     "where": "docs/decisions/0008-rodadas-continuas-resultado-feed-e-perfil.md"
   },
   "database": {
-    "newTables": ["profile_settings", "profile_surveys"],
+    "newTables": [
+      "profile_settings",
+      "profile_surveys"
+    ],
     "migration": "2026-11-26-profiles-v1",
     "existingTablesChanged": false
   },
@@ -22,20 +43,44 @@
   ],
   "tests": {
     "ranBy": "o agente que escreve o handoff, em 26/11/2026, em macOS",
-    "shared": "142 de 142",
-    "back": "353 de 353",
-    "app": "260 de 260",
+    "shared": "143 de 143",
+    "back": "354 de 354",
+    "app": "263 de 263",
     "editorialVerify": "passou",
     "databaseSmokes": {
       "database": "PostgreSQL 16 local descartável",
-      "passed": ["test:integration", "ordered-choices-smoke", "presidential-duels-smoke", "test:abuse", "game-progress-smoke", "civic-schema-smoke (banco próprio)", "test:resilience", "test:photo-survey", "test:registration", "test:profile"],
-      "notRun": ["ensaio de backup e restauração", "partial-restore-smoke"]
+      "passed": [
+        "test:integration",
+        "ordered-choices-smoke",
+        "presidential-duels-smoke",
+        "test:abuse",
+        "game-progress-smoke",
+        "civic-schema-smoke (banco próprio)",
+        "test:resilience",
+        "test:photo-survey",
+        "test:registration",
+        "test:profile"
+      ],
+      "notRun": [
+        "ensaio de backup e restauração",
+        "partial-restore-smoke"
+      ]
     },
     "browser": {
       "server": "simulado pelos próprios roteiros, com vite preview local",
-      "webkit": { "photo-survey.mjs": 42, "site-shell.mjs": 58, "client-error-report.mjs": "5 páginas" },
-      "chromium": { "photo-survey.mjs": 42, "site-shell.mjs": 58, "client-error-report.mjs": "5 páginas", "note": "revisão 1187 já instalada, aberta por roteiro auxiliar fora do repositório" }
-    }
+      "webkit": {
+        "photo-survey.mjs": 42,
+        "site-shell.mjs": 60,
+        "client-error-report.mjs": "5 páginas"
+      },
+      "chromium": {
+        "photo-survey.mjs": 42,
+        "site-shell.mjs": 60,
+        "client-error-report.mjs": "5 páginas",
+        "note": "revisão 1187 já instalada, aberta por roteiro auxiliar fora do repositório"
+      }
+    },
+    "afterReview": "unidade repetida pelo agente do handoff; roteiros de banco (perfil, pesquisa por foto, cadastro) e de navegador rodados pelo agente das correções"
   },
   "notVerified": [
     "nada em produção: o estágio não está publicado",
@@ -48,5 +93,19 @@
     "merge": "pendente",
     "publication": "pendente, depois da revisão jurídica que o Stefan decidir",
     "issueClosing": "pendente"
+  },
+  "independentReview": {
+    "first": {
+      "when": "2026-11-26",
+      "verdict": "segurou o merge",
+      "fixed": [
+        "desligar sem cadastro",
+        "textos falsos e notas nas decisões 0001, 0004, 0007",
+        "nome de perfil fixo",
+        "feed noutro aparelho abre o resultado",
+        "escolhas 10 a 13 por extenso",
+        "no-store, X-Robots-Tag, teste do texto do aceite"
+      ]
+    }
   }
 }
