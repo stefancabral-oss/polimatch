@@ -8,7 +8,7 @@ import { PHOTO_SURVEYS } from "../../shared/photo-survey.js";
 import { PROFILE_CONSENT_TEXT, PROFILE_CONSENT_VERSION, normalizeHandle } from "../../shared/profile.js";
 import { IDENTITY_KEY, readIdentityKey } from "./account-session.js";
 import { loadMyProfile, saveMyProfile } from "./api.js";
-import { HANDLE_CHOOSE_NOTE, HANDLE_LOCKED_NOTE, enableBody, enableProblem, profileLink, profileRefusal, profileState } from "./profile-view.js";
+import { HANDLE_CHOOSE_NOTE, HANDLE_LOCKED_NOTE, MARKS_NEED_REGISTRATION_NOTE, enableBody, enableProblem, handleLockedOutcome, profileLink, profileRefusal, profileState } from "./profile-view.js";
 import { accountKind, mountSiteMenu } from "./site-menu.js";
 
 // "Meu perfil" (ICM 76, #354, decisão 0008). A versão do perfil que só a
@@ -60,14 +60,18 @@ function head(title, hint) {
   return `<p class="ps-kicker">Meu perfil</p><h1 class="ps-title" id="ps-title" tabindex="-1">${escapeText(title)}</h1><p class="ps-hint">${escapeText(hint)}</p>${noticeMarkup()}${doneMarkup()}`;
 }
 
-/** As pesquisas para marcar, na ordem do site, com a primeira colocada da pessoa quando ela tem. */
-function marksMarkup() {
+/**
+ * As pesquisas para marcar, na ordem do site, com a primeira colocada da
+ * pessoa quando ela tem. `readOnly`: as caixas aparecem travadas (perfil
+ * ligado sem cadastro, que só pode desligar).
+ */
+function marksMarkup({ readOnly = false } = {}) {
   const rows = PHOTO_SURVEYS.map((survey) => {
     const first = profile.firstPlaces.get(survey.id) || "";
     const status = first
       ? `Seu 1º lugar: ${escapeText(artById.get(first).name)}`
       : "Você ainda não respondeu. Só aparece depois da primeira rodada.";
-    return `<label class="ps-mark">${first ? thumb(first) : '<span class="ps-card" aria-hidden="true"></span>'}<span class="ps-survey-text"><small>${escapeText(survey.subject)}</small><b>${escapeText(survey.question)}</b><small>${status}</small></span><input type="checkbox" name="survey" value="${escapeText(survey.id)}"${form.surveys.has(survey.id) ? " checked" : ""}${busy ? " disabled" : ""}></label>`;
+    return `<label class="ps-mark">${first ? thumb(first) : '<span class="ps-card" aria-hidden="true"></span>'}<span class="ps-survey-text"><small>${escapeText(survey.subject)}</small><b>${escapeText(survey.question)}</b><small>${status}</small></span><input type="checkbox" name="survey" value="${escapeText(survey.id)}"${form.surveys.has(survey.id) ? " checked" : ""}${busy || readOnly ? " disabled" : ""}></label>`;
   }).join("");
   return `<fieldset class="ps-fieldset"><legend>Pesquisas no perfil</legend>${rows}</fieldset>`;
 }
@@ -102,6 +106,14 @@ function render({ focus = false, target = "" } = {}) {
   } else {
     const link = profileLink(profile.handle);
     const outdated = profile.consentVersion !== PROFILE_CONSENT_VERSION;
+    // Sem cadastro, o perfil ligado só desliga: as marcações aparecem travadas.
+    const onlyDisable = !profile.canEnable;
+    const actions = onlyDisable
+      ? `<p class="ps-muted" id="pf-marks-help">${escapeText(MARKS_NEED_REGISTRATION_NOTE)}</p>
+        <div class="ps-stack"><button class="ps-btn ps-btn--ghost" type="button" data-action="disable"${busy ? " disabled" : ""}>Desligar</button></div>`
+      : `${outdated ? consentMarkup() : ""}
+        <div class="ps-stack ps-stack--pair"><button class="ps-btn" type="submit"${busy ? " disabled" : ""}>${busy ? "Salvando…" : "Salvar marcações"}</button>
+          <button class="ps-btn ps-btn--ghost" type="button" data-action="disable"${busy ? " disabled" : ""}>Desligar</button></div>`;
     main.innerHTML = `${head("Seu perfil está ligado", "Quem tiver o link vê a sua primeira colocada nas pesquisas marcadas. Pesquisa sem marca não aparece.")}
       <div class="ps-link-box"><output id="pf-link">${escapeText(link)}</output>
         <button class="ps-btn ps-btn--ghost" type="button" data-action="copy">Copiar link</button>
@@ -109,10 +121,8 @@ function render({ focus = false, target = "" } = {}) {
         <a class="ps-link" href="./perfil.html?u=${encodeURIComponent(profile.handle)}">Ver como os outros veem</a>
         <p class="ps-muted" id="pf-handle-help">${escapeText(HANDLE_LOCKED_NOTE)}</p></div>
       <form class="ps-profile-form" id="pf-form" novalidate>
-        ${marksMarkup()}
-        ${outdated ? consentMarkup() : ""}
-        <div class="ps-stack ps-stack--pair"><button class="ps-btn" type="submit"${busy ? " disabled" : ""}>${busy ? "Salvando…" : "Salvar marcações"}</button>
-          <button class="ps-btn ps-btn--ghost" type="button" data-action="disable"${busy ? " disabled" : ""}>Desligar</button></div>
+        ${marksMarkup({ readOnly: onlyDisable })}
+        ${actions}
       </form>`;
   }
   if (target) {
@@ -195,15 +205,19 @@ async function save(body, doneText) {
 }
 
 // Busca o perfil de novo depois de uma recusa (o nome gravado mudou em outra
-// aba), sem perder as marcações e o aceite que a pessoa preencheu. Se a busca
-// falhar, a tela fica como estava, com o aviso da recusa.
+// aba). Ainda desligado: fica o que a pessoa preencheu (marcações e aceite) e
+// o campo mostra o nome gravado, travado. Já ligado em outra aba: vale o que o
+// servidor tem (nome e marcações), com um aviso que não fala de campo. Se a
+// busca falhar, a tela fica como estava, com o aviso da recusa.
 async function refreshKeepingForm(key, mine) {
   try {
     const raw = await loadMyProfile(key);
     if (mine !== run) return;
     const kept = form;
     useProfile(raw);
-    form = { ...form, surveys: kept.surveys, consent: kept.consent };
+    const outcome = handleLockedOutcome(profile);
+    notice = outcome.text;
+    if (outcome.keepForm) form = { ...form, surveys: kept.surveys, consent: kept.consent };
   } catch {
     // Fica o aviso da recusa.
   }
@@ -211,6 +225,8 @@ async function refreshKeepingForm(key, mine) {
 
 function submit() {
   if (busy || phase !== "ready") return;
+  // Ligado sem cadastro: só "Desligar" grava; o servidor recusaria as marcações.
+  if (profile.enabled && !profile.canEnable) return;
   if (profile.enabled) {
     const outdated = profile.consentVersion !== PROFILE_CONSENT_VERSION;
     if (outdated && !form.consent) {

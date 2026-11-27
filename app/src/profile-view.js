@@ -89,6 +89,23 @@ export const HANDLE_LOCKED_NOTE = "O nome de perfil não muda depois de escolhid
 /** O aviso embaixo do campo, antes de ligar pela primeira vez. */
 export const HANDLE_CHOOSE_NOTE = "Escolha com cuidado: o nome não muda depois.";
 
+/** O aviso embaixo das marcações de um perfil ligado sem cadastro: ele só pode desligar. */
+export const MARKS_NEED_REGISTRATION_NOTE = "Para mudar as marcações, falta o cadastro com CPF.";
+
+/**
+ * Depois da recusa `handle-locked`, a tela busca o perfil de novo. Se ele já
+ * está ligado (outra aba ligou), vale o que o servidor tem: o nome e as
+ * marcações dele, com um aviso que não fala de campo, porque não há campo.
+ * Se continua desligado, a tela mantém o que a pessoa preencheu e mostra o
+ * nome gravado no campo travado. `keepForm` diz se o preenchido fica.
+ */
+export function handleLockedOutcome(profile) {
+  if (profile?.enabled && profile.handle) {
+    return { keepForm: false, text: `Este perfil foi ligado em outra aba com o nome @${profile.handle}. Confira as marcações abaixo.` };
+  }
+  return { keepForm: true, text: HANDLE_LOCKED_TEXT };
+}
+
 /** O que falta antes de mandar o pedido de ligar, ou null. */
 export function enableProblem({ handle, consent }) {
   if (!isValidHandle(handle)) return { field: "handle", text: HANDLE_TEXT };

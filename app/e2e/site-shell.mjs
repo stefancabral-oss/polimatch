@@ -321,6 +321,13 @@ function createServer() {
       const current = profileOf(key);
       const surveys = sent.surveys === undefined ? current.surveys : [...new Set(sent.surveys)];
       if (!sent.enabled) {
+        // Como o servidor: sem cadastro o pedido só desliga; marcações são
+        // recusadas e, sem perfil gravado, nada é criado.
+        if (!server.registered.has(key)) {
+          if (sent.surveys !== undefined) return send(403, { error: "cadastro com CPF obrigatório", code: "CPF_REGISTRATION_REQUIRED" });
+          if (current.enabled) server.profiles.set(key, { ...current, enabled: false });
+          return send(200, profileView(key));
+        }
         server.profiles.set(key, { ...current, enabled: false, surveys });
         return send(200, profileView(key));
       }
@@ -1693,6 +1700,43 @@ try {
     assert.equal(await visitor.locator("#ps-action").count(), 1);
   });
 
+  await scenario("feed: Continuar votando sem confronto por ver volta ao resultado sem o botão e com o aviso", async () => {
+    // A conta viu todos os confrontos noutro aparelho: este não sabe das rodadas.
+    const server = createServer();
+    server.answered(GOOGLE_KEY, SURVEY);
+    server.exhaust(GOOGLE_KEY, SURVEY);
+    const rounds = server.roundsOf(GOOGLE_KEY, SURVEY).length;
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), new URL(`?p=${SURVEY.id}&ver=resultado`, appUrl).href);
+    await resultShown(page);
+    // Sem as rodadas, o resultado do feed oferece continuar.
+    await page.getByRole("button", { name: "Continuar votando" }).click();
+    await page.locator("#ps-notice:not([hidden])", { hasText: "Você já viu todos os confrontos desta pesquisa." }).waitFor();
+    await resultShown(page);
+    assert.equal(await page.locator("#ps-notice").innerText(), "Você já viu todos os confrontos desta pesquisa.");
+    assert.equal(await page.getByRole("button", { name: "Continuar votando" }).count(), 0, "sem confronto por ver, o botão some");
+    assert.deepEqual(server.last("/draw").body, { next: true });
+    assert.equal(server.roundsOf(GOOGLE_KEY, SURVEY).length, rounds, "nenhuma rodada nova");
+    assert.deepEqual(server.writes().filter((entry) => !entry.endsWith("/draw")), [], "nada é gravado");
+  });
+
+  await scenario("feed: ver=resultado com conta sem cadastro abre a página da pesquisa, que leva ao cadastro no toque", async () => {
+    const server = createServer();
+    server.registered.delete(GOOGLE_KEY);
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), new URL(`?p=${SURVEY.id}&ver=resultado`, appUrl).href);
+    await entryReady(page);
+    assert.equal(server.count("GET", "/result"), 1);
+    assert.equal(server.count("POST", "/draw"), 0, "abrir não sorteia");
+    assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Não conseguimos carregar o seu resultado/);
+    assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+    assert.equal(new URL(page.url()).search, `?p=${SURVEY.id}`);
+    // O toque leva ao cadastro, como na página de sempre.
+    await page.locator("#ps-action").click();
+    await waitStep(page, "Cadastro");
+    assert.equal(await page.locator("#ps-title").innerText(), "Faça seu voto contar");
+    assert.equal(await page.locator(".ps-hint").first().innerText(), "Um CPF, uma pessoa. A sua escolha só aparece no perfil que você ligar.");
+    assert.deepEqual(server.writes().filter((entry) => !entry.endsWith("/draw")), [], "nada é gravado");
+  });
+
   await scenario("feed: a pesquisa fechada sem resposta sai, a respondida fica, e a leitura que falha pede para tentar de novo", async () => {
     const server = createServer();
     server.closed.add(SECOND.id);
@@ -2856,6 +2900,12 @@ try {
     server.registered.delete(GOOGLE_KEY);
     const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), MY_PROFILE_URL);
     await page.locator("#ps-title", { hasText: "Seu perfil está ligado" }).waitFor();
+    // Sem cadastro, só "Desligar": as marcações aparecem travadas e não há "Salvar marcações".
+    assert.equal(await page.getByRole("button", { name: "Salvar marcações" }).count(), 0);
+    assert.equal(await page.getByRole("button", { name: "Desligar" }).count(), 1);
+    assert.equal(await page.locator("#pf-marks-help").innerText(), "Para mudar as marcações, falta o cadastro com CPF.");
+    assert.deepEqual(await marks(page), [SURVEY.id]);
+    assert.equal(await page.locator('input[name="survey"]:not([disabled])').count(), 0, "as caixas ficam travadas");
     // Um desligar que o servidor recusa não vira "desligado" na tela.
     await page.route("**/api/me/profile", (route) => (route.request().method() === "PUT"
       ? route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ error: "erro interno", code: "INTERNAL_ERROR" }) })
@@ -2872,6 +2922,7 @@ try {
     assert.deepEqual(profileWrites(server).at(-1), { enabled: false });
     assert.match(await page.locator("#pf-done").innerText(), /Perfil desligado/);
     assert.equal(server.profiles.get(GOOGLE_KEY).enabled, false);
+    assert.deepEqual(server.profiles.get(GOOGLE_KEY).surveys, [SURVEY.id], "desligar sem cadastro não mexe nas marcações");
     const visitor = await publicProfile(server, "sem_cad");
     assert.equal(await profileTitle(visitor), "Perfil não encontrado.");
 
@@ -2897,6 +2948,28 @@ try {
     await other.getByRole("button", { name: "Ligar meu perfil" }).click();
     await other.locator("#ps-title", { hasText: "Seu perfil está ligado" }).waitFor();
     assert.equal(profileWrites(lockedServer).at(-1).handle, "da_outra_aba");
+
+    // Outra aba já ligou o perfil com outro nome e outras marcações: depois da
+    // recusa, a tela mostra o estado do servidor, não as caixas desta aba, e
+    // o aviso não fala de campo (não há campo).
+    const enabledServer = createServer();
+    const third = await open(await newContext(enabledServer, { storedKey: GOOGLE_KEY }), MY_PROFILE_URL);
+    await third.locator("#pf-form").waitFor();
+    enabledServer.profiles.set(GOOGLE_KEY, { handle: "ligado_la", enabled: true, consentVersion: PROFILE_CONSENT_VERSION, consentedAt: new Date().toISOString(), surveys: [SECOND.id] });
+    await third.locator("#pf-handle").fill("nome_aqui");
+    await third.locator(`input[name="survey"][value="${SURVEY.id}"]`).check();
+    await third.locator("#pf-consent").check();
+    const writesBefore = profileWrites(enabledServer).length;
+    await third.getByRole("button", { name: "Ligar meu perfil" }).click();
+    await third.locator("#ps-title", { hasText: "Seu perfil está ligado" }).waitFor();
+    await profileNotice(third).waitFor();
+    assert.equal(await profileNotice(third).innerText(), "Este perfil foi ligado em outra aba com o nome @ligado_la. Confira as marcações abaixo.");
+    assert.doesNotMatch(await profileNotice(third).innerText(), /campo/);
+    assert.equal(await third.locator("#pf-handle").count(), 0, "ligado, não há campo de nome");
+    assert.equal(await third.locator("#pf-link").innerText(), "https://polimatch.com.br/perfil.html?u=ligado_la");
+    assert.deepEqual(await marks(third), [SECOND.id], "as marcações do servidor, não as desta aba");
+    assert.equal(profileWrites(enabledServer).length, writesBefore + 1, "só o pedido recusado");
+    assert.deepEqual(enabledServer.profiles.get(GOOGLE_KEY).surveys, [SECOND.id]);
   });
 
   await scenario("Meu perfil e o perfil público cabem na largura em 390, 360 e 320 px", async () => {

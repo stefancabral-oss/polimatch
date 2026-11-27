@@ -172,10 +172,11 @@ export function profileStore({
     },
 
     /**
-     * Liga, desliga e muda as marcações. Ligar exige conta com cadastro;
-     * desligar só exige a conta, para que nada impeça desligar. O nome de
-     * perfil, depois de gravado, não muda: um link antigo nunca passa a
-     * mostrar as escolhas de outra pessoa.
+     * Liga, desliga e muda as marcações. Ligar e mexer nas marcações exigem
+     * conta com cadastro. Sem cadastro, o pedido só pode desligar: nada impede
+     * desligar, mas também nada é gravado além disso (sem linha nova, sem
+     * marcações). O nome de perfil, depois de gravado, não muda: um link
+     * antigo nunca passa a mostrar as escolhas de outra pessoa.
      */
     async updateProfile({ recoveryKey, now, ...body } = {}) {
       const change = checkProfileUpdate(body, surveys);
@@ -183,13 +184,17 @@ export function profileStore({
       return withClient(async (client) => {
         // findPlayer trava `player:<id>`.
         const player = await findPlayer(client, recoveryKey);
-        if (change.enabled && !(await hasRegistration(client, player.id))) throw registrationRequiredError();
+        const registered = await hasRegistration(client, player.id);
+        // Sem cadastro: ligar e gravar marcações são recusados antes de tudo.
+        if (!registered && (change.enabled || change.surveys !== undefined)) throw registrationRequiredError();
         const account = await googleAccount(client, player.id);
         if (!account) throw registrationRequiredError();
         // A conta pode estar em mais de um jogador ao longo do tempo: a trava
         // da conta põe em fila dois pedidos dela, mesmo de jogadores diferentes.
         await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [`profile:${account.provider}:${account.subject}`]);
         const current = await settingsOf(client, account);
+        // Sem cadastro, só desligar: sem linha ou já desligado, nada a gravar.
+        if (!registered && !current?.enabled) return ownView(client, player.id, account);
         let next;
         if (change.enabled) {
           const handle = change.handle ?? current?.handle;

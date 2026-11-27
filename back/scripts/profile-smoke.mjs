@@ -212,10 +212,17 @@ try {
     raw.release();
   }
 
-  // --- Desligar não exige cadastro: conta sem cadastro desliga; conta que
-  // perdeu o cadastro desliga e o perfil público some na hora ---
+  // --- Sem cadastro, o pedido só desliga: conta sem cadastro que nunca ligou
+  // responde desligado sem criar linha; marcações são recusadas sem gravar;
+  // conta que perdeu o cadastro desliga, o perfil público some na hora e as
+  // marcações ficam como estavam ---
+  before = await allRows();
   const carlaOff = await store.updateProfile({ recoveryKey: carla.token, enabled: false });
-  assert.deepEqual([carlaOff.enabled, carlaOff.handle, carlaOff.canEnable], [false, null, false]);
+  assert.deepEqual([carlaOff.enabled, carlaOff.handle, carlaOff.surveys, carlaOff.canEnable], [false, null, [], false]);
+  await rejectsWith(store.updateProfile({ recoveryKey: carla.token, enabled: false, surveys: [POLITICS.id] }), 403, "CPF_REGISTRATION_REQUIRED");
+  await rejectsWith(store.updateProfile({ recoveryKey: carla.token, enabled: false, surveys: [] }), 403, "CPF_REGISTRATION_REQUIRED");
+  assert.deepEqual(await allRows(), before, "conta sem cadastro não grava linha nem marcação");
+  assert.equal(await count("profile_settings", "WHERE subject = $1", [carla.subject]), 0);
   const elisa = await newAccount();
   await play(elisa.token, POLITICS, 1);
   const elisaHandle = handleOf("elisa");
@@ -223,12 +230,22 @@ try {
   assert.equal((await store.publicProfile(elisaHandle)).surveys.length, 1);
   // O banco é descartável: apagar o cadastro imita a conta que o perdeu.
   await audit.query("DELETE FROM cpf_registrations WHERE provider = 'google' AND subject = $1", [elisa.subject]);
+  before = await allRows();
+  const elisaRow = await settingsRow(elisa.subject);
   await rejectsWith(enable(elisa.token, undefined), 403, "CPF_REGISTRATION_REQUIRED");
+  await rejectsWith(store.updateProfile({ recoveryKey: elisa.token, enabled: false, surveys: [] }), 403, "CPF_REGISTRATION_REQUIRED");
+  assert.deepEqual(await allRows(), before, "as recusas não gravam");
+  assert.deepEqual(await settingsRow(elisa.subject), elisaRow);
   assert.equal((await store.publicProfile(elisaHandle)).handle, elisaHandle, "a recusa de ligar não muda nada");
   const elisaOff = await store.updateProfile({ recoveryKey: elisa.token, enabled: false });
-  assert.deepEqual([elisaOff.enabled, elisaOff.handle, elisaOff.canEnable], [false, elisaHandle, false]);
+  assert.deepEqual([elisaOff.enabled, elisaOff.handle, elisaOff.surveys, elisaOff.canEnable], [false, elisaHandle, [POLITICS.id], false]);
   await rejectsWith(store.publicProfile(elisaHandle), 404, "PROFILE_NOT_FOUND");
   assert.equal((await settingsRow(elisa.subject)).enabled, false);
+  assert.equal(await count("profile_surveys", "WHERE subject = $1", [elisa.subject]), 1, "desligar sem cadastro não mexe nas marcações");
+  // Já desligado, desligar de novo não grava nada.
+  const elisaOffRow = await settingsRow(elisa.subject);
+  assert.equal((await store.updateProfile({ recoveryKey: elisa.token, enabled: false })).enabled, false);
+  assert.deepEqual(await settingsRow(elisa.subject), elisaOffRow);
 
   // --- Nome único sem diferença de caixa; o nome gravado não muda e o link
   // continua da mesma pessoa ---
@@ -345,7 +362,7 @@ try {
   }
   assert.equal(await count("schema_migrations", "WHERE id = '2026-11-26-profiles-v1'"), 1);
 
-  console.log("Smoke do perfil aprovado: resultado só lê e bate com a regra de pontos, perfil nasce desligado, ligar exige cadastro, nome e aceite, desligar vale na hora e não exige cadastro, o nome gravado não muda, só pesquisas marcadas com rodada aparecem, desligado e inexistente respondem igual, nome único também em disputa simultânea e no índice, perfil acompanha a conta e segundo boot.");
+  console.log("Smoke do perfil aprovado: resultado só lê e bate com a regra de pontos, perfil nasce desligado, ligar exige cadastro, nome e aceite, desligar vale na hora e não exige cadastro (sem cadastro só desliga, sem gravar marcações), o nome gravado não muda, só pesquisas marcadas com rodada aparecem, desligado e inexistente respondem igual, nome único também em disputa simultânea e no índice, perfil acompanha a conta e segundo boot.");
 } finally {
   await audit.end();
   await store.close();

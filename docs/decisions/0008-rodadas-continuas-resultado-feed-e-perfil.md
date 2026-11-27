@@ -62,9 +62,11 @@ quatro itens ou deixo o perfil público para depois?". Ele respondeu:
 
 1. **As rodadas seguem sem perguntar.** Confirmada uma rodada, a seguinte
    começa enquanto houver confronto por ver.
-2. **O resultado prévio é o da própria pessoa, e aparece quando ela pede.**
-   (Leitura do agente sobre a resposta dele, não promessa: a soma de todos
-   continua sem aparecer, pelo gate #177.)
+2. **O resultado prévio aparece quando a pessoa pede, e não é "o de
+   todos"**, que o Stefan rejeitou. Que seja o da própria pessoa é leitura
+   do agente sobre a resposta dele. A soma de todos continua sem aparecer,
+   pelo gate #177; a resposta dele não promete que ela apareça quando a
+   pesquisa fechar.
 3. **Quem entrou vê na página inicial um feed das pesquisas.**
 4. **Cada pessoa tem um perfil, visível a outras pessoas como no Instagram,**
    com a foto de quem está em primeiro lugar nas escolhas dela em cada
@@ -88,11 +90,14 @@ do gate do merge as apresenta por extenso. As escolhas 14 a 16 são de desenho
    uma tela de voto (a campeã ganha os dois: 4). Empate: mais vitórias na
    final, depois mais vitórias em tela, depois a ordem das cartas na
    pesquisa. Contam todas as rodadas respondidas pela pessoa, pela regra de
-   identidade da decisão 0007. O resultado prévio mostra essa ordem.
+   identidade da decisão 0007. Só entram cartas com ao menos 1 ponto, e
+   cartas que saíram da pesquisa não entram. O resultado prévio mostra essa
+   ordem.
 2. **Ligar o perfil pede um aceite próprio,** separado do cadastro, com
    versão e data do aceite gravadas no banco (o texto de cada versão fica no
    código, e um teste impede mudar o texto sem mudar a versão). Desligar é a
-   qualquer momento, sem aceite e sem exigir cadastro, e vale na hora.
+   qualquer momento, sem aceite e sem exigir cadastro, e vale na hora. Sem
+   cadastro, a conta só pode desligar: não grava marcações nem cria perfil.
 3. **A pessoa escolhe pesquisa por pesquisa o que mostra.** Ao ligar, nenhuma
    pesquisa vem marcada; ela marca as que quer mostrar. Pesquisa que ela não
    marcou não aparece, nem como "oculta".
@@ -112,8 +117,10 @@ do gate do merge as apresenta por extenso. As escolhas 14 a 16 são de desenho
    prévio dela naquele momento.
 8. **Textos de privacidade mudam.** "Como funciona" e a tela do cadastro
    passam a dizer que a escolha da pessoa só aparece no perfil que ela
-   ligar, e só nas pesquisas que marcar. O texto do aceite do cadastro (o
-   que a pessoa aceitou) não muda.
+   ligar, e só nas pesquisas que marcar; o título do cadastro deixa de dizer
+   "nunca o seu nome", porque o nome de perfil é escolhido pela pessoa e
+   pode ser o nome dela. O texto do aceite do cadastro (o que a pessoa
+   aceitou) não muda.
 9. **Só quem tem cadastro com CPF liga perfil**, como só quem tem cadastro
    responde (decisão 0004). Salvar marcações com o perfil ligado manda de
    novo a versão atual do aceite; se o texto do aceite mudar um dia, a

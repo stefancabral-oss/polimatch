@@ -263,7 +263,7 @@ test("desligar vale na hora, não exige nada e guarda nome, aceite e marcações
   assert.equal((await store.publicProfile("ANA_01")).handle, "ana_01");
 });
 
-test("desligar não exige cadastro: a conta que perdeu o cadastro desliga e o perfil público some na hora", async () => {
+test("sem cadastro o pedido só desliga: a conta que perdeu o cadastro desliga, o perfil público some e as marcações ficam", async () => {
   const { db, store } = setup();
   const ana = db.addPlayer();
   await play(store, ana, POLITICS.id, 1);
@@ -271,17 +271,31 @@ test("desligar não exige cadastro: a conta que perdeu o cadastro desliga e o pe
   assert.equal((await store.publicProfile("ana_01")).surveys.length, 1);
   db.unregister(ana);
   // Sem cadastro, ligar de novo é recusado e nada muda.
+  let mark = db.statements.length;
   await rejectsWith(enable(store, ana), 403, "CPF_REGISTRATION_REQUIRED");
+  // Sem cadastro, mandar marcações é recusado, mesmo desligando, e nada é gravado.
+  await rejectsWith(store.updateProfile({ recoveryKey: ana.key, enabled: false, surveys: [] }), 403, "CPF_REGISTRATION_REQUIRED");
+  await rejectsWith(store.updateProfile({ recoveryKey: ana.key, enabled: false, surveys: [CLOTHES.id] }), 403, "CPF_REGISTRATION_REQUIRED");
+  assert.deepEqual(writes(db, mark), []);
   assert.equal((await store.publicProfile("ana_01")).handle, "ana_01");
-  // Desligar funciona e vale na hora.
+  // Desligar funciona, vale na hora e não mexe nas marcações.
   const off = await store.updateProfile({ recoveryKey: ana.key, enabled: false });
-  assert.deepEqual([off.enabled, off.handle, off.canEnable], [false, "ana_01", false]);
+  assert.deepEqual([off.enabled, off.handle, off.canEnable, off.surveys], [false, "ana_01", false, [POLITICS.id]]);
   await rejectsWith(store.publicProfile("ana_01"), 404, "PROFILE_NOT_FOUND");
-  // Conta sem cadastro que nunca ligou também pode gravar o desligado.
-  const bruno = db.addPlayer({ registered: false });
-  assert.equal((await store.updateProfile({ recoveryKey: bruno.key, enabled: false })).enabled, false);
-  // Visitante sem conta Google é recusado ao desligar, e nada é gravado para ele.
+  // Já desligado, desligar de novo não grava nada.
+  mark = db.statements.length;
+  assert.equal((await store.updateProfile({ recoveryKey: ana.key, enabled: false })).enabled, false);
+  assert.deepEqual(writes(db, mark), []);
+  // Conta sem cadastro que nunca ligou: responde o perfil desligado sem criar linha.
   const counts = db.profileCounts();
+  const bruno = db.addPlayer({ registered: false });
+  mark = db.statements.length;
+  const brunoOff = await store.updateProfile({ recoveryKey: bruno.key, enabled: false });
+  assert.deepEqual([brunoOff.enabled, brunoOff.handle, brunoOff.surveys, brunoOff.canEnable], [false, null, [], false]);
+  await rejectsWith(store.updateProfile({ recoveryKey: bruno.key, enabled: false, surveys: [POLITICS.id] }), 403, "CPF_REGISTRATION_REQUIRED");
+  assert.deepEqual(writes(db, mark), []);
+  assert.deepEqual(db.profileCounts(), counts);
+  // Visitante sem conta Google é recusado ao desligar, e nada é gravado para ele.
   const visitor = db.addPlayer({ registered: false, account: false });
   await rejectsWith(store.updateProfile({ recoveryKey: visitor.key, enabled: false }), 403, "CPF_REGISTRATION_REQUIRED");
   assert.deepEqual(db.profileCounts(), counts);
@@ -479,9 +493,13 @@ test("pelas rotas: sessão exigida, corpo do PUT só com os quatro campos, respo
     const unregistered = db.addPlayer({ registered: false });
     const forbidden = await call(`${base}/api/me/profile`, { method: "PUT", key: unregistered.key, payload: { enabled: true, handle: "sem_cad", consentVersion: PROFILE_CONSENT_VERSION } });
     assert.deepEqual([forbidden.status, forbidden.body.code, forbidden.cache], [403, "CPF_REGISTRATION_REQUIRED", "no-store"]);
-    // Desligar não exige cadastro, só a conta Google.
+    // Sem cadastro o pedido só desliga: sem linha, responde desligado e nada grava.
+    const countsBefore = db.profileCounts();
     const offWithout = await call(`${base}/api/me/profile`, { method: "PUT", key: unregistered.key, payload: { enabled: false } });
     assert.deepEqual([offWithout.status, offWithout.cache, offWithout.body.enabled, offWithout.body.canEnable], [200, "no-store", false, false]);
+    const marksWithout = await call(`${base}/api/me/profile`, { method: "PUT", key: unregistered.key, payload: { enabled: false, surveys: [POLITICS.id] } });
+    assert.deepEqual([marksWithout.status, marksWithout.body.code, marksWithout.cache], [403, "CPF_REGISTRATION_REQUIRED", "no-store"]);
+    assert.deepEqual(db.profileCounts(), countsBefore, "conta sem cadastro não grava linha nem marcação");
     const visitor = db.addPlayer({ registered: false, account: false });
     const visitorOff = await call(`${base}/api/me/profile`, { method: "PUT", key: visitor.key, payload: { enabled: false } });
     assert.deepEqual([visitorOff.status, visitorOff.body.code, visitorOff.cache], [403, "CPF_REGISTRATION_REQUIRED", "no-store"]);

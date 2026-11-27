@@ -91,7 +91,7 @@ Rodado pelo agente que escreve este handoff, em 26/11/2026, neste computador
 
 - `npm run test:shared`: 143 de 143.
 - `npm test --prefix back`: 354 de 354.
-- `npm test --prefix app`: 263 de 263.
+- `npm test --prefix app`: 265 de 265.
 - `npm run editorial:verify --prefix back`: passou.
 - Roteiros de banco, na ordem do `back-shared.yml`, contra PostgreSQL 16
   local descartável: os dez passaram (integração, escolhas ordenadas, duelos
@@ -101,7 +101,7 @@ Rodado pelo agente que escreve este handoff, em 26/11/2026, neste computador
 - Build do app com o client id de teste do CI, e os três roteiros de
   navegador contra `vite preview` local, com o servidor simulado dos
   próprios roteiros: em WebKit e em Chromium, `photo-survey.mjs` com 42
-  cenários, `site-shell.mjs` com 60 e `client-error-report.mjs` com 5
+  cenários, `site-shell.mjs` com 62 e `client-error-report.mjs` com 5
   páginas, todos passando. O Chromium é o que já estava na máquina (revisão
   1187), aberto por um roteiro auxiliar fora do repositório.
 
@@ -148,6 +148,18 @@ rodaram, pelo agente das correções, os roteiros de banco do perfil, da
 pesquisa por foto e do cadastro e os três roteiros de navegador nos dois
 navegadores.
 
+Uma segunda leitura, sobre as correções, também segurou o merge. Por causa
+dela: o título da tela do cadastro deixou de dizer "nunca o seu nome"; sem
+cadastro, a conta só desliga e não grava marcações; a tela de "Meu perfil"
+mostra o estado do servidor quando outra aba ligou o perfil; "Continuar
+votando" sem confronto por ver mostra "Você já viu todos os confrontos desta
+pesquisa."; o link do feed para conta sem cadastro abre a página de sempre;
+e a política, o contexto e a decisão passaram a dizer o que o código faz.
+Essas correções foram feitas por um agente à parte, que rodou os roteiros de
+banco do perfil, da pesquisa por foto e do cadastro e os três de navegador
+nos dois navegadores; os testes de unidade foram repetidos pelo agente que
+escreve este handoff. Elas não passaram por nova leitura.
+
 ## Riscos conhecidos
 
 - **"Como funciona" com fonte monoespaçada** ainda não cabe em 360×640 sem
@@ -184,7 +196,7 @@ decidir fazer.
 
 ## Gate humano
 
-- [ ] Merge: sim do Stefan, com as nove escolhas de regra e de dado por
+- [ ] Merge: sim do Stefan, com as treze escolhas de regra e de dado por
       extenso na pergunta.
 - [ ] Publicação (76d): outro sim, depois do merge.
 - [ ] Fechamento da issue #354: outro sim.

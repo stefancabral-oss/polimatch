@@ -555,6 +555,15 @@ async function openResult({ focus = true } = {}) {
     resultData = data && typeof data === "object" ? data : { answeredRounds: 0, ranking: [] };
   } catch (error) {
     if (run !== epoch || view !== "result") return;
+    if (resultFromFeed && error.status === 403 && error.code === "CPF_REGISTRATION_REQUIRED") {
+      // `ver=resultado` com uma conta sem cadastro: não há resultado para
+      // mostrar. Abre a página da pesquisa como se não houvesse o pedido (a
+      // entrada de sempre, que leva ao cadastro no toque).
+      resultFromFeed = false;
+      identity = "";
+      openSurvey();
+      return;
+    }
     resultFailed = true;
     notice = `${error.status === 429 ? "Muitas tentativas agora. Espere um pouco e tente de novo." : "Não conseguimos carregar o seu resultado agora."} ${retryButton("result")}`;
   }
@@ -855,6 +864,9 @@ function showLastAnswered(text = "") {
   openResult();
 }
 
+/** O aviso de quem pediu outra rodada sem confronto por ver. */
+const ALL_SEEN_NOTICE = "Você já viu todos os confrontos desta pesquisa.";
+
 /**
  * O que o sorteio devolveu. `next` diz que a pessoa pediu outra rodada: se o
  * servidor devolveu a última respondida, não havia rodada para abrir.
@@ -868,9 +880,12 @@ function applyDraw(result, { next = false, auto = false } = {}) {
     response = result.response;
     progress = null;
     persist();
-    // Vistos todos os confrontos, o resultado diz. Com a pesquisa fora da
-    // janela ele não diz por que a rodada não abriu: o aviso diz.
+    // Com a pesquisa fora da janela, o resultado não diz por que a rodada
+    // não abriu: o aviso diz. Aberta, o pedido de outra rodada que volta com
+    // a última respondida quer dizer que não havia confronto por ver: o aviso
+    // diz, e "Continuar votando" some (o progresso do servidor não deixa).
     if (next && survey?.status !== "open") notice = "Esta pesquisa fechou. Não dá para jogar outra rodada.";
+    else if (next) notice = ALL_SEEN_NOTICE;
     // Um servidor de antes das rodadas não tem resultado: vale a tela de antes.
     if (rounds.round) openResult();
     else renderDone({ focus: true });
@@ -1660,7 +1675,7 @@ function renderGate({ focus = false, mount = true } = {}) {
       step: "Cadastro",
       mainClass: "ps-main--entry",
       focus: focus && !target,
-      body: `${heading("Cadastro", "Faça seu voto contar", "Um CPF, uma pessoa. Só o resultado somado aparece, nunca o seu nome.")}${registrationFormMarkup({ form, busy, invalid: invalidField })}`,
+      body: `${heading("Cadastro", "Faça seu voto contar", "Um CPF, uma pessoa. A sua escolha só aparece no perfil que você ligar.")}${registrationFormMarkup({ form, busy, invalid: invalidField })}`,
     });
     if (target) {
       // O aviso fica no topo, à vista; o foco vai para o campo que ele cita.

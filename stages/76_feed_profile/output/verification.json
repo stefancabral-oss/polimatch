@@ -45,7 +45,7 @@
     "ranBy": "o agente que escreve o handoff, em 26/11/2026, em macOS",
     "shared": "143 de 143",
     "back": "354 de 354",
-    "app": "263 de 263",
+    "app": "265 de 265",
     "editorialVerify": "passou",
     "databaseSmokes": {
       "database": "PostgreSQL 16 local descartável",
@@ -70,12 +70,12 @@
       "server": "simulado pelos próprios roteiros, com vite preview local",
       "webkit": {
         "photo-survey.mjs": 42,
-        "site-shell.mjs": 60,
+        "site-shell.mjs": 62,
         "client-error-report.mjs": "5 páginas"
       },
       "chromium": {
         "photo-survey.mjs": 42,
-        "site-shell.mjs": 60,
+        "site-shell.mjs": 62,
         "client-error-report.mjs": "5 páginas",
         "note": "revisão 1187 já instalada, aberta por roteiro auxiliar fora do repositório"
       }
@@ -106,6 +106,19 @@
         "escolhas 10 a 13 por extenso",
         "no-store, X-Robots-Tag, teste do texto do aceite"
       ]
+    },
+    "second": {
+      "when": "2026-11-26",
+      "verdict": "segurou o merge",
+      "fixed": [
+        "título do cadastro",
+        "sem cadastro só desliga, sem gravar marcações",
+        "duas abas em Meu perfil",
+        "Continuar votando sem confronto",
+        "ver=resultado sem cadastro",
+        "política, contexto e decisão alinhados ao código"
+      ],
+      "note": "as correções da segunda leitura não passaram por nova leitura"
     }
   }
 }

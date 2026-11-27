@@ -1107,6 +1107,8 @@ try {
     await page.locator("#e2e-google").click();
     await step(page, "Cadastro");
     assert.equal(await title(page), "Faça seu voto contar");
+    // Com o perfil (ICM 76), a escolha pode aparecer: o texto não promete o contrário.
+    assert.equal(await page.locator(".ps-hint").first().innerText(), "Um CPF, uma pessoa. A sua escolha só aparece no perfil que você ligar.");
     assert.equal(await storedKey(page), account);
     assert.equal(server.count("POST", "/draw"), 1, "o pedido de sorteio é quem diz que falta o cadastro");
     assert.equal(server.draws.size, 0, "sem cadastro, nenhum sorteio nasce");

@@ -53,12 +53,15 @@ ler). Resposta:
 `canEnable` é falso sem cadastro. `firstPlaces` traz todas as pesquisas em que
 a pessoa tem rodada respondida, marcadas ou não (é a vista dela).
 
-`PUT /api/me/profile` — com sessão de conta com cadastro. Corpo:
+`PUT /api/me/profile` — com sessão de conta Google. Ligar e mudar marcações
+exigem cadastro; sem cadastro, o pedido só desliga e não grava marcações.
+Corpo:
 `{ enabled: boolean, handle?: string, surveys?: [surveyId], consentVersion?: string }`.
 - `enabled: true` exige `handle` válido e livre (ou o atual) e
   `consentVersion` igual a `PROFILE_CONSENT_VERSION`.
 - `enabled: false` só desliga; `surveys` pode vir junto.
-- Recusas: 400 `PROFILE_INVALID` (motivo `handle`, `surveys`, `enabled`),
+- Recusas: 400 `PROFILE_INVALID` (motivo `handle`, `handle-locked`,
+  `surveys`, `enabled`),
   400 `PROFILE_CONSENT_REQUIRED`, 409 `PROFILE_HANDLE_TAKEN`, 403
   `CPF_REGISTRATION_REQUIRED`.
 - Resposta: a mesma de `GET /api/me/profile`.
@@ -117,10 +120,14 @@ política. Posso desmarcar pesquisas ou desligar o perfil quando quiser."
 5. **Perfil público** `perfil.html?u=<nome>`: nome de perfil e grade de
    fotos (uma por pesquisa), com assunto embaixo; `noindex`; perfil não
    encontrado com a mesma mensagem para desligado e inexistente.
-6. **"Como funciona":** a nota passa a ser "Do PoliMatch só sai o resultado
-   somado. A escolha de uma pessoa só aparece no perfil que ela mesma ligou,
-   e só nas pesquisas que ela marcou. Não guardamos o número do CPF, só um
-   código gerado a partir dele." (manter o resto da frase atual sobre o CPF).
+6. **Textos de privacidade.** "Como funciona", item 5: "Um CPF, uma pessoa:
+   todas as suas rodadas contam como a resposta de uma pessoa só."; nota: "Do
+   PoliMatch só sai o resultado somado. A sua escolha só aparece no perfil
+   que você ligar, e só nas pesquisas que marcar. Do CPF guardamos só um
+   código, nunca o número." Tela do cadastro: título "Um CPF, uma pessoa. A
+   sua escolha só aparece no perfil que você ligar." e a nota sobre o CPF
+   termina em "A sua escolha só aparece no perfil que você ligar." (textos
+   encurtados para caber em 360×640 com a fonte do Linux).
 
 ## Entregas
 

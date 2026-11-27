@@ -5,11 +5,13 @@ import { PROFILE_CONSENT_VERSION } from "../../shared/profile.js";
 import {
   HANDLE_CHOOSE_NOTE,
   HANDLE_LOCKED_NOTE,
+  MARKS_NEED_REGISTRATION_NOTE,
   enableBody,
   enableProblem,
   feedEntries,
   feedHref,
   handleFromSearch,
+  handleLockedOutcome,
   profileLink,
   profileRefusal,
   profileState,
@@ -128,6 +130,25 @@ test("o perfil público: uma carta por pesquisa, só cartas do catálogo, e o te
     { surveyId: SECOND, cardId: "c", subject: "<b>x</b>", question: "" },
   ]);
   assert.deepEqual(publicProfileCards({}), []);
+});
+
+test("depois de handle-locked: ligado em outra aba vale o servidor, sem falar de campo; desligado mantém o preenchido", () => {
+  const enabled = profileState({ enabled: true, handle: "da_outra_aba", surveys: [FIRST], canEnable: true });
+  assert.deepEqual(handleLockedOutcome(enabled), {
+    keepForm: false,
+    text: "Este perfil foi ligado em outra aba com o nome @da_outra_aba. Confira as marcações abaixo.",
+  });
+  assert.doesNotMatch(handleLockedOutcome(enabled).text, /campo/);
+  const disabled = profileState({ enabled: false, handle: "da_outra_aba", surveys: [], canEnable: true });
+  assert.deepEqual(handleLockedOutcome(disabled), {
+    keepForm: true,
+    text: "Este perfil já tem um nome, e o nome de perfil não muda depois de escolhido. Confira o nome no campo e tente de novo.",
+  });
+  assert.equal(handleLockedOutcome(null).keepForm, true);
+});
+
+test("perfil ligado sem cadastro: o aviso das marcações travadas", () => {
+  assert.equal(MARKS_NEED_REGISTRATION_NOTE, "Para mudar as marcações, falta o cadastro com CPF.");
 });
 
 test("os avisos do nome de perfil: travado depois de gravado, e o cuidado antes de ligar", () => {
