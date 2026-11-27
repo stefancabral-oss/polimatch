@@ -15,8 +15,10 @@
  *   1. O início é a pesquisa, com o botão do menu, e abrir não grava nada.
  *   2. O menu abre, prende o foco, fecha por Esc e pelo botão, e devolve o foco.
  *   3. Durante o voto não há menu: fica o indicador de etapa.
- *   4. Entrar com Google pelo menu, na entrada, não cria jogador.
- *   5. Quem respondeu sem conta entra, faz o cadastro e vê a resposta que deu.
+ *   4. Entrar com Google pelo menu, na entrada, não cria jogador; com a
+ *      conta, a capa vira o feed (ICM 76).
+ *   5. Quem respondeu sem conta entra, faz o cadastro e vê o resultado da
+ *      resposta que deu.
  *   6. Sair revoga a sessão e esquece a chave.
  *   7. Sair com a sessão vencida esquece a chave; com o servidor fora do ar, não.
  *   8. Cadastro com CPF (ICM 71, #336), no lugar do antigo cenário da cota de
@@ -26,10 +28,11 @@
  *      entrada; a conta que perde o cadastro espera o toque; o formulário
  *      não passa de uma conta para a outra; outra aba; foco no campo com
  *      erro; tamanhos de tela.
- *   9. A resposta registrada mostra as próximas pesquisas, sem "Ir para o início",
- *      abaixo de "Mais uma rodada" (ICM 75), com os três botões à vista.
+ *   9. O resultado (ICM 76) oferece "Continuar votando", o compartilhar e as
+ *      outras pesquisas, sem "Ir para o início", com os botões à vista; sem
+ *      confronto por ver, "Próxima pesquisa".
  *  10. "Como funciona" cabe na tela, abre o menu e leva ao início; o item 5
- *      fala das rodadas (ICM 75).
+ *      fala das rodadas (ICM 75) e a nota, do perfil que a pessoa liga (ICM 76).
  *  11. As páginas antigas saíram do build e o sitemap lista as três páginas.
  *  12. O script do Google falha: o menu avisa, e tentar de novo carrega.
  *  13. A entrada falha no servidor: o menu avisa e a chave não muda.
@@ -47,13 +50,14 @@
  *
  * Capa com várias pesquisas (ICM 70, #334):
  *  25. Cada pesquisa tem endereço; um código desconhecido cai na capa.
- *  26. Responder a primeira: a capa mostra a escolha e destaca a segunda;
- *      respondidas as duas, destaca a de famosos; depois, a de roupas;
- *      respondidas as quatro, a capa oferece mais uma rodada da primeira
- *      (ICM 75). Uma não mexe na outra.
- *  27. A capa destaca a pesquisa que ficou pela metade, com "Continuar"; se
- *      ela fecha, a capa não fica presa nela.
- *  28. Uma pesquisa fechada sai do destaque e aparece como fechada.
+ *  26. Feed (ICM 76, #354): quem entrou vê as pesquisas em cartões, com o
+ *      estado ("Começar", "Continuar", "Ver meu resultado") e a primeira
+ *      colocada; o feed só lê; responder uma não mexe na outra.
+ *  27. Feed: a fechada sem resposta sai, a respondida fica; sem o perfil, o
+ *      feed sai sem a primeira colocada; a leitura que falha pede para tentar
+ *      de novo.
+ *  28. Uma pesquisa fechada sai do destaque da capa de quem não entrou; no
+ *      feed, a respondida e fechada aparece com a primeira colocada.
  *  29. Com a API fora do ar, a capa avisa e tenta de novo.
  *  30. Compartilhar (ICM 70 e 72): só a imagem, com a escolha e as
  *      finalistas, só no toque, com o botão esperando a imagem.
@@ -63,18 +67,19 @@
  *      arquivo, a imagem aparece na tela.
  *  31c. A imagem demora, falha ou perde uma carta: o botão não fica preso
  *      e o toque nunca manda só o link.
- *  32. Servidor que ainda não conhece uma pesquisa: a capa mostra só as que
- *      ele conhece (é o que acontece se o app for publicado antes da API).
- *  33. Uma leitura que falha não vira informação falsa: a capa pede para
+ *  32. Servidor que ainda não conhece uma pesquisa: a capa e o feed mostram
+ *      só as que ele conhece (é o que acontece se o app for publicado antes
+ *      da API).
+ *  33. Uma leitura que falha não vira informação falsa: o feed pede para
  *      tentar de novo.
- *  34. Outra aba sai da conta: a capa desta se refaz.
+ *  34. Outra aba sai da conta: o feed desta vira a capa de quem não entrou.
  *
  * Pesquisa de roupas (ICM 73, #345):
  *  35. `/?p=roupas-demo-01` abre a entrada com o assunto, a pergunta, a
  *      observação e três cartas de roupa; a observação entra como texto.
  *  36. O caminho inteiro da pesquisa de roupas: quatro telas com as 16
- *      cartas, final, confirmação, resposta registrada e compartilhar; a
- *      capa mostra a escolha e continua abrindo nas pesquisas de política.
+ *      cartas, final, confirmação, a rodada 2 que abre sozinha, o resultado e
+ *      compartilhar; o feed mostra a peça em primeiro.
  *  37. A entrada das pesquisas de política não tem observação e só ilustra
  *      com as cartas da lista da entrada.
  *
@@ -82,23 +87,27 @@
  *  38. `/?p=famosos-01` abre a entrada com o assunto, a pergunta, a
  *      observação e três cartas de famosos, sorteadas a cada visita.
  *  39. O caminho inteiro da pesquisa de famosos: quatro telas com 16 das 20
- *      cartas, a final com "quem fica?", confirmação e resposta registrada;
- *      na capa, quem só respondeu a de famosos continua abrindo na política.
+ *      cartas, a final com "quem fica?", confirmação, a rodada 2 e o
+ *      resultado; no feed, só o cartão de famosos muda.
  *  40. `/creditos.html` lista uma linha por carta do catálogo, com o autor e
  *      a licença, cabe na largura até 320 px, e o menu marca a página.
- *  41. Sem nenhuma lista para mostrar, a capa não deixa bloco vazio.
+ *  41. Sem nenhuma lista para mostrar, a capa e o feed não deixam bloco vazio.
  *
- * Rodadas (ICM 75, #350):
- *  42. A capa destaca a primeira pesquisa com rodada por jogar, com "Mais
- *      uma rodada" e o número da rodada, sem emitir rodada; "Suas escolhas"
- *      mostra a última rodada respondida; a rodada emitida e não tocada
- *      continua como "Mais uma rodada", e a tocada vira "Continuar".
- *  43. A ordem do destaque com rodadas: uma pesquisa sem resposta vem antes
- *      de outra rodada; vistos todos os confrontos da primeira, o destaque
- *      passa para a seguinte; vistos todos, de todas, a capa diz que a
- *      pessoa respondeu todas.
- *  44. Servidor de antes das rodadas: a capa e a resposta registrada ficam
+ * Rodadas (ICM 75, #350) e feed (ICM 76, #354):
+ *  42. A capa não emite sorteio: o feed mostra a primeira colocada de cada
+ *      pesquisa, e o cartão leva ao resultado, sem transformar a rodada
+ *      emitida e não tocada em voto.
+ *  43. Servidor de antes das rodadas: o feed e a resposta registrada ficam
  *      como eram.
+ *
+ * Meu perfil e perfil público (ICM 76, #354):
+ *  44. Nasce desligado; ligar sem aceite ou com nome inválido não grava; nome
+ *      em uso; ligado, o link para copiar; o perfil público mostra só as
+ *      pesquisas marcadas e respondidas; mudar as marcações; desligar some na
+ *      hora, com a mesma mensagem de um nome que não existe.
+ *  45. Sem cadastro, leva ao cadastro; sem conta, pede para entrar, e o menu
+ *      só mostra "Meu perfil" com conta.
+ *  46. As duas páginas cabem na largura em 390, 360 e 320 px.
  */
 import assert from "node:assert/strict";
 import { randomInt } from "node:crypto";
@@ -108,6 +117,7 @@ import {
   drawCards,
   drawGroups,
   drawRound,
+  personalRanking,
   photoSurveyById,
   publicPhotoSurvey,
   seenPairKeys,
@@ -115,6 +125,7 @@ import {
   totalPairCount,
   validateBracket,
 } from "../../shared/photo-survey.js";
+import { PROFILE_CONSENT_TEXT, PROFILE_CONSENT_VERSION, isValidHandle, normalizeHandle } from "../../shared/profile.js";
 import CELEBRITY_CARDS from "../src/celebrity-cards.json" with { type: "json" };
 import CLOTHES_CARDS from "../src/clothes-cards.json" with { type: "json" };
 import { ENTRY_CARD_IDS, PHOTO_SURVEY_STORAGE_KEY, identityTag, savedProgressText } from "../src/photo-survey-flow.js";
@@ -174,6 +185,11 @@ function createServer() {
     // Um servidor de antes das rodadas (ICM 75): não lê `next` nem `round` e
     // não manda `round`, `progress` nem `lastAnswered`.
     legacy: false,
+    // Perfis (ICM 76, #354), por chave: nome, ligado, versão e data do aceite
+    // e pesquisas marcadas. Nascem desligados.
+    profiles: new Map(),
+    // Falhas programadas da leitura do perfil da conta (status HTTP).
+    failProfile: [],
     requests: [],
     // A rodada 1 de cada pesquisa e identidade: o sorteio e a resposta, como
     // antes das rodadas. As seguintes ficam em `later`, cada uma com o número,
@@ -220,6 +236,23 @@ function createServer() {
       lastAnswered: last ? { round: last.round, response: last.response } : null,
     };
   };
+  // O ranking da pessoa numa pesquisa, com a regra de pontos compartilhada.
+  const rankingOf = (key, survey) => personalRanking(survey, roundsOf(key, survey).filter((entry) => entry.response)
+    .map((entry) => ({ shownIds: entry.shownIds, pickIds: entry.response.pickIds, championId: entry.response.championId })));
+  const profileOf = (key) => server.profiles.get(key) || { handle: "", enabled: false, consentVersion: "", consentedAt: null, surveys: [] };
+  const profileView = (key) => {
+    const profile = profileOf(key);
+    return {
+      enabled: profile.enabled,
+      handle: profile.handle || null,
+      consentVersion: profile.consentVersion || null,
+      consentedAt: profile.consentedAt,
+      surveys: [...profile.surveys],
+      firstPlaces: PHOTO_SURVEYS.map((item) => ({ surveyId: item.id, cardId: rankingOf(key, item)[0]?.cardId })).filter((entry) => entry.cardId),
+      canEnable: server.registered.has(key),
+    };
+  };
+  server.profileView = profileView;
   const addRound = (key, survey, entry) => server.later.set(slot(survey, key), [...(server.later.get(slot(survey, key)) || []), entry]);
   server.handler = async (route) => {
     const request = route.request();
@@ -270,6 +303,44 @@ function createServer() {
       server.registered.add(key);
       return send(200, { registered: true, status: "created", registeredAt: new Date().toISOString() });
     }
+    // Perfil da conta e perfil público (ICM 76, #354).
+    if (pathname === "/api/me/profile") {
+      if (!key || server.revoked.has(key) || !key.startsWith("pms_")) return send(401, { error: "sessão de conta obrigatória", code: "PLAYER_SESSION_REQUIRED" });
+      if (method === "GET") {
+        if (server.failProfile.length) return send(server.failProfile.shift(), { error: "erro interno", code: "INTERNAL_ERROR" });
+        return send(200, profileView(key));
+      }
+      if (method !== "PUT") return send(404, { error: "rota não simulada" });
+      if (!server.registered.has(key)) return send(403, { error: "cadastro com CPF obrigatório", code: "CPF_REGISTRATION_REQUIRED" });
+      const refuse = (reason) => send(400, { error: "perfil inválido", code: "PROFILE_INVALID", current: { reason } });
+      if (typeof sent?.enabled !== "boolean") return refuse("enabled");
+      if (sent.surveys !== undefined && (!Array.isArray(sent.surveys) || !sent.surveys.every((id) => photoSurveyById(id)))) return refuse("surveys");
+      const current = profileOf(key);
+      const surveys = sent.surveys === undefined ? current.surveys : [...new Set(sent.surveys)];
+      if (!sent.enabled) {
+        server.profiles.set(key, { ...current, enabled: false, surveys });
+        return send(200, profileView(key));
+      }
+      const handle = normalizeHandle(sent.handle ?? current.handle);
+      if (!isValidHandle(handle)) return refuse("handle");
+      if (sent.consentVersion !== PROFILE_CONSENT_VERSION) return send(400, { error: "aceite do perfil obrigatório", code: "PROFILE_CONSENT_REQUIRED" });
+      const taken = [...server.profiles].some(([other, profile]) => other !== key && profile.handle === handle);
+      if (taken) return send(409, { error: "nome de perfil em uso", code: "PROFILE_HANDLE_TAKEN" });
+      server.profiles.set(key, { handle, enabled: true, consentVersion: PROFILE_CONSENT_VERSION, consentedAt: new Date().toISOString(), surveys });
+      return send(200, profileView(key));
+    }
+    const publicProfile = pathname.match(/^\/api\/profiles\/([^/]+)$/);
+    if (publicProfile && method === "GET") {
+      const handle = normalizeHandle(decodeURIComponent(publicProfile[1]));
+      const owner = [...server.profiles].find(([, profile]) => profile.enabled && profile.handle === handle)?.[0];
+      // Desligado e inexistente respondem igual.
+      if (!owner) return send(404, { error: "perfil não encontrado", code: "PROFILE_NOT_FOUND" });
+      const profile = server.profiles.get(owner);
+      const surveys = PHOTO_SURVEYS.filter((item) => profile.surveys.includes(item.id))
+        .map((item) => ({ surveyId: item.id, subject: item.subject, question: item.question, cardId: rankingOf(owner, item)[0]?.cardId }))
+        .filter((entry) => entry.cardId);
+      return send(200, { handle, surveys });
+    }
     if (pathname === "/api/auth/logout" && method === "POST") {
       if (server.beforeLogout) await server.beforeLogout();
       if (server.logout === "down") return route.abort("connectionrefused");
@@ -277,17 +348,21 @@ function createServer() {
       if (server.logout === "expired") return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
       return route.fulfill({ status: 204, body: "" });
     }
-    const [, surveyId, action = ""] = pathname.match(/^\/api\/photo-surveys\/([^/]+)(?:\/(draw|response))?$/) || [];
+    const [, surveyId, action = ""] = pathname.match(/^\/api\/photo-surveys\/([^/]+)(?:\/(draw|response|result))?$/) || [];
     const survey = server.unknown.has(surveyId) ? null : photoSurveyById(surveyId || "");
     if (!survey) return send(404, { error: "pesquisa não encontrada", code: "PHOTO_SURVEY_NOT_FOUND" });
     if (!action && method === "GET") {
       if (server.holdSurvey) await server.holdSurvey.promise;
       return send(200, view(survey));
     }
-    if (method !== "POST") return send(404, { error: "rota não simulada" });
+    if (method !== "POST" && action !== "result") return send(404, { error: "rota não simulada" });
     if (!key || server.revoked.has(key)) return send(401, { error: "sessão de jogador obrigatória", code: "PLAYER_SESSION_REQUIRED" });
     // Como o servidor de verdade: sem conta com cadastro não há sorteio nem resposta.
     if (!server.registered.has(key)) return send(403, { error: "cadastro com CPF obrigatório para responder", code: "CPF_REGISTRATION_REQUIRED" });
+    if (action === "result") {
+      if (method !== "GET") return send(404, { error: "rota não simulada" });
+      return send(200, { surveyId: survey.id, answeredRounds: roundsOf(key, survey).filter((entry) => entry.response).length, ranking: rankingOf(key, survey) });
+    }
     const status = view(survey).status;
     const rounds = roundsOf(key, survey);
     const body = sent;
@@ -432,19 +507,58 @@ async function signIn(page) {
 const waitStep = (page, text) => page.waitForFunction((expected) => document.querySelector("#ps-step")?.textContent === expected, text, { timeout: 15000 });
 const tapCard = (page, position = 0) => page.locator('.ps-grid[data-ready="true"] button[data-card]:not([disabled])').nth(position).click();
 
+// A etapa de uma tela de voto, em qualquer rodada ("Tela 2 de 4" ou "Rodada 3 · Tela 2 de 4").
+const waitStepEnd = (page, text) => page.waitForFunction((expected) => {
+  const value = document.querySelector("#ps-step")?.textContent || "";
+  return value === expected || value.endsWith(` · ${expected}`);
+}, text, { timeout: 15000 });
+
+/**
+ * Espera o que vem depois de confirmar: a rodada seguinte, que abre sozinha
+ * (ICM 76, #354), o resultado, ou a resposta registrada de antes das rodadas.
+ * O aviso "Rodada registrada" fica no caminho e não conta.
+ */
+const settled = (page) => page.waitForFunction(() => {
+  const value = document.querySelector("#ps-step")?.textContent || "";
+  const title = document.querySelector("#ps-title")?.textContent || "";
+  const hint = document.querySelector(".ps-hint")?.textContent || "";
+  if (/(^|· )Tela 1 de 4$/.test(value)) return document.querySelector('.ps-grid[data-ready="true"]') !== null;
+  if (value === "Resultado") return !/Carregando/.test(hint);
+  return value === "Registrada" && title !== "Rodada registrada";
+}, null, { timeout: 15000 });
+
 /** Joga as quatro telas, a final e confirma. Devolve o nome da carta escolhida. */
 async function answer(page, position = 0) {
   for (let screen = 1; screen <= 4; screen += 1) {
-    await waitStep(page, `Tela ${screen} de 4`);
+    await waitStepEnd(page, `Tela ${screen} de 4`);
     await tapCard(page, position);
   }
-  await waitStep(page, "Final");
+  await waitStepEnd(page, "Final");
   await tapCard(page, position);
-  await waitStep(page, "Confirmar");
+  await waitStepEnd(page, "Confirmar");
+  const name = await page.locator("#ps-title").innerText();
   await page.locator('[data-action="confirm"]:not([disabled])').click();
-  await waitStep(page, "Registrada");
-  return page.locator("#ps-title").innerText();
+  await settled(page);
+  return name;
 }
+
+// Resultado e feed (ICM 76, #354).
+const resultShown = async (page) => {
+  await waitStep(page, "Resultado");
+  await page.waitForFunction(() => !/Carregando/.test(document.querySelector(".ps-hint")?.textContent || ""), null, { timeout: 15000 });
+};
+const feedReady = (page) => page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Pesquisas"
+  && !/Carregando/.test(document.querySelector(".ps-hint")?.textContent || ""), null, { timeout: 15000 });
+/** Os cartões do feed: pesquisa, rótulo, a primeira colocada (nome) e o estado. */
+const feedCards = (page) => page.locator(".ps-feed-card").evaluateAll((cards) => cards.map((card) => ({
+  id: card.dataset.survey,
+  go: card.querySelector(".ps-feed-go").textContent.replace(/\s*›\s*$/, ""),
+  first: card.querySelector(".ps-feed-first strong")?.textContent || "",
+  tag: card.querySelector(".pm-tag").textContent,
+})));
+
+// Todas as cartas, por nome: o feed mostra o nome da primeira colocada.
+const ARTS_BY_NAME = new Map([...(await import("../src/political-chromas.json", { with: { type: "json" } })).default, ...CELEBRITY_CARDS, ...CLOTHES_CARDS].map((art) => [art.name, art]));
 
 const VALID_CPF = "529.982.247-25";
 const formNotice = (page) => page.locator("#ps-notice:not([hidden])");
@@ -577,7 +691,7 @@ try {
 
   await scenario("durante o voto não há menu: fica o indicador de etapa", async () => {
     const server = createServer();
-    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
     await entryReady(page);
     await page.locator("#ps-action").click();
     await page.locator('.ps-grid[data-ready="true"]').waitFor({ timeout: 20000 });
@@ -598,6 +712,10 @@ try {
     assert.equal(await page.locator("#e2e-google").count(), 0);
     assert.equal(server.last("/api/auth/google").key, "", "sem chave no aparelho, a entrada vai sem ela");
     await page.keyboard.press("Escape");
+    // Com a conta, a capa vira o feed (ICM 76, #354), sem gravar nada.
+    await feedReady(page);
+    assert.deepEqual(server.writes(), ["POST /api/auth/google"], "entrar e ver o feed não grava nada além da entrada");
+    await page.locator(`.ps-feed-card[data-survey="${SURVEY.id}"]`).click();
     await entryReady(page);
     await page.locator("#ps-action").click();
     await page.locator('.ps-grid[data-ready="true"]').waitFor({ timeout: 20000 });
@@ -629,8 +747,9 @@ try {
     assert.equal(server.last("/api/auth/google").key, ANONYMOUS_KEY, "a chave sem conta vai junto, para o servidor ligar a resposta à conta");
     assert.equal(await storedKey(page), GOOGLE_KEY);
     await submitButton(page).click();
-    // A resposta dada sem conta agora é da conta: a pessoa vê a escolha, não um voto novo.
-    await waitStep(page, "Registrada");
+    // A resposta dada sem conta agora é da conta: a pessoa vê o resultado, não um voto novo.
+    await resultShown(page);
+    assert.equal(await page.locator("#ps-title").innerText(), (await import("../src/political-chromas.json", { with: { type: "json" } })).default.find((art) => art.id === answered.championId).name);
     assert.equal(server.last("/draw").key, GOOGLE_KEY);
     assert.equal(await page.locator(".ps-grid, #ps-action").count(), 0, "quem já respondeu não vota de novo");
     assert.deepEqual(server.responseOf(GOOGLE_KEY), answered);
@@ -639,7 +758,7 @@ try {
 
   await scenario("sair revoga a sessão e esquece a chave", async () => {
     const server = createServer();
-    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
     await entryReady(page);
     await openMenu(page);
     await page.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
@@ -652,7 +771,7 @@ try {
   await scenario("sair com a sessão vencida esquece a chave; com o servidor fora do ar, não", async () => {
     const expired = createServer();
     expired.logout = "expired";
-    const first = await open(await newContext(expired, { storedKey: GOOGLE_KEY }));
+    const first = await open(await newContext(expired, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
     await entryReady(first);
     await openMenu(first);
     await first.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
@@ -661,7 +780,7 @@ try {
 
     const down = createServer();
     down.logout = "down";
-    const second = await open(await newContext(down, { storedKey: GOOGLE_KEY }));
+    const second = await open(await newContext(down, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
     await entryReady(second);
     await openMenu(second);
     await second.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
@@ -672,7 +791,7 @@ try {
 
     const broken = createServer();
     broken.logout = "error";
-    const third = await open(await newContext(broken, { storedKey: GOOGLE_KEY }));
+    const third = await open(await newContext(broken, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
     await entryReady(third);
     await openMenu(third);
     await third.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
@@ -684,7 +803,7 @@ try {
   await scenario("conta sem cadastro: Começar abre o formulário, e cada recusa do servidor tem o seu texto", async () => {
     const server = createServer();
     server.registered.delete(GOOGLE_KEY);
-    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
     await entryReady(page);
     await page.waitForTimeout(300);
     assert.deepEqual(server.writes(), [], "a capa não pergunta pelo cadastro: quem decide é o toque");
@@ -728,7 +847,7 @@ try {
     const server = createServer();
     const renewed = `pms_${"r".repeat(43)}`;
     server.registered.delete(GOOGLE_KEY);
-    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
     await entryReady(page);
     await page.locator("#ps-action").click();
     await fillRegistration(page);
@@ -1105,45 +1224,50 @@ try {
     await waitStep(page, "Tela 2 de 4");
   });
 
-  await scenario("a resposta registrada oferece a próxima pesquisa, sem \"Ir para o início\"", async () => {
+  await scenario("o resultado oferece continuar votando e as outras pesquisas, sem \"Ir para o início\"", async () => {
     // A fonte do Linux do CI é mais larga que a do macOS: o terceiro caso força
     // uma fonte larga, para a medida não depender da máquina.
     const WIDE_FONT = '.ps-shell, .ps-shell button, .ps-shell a { font-family: Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace !important; }';
-    for (const [width, height, wide = false] of [[390, 844], [360, 640], [360, 640, true]]) {
+    for (const [width, height, wide = false] of [[390, 844], [360, 640], [360, 640, true], [320, 568]]) {
       const server = createServer();
       server.answered(GOOGLE_KEY);
-      const page = await open(await newContext(server, { width, height, storedKey: GOOGLE_KEY }));
+      const page = await open(await newContext(server, { width, height, storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
       await entryReady(page);
       if (wide) await page.addStyleTag({ content: WIDE_FONT });
       await page.locator("#ps-action").click();
-      await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
+      // Quem já respondeu e toca em Começar vê o resultado (ICM 76, #354).
+      await resultShown(page);
       await menuButton(page).waitFor();
+      const label = `${width}×${height}${wide ? " com fonte larga" : ""}`;
       const next = page.locator(".ps-stack");
-      const link = next.getByRole("link", { name: "Próxima pesquisa" });
-      assert.equal(await link.getAttribute("href"), "./", "a próxima é a que a capa puser em destaque");
-      // Os dois botões cabem na largura, com texto curto, lado a lado, abaixo
-      // de "Mais uma rodada" (ICM 75), que é o botão principal.
-      const share = next.getByRole("button", { name: "Compartilhar minha escolha" });
-      assert.equal(await share.innerText(), "Compartilhar");
-      const more = next.getByRole("button", { name: "Mais uma rodada" });
-      assert.deepEqual(await next.locator(".ps-btn").allInnerTexts(), ["Mais uma rodada", "Compartilhar", "Próxima pesquisa"], "a ordem dos botões é a da leitura e a do teclado");
-      const [linkBox, shareBox, moreBox] = [await link.boundingBox(), await share.boundingBox(), await more.boundingBox()];
-      assert.ok(moreBox.y + moreBox.height <= shareBox.y && Math.abs(shareBox.y - linkBox.y) < 1, `${width}×${height}: Mais uma rodada fica em cima dos outros dois`);
-      for (const [label, box] of [["próxima pesquisa", linkBox], ["compartilhar", shareBox], ["mais uma rodada", moreBox]]) {
-        assert.ok(box.height >= 44 && box.height <= 80, `${width}×${height}${wide ? " com fonte larga" : ""}: o botão de ${label} tem ${Math.round(box.height)} px de altura`);
-        assert.ok(box.x >= 0 && box.x + box.width <= width + 0.5, `${width}×${height}: o botão de ${label} sai da tela`);
+      assert.deepEqual(await next.locator(".ps-btn").allInnerTexts(), ["Continuar votando", "Compartilhar"], "a ordem dos botões é a da leitura e a do teclado");
+      const share = next.getByRole("button", { name: "Compartilhar meu resultado" });
+      const more = next.getByRole("button", { name: "Continuar votando" });
+      for (const [name, box] of [["compartilhar", await share.boundingBox()], ["continuar votando", await more.boundingBox()]]) {
+        assert.ok(box.height >= 44 && box.height <= 80, `${label}: o botão de ${name} tem ${Math.round(box.height)} px de altura`);
+        assert.ok(box.x >= 0 && box.x + box.width <= width + 0.5, `${label}: o botão de ${name} sai da tela`);
+        assert.ok(box.y >= 0 && box.y + box.height <= height + 0.5, `${label}: o botão de ${name} fica à vista`);
       }
+      assert.equal(await page.getByRole("link", { name: "Outras pesquisas" }).getAttribute("href"), "./");
       assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Ir para o início/);
       assert.equal(new URL(page.url()).search, `?p=${SURVEY.id}`, "a pesquisa respondida fica no endereço");
-      const nextBox = await next.boundingBox();
-      assert.ok(nextBox.y + nextBox.height <= height + 1, `${width}×${height}: a próxima pesquisa aparece sem rolar`);
       const heroBox = await page.locator(".ps-hero .ps-card").boundingBox();
-      const rowBox = await page.locator(".ps-row").boundingBox();
-      // O mínimo do CSS é 70 px: aqui a carta precisa sobrar bem acima disso.
-      assert.ok(heroBox.height >= (height >= 800 ? 180 : 90), `${width}×${height}${wide ? " com fonte larga" : ""}: a carta escolhida ficou pequena (${Math.round(heroBox.height)} px)`);
-      assert.ok(rowBox.y + rowBox.height <= nextBox.y + 1, `${width}×${height}: as finalistas não ficam atrás dos botões`);
-      assert.ok(heroBox.y + heroBox.height <= rowBox.y + 1, `${width}×${height}: a escolhida não cobre as finalistas`);
+      const nextBox = await next.boundingBox();
+      assert.ok(heroBox.height >= (height >= 800 ? 180 : 90), `${label}: a primeira colocada ficou pequena (${Math.round(heroBox.height)} px)`);
+      assert.ok(heroBox.y + heroBox.height <= nextBox.y + 1, `${label}: a primeira colocada não fica atrás dos botões`);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, `${label}: rolagem lateral`);
+      assert.deepEqual(server.writes().filter((entry) => !entry.endsWith("/draw")), [], "ver o resultado não grava nada");
     }
+    // Vistos todos os confrontos, a próxima pesquisa toma o lugar de continuar votando.
+    const server = createServer();
+    server.answered(GOOGLE_KEY);
+    server.exhaust(GOOGLE_KEY);
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
+    await entryReady(page);
+    await page.locator("#ps-action").click();
+    await resultShown(page);
+    assert.deepEqual(await page.locator(".ps-stack .ps-btn").allInnerTexts(), ["Compartilhar", "Próxima pesquisa"]);
+    assert.equal(await page.locator(".ps-stack").getByRole("link", { name: "Próxima pesquisa" }).getAttribute("href"), "./", "a próxima é a que a capa puser em destaque");
   });
 
   await scenario("\"Como funciona\" cabe na tela, abre o menu e leva ao início", async () => {
@@ -1160,7 +1284,11 @@ try {
         "Um CPF, uma pessoa: você pode jogar várias rodadas da mesma pesquisa, e todas contam como a resposta de uma pessoa só.",
       );
       assert.doesNotMatch(await page.locator(".ps-list").innerText(), /responde uma vez/);
-      assert.match(await page.locator(".pm-note").innerText(), /só sai o resultado somado, nunca a escolha de uma pessoa/);
+      // A nota fala do perfil que a própria pessoa liga (ICM 76, #354).
+      assert.equal(
+        await page.locator(".pm-note").innerText(),
+        "Do PoliMatch só sai o resultado somado. A escolha de uma pessoa só aparece no perfil que ela mesma ligou, e só nas pesquisas que ela marcou. Não guardamos o número do CPF, só um código gerado a partir dele.",
+      );
       assert.match(await page.locator(".pm-note").innerText(), /Não guardamos o número do CPF/);
       assert.equal(await fits(page), true, `${width}×${height}: a página cabe sem rolar`);
       const action = page.locator(".ps-stack a.ps-btn");
@@ -1248,7 +1376,8 @@ try {
     await signIn(first);
     await first.keyboard.press("Escape");
     const second = await open(context);
-    await entryReady(second);
+    // Com a conta, a capa é o feed (ICM 76, #354).
+    await feedReady(second);
     await openMenu(second);
     await second.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
     await second.locator("dialog.pm-menu[open] #e2e-google").waitFor();
@@ -1261,10 +1390,10 @@ try {
   await scenario("sair na resposta registrada não convida a responder de novo", async () => {
     const server = createServer();
     server.answered(GOOGLE_KEY);
-    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
     await entryReady(page);
     await page.locator("#ps-action").click();
-    await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
+    await resultShown(page);
     await openMenu(page);
     await page.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
     await page.locator("dialog.pm-menu[open] #e2e-google").waitFor();
@@ -1273,7 +1402,7 @@ try {
     assert.match(await page.locator("#ps-notice").innerText(), /Você saiu da conta neste aparelho\. A sua resposta continua registrada\./);
     assert.equal(await stepText(page), "Registrada");
     assert.equal(await page.locator("#ps-action, .ps-grid").count(), 0, "sem botão para responder de novo");
-    assert.equal(await page.locator('[data-action="next-round"], #ps-seen').count(), 0, "sem a conta, não há rodada para oferecer");
+    assert.equal(await page.locator('[data-action="next-round"], [data-action="continue"], #ps-seen').count(), 0, "sem a conta, não há rodada para oferecer");
     assert.equal(await storedKey(page), null);
   });
 
@@ -1287,7 +1416,8 @@ try {
     await openMenu(page);
     await signIn(page);
     await page.keyboard.press("Escape");
-    await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
+    await resultShown(page);
+    assert.equal(await page.locator('[data-action="continue"]').count(), 0, "fechada, não há como continuar votando");
     // E sair, com a pesquisa fechada, volta para a tela de fechada, sem "Começar".
     await openMenu(page);
     await page.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
@@ -1316,7 +1446,7 @@ try {
 
   await scenario("o foco fica no menu quando o conteúdo dele muda", async () => {
     const server = createServer();
-    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
     await entryReady(page);
     await openMenu(page);
     assert.equal(await page.locator("dialog.pm-menu[open] .pm-account-state").getAttribute("role"), "status");
@@ -1373,8 +1503,13 @@ try {
     await signIn(page);
     assert.deepEqual(keys(), [ANONYMOUS_KEY, ANONYMOUS_KEY]);
     await page.keyboard.press("Escape");
-    await page.locator("#ps-action:not([disabled])").click();
-    await page.waitForFunction(() => document.querySelector("#ps-step")?.textContent === "Registrada");
+    // Com a conta, a capa é o feed, e ele já mostra a pesquisa como respondida.
+    await feedReady(page);
+    assert.equal((await feedCards(page))[0].go, "Ver meu resultado");
+    await page.locator(`.ps-feed-card[data-survey="${SURVEY.id}"]`).click();
+    await entryReady(page);
+    await page.locator("#ps-action").click();
+    await resultShown(page);
   });
 
   await scenario("entrada sem sessão na resposta: o menu avisa e a chave não muda", async () => {
@@ -1391,7 +1526,7 @@ try {
   await scenario("sair não apaga a sessão que outra aba gravou enquanto o servidor respondia", async () => {
     const server = createServer();
     const other = `pms_${"n".repeat(43)}`;
-    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
     await entryReady(page);
     server.beforeLogout = async () => {
       server.beforeLogout = null;
@@ -1407,7 +1542,7 @@ try {
 
   await scenario("a pesquisa fechou depois de aberta a página: sair não oferece \"Começar\"", async () => {
     const server = createServer();
-    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SURVEY));
     await entryReady(page);
     server.status = "closed";
     await page.locator("#ps-action").click();
@@ -1444,31 +1579,67 @@ try {
     assert.equal(await unknown.locator(".ps-home").count(), 1, "código desconhecido abre a capa");
   });
 
-  await scenario("responder a primeira: a capa mostra a escolha e destaca a segunda, depois a de famosos e a de roupas; uma não mexe na outra", async () => {
+  await scenario("feed: quem entrou vê as pesquisas em cartões, com o estado e a primeira colocada; responder uma não mexe na outra", async () => {
     const server = createServer();
     const context = await newContext(server, { storedKey: GOOGLE_KEY });
     const page = await open(context);
+    await feedReady(page);
+    assert.equal(await page.locator("#ps-title").innerText(), "Suas pesquisas");
+    assert.deepEqual(await feedCards(page), PHOTO_SURVEYS.map((item) => ({ id: item.id, go: "Começar", first: "", tag: "Aberta" })));
+    assert.deepEqual(await page.locator(".ps-feed-card b").allInnerTexts(), PHOTO_SURVEYS.map((item) => item.question), "na ordem das pesquisas");
+    assert.deepEqual(await page.locator(".ps-feed-card").evaluateAll((cards) => cards.map((card) => card.getAttribute("href"))), PHOTO_SURVEYS.map((item) => `./?p=${item.id}`));
+    assert.equal(await page.locator("#ps-action, .ps-fan").count(), 0, "o feed não tem o destaque da capa de quem não entrou");
+    assert.equal(await page.locator('.ps-top [data-action="menu"]').count(), 1);
+    // A capa só lê: as pesquisas e o perfil da conta, um pedido só para as primeiras colocadas.
+    assert.deepEqual(server.writes(), [], "o feed não grava nada");
+    assert.equal(server.count("GET", "/api/me/profile"), 1);
+    assert.equal(server.requests.filter((request) => request.pathname.includes("/draw") || request.pathname.endsWith("/result")).length, 0, "o feed não pede sorteio nem resultado");
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "o feed não rola para o lado");
+
+    // Responder a primeira: a rodada 2 abre sozinha, e a segunda não é tocada.
+    await page.locator(`.ps-feed-card[data-survey="${SURVEY.id}"]`).click();
     await entryReady(page);
     await page.locator("#ps-action").click();
     const first = await answer(page, 0);
+    await waitStep(page, "Rodada 2 · Tela 1 de 4");
     assert.equal(new URL(page.url()).search, `?p=${SURVEY.id}`);
     assert.equal(server.responseOf(GOOGLE_KEY, SECOND), null, "responder a primeira não responde a segunda");
 
-    // "Próxima pesquisa" leva à capa: a escolha aparece e a segunda vira o destaque.
-    await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Próxima pesquisa" }).click()]);
-    await entryReady(page);
-    assert.equal(await page.locator("#ps-title").innerText(), "Em quem você confia mais?");
-    const pick = page.locator(".ps-home .ps-pick");
-    await pick.locator("b", { hasText: first }).waitFor();
-    assert.equal(await pick.count(), 1);
-    assert.equal(await pick.getAttribute("href"), `./?p=${SURVEY.id}`);
-    assert.match(await pick.locator("small").innerText(), /Política · Quem você prefere\?/);
-    assert.equal(await pick.locator("img").evaluate((image) => image.naturalWidth > 0), true, "a carta escolhida aparece");
-    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas", "Mais pesquisas"]);
-    assert.deepEqual(await page.locator(".ps-home a.ps-survey b").allInnerTexts(), ["De quem você é mais fã?", "Qual você usaria?"], "a segunda está no destaque, não na lista; a de famosos e a de roupas continuam na lista, nessa ordem");
-    assert.equal(server.count("POST", `/api/photo-surveys/${SECOND.id}/draw`), 0, "a capa não emite sorteio da pesquisa em destaque");
+    // De volta ao feed: a primeira mostra a primeira colocada e "Ver meu resultado".
+    const draws = server.count("POST", "/draw");
+    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
+    await feedReady(page);
+    assert.deepEqual((await feedCards(page)).map(({ id, go, first: name }) => [id, go, name]), [
+      [SURVEY.id, "Ver meu resultado", first],
+      [SECOND.id, "Começar", ""],
+      [CELEBRITIES.id, "Começar", ""],
+      [CLOTHES.id, "Começar", ""],
+    ]);
+    const firstCard = page.locator(`.ps-feed-card[data-survey="${SURVEY.id}"]`);
+    assert.equal(await firstCard.locator("img").getAttribute("src"), ARTS_BY_NAME.get(first).src, "a carta do cartão é a primeira colocada");
+    assert.equal(await firstCard.locator("img").evaluate((image) => image.complete && image.naturalWidth > 0), true);
+    assert.equal(server.count("POST", "/draw"), draws, "a capa não emite sorteio");
+
+    // O cartão leva ao resultado, sem emitir rodada; continuar votando abre a rodada 2.
+    await firstCard.click();
+    await resultShown(page);
+    assert.equal(await page.locator("#ps-title").innerText(), first);
+    assert.equal(server.count("POST", "/draw"), draws + 1);
+    assert.deepEqual(server.last("/draw").body, {}, "abrir a pesquisa respondida não pede rodada seguinte");
+    await page.locator('[data-action="continue"]').click();
+    await waitStep(page, "Rodada 2 · Tela 1 de 4");
+    await tapCard(page, 1);
+    await waitStep(page, "Rodada 2 · Tela 2 de 4");
+    // Com a rodada pela metade neste aparelho, o cartão diz "Continuar" e leva direto ao voto.
+    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
+    await feedReady(page);
+    assert.deepEqual((await feedCards(page))[0], { id: SURVEY.id, go: "Continuar", first, tag: "Aberta" });
+    await page.locator(`.ps-feed-card[data-survey="${SURVEY.id}"]`).click();
+    await waitStep(page, "Rodada 2 · Tela 2 de 4");
 
     // A segunda começa do zero: sorteio próprio, nenhuma escolha herdada.
+    await page.goto(surveyUrl(SECOND), { waitUntil: "domcontentloaded" });
+    await entryReady(page);
     await page.locator("#ps-action").click();
     await waitStep(page, "Tela 1 de 4");
     assert.equal(await page.locator('.ps-grid button[aria-pressed="true"]').count(), 0);
@@ -1476,91 +1647,45 @@ try {
     assert.notEqual(server.responseOf(GOOGLE_KEY, SURVEY).answerId, server.responseOf(GOOGLE_KEY, SECOND).answerId);
     assert.equal(server.responseOf(GOOGLE_KEY, CELEBRITIES), null, "responder as de política não responde a de famosos");
     assert.equal(server.responseOf(GOOGLE_KEY, CLOTHES), null, "responder as de política não responde a de roupas");
-
-    // Respondidas as duas de política, a capa mostra as duas escolhas e destaca a de famosos.
-    await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Próxima pesquisa" }).click()]);
-    await entryReady(page);
-    assert.equal(await page.locator("#ps-title").innerText(), "De quem você é mais fã?");
-    assert.equal(await page.locator(".ps-kicker").first().innerText(), "FAMOSOS · 16 CARTAS");
-    assert.equal(await page.locator(".ps-note").innerText(), "Fotos de licença livre. Ver os créditos");
-    // As duas de política sorteiam das mesmas cartas: a escolha pode ser a mesma pessoa nas duas.
-    await page.locator(".ps-home .ps-pick").nth(1).locator("b", { hasText: second }).waitFor();
-    assert.deepEqual(await page.locator(".ps-home .ps-pick b").allInnerTexts(), [first, second]);
-    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas", "Mais pesquisas"]);
-    assert.deepEqual(await page.locator(".ps-home a.ps-survey b").allInnerTexts(), ["Qual você usaria?"]);
-    await page.locator("#ps-action").click();
-    const third = await answer(page, 2);
-    assert.equal(new URL(page.url()).search, `?p=${CELEBRITIES.id}`);
-    assert.equal(server.responseOf(GOOGLE_KEY, CLOTHES), null, "responder a de famosos não responde a de roupas");
-
-    // Respondida a de famosos, a capa mostra as três escolhas e destaca a de roupas.
-    await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Próxima pesquisa" }).click()]);
-    await entryReady(page);
-    assert.equal(await page.locator("#ps-title").innerText(), "Qual você usaria?");
-    assert.equal(await page.locator(".ps-note").innerText(), "Peças de demonstração, desenhadas com IA pelo PoliMatch.");
-    await page.locator(".ps-home .ps-pick").nth(2).locator("b", { hasText: third }).waitFor();
-    assert.deepEqual(await page.locator(".ps-home .ps-pick b").allInnerTexts(), [first, second, third]);
-    assert.match(await page.locator(".ps-home .ps-pick").nth(2).locator("small").innerText(), /Famosos · De quem você é mais fã\?/);
-    assert.equal(await page.locator(".ps-home .ps-pick").nth(2).getAttribute("href"), `./?p=${CELEBRITIES.id}`);
-    // Não sobra pesquisa para "Mais pesquisas", e não há anúncio: só "Suas escolhas".
-    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas"]);
-    await page.locator("#ps-action").click();
-    const fourth = await answer(page, 3);
-    assert.equal(new URL(page.url()).search, `?p=${CLOTHES.id}`);
-    assert.equal(await page.getByRole("link", { name: "Ver pesquisas" }).getAttribute("href"), "./", "sem próxima, o botão leva à capa");
-
-    // Respondidas as quatro, não sobra pesquisa por responder: a capa oferece
-    // mais uma rodada da primeira (ICM 75) e mostra as quatro escolhas.
-    await page.getByRole("link", { name: "Ver pesquisas" }).click();
-    await entryReady(page, "Mais uma rodada");
-    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
-    assert.equal(await page.locator(".ps-kicker").first().innerText(), "POLÍTICA · RODADA 2");
-    assert.equal(await page.locator(".ps-hint").first().innerText(), "Ainda há confrontos que você não viu.");
-    assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Você respondeu todas/);
-    assert.equal(await page.locator(".ps-note").count(), 0, "a pesquisa de política em destaque não tem observação");
-    await page.locator(".ps-home .ps-pick").nth(3).locator("b", { hasText: fourth }).waitFor();
-    assert.deepEqual(await page.locator(".ps-home .ps-pick b").allInnerTexts(), [first, second, third, fourth]);
-    assert.match(await page.locator(".ps-home .ps-pick").nth(3).locator("small").innerText(), /Roupas · Qual você usaria\?/);
-    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas"]);
-    assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Em breve/);
-    // Tocar numa escolha abre a tela da resposta daquela pesquisa.
-    await page.locator(".ps-home .ps-pick").first().click();
-    await waitStep(page, "Registrada");
-    assert.equal(await page.locator("#ps-title").innerText(), first);
+    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
+    await feedReady(page);
+    assert.deepEqual((await feedCards(page)).map(({ go, first: name }) => [go, name]), [["Continuar", first], ["Ver meu resultado", second], ["Começar", ""], ["Começar", ""]]);
   });
 
-  await scenario("a capa destaca a pesquisa que ficou pela metade, com Continuar, e não fica presa se ela fecha", async () => {
+  await scenario("feed: a pesquisa fechada sem resposta sai, a respondida fica, e a leitura que falha pede para tentar de novo", async () => {
     const server = createServer();
-    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), surveyUrl(SECOND));
-    await entryReady(page);
-    await page.locator("#ps-action").click();
-    await waitStep(page, "Tela 1 de 4");
-    await tapCard(page, 2);
-    await waitStep(page, "Tela 2 de 4");
-    // A primeira pesquisa não herda nada da segunda.
-    await page.goto(surveyUrl(SURVEY), { waitUntil: "domcontentloaded" });
-    await entryReady(page);
-    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
-    // A capa continua sendo a capa: destaca a que ficou pela metade e oferece continuar.
-    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
-    await entryReady(page, "Continuar");
-    assert.equal(new URL(page.url()).search, "");
-    assert.equal(await page.locator("#ps-title").innerText(), "Em quem você confia mais?");
-    assert.match(await page.locator(".ps-hint").first().innerText(), /Você parou no meio/);
-    assert.deepEqual(await page.locator(".ps-home a.ps-survey b").allInnerTexts(), ["Quem você prefere?", "De quem você é mais fã?", "Qual você usaria?"]);
-    assert.equal(server.count("POST", `/api/photo-surveys/${SURVEY.id}/draw`), 0);
-    await page.locator("#ps-action").click();
-    await waitStep(page, "Tela 2 de 4");
-    assert.equal(new URL(page.url()).search, `?p=${SECOND.id}`);
-    assert.equal(await page.locator('.ps-grid button[aria-pressed="true"]').count(), 0, "a tela 2 ainda não tem escolha");
-
-    // A pesquisa pela metade fecha: a capa segue alcançável e destaca a outra.
     server.closed.add(SECOND.id);
-    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
-    await entryReady(page, "Começar");
-    assert.equal(new URL(page.url()).search, "", "a capa não manda para a pesquisa fechada");
-    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
-    assert.deepEqual(await page.locator(".ps-home a.ps-survey").evaluateAll((rows) => rows.map((row) => `${row.querySelector("b").textContent} | ${row.querySelector(".pm-tag").textContent}`)), ["Em quem você confia mais? | Fechada", "De quem você é mais fã? | Aberta", "Qual você usaria? | Aberta"]);
+    server.closed.add(CLOTHES.id);
+    server.answered(GOOGLE_KEY, CLOTHES);
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }));
+    await feedReady(page);
+    const cards = await feedCards(page);
+    assert.deepEqual(cards.map(({ id, go, tag }) => [id, go, tag]), [
+      [SURVEY.id, "Começar", "Aberta"],
+      [CELEBRITIES.id, "Começar", "Aberta"],
+      [CLOTHES.id, "Ver meu resultado", "Fechada"],
+    ]);
+    assert.ok(cards[2].first, "a respondida mostra a primeira colocada, mesmo fechada");
+    assert.deepEqual(server.writes(), [], "fechada ou aberta, o feed não grava nada");
+
+    // Sem o perfil, o feed sai assim mesmo, sem a primeira colocada.
+    server.failProfile.push(500);
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await feedReady(page);
+    assert.deepEqual((await feedCards(page)).map(({ id }) => id), [SURVEY.id, CELEBRITIES.id]);
+
+    // As pesquisas não carregam: o aviso e o botão de tentar de novo.
+    let down = true;
+    await page.context().route(/\/api\/photo-surveys\//, (route) => (down ? route.abort("connectionrefused") : route.fallback()));
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.locator("#ps-notice:not([hidden])").waitFor();
+    assert.match(await page.locator("#ps-notice").innerText(), /Não conseguimos falar com o servidor/);
+    assert.equal(await page.locator("#ps-action").innerText(), "Tentar de novo");
+    down = false;
+    await page.locator("#ps-action").click();
+    await feedReady(page);
+    assert.equal(await page.locator(".ps-feed-card").count(), 3);
+    assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
   });
 
   await scenario("uma pesquisa fechada sai do destaque e aparece como fechada", async () => {
@@ -1581,15 +1706,16 @@ try {
     assert.equal(await empty.locator("#ps-action").count(), 0);
     assert.equal(await empty.locator(".ps-home a.ps-survey .pm-tag", { hasText: "Fechada" }).count(), PHOTO_SURVEYS.length);
 
-    // Quem tem conta no aparelho e respondeu antes de fechar vê a escolha, mesmo sem registro local.
+    // Quem tem conta no aparelho e respondeu antes de fechar vê a primeira colocada no feed, mesmo sem registro local.
     const past = createServer();
     past.status = "closed";
     const chosen = past.answered(GOOGLE_KEY, SECOND);
     const mine = await open(await newContext(past, { storedKey: GOOGLE_KEY }));
-    await mine.locator(".ps-home .ps-pick img").waitFor();
-    assert.equal(await mine.locator(".ps-home .ps-pick").getAttribute("href"), `./?p=${SECOND.id}`);
-    assert.equal(await mine.locator(".ps-home .ps-pick img").getAttribute("src"), (await import("../src/political-chromas.json", { with: { type: "json" } })).default.find((art) => art.id === chosen.championId).src);
-    assert.deepEqual(past.writes().filter((entry) => !entry.endsWith("/draw")), [], "só o pedido da resposta, que fechada não grava nada");
+    await feedReady(mine);
+    assert.deepEqual((await feedCards(mine)).map(({ id, go, tag }) => [id, go, tag]), [[SECOND.id, "Ver meu resultado", "Fechada"]]);
+    assert.equal(await mine.locator(".ps-feed-card").getAttribute("href"), `./?p=${SECOND.id}`);
+    assert.equal(await mine.locator(".ps-feed-card img").getAttribute("src"), (await import("../src/political-chromas.json", { with: { type: "json" } })).default.find((art) => art.id === chosen.championId).src);
+    assert.deepEqual(past.writes(), [], "o feed não grava nada");
 
     // Um estado que a página não conhece vale como fechada, sem quebrar a capa.
     const odd = createServer();
@@ -1692,10 +1818,11 @@ try {
     page.cardRequests = images;
     await entryReady(page);
     await page.locator("#ps-action").click();
-    await waitStep(page, "Registrada");
+    // Quem já respondeu e toca em Começar vê o resultado (ICM 76, #354), com o compartilhar.
+    await resultShown(page);
     return { page, server, name: await page.locator("#ps-title").innerText(), answered };
   }
-  const shareButton = (page) => page.getByRole("button", { name: "Compartilhar minha escolha" });
+  const shareButton = (page) => page.getByRole("button", { name: /^Compartilhar (minha escolha|meu resultado)$/ });
   const shareReady = (page) => page.locator('[data-action="share"][data-ready="true"]:not([disabled])').waitFor();
   const preview = (page) => page.locator("dialog.ps-share[open]");
   const previewClosed = (page) => page.waitForFunction(() => !document.querySelector("dialog.ps-share").hasAttribute("open"));
@@ -1725,12 +1852,13 @@ try {
     assert.ok(finalists[0].y > hero.y + hero.height, "as finalistas ficam abaixo da escolhida");
     assert.ok(drawn.every((box) => box.x >= 0 && box.x + box.width <= 1080 && box.y >= 0 && box.y + box.height <= 1350), "tudo dentro da folha");
     // O que a imagem escreve: a escolha, e as outras três como "Também na final".
-    // O rótulo descreve a final; não diz que a pessoa "escolheu" as três.
+    // Os rótulos não dizem que a pessoa "escolheu" as três.
     const texts = await page.evaluate(() => window.__texts);
     // Os rótulos são os textos todos em maiúsculas; o nome, a pergunta e o
     // endereço ficam de fora, para uma pergunta futura não derrubar o cenário.
     const labels = texts.filter((text) => /\p{L}/u.test(text) && text === text.toUpperCase());
-    assert.deepEqual(labels, ["MINHA ESCOLHA", "TAMBÉM NA FINAL"], `os rótulos da imagem (${texts.join(" | ")})`);
+    // No resultado (ICM 76, #354) os rótulos falam da primeira colocada e das seguintes.
+    assert.deepEqual(labels, ["MEU PRIMEIRO LUGAR", "DEPOIS DELA"], `os rótulos da imagem (${texts.join(" | ")})`);
     // Dois toques seguidos abrem o compartilhamento uma vez só.
     await button.click();
     await button.click();
@@ -1770,7 +1898,7 @@ try {
       const image = preview(page).locator("img.ps-share-img");
       await page.waitForFunction(() => document.querySelector("dialog.ps-share img")?.naturalWidth > 0);
       assert.deepEqual(await image.evaluate((node) => [node.naturalWidth, node.naturalHeight]), [1080, 1350]);
-      assert.match(await image.getAttribute("alt"), new RegExp(`^Imagem com a minha escolha: ${name}\\. Também na final: .+, .+ e .+\\.$`));
+      assert.match(await image.getAttribute("alt"), new RegExp(`^Imagem com a minha escolha: ${name}\\. Depois dela: .+, .+ e .+\\.$`));
       const link = preview(page).getByRole("link", { name: "Baixar imagem" });
       assert.equal(await link.getAttribute("download"), "polimatch-minha-escolha.jpg");
       assert.match(await link.getAttribute("href"), /^blob:/);
@@ -1941,10 +2069,12 @@ try {
     server.unknown.add(CLOTHES.id);
     const context = await newContext(server, { storedKey: GOOGLE_KEY });
     const page = await open(context);
-    await entryReady(page);
-    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
-    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), [], "as pesquisas desconhecidas não entram na lista, e sem lista não há rótulo");
+    // Com a conta, o feed mostra só a pesquisa que o servidor conhece.
+    await feedReady(page);
+    assert.deepEqual((await feedCards(page)).map(({ id }) => id), [SURVEY.id], "as pesquisas desconhecidas não entram no feed");
     assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
+    await page.locator(".ps-feed-card").click();
+    await entryReady(page);
     await page.locator("#ps-action").click();
     await waitStep(page, "Tela 1 de 4");
     // No endereço dela, a pesquisa desconhecida diz que não está disponível, com saída para a capa.
@@ -1961,19 +2091,19 @@ try {
     const first = await open(context, surveyUrl(SURVEY));
     await entryReady(first);
     await first.locator("#ps-action").click();
-    await waitStep(first, "Registrada");
-    // A leitura da segunda falha: a capa não pode dizer que tudo foi respondido.
+    await resultShown(first);
+    // A leitura da segunda falha: o feed não pode mostrar uma lista pela metade.
     let down = true;
     await context.route(new RegExp(`/api/photo-surveys/${SECOND.id}$`), (route) => (down ? route.abort("connectionrefused") : route.fallback()));
     const page = await open(context);
     await page.locator("#ps-notice:not([hidden])").waitFor();
     assert.match(await page.locator("#ps-notice").innerText(), /Não conseguimos falar com o servidor/);
     assert.equal(await page.locator("#ps-action").innerText(), "Tentar de novo");
-    assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Você respondeu todas/);
+    assert.equal(await page.locator(".ps-feed-card").count(), 0, "sem saber o que está aberto, o feed não mostra cartões");
     down = false;
     await page.locator("#ps-action").click();
-    await entryReady(page, "Começar");
-    assert.equal(await page.locator("#ps-title").innerText(), "Em quem você confia mais?");
+    await feedReady(page);
+    assert.deepEqual((await feedCards(page)).map(({ go }) => go), ["Ver meu resultado", "Começar", "Começar", "Começar"]);
     assert.equal(await page.locator("#ps-notice:not([hidden])").count(), 0);
   });
 
@@ -1984,18 +2114,18 @@ try {
     const first = await open(context, surveyUrl(SURVEY));
     await entryReady(first);
     await first.locator("#ps-action").click();
-    await waitStep(first, "Registrada");
+    await resultShown(first);
     await first.goto(appUrl, { waitUntil: "domcontentloaded" });
-    await first.locator(".ps-home .ps-pick img").waitFor();
-    assert.equal(await first.locator("#ps-title").innerText(), "Em quem você confia mais?");
+    await feedReady(first);
+    await first.locator(".ps-feed-card .ps-feed-first").waitFor();
 
     const second = await open(context);
-    await entryReady(second);
+    await feedReady(second);
     await openMenu(second);
     await second.locator('dialog.pm-menu[open] [data-menu="signout"]').click();
     await second.locator("dialog.pm-menu[open] #e2e-google").waitFor();
-    // Sem a conta, a escolha dela some da capa e o destaque volta para a primeira pesquisa.
-    await first.waitForFunction(() => document.querySelectorAll(".ps-home .ps-pick").length === 0 && document.querySelector("#ps-title")?.textContent === "Quem você prefere?");
+    // Sem a conta, o feed sai e volta a capa de quem não entrou, com a primeira pesquisa em destaque.
+    await first.waitForFunction(() => document.querySelectorAll(".ps-feed-card").length === 0 && document.querySelector("#ps-title")?.textContent === "Quem você prefere?");
     assert.deepEqual(await first.locator(".ps-home .ps-label").allInnerTexts(), ["Mais pesquisas"]);
   });
 
@@ -2116,45 +2246,43 @@ try {
     assert.deepEqual(await page.locator(".ps-row [role=img]").evaluateAll((cards) => cards.map((card) => card.getAttribute("aria-label"))), others);
     assert.equal(server.count("POST", "/response"), 0, "nada é gravado antes de confirmar");
     await page.locator('[data-action="confirm"]:not([disabled])').click();
-    await waitStep(page, "Registrada");
+    // A rodada 2 abre sozinha (ICM 76, #354), e o resultado mostra a peça escolhida em primeiro.
+    await waitStep(page, "Rodada 2 · Tela 1 de 4");
+    assert.equal(await page.locator(".ps-kicker").first().innerText(), "ROUPAS · RODADA 2");
+    await page.locator('[data-action="result"]').click();
+    await resultShown(page);
     assert.equal(await page.locator("#ps-title").innerText(), chosen);
+    assert.equal(await page.locator(".ps-kicker").first().innerText(), "ROUPAS · SEU RESULTADO");
     assert.equal(await page.locator(".ps-hero img").getAttribute("src"), CLOTHES_CARDS.find((card) => card.id === picks[1]).src);
-    assert.deepEqual(await page.locator(".ps-row [role=img]").evaluateAll((cards) => cards.map((card) => card.getAttribute("aria-label"))), others);
+    assert.deepEqual(await page.locator(".ps-rank b").allInnerTexts(), CLOTHES.cardIds.filter((id) => picks.includes(id) && id !== picks[1]).map((id) => clothesName.get(id)), "as outras finalistas, empatadas, na ordem da pesquisa");
     assert.equal(server.last("/response").pathname, `/api/photo-surveys/${CLOTHES.id}/response`);
     const recorded = server.responseOf(GOOGLE_KEY, CLOTHES);
     assert.deepEqual([recorded.pickIds, recorded.championId], [picks, picks[1]]);
     assert.equal(server.responseOf(GOOGLE_KEY, SURVEY), null, "responder a de roupas não responde as de política");
     assert.equal(server.responseOf(GOOGLE_KEY, SECOND), null);
-    assert.equal(await page.locator(".ps-grid, [data-action=confirm], #ps-action").count(), 0, "depois de registrar não há como responder de novo");
+    assert.equal(await page.locator("[data-action=confirm], #ps-action").count(), 0, "do resultado não dá para mudar a resposta registrada");
 
-    // Compartilhar: a imagem leva a peça escolhida, as finalistas e a pergunta desta pesquisa.
+    // Compartilhar: a imagem leva a peça em primeiro, as seguintes e a pergunta desta pesquisa.
     await shareReady(page);
-    assert.equal((await page.evaluate(() => window.__drawn)).length, 4, "a escolhida e as três finalistas");
+    assert.equal((await page.evaluate(() => window.__drawn)).length, 4, "a primeira colocada e as três seguintes");
     const texts = await page.evaluate(() => window.__texts);
     assert.ok(texts.includes(chosen) && texts.includes("Qual você usaria?"), `a imagem leva o nome da peça e a pergunta (${texts.join(" | ")})`);
-    assert.deepEqual(texts.filter((text) => /\p{L}/u.test(text) && text === text.toUpperCase()), ["MINHA ESCOLHA", "TAMBÉM NA FINAL"]);
+    assert.deepEqual(texts.filter((text) => /\p{L}/u.test(text) && text === text.toUpperCase()), ["MEU PRIMEIRO LUGAR", "DEPOIS DELA"]);
     await shareButton(page).click();
     await page.waitForFunction(() => window.__shared.length === 1);
     const [shared] = await page.evaluate(() => window.__shared);
     assert.deepEqual(shared.keys, ["files"]);
     assert.deepEqual([shared.files[0].type, shared.files[0].width, shared.files[0].height], ["image/jpeg", 1080, 1350]);
 
-    // A capa continua abrindo nas pesquisas de política, e mostra a escolha de roupas.
-    await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Próxima pesquisa" }).click()]);
-    await entryReady(page);
-    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
-    assert.equal(await page.locator(".ps-note").count(), 0);
-    const pick = page.locator(".ps-home .ps-pick");
-    await pick.locator("b", { hasText: chosen }).waitFor();
-    assert.equal(await pick.count(), 1);
-    assert.equal(await pick.getAttribute("href"), `./?p=${CLOTHES.id}`);
-    assert.match(await pick.locator("small").innerText(), /Roupas · Qual você usaria\?/);
-    assert.equal(await pick.locator("img").getAttribute("src"), CLOTHES_CARDS.find((card) => card.id === picks[1]).src);
-    assert.equal(await pick.locator("img").evaluate((image) => image.naturalWidth > 0), true, "a carta escolhida aparece");
-    assert.deepEqual(await page.locator(".ps-home a.ps-survey b").allInnerTexts(), ["Em quem você confia mais?", "De quem você é mais fã?"]);
-    // Tocar na escolha abre a tela da resposta da pesquisa de roupas.
-    await pick.click();
-    await waitStep(page, "Registrada");
+    // No feed, o cartão de roupas mostra a peça em primeiro e leva ao resultado.
+    await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Outras pesquisas" }).click()]);
+    await feedReady(page);
+    const card = page.locator(`.ps-feed-card[data-survey="${CLOTHES.id}"]`);
+    assert.deepEqual((await feedCards(page)).find((entry) => entry.id === CLOTHES.id), { id: CLOTHES.id, go: "Ver meu resultado", first: chosen, tag: "Aberta" });
+    assert.equal(await card.locator("img").getAttribute("src"), CLOTHES_CARDS.find((item) => item.id === picks[1]).src);
+    assert.equal(await card.locator("img").evaluate((image) => image.complete && image.naturalWidth > 0), true, "a carta escolhida aparece");
+    await card.click();
+    await resultShown(page);
     assert.equal(await page.locator("#ps-title").innerText(), chosen);
   });
 
@@ -2291,21 +2419,24 @@ try {
     assert.deepEqual(await page.locator(".ps-row [role=img]").evaluateAll((cards) => cards.map((card) => card.getAttribute("aria-label"))), others);
     assert.equal(server.count("POST", "/response"), 0, "nada é gravado antes de confirmar");
     await page.locator('[data-action="confirm"]:not([disabled])').click();
-    await waitStep(page, "Registrada");
+    // A rodada 2 abre sozinha (ICM 76, #354); o resultado mostra a pessoa escolhida em primeiro.
+    await waitStep(page, "Rodada 2 · Tela 1 de 4");
+    await page.locator('[data-action="result"]').click();
+    await resultShown(page);
     assert.equal(await page.locator("#ps-title").innerText(), chosen);
     const chosenSrc = CELEBRITY_CARDS.find((card) => card.id === picks[2]).src;
     assert.equal(await page.locator(".ps-hero img").getAttribute("src"), chosenSrc);
     assert.equal(await page.locator(".ps-hero img").evaluate((image) => image.naturalWidth > 0), true, "a carta escolhida aparece");
-    assert.deepEqual(await page.locator(".ps-row [role=img]").evaluateAll((cards) => cards.map((card) => card.getAttribute("aria-label"))), others);
+    assert.deepEqual(await page.locator(".ps-rank b").allInnerTexts(), CELEBRITIES.cardIds.filter((id) => picks.includes(id) && id !== picks[2]).map((id) => celebrityName.get(id)));
     assert.equal(server.last("/response").pathname, `/api/photo-surveys/${CELEBRITIES.id}/response`);
     const recorded = server.responseOf(GOOGLE_KEY, CELEBRITIES);
     assert.deepEqual([recorded.pickIds, recorded.championId], [picks, picks[2]]);
     for (const other of [SURVEY, SECOND, CLOTHES]) assert.equal(server.responseOf(GOOGLE_KEY, other), null, `responder a de famosos não responde ${other.id}`);
-    assert.equal(await page.locator(".ps-grid, [data-action=confirm], #ps-action").count(), 0, "depois de registrar não há como responder de novo");
+    assert.equal(await page.locator("[data-action=confirm], #ps-action").count(), 0, "do resultado não dá para mudar a resposta registrada");
 
-    // Compartilhar: a imagem leva a pessoa escolhida, as finalistas e a pergunta desta pesquisa.
+    // Compartilhar: a imagem leva a pessoa em primeiro, as seguintes e a pergunta desta pesquisa.
     await shareReady(page);
-    assert.equal((await page.evaluate(() => window.__drawn)).length, 4, "a escolhida e as três finalistas");
+    assert.equal((await page.evaluate(() => window.__drawn)).length, 4, "a primeira colocada e as três seguintes");
     const texts = await page.evaluate(() => window.__texts);
     assert.ok(texts.includes(chosen) && texts.includes("De quem você é mais fã?"), `a imagem leva o nome e a pergunta (${texts.join(" | ")})`);
     await shareButton(page).click();
@@ -2314,25 +2445,20 @@ try {
     assert.deepEqual(shared.keys, ["files"]);
     assert.deepEqual([shared.files[0].type, shared.files[0].width, shared.files[0].height], ["image/jpeg", 1080, 1350]);
 
-    // Quem só respondeu a de famosos continua abrindo a capa na política, e vê a escolha em "Suas escolhas".
-    await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Próxima pesquisa" }).click()]);
-    await entryReady(page);
-    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
-    assert.equal(await page.locator(".ps-note").count(), 0);
-    const pick = page.locator(".ps-home .ps-pick");
-    await pick.locator("b", { hasText: chosen }).waitFor();
-    assert.equal(await pick.count(), 1);
-    assert.equal(await pick.getAttribute("href"), `./?p=${CELEBRITIES.id}`);
-    assert.match(await pick.locator("small").innerText(), /Famosos · De quem você é mais fã\?/);
-    assert.equal(await pick.locator("img").getAttribute("src"), chosenSrc);
-    assert.equal(await pick.locator("img").evaluate((image) => image.naturalWidth > 0), true, "a carta escolhida aparece");
-    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas", "Mais pesquisas"]);
-    assert.deepEqual(await page.locator(".ps-home a.ps-survey b").allInnerTexts(), ["Em quem você confia mais?", "Qual você usaria?"]);
-    // Tocar na escolha abre a tela da resposta da pesquisa de famosos.
-    await pick.click();
-    await waitStep(page, "Registrada");
+    // No feed, o cartão de famosos mostra a pessoa em primeiro, e os outros continuam em "Começar".
+    await Promise.all([page.waitForURL(appUrl), page.getByRole("link", { name: "Outras pesquisas" }).click()]);
+    await feedReady(page);
+    assert.deepEqual((await feedCards(page)).map(({ id, go, first }) => [id, go, first]), [
+      [SURVEY.id, "Começar", ""],
+      [SECOND.id, "Começar", ""],
+      [CELEBRITIES.id, "Ver meu resultado", chosen],
+      [CLOTHES.id, "Começar", ""],
+    ]);
+    const card = page.locator(`.ps-feed-card[data-survey="${CELEBRITIES.id}"]`);
+    assert.equal(await card.locator("img").getAttribute("src"), chosenSrc);
+    await card.click();
+    await resultShown(page);
     assert.equal(await page.locator("#ps-title").innerText(), chosen);
-    assert.equal(new URL(page.url()).search, `?p=${CELEBRITIES.id}`);
   });
 
   await scenario("\"Créditos das fotos\" lista uma linha por carta do catálogo, cabe na largura, e o menu marca a página", async () => {
@@ -2446,174 +2572,249 @@ try {
     assert.deepEqual(after, [0], "depois do botão só há a área das listas, sem altura");
     assert.equal(await fits(page), true, "a capa cabe na tela sem rolar");
 
-    // Quem respondeu a única pesquisa que o servidor conhece vê só "Suas escolhas".
-    // Um servidor que só conhece a primeira pesquisa é de antes das rodadas.
+    // Quem respondeu a única pesquisa que o servidor conhece vê o feed com um
+    // cartão só, sem bloco vazio embaixo. Um servidor que só conhece a primeira
+    // pesquisa é de antes das rodadas.
     const done = createServer();
     done.legacy = true;
     for (const survey of PHOTO_SURVEYS.slice(1)) done.unknown.add(survey.id);
     done.answered(GOOGLE_KEY);
     const storedProgress = savedProgressText("", SURVEY.id, { identity: identityTag(GOOGLE_KEY), answered: true });
     const mine = await open(await newContext(done, { storedKey: GOOGLE_KEY, storedProgress }));
-    await mine.locator("#ps-title", { hasText: "Você respondeu todas as pesquisas abertas." }).waitFor();
-    await mine.locator(".ps-home .ps-pick img").waitFor();
-    assert.deepEqual(await mine.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas"]);
-    assert.equal(await mine.locator(".ps-home > :last-child").evaluate((node) => node.matches("a.ps-pick")), true);
+    await feedReady(mine);
+    assert.deepEqual((await feedCards(mine)).map(({ id, go }) => [id, go]), [[SURVEY.id, "Ver meu resultado"]]);
+    assert.deepEqual(
+      await mine.locator(".ps-home").evaluate((node) => ({ nodes: node.childNodes.length, display: getComputedStyle(node).display })),
+      { nodes: 0, display: "none" },
+    );
   });
 
-  // Rodadas (ICM 75, #350) ---------------------------------------------------
+  // Feed com rodadas (ICM 75 e 76) --------------------------------------------
   const allAnswered = () => PHOTO_SURVEYS.reduce((text, survey) => savedProgressText(text, survey.id, { identity: identityTag(GOOGLE_KEY), answered: true }), "");
   const drawBodies = (server, from = 0) => server.requests.slice(from).filter((request) => request.method === "POST" && request.pathname.endsWith("/draw")).map((request) => request.body);
   const allRounds = (server) => PHOTO_SURVEYS.map((survey) => server.roundsOf(GOOGLE_KEY, survey).length);
-  const politicalName = new Map(ARTS.map((art) => [art.id, art.name]));
+  const nameOfCard = new Map([...ARTS, ...CELEBRITY_CARDS, ...CLOTHES_CARDS].map((art) => [art.id, art.name]));
 
-  await scenario("a capa destaca a pesquisa com rodada por jogar, com Mais uma rodada, e Suas escolhas mostra a última rodada", async () => {
+  await scenario("a capa não emite sorteio: o feed mostra a primeira colocada de cada pesquisa, e o cartão leva ao resultado", async () => {
     const server = createServer();
-    // A conta respondeu as quatro pesquisas; da primeira, jogou duas rodadas,
-    // com escolhidas diferentes.
-    const firstRound = server.answered(GOOGLE_KEY, SURVEY);
-    for (const survey of PHOTO_SURVEYS.slice(1)) server.answered(GOOGLE_KEY, survey);
-    const secondRound = server.playRound(GOOGLE_KEY, SURVEY, { avoid: [firstRound.championId] }).response;
-    assert.notEqual(secondRound.championId, firstRound.championId);
+    // A conta respondeu as quatro pesquisas; da primeira, jogou duas rodadas e
+    // tem uma terceira emitida e não tocada.
+    for (const survey of PHOTO_SURVEYS) server.answered(GOOGLE_KEY, survey);
+    server.playRound(GOOGLE_KEY, SURVEY);
+    server.playRound(GOOGLE_KEY, SURVEY, { open: true });
     const page = await open(await newContext(server, { storedKey: GOOGLE_KEY, storedProgress: allAnswered() }));
-    await entryReady(page, "Mais uma rodada");
-    // O destaque: a primeira pesquisa, com a rodada que o toque abre.
-    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
-    assert.equal(await page.locator(".ps-kicker").first().innerText(), "POLÍTICA · RODADA 3");
-    assert.equal(await page.locator(".ps-hint").first().innerText(), "Ainda há confrontos que você não viu.");
-    assert.equal(await page.locator(".ps-cta-note").innerText(), "Sua escolha só é registrada quando você confirmar.");
-    assert.equal(await page.locator("#ps-action").getAttribute("data-action"), "next-round");
-    assert.equal(new URL(page.url()).search, "", "a capa não põe pesquisa no endereço");
-    // "Suas escolhas" mostra a escolhida da última rodada respondida, não a da primeira.
-    const picks = page.locator(".ps-home .ps-pick");
-    await picks.first().locator("b", { hasText: politicalName.get(secondRound.championId) }).waitFor();
-    assert.equal(await picks.count(), 4);
-    assert.equal(await picks.first().getAttribute("href"), `./?p=${SURVEY.id}`);
-    assert.equal(await picks.first().locator("img").getAttribute("src"), ARTS.find((art) => art.id === secondRound.championId).src);
-    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas"]);
-    // A capa pergunta ao servidor uma vez por pesquisa respondida, sem pedir
-    // rodada seguinte: abrir a capa não emite rodada.
-    assert.deepEqual(drawBodies(server), [{}, {}, {}, {}]);
-    assert.deepEqual(allRounds(server), [2, 1, 1, 1]);
-
-    // O toque abre a rodada 3, e só então o servidor a emite.
-    let before = server.requests.length;
-    await page.locator("#ps-action").click();
-    await waitStep(page, "Rodada 3 · Tela 1 de 4");
-    assert.deepEqual(drawBodies(server, before), [{ next: true }]);
+    await feedReady(page);
+    const firsts = PHOTO_SURVEYS.map((survey) => nameOfCard.get(server.profileView(GOOGLE_KEY).firstPlaces.find((entry) => entry.surveyId === survey.id).cardId));
+    assert.deepEqual(await feedCards(page), PHOTO_SURVEYS.map((survey, index) => ({ id: survey.id, go: "Ver meu resultado", first: firsts[index], tag: "Aberta" })));
+    assert.deepEqual(drawBodies(server), [], "a capa não pede sorteio nenhum");
+    assert.deepEqual(server.writes(), []);
     assert.deepEqual(allRounds(server), [3, 1, 1, 1]);
-    assert.equal(new URL(page.url()).search, `?p=${SURVEY.id}`);
-    assert.equal(await page.locator(".ps-kicker").first().innerText(), "POLÍTICA · RODADA 3");
-
-    // Voltar à capa sem tocar em carta: a rodada emitida continua à espera,
-    // como "Mais uma rodada", e "Suas escolhas" segue na última respondida.
-    before = server.requests.length;
-    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
-    await entryReady(page, "Mais uma rodada");
-    assert.equal(await page.locator(".ps-kicker").first().innerText(), "POLÍTICA · RODADA 3");
-    await picks.first().locator("b", { hasText: politicalName.get(secondRound.championId) }).waitFor();
-    assert.deepEqual(drawBodies(server, before), [{}, {}, {}, {}]);
-    assert.deepEqual(allRounds(server), [3, 1, 1, 1], "a capa não emite outra rodada");
-    // O toque devolve a mesma rodada, com as mesmas cartas.
+    // O cartão abre o resultado: a rodada emitida e não tocada não vira voto sem toque.
+    await page.locator(`.ps-feed-card[data-survey="${SURVEY.id}"]`).click();
+    await resultShown(page);
+    assert.equal(await page.locator("#ps-title").innerText(), firsts[0]);
+    assert.match(await page.locator(".ps-hint").first().innerText(), /2 rodadas respondidas\./);
+    assert.deepEqual(drawBodies(server), [{}]);
+    // "Continuar votando" abre a rodada 3 que já existia, sem emitir outra.
     const third = server.roundsOf(GOOGLE_KEY, SURVEY)[2].shownIds;
-    await page.locator("#ps-action").click();
+    await page.locator('[data-action="continue"]').click();
     await waitStep(page, "Rodada 3 · Tela 1 de 4");
     await page.locator('.ps-grid[data-ready="true"]').waitFor();
     assert.deepEqual(await page.locator(".ps-grid button[data-card]").evaluateAll((cards) => cards.map((card) => card.dataset.card)), third.slice(0, 4));
     assert.deepEqual(allRounds(server), [3, 1, 1, 1]);
-
-    // Com uma carta escolhida, a rodada ficou pela metade: a capa oferece continuar.
-    await tapCard(page, 1);
-    await waitStep(page, "Rodada 3 · Tela 2 de 4");
-    before = server.requests.length;
-    await page.goto(appUrl, { waitUntil: "domcontentloaded" });
-    await entryReady(page, "Continuar");
-    assert.equal(await page.locator("#ps-title").innerText(), "Quem você prefere?");
-    assert.match(await page.locator(".ps-hint").first().innerText(), /Você parou no meio/);
-    await picks.first().locator("b", { hasText: politicalName.get(secondRound.championId) }).waitFor();
-    assert.equal(await picks.count(), 4, "a pesquisa com a rodada pela metade continua em Suas escolhas");
-    before = server.requests.length;
-    await page.locator("#ps-action").click();
-    await waitStep(page, "Rodada 3 · Tela 2 de 4");
-    assert.deepEqual(drawBodies(server, before), [{}], "continuar não pede rodada seguinte");
-    assert.deepEqual(allRounds(server), [3, 1, 1, 1]);
     assert.equal(server.count("POST", "/response"), 0);
   });
 
-  await scenario("a ordem do destaque com rodadas: sem resposta, depois com rodada por jogar, depois nenhuma", async () => {
-    // Uma pesquisa ainda sem resposta vem antes de outra rodada das respondidas.
-    const partial = createServer();
-    for (const survey of [SURVEY, SECOND, CELEBRITIES]) partial.answered(GOOGLE_KEY, survey);
-    const some = [SURVEY, SECOND, CELEBRITIES].reduce((text, survey) => savedProgressText(text, survey.id, { identity: identityTag(GOOGLE_KEY), answered: true }), "");
-    const first = await open(await newContext(partial, { storedKey: GOOGLE_KEY, storedProgress: some }));
-    await entryReady(first, "Começar");
-    assert.equal(await first.locator("#ps-title").innerText(), "Qual você usaria?");
-    assert.equal(await first.locator(".ps-kicker").first().innerText(), "ROUPAS · 16 CARTAS");
-    assert.equal(await first.locator(".ps-hint").first().innerText(), "Leva menos de um minuto.");
-    await first.locator(".ps-home .ps-pick img").first().waitFor();
-    assert.equal(partial.roundsOf(GOOGLE_KEY, CLOTHES).length, 0, "a capa não emite sorteio da pesquisa por responder");
-
-    // Vistos todos os confrontos da primeira, o destaque passa para a seguinte.
-    const later = createServer();
-    for (const survey of PHOTO_SURVEYS) later.answered(GOOGLE_KEY, survey);
-    const total = later.exhaust(GOOGLE_KEY, SURVEY).length;
-    assert.ok(total >= 2, `a primeira pesquisa fechou em ${total} rodadas`);
-    const second = await open(await newContext(later, { storedKey: GOOGLE_KEY, storedProgress: allAnswered() }));
-    await entryReady(second, "Mais uma rodada");
-    assert.equal(await second.locator("#ps-title").innerText(), "Em quem você confia mais?");
-    assert.equal(await second.locator(".ps-kicker").first().innerText(), "POLÍTICA · RODADA 2");
-    assert.equal(await second.locator(".ps-home .ps-pick").count(), 4);
-    // A pesquisa em que não sobra confronto abre na última rodada, sem botão de rodada.
-    await Promise.all([second.waitForURL(surveyUrl(SURVEY)), second.locator(".ps-home .ps-pick").first().click()]);
-    await waitStep(second, "Registrada");
-    assert.equal(await second.locator(".ps-kicker").first().innerText(), `ESCOLHA REGISTRADA · RODADA ${total}`);
-    assert.equal(await second.locator("#ps-seen").innerText(), "Você viu todos os confrontos desta pesquisa.");
-    assert.equal(await second.locator('[data-action="next-round"]').count(), 0);
-    assert.deepEqual(await second.locator(".ps-stack .ps-btn").allInnerTexts(), ["Compartilhar", "Ver pesquisas"]);
-
-    // Vistos todos os confrontos de todas: a capa diz que a pessoa respondeu todas.
-    const none = createServer();
-    for (const survey of PHOTO_SURVEYS) {
-      none.answered(GOOGLE_KEY, survey);
-      none.exhaust(GOOGLE_KEY, survey);
-    }
-    const third = await open(await newContext(none, { storedKey: GOOGLE_KEY, storedProgress: allAnswered() }));
-    await third.locator("#ps-title", { hasText: "Você respondeu todas as pesquisas abertas." }).waitFor();
-    assert.equal(await third.locator("#ps-action").count(), 0);
-    assert.equal(await third.locator(".ps-hint").first().innerText(), "Quando abrir outra, ela aparece aqui.");
-    await third.locator(".ps-home .ps-pick img").nth(3).waitFor();
-    assert.deepEqual(await third.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas"]);
-    assert.deepEqual(drawBodies(none), [{}, {}, {}, {}]);
-
-    // Uma pesquisa fechada não entra no destaque, mesmo com rodada por jogar.
-    const closed = createServer();
-    for (const survey of PHOTO_SURVEYS) closed.answered(GOOGLE_KEY, survey);
-    closed.closed.add(SURVEY.id);
-    const fourth = await open(await newContext(closed, { storedKey: GOOGLE_KEY, storedProgress: allAnswered() }));
-    await entryReady(fourth, "Mais uma rodada");
-    assert.equal(await fourth.locator("#ps-title").innerText(), "Em quem você confia mais?");
-  });
-
-  await scenario("servidor de antes das rodadas: a capa e a resposta registrada ficam como eram", async () => {
+  await scenario("servidor de antes das rodadas: o feed e a resposta registrada ficam como eram", async () => {
     const server = createServer();
     server.legacy = true;
     for (const survey of PHOTO_SURVEYS) server.answered(GOOGLE_KEY, survey);
     const page = await open(await newContext(server, { storedKey: GOOGLE_KEY, storedProgress: allAnswered() }));
-    // Respondidas as quatro, a capa diz isso e mostra as quatro escolhas.
-    await page.locator("#ps-title", { hasText: "Você respondeu todas as pesquisas abertas." }).waitFor();
-    assert.equal(await page.locator("#ps-action").count(), 0);
-    assert.equal(await page.locator(".ps-note").count(), 0, "sem pesquisa em destaque não há observação");
-    await page.locator(".ps-home .ps-pick img").nth(3).waitFor();
-    assert.deepEqual(await page.locator(".ps-home .ps-label").allInnerTexts(), ["Suas escolhas"]);
-    assert.doesNotMatch(await page.locator(".ps-main").innerText(), /Mais uma rodada|Rodada|confrontos/);
+    await feedReady(page);
+    assert.deepEqual((await feedCards(page)).map(({ go }) => go), PHOTO_SURVEYS.map(() => "Ver meu resultado"));
     // A resposta registrada: os dois botões e o texto de antes das rodadas.
-    await page.locator(".ps-home .ps-pick").first().click();
+    await page.locator(".ps-feed-card").first().click();
     await waitStep(page, "Registrada");
     assert.equal(await page.locator(".ps-kicker").first().innerText(), "ESCOLHA REGISTRADA");
     assert.equal(await page.locator(".ps-hint").first().innerText(), "Obrigado por participar. Sua resposta está registrada e não pode ser trocada nesta pesquisa.");
-    assert.equal(await page.locator('[data-action="next-round"], #ps-seen, .ps-pair').count(), 0);
+    assert.equal(await page.locator('[data-action="next-round"], [data-action="continue"], [data-action="result"], #ps-seen, .ps-pair').count(), 0);
     assert.deepEqual(await page.locator(".ps-stack--pair .ps-btn").allInnerTexts(), ["Compartilhar", "Ver pesquisas"]);
     assert.equal(await page.locator('[data-action="share"]').evaluate((button) => button.classList.contains("ps-btn--ghost")), false, "sem outra rodada, compartilhar é o botão principal");
     assert.ok(drawBodies(server).every((body) => JSON.stringify(body) === "{}"), "nenhum pedido leva campo novo");
+    assert.equal(server.count("GET", "/result"), 0);
+  });
+
+  // Meu perfil e perfil público (ICM 76, #354) --------------------------------
+  const MY_PROFILE_URL = new URL("meu-perfil.html", appUrl).href;
+  const profileUrl = (handle) => new URL(`perfil.html?u=${encodeURIComponent(handle)}`, appUrl).href;
+  const profileWrites = (server) => server.requests.filter((request) => request.pathname === "/api/me/profile" && request.method === "PUT").map((request) => request.body);
+  const marks = (page) => page.locator('input[name="survey"]').evaluateAll((inputs) => inputs.filter((input) => input.checked).map((input) => input.value));
+  const profileTitle = (page) => page.locator("#ps-title").innerText();
+  const profileNotice = (page) => page.locator("#pf-notice:not([hidden])");
+  async function publicProfile(server, handle, size = {}) {
+    const page = await open(await newContext(server, size), profileUrl(handle));
+    await page.waitForFunction(() => !/Carregando/.test(document.querySelector("#ps-title")?.textContent || ""), null, { timeout: 15000 });
+    return page;
+  }
+
+  await scenario("Meu perfil: nasce desligado; ligar pede nome válido e livre e o aceite; o perfil público mostra só as pesquisas marcadas e respondidas; desligar some na hora", async () => {
+    const server = createServer();
+    server.answered(GOOGLE_KEY, SURVEY);
+    server.answered(GOOGLE_KEY, CELEBRITIES);
+    const context = await newContext(server, { storedKey: GOOGLE_KEY });
+    await context.addInitScript(() => {
+      Object.defineProperty(Navigator.prototype, "clipboard", { configurable: true, get: () => ({ writeText: async (text) => { window.__copied = text; } }) });
+    });
+    const page = await open(context, MY_PROFILE_URL);
+    await page.locator("#pf-form").waitFor();
+    assert.equal(await profileTitle(page), "Seu perfil está desligado");
+    assert.equal(await page.title(), "Meu perfil — PoliMatch");
+    assert.equal(await page.locator('meta[name="robots"]').getAttribute("content"), "noindex");
+    assert.deepEqual(server.writes(), [], "abrir Meu perfil não grava nada");
+    // Nenhuma pesquisa marcada; o aceite por extenso; a primeira colocada de quem respondeu.
+    assert.equal(await page.locator('input[name="survey"]').count(), PHOTO_SURVEYS.length);
+    assert.deepEqual(await marks(page), []);
+    assert.equal(await page.locator(".ps-check span").innerText(), PROFILE_CONSENT_TEXT);
+    assert.equal(await page.locator("#pf-consent").isChecked(), false);
+    const firstPolitics = nameOfCard.get(server.profileView(GOOGLE_KEY).firstPlaces.find((entry) => entry.surveyId === SURVEY.id).cardId);
+    assert.match(await page.locator(".ps-mark").first().innerText(), new RegExp(`Seu 1º lugar: ${firstPolitics}`));
+    assert.match(await page.locator(".ps-mark").nth(1).innerText(), /Você ainda não respondeu/);
+    await openMenu(page);
+    assert.equal(await menu(page).locator('a[aria-current="page"] span').innerText(), "Meu perfil");
+    await page.keyboard.press("Escape");
+
+    // Sem aceite: nada vai ao servidor.
+    await page.locator("#pf-handle").fill("Bia_Teste");
+    await page.locator(`input[name="survey"][value="${SURVEY.id}"]`).check();
+    await page.locator(`input[name="survey"][value="${SECOND.id}"]`).check();
+    await page.getByRole("button", { name: "Ligar meu perfil" }).click();
+    await profileNotice(page).waitFor();
+    assert.equal(await profileNotice(page).innerText(), "Para ligar o perfil, marque o aceite.");
+    assert.equal(await page.evaluate(() => document.activeElement?.id), "pf-consent");
+    assert.deepEqual(profileWrites(server), [], "sem aceite, nada é gravado");
+    // Nome que não vale: nada vai ao servidor.
+    await page.locator("#pf-consent").check();
+    await page.locator("#pf-handle").fill("ab");
+    await page.getByRole("button", { name: "Ligar meu perfil" }).click();
+    await page.locator("#pf-notice:not([hidden])", { hasText: "nome de perfil com 3 a 20" }).waitFor();
+    assert.equal(await page.evaluate(() => document.activeElement?.id), "pf-handle");
+    assert.deepEqual(profileWrites(server), []);
+    // Nome em uso por outra conta: o aviso, e as marcações continuam.
+    server.profiles.set(`pms_${"o".repeat(43)}`, { handle: "bia_teste", enabled: true, consentVersion: PROFILE_CONSENT_VERSION, consentedAt: new Date().toISOString(), surveys: [] });
+    await page.locator("#pf-handle").fill("Bia_Teste");
+    await page.getByRole("button", { name: "Ligar meu perfil" }).click();
+    await page.locator("#pf-notice:not([hidden])", { hasText: "já está em uso" }).waitFor();
+    assert.equal(await profileNotice(page).innerText(), "Esse nome de perfil já está em uso. Escolha outro.");
+    assert.equal(await page.evaluate(() => document.activeElement?.id), "pf-handle");
+    assert.deepEqual(await marks(page), [SURVEY.id, SECOND.id]);
+    assert.equal(await page.locator("#pf-consent").isChecked(), true);
+    // Nome livre: liga.
+    await page.locator("#pf-handle").fill("bia_ok");
+    await page.getByRole("button", { name: "Ligar meu perfil" }).click();
+    await page.locator("#ps-title", { hasText: "Seu perfil está ligado" }).waitFor();
+    assert.deepEqual(profileWrites(server).at(-1), { enabled: true, handle: "bia_ok", surveys: [SURVEY.id, SECOND.id], consentVersion: PROFILE_CONSENT_VERSION });
+    assert.equal(await page.locator("#pf-done").innerText(), "Perfil ligado.");
+    assert.equal(await page.locator("#pf-link").innerText(), "https://polimatch.com.br/perfil.html?u=bia_ok");
+    await page.getByRole("button", { name: "Copiar link" }).click();
+    await page.locator("#pf-copied", { hasText: "Link copiado." }).waitFor();
+    assert.equal(await page.evaluate(() => window.__copied), "https://polimatch.com.br/perfil.html?u=bia_ok");
+    assert.equal(await page.getByRole("link", { name: "Ver como os outros veem" }).getAttribute("href"), "./perfil.html?u=bia_ok");
+
+    // O perfil público, sem conta: a pesquisa marcada e respondida; a marcada
+    // sem resposta e a respondida sem marca não aparecem.
+    const visitorServer = server;
+    const before = visitorServer.requests.length;
+    const visitor = await publicProfile(visitorServer, "Bia_OK");
+    assert.equal(await profileTitle(visitor), "bia_ok");
+    assert.equal(await visitor.locator('meta[name="robots"]').getAttribute("content"), "noindex");
+    assert.deepEqual(await visitor.locator(".ps-profile-grid small").allInnerTexts(), ["Política"]);
+    assert.equal(await visitor.locator(".ps-profile-grid [role=img]").getAttribute("aria-label"), firstPolitics);
+    const lookup = visitorServer.requests.slice(before).find((request) => request.pathname.startsWith("/api/profiles/"));
+    assert.equal(lookup.pathname, "/api/profiles/bia_ok");
+    assert.equal(lookup.key, "", "o perfil público não leva sessão");
+    assert.equal(await visitor.getByRole("link", { name: "Responder as pesquisas" }).getAttribute("href"), "./");
+    assert.doesNotMatch(await visitor.locator("main").innerText(), /Bia|@|CPF|Google/, "nada além do nome de perfil e das cartas");
+
+    // Mudar as marcações: tira a de política e põe a de famosos.
+    await page.locator(`input[name="survey"][value="${SURVEY.id}"]`).uncheck();
+    await page.locator(`input[name="survey"][value="${CELEBRITIES.id}"]`).check();
+    await page.getByRole("button", { name: "Salvar marcações" }).click();
+    await page.locator("#pf-done", { hasText: "Marcações salvas." }).waitFor();
+    assert.deepEqual(profileWrites(server).at(-1), { enabled: true, handle: "bia_ok", surveys: [SECOND.id, CELEBRITIES.id], consentVersion: PROFILE_CONSENT_VERSION });
+    await visitor.reload({ waitUntil: "domcontentloaded" });
+    await visitor.locator(".ps-profile-grid").waitFor();
+    assert.deepEqual(await visitor.locator(".ps-profile-grid small").allInnerTexts(), ["Famosos"]);
+
+    // Desligar: some na hora, com a mesma mensagem de um nome que não existe.
+    await page.getByRole("button", { name: "Desligar" }).click();
+    await page.locator("#ps-title", { hasText: "Seu perfil está desligado" }).waitFor();
+    assert.deepEqual(profileWrites(server).at(-1), { enabled: false });
+    assert.match(await page.locator("#pf-done").innerText(), /Perfil desligado/);
+    assert.deepEqual(await marks(page), [SECOND.id, CELEBRITIES.id], "as marcações ficam guardadas");
+    await visitor.reload({ waitUntil: "domcontentloaded" });
+    await visitor.locator("#ps-title", { hasText: "Perfil não encontrado." }).waitFor();
+    assert.equal(await visitor.locator(".ps-profile-grid").count(), 0);
+    const nobody = await publicProfile(server, "ninguem_aqui");
+    assert.equal(await profileTitle(nobody), "Perfil não encontrado.");
+    assert.equal(await nobody.locator(".ps-hint").innerText(), await visitor.locator(".ps-hint").innerText(), "desligado e inexistente têm a mesma mensagem");
+    // Nome que não vale nem é pedido ao servidor.
+    const requests = server.requests.length;
+    const reserved = await publicProfile(server, "admin");
+    assert.equal(await profileTitle(reserved), "Perfil não encontrado.");
+    assert.equal(server.requests.slice(requests).filter((request) => request.pathname.startsWith("/api/profiles/")).length, 0);
+  });
+
+  await scenario("Meu perfil sem cadastro leva ao cadastro; sem conta, pede para entrar, e o menu não mostra o perfil", async () => {
+    const server = createServer();
+    server.registered.delete(GOOGLE_KEY);
+    const page = await open(await newContext(server, { storedKey: GOOGLE_KEY }), MY_PROFILE_URL);
+    await page.locator("#ps-title", { hasText: "Seu perfil está desligado" }).waitFor();
+    assert.match(await page.locator(".ps-hint").first().innerText(), /falta o cadastro com CPF/);
+    assert.equal(await page.getByRole("link", { name: "Fazer o cadastro" }).getAttribute("href"), `./?p=${SURVEY.id}`);
+    assert.equal(await page.locator("#pf-form").count(), 0);
+
+    // O cadastro sumiu depois de a página abrir: o servidor recusa, e a tela leva ao cadastro.
+    const lost = createServer();
+    const other = await open(await newContext(lost, { storedKey: GOOGLE_KEY }), MY_PROFILE_URL);
+    await other.locator("#pf-form").waitFor();
+    lost.registered.delete(GOOGLE_KEY);
+    await other.locator("#pf-handle").fill("sem_cadastro");
+    await other.locator("#pf-consent").check();
+    await other.getByRole("button", { name: "Ligar meu perfil" }).click();
+    await other.getByRole("link", { name: "Fazer o cadastro" }).waitFor();
+    assert.equal(await other.locator("#pf-notice").innerText(), "Para ligar o perfil, falta o cadastro com CPF.");
+    assert.equal(lost.profiles.size, 0);
+
+    // Sem conta: a página pede para entrar, e o menu não tem "Meu perfil".
+    const visitor = await open(await newContext(createServer()), MY_PROFILE_URL);
+    await visitor.locator("#ps-title", { hasText: "Meu perfil" }).waitFor();
+    await visitor.locator(".ps-hint", { hasText: "Entre com Google pelo menu" }).waitFor();
+    await visitor.locator('main [data-action="menu"]').click();
+    await visitor.locator("dialog.pm-menu[open]").waitFor();
+    assert.equal(await menu(visitor).locator('a[href="./meu-perfil.html"]').count(), 0);
+    // Entrar pelo menu carrega o perfil.
+    await visitor.locator("dialog.pm-menu[open] #e2e-google").click();
+    await visitor.locator("#pf-form").waitFor();
+    assert.equal(await menu(visitor).locator('a[href="./meu-perfil.html"]').count(), 1);
+  });
+
+  await scenario("Meu perfil e o perfil público cabem na largura em 390, 360 e 320 px", async () => {
+    for (const [width, height] of [[390, 844], [360, 640], [320, 568]]) {
+      const server = createServer();
+      for (const survey of PHOTO_SURVEYS) server.answered(GOOGLE_KEY, survey);
+      server.profiles.set(GOOGLE_KEY, { handle: "perfil_largo_de_vint", enabled: false, consentVersion: "", consentedAt: null, surveys: [] });
+      const page = await open(await newContext(server, { storedKey: GOOGLE_KEY, width, height }), MY_PROFILE_URL);
+      await page.locator("#pf-form").waitFor();
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, `${width}×${height}: Meu perfil rola para o lado`);
+      const button = page.getByRole("button", { name: "Ligar meu perfil" });
+      await button.scrollIntoViewIfNeeded();
+      const box = await button.boundingBox();
+      assert.ok(box.x >= 0 && box.x + box.width <= width + 0.5 && box.height >= 44, `${width}×${height}: o botão de ligar`);
+      server.profiles.set(GOOGLE_KEY, { handle: "perfil_largo_de_vint", enabled: true, consentVersion: PROFILE_CONSENT_VERSION, consentedAt: new Date().toISOString(), surveys: PHOTO_SURVEYS.map((survey) => survey.id) });
+      const visitor = await publicProfile(server, "perfil_largo_de_vint", { width, height });
+      assert.equal(await visitor.locator(".ps-profile-grid li").count(), PHOTO_SURVEYS.length);
+      assert.equal(await visitor.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, `${width}×${height}: o perfil público rola para o lado`);
+    }
   });
 
   assert.deepEqual(pageErrors, [], `erros de página: ${pageErrors.join(" | ")}`);

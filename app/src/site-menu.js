@@ -61,8 +61,9 @@ function accountMarkup({ account, googleReady, busy, error }) {
 
 /**
  * A marcação do painel. `account` é o resultado de `accountKind`; `current`
- * diz onde a pessoa está: `"home"`, `"how"`, `"credits"` ou o código de uma
- * pesquisa. `surveys` são as pesquisas, na ordem da capa; cada uma tem
+ * diz onde a pessoa está: `"home"`, `"how"`, `"credits"`, `"profile"` ou o
+ * código de uma pesquisa. "Meu perfil" (ICM 76, #354) só aparece com conta
+ * Google. `surveys` são as pesquisas, na ordem da capa; cada uma tem
  * endereço próprio. `upcoming` são os anúncios das próximas pesquisas.
  */
 export function menuMarkup({ account = "none", googleReady = false, busy = false, error = "", current = "", surveys = PHOTO_SURVEYS, upcoming = UPCOMING_SURVEYS } = {}) {
@@ -75,6 +76,7 @@ export function menuMarkup({ account = "none", googleReady = false, busy = false
     ${surveyLinks}${upcomingMarkup(upcoming)}
     <p class="pm-group">PoliMatch</p>
     <a class="pm-item" href="./"${here("home")}><span>Início</span><i aria-hidden="true">›</i></a>
+    ${account === "google" ? `<a class="pm-item" href="./meu-perfil.html"${here("profile")}><span>Meu perfil</span><i aria-hidden="true">›</i></a>` : ""}
     <a class="pm-item" href="./como-funciona.html"${here("how")}><span>Como funciona</span><i aria-hidden="true">›</i></a>
     <a class="pm-item" href="./creditos.html"${here("credits")}><span>Créditos das fotos</span><i aria-hidden="true">›</i></a>
     ${accountMarkup({ account, googleReady, busy, error })}`;

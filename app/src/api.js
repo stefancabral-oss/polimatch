@@ -234,6 +234,41 @@ export function respondPhotoSurvey(surveyId, recoveryKey, { answerId, pickIds, c
   return gameRequest(photoSurveyPath(surveyId, "/response"), recoveryKey, Number.isInteger(round) && round >= 1 ? { ...body, round } : body);
 }
 
+// Resultado da pessoa, feed e perfil (ICM 76, #354). Ler o resultado e o perfil
+// não grava nada; só `saveMyProfile` grava, e só no toque.
+const authorized = (sessionToken) => ({ Authorization: `Bearer ${sessionToken}` });
+
+/** O resultado prévio da própria pessoa numa pesquisa: as cartas dela em ordem de pontos. */
+export function loadPhotoSurveyResult(surveyId, sessionToken) {
+  return requestJson(photoSurveyPath(surveyId, "/result"), { headers: authorized(sessionToken) });
+}
+
+/** O perfil da conta: ligado ou não, o nome, as marcações e a primeira colocada de cada pesquisa. */
+export function loadMyProfile(sessionToken) {
+  return requestJson("/api/me/profile", { headers: authorized(sessionToken) });
+}
+
+/**
+ * Liga, desliga ou muda as marcações do perfil. Só vão os campos do contrato:
+ * `enabled` sempre; `handle`, `surveys` e `consentVersion` quando vierem.
+ */
+export function saveMyProfile(sessionToken, { enabled, handle, surveys, consentVersion } = {}) {
+  const body = { enabled: enabled === true };
+  if (typeof handle === "string") body.handle = handle;
+  if (Array.isArray(surveys)) body.surveys = surveys.filter((id) => typeof id === "string");
+  if (typeof consentVersion === "string" && consentVersion) body.consentVersion = consentVersion;
+  return requestJson("/api/me/profile", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...authorized(sessionToken) },
+    body: JSON.stringify(body),
+  });
+}
+
+/** O perfil público de um nome de perfil. Sem sessão: qualquer um com o link lê. */
+export function loadPublicProfile(handle) {
+  return requestJson(`/api/profiles/${encodeURIComponent(handle)}`);
+}
+
 // Cadastro com CPF (ICM 71, #336). O CPF só viaja neste pedido, no corpo:
 // nunca no endereço e nunca para o armazenamento do aparelho.
 export function registerCpf(sessionToken, body) {

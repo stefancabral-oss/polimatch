@@ -133,10 +133,11 @@ test("robots.txt and sitemap.xml describe the public pages at the canonical orig
   const inputs = [...viteConfig.match(/input:\s*\{([^}]*)\}/)[1].matchAll(/"([^"]+\.html)"/g)].map(([, name]) => name);
   // Desde a ICM 69 (#331) o build tem a capa, que é a pesquisa, e "Como
   // funciona"; desde a ICM 74 (#348), também "Créditos das fotos". Nenhuma
-  // das três fica escondida.
-  assert.deepEqual(inputs, ["index.html", "como-funciona.html", "creditos.html"]);
+  // das três fica escondida. Desde a ICM 76 (#354) há "Meu perfil" e o perfil
+  // público, que pedem para não ser indexados e ficam fora do sitemap.
+  assert.deepEqual(inputs, ["index.html", "como-funciona.html", "creditos.html", "meu-perfil.html", "perfil.html"]);
   const hidden = inputs.filter((name) => /<meta name="robots" content="noindex">/.test(read(`../${name}`)));
-  assert.deepEqual(hidden, []);
+  assert.deepEqual(hidden, ["meu-perfil.html", "perfil.html"]);
   const expected = inputs
     .filter((name) => !hidden.includes(name))
     .map((name) => `https://polimatch.com.br/${name === "index.html" ? "" : name}`)

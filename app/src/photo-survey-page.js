@@ -7,12 +7,13 @@ import ARTS from "./political-chromas.json" with { type: "json" };
 import { PHOTO_SURVEYS, photoSurveyById } from "../../shared/photo-survey.js";
 import { formatCpf } from "../../shared/registration.js";
 import { signInWithGoogleCredential } from "./account-session.js";
-import { drawPhotoSurvey, loadPhotoSurvey, registerCpf, respondPhotoSurvey } from "./api.js";
+import { drawPhotoSurvey, loadMyProfile, loadPhotoSurvey, loadPhotoSurveyResult, registerCpf, respondPhotoSurvey } from "./api.js";
 import { googleClientId, mountGoogleButton } from "./google-login.js";
 import { safeStorage } from "./safe-storage.js";
 import {
   NO_ROUNDS,
   PHOTO_SURVEY_STORAGE_KEY,
+  afterConfirm,
   answeredElsewhere,
   answeredSurveyIds,
   chooseChampion,
@@ -21,7 +22,8 @@ import {
   finalTitleFor,
   goBack,
   identityTag,
-  inProgressSurveyId,
+  inProgressSurveyIds,
+  nextRoundNumber,
   nextSurveyId,
   pickCard,
   progressView,
@@ -29,6 +31,8 @@ import {
   registeredCopy,
   responseBody,
   restoreProgress,
+  resultOnOpen,
+  resultSummary,
   roundState,
   sameGroups,
   sampleCards,
@@ -44,7 +48,8 @@ import {
   registrationRefusal,
   signInMarkup,
 } from "./registration-view.js";
-import { shareChoice, shareImage, sharePlan, sharePreviewMarkup } from "./share-choice.js";
+import { feedEntries, profileState } from "./profile-view.js";
+import { CHOICE_LABELS, RESULT_LABELS, shareChoice, shareImage, sharePlan, sharePreviewMarkup } from "./share-choice.js";
 import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingSectionMarkup } from "./site-menu.js";
 
 // Pesquisa por foto (ICM 68, #324), que desde a ICM 69 (#331) é a capa do
@@ -68,10 +73,20 @@ import { accountKind, menuButtonMarkup, mountSiteMenu, upcomingSectionMarkup } f
 // que ela ainda não viu. Quem monta cada rodada e diz se cabe outra é o
 // servidor. Um servidor de antes das rodadas não diz nada disso, e as telas
 // ficam como eram.
+//
+// Desde a ICM 76 (#354, decisão 0008) as rodadas seguem sem perguntar: ao
+// confirmar, a tela diz "Rodada registrada" e a seguinte abre sozinha
+// (sorteio com `next: true`), enquanto houver confronto por ver e a pesquisa
+// estiver aberta; senão, a tela vai para o resultado da pessoa. Abrir a página
+// de uma pesquisa já respondida, sem toque, mostra o resultado com "Continuar
+// votando": abrir a página nunca emite rodada. Quem entrou com Google vê na
+// capa o feed das pesquisas, que só lê (as pesquisas e o perfil da conta).
 
 const IDENTITY_KEY = "polimatch:v3:recovery-key";
 const GRID_SIZES = "(max-width: 440px) 45vw, 198px";
 const ADVANCE_MS = 220;
+// Quanto tempo, no mínimo, o aviso "Rodada registrada" fica na tela.
+const REGISTERED_MS = 900;
 const GRID_TIMEOUT_MS = 12000;
 
 const root = document.querySelector("#photo-survey");
@@ -85,19 +100,14 @@ let surveyId = "";
 let definition = PHOTO_SURVEYS[0];
 // A capa: o endereço sem `?p=`. Abaixo da entrada vêm as listas de pesquisas.
 let atHome = false;
-// O que a capa leu: as visões públicas das pesquisas e, para as que esta
-// identidade já respondeu, a resposta (null enquanto não chega).
+// O que a capa leu: as visões públicas das pesquisas.
 let homeViews = [];
-const homeChoices = new Map();
 // A identidade com que a capa foi montada.
 let homeKey = "";
-// O destaque da capa: "resume" é a pesquisa que a pessoa deixou pela metade
-// neste aparelho; "start", uma aberta que ela ainda não respondeu; "more", uma
-// respondida em que ainda há rodada por jogar, e `homeRound` é o número dela.
+// O destaque da capa de quem não entrou: "start", a primeira aberta; "" sem
+// nenhuma. Desde a ICM 76 (#354) quem entrou vê o feed, e os destaques de
+// quem tinha resposta ("resume", "more") saíram da capa.
 let homeMode = "";
-let homeRound = 0;
-// O que o servidor disse das rodadas de cada pesquisa que a capa consultou.
-const homeRounds = new Map();
 // O leque da entrada é sorteado uma vez por pesquisa e por visita.
 const fans = new Map();
 
@@ -119,6 +129,10 @@ let response = null;
 // o número da rodada na tela, o progresso da pessoa e a última rodada que ela
 // respondeu. NO_ROUNDS quando ele não disse nada.
 let rounds = NO_ROUNDS;
+// O resultado da pessoa na tela (ICM 76, #354): o que `GET …/result` devolveu,
+// ou null enquanto não chega; `resultFailed` quando a leitura falhou.
+let resultData = null;
+let resultFailed = false;
 let view = "loading";
 let notice = "";
 let busy = false;
@@ -199,6 +213,12 @@ function forgetSaved() {
 function hasSavedPicks() {
   const saved = savedRecord();
   return Boolean(saved && saved.identity === identityTag(identity) && Array.isArray(saved.progress?.picks) && saved.progress.picks.some(Boolean));
+}
+
+/** Há escolha desta identidade guardada para este mesmo sorteio. */
+function hasSavedPicksFor(groups) {
+  const saved = savedRecord();
+  return hasSavedPicks() && sameGroups(saved.progress.groups, groups);
 }
 
 /** Quem já começou nesta identidade tem sorteio emitido: retomar não grava nada novo. */
@@ -307,23 +327,14 @@ function surveyRow(view) {
   return `<a class="ps-survey" href="${surveyHref(view.id)}"><span class="ps-survey-text"><b>${escapeText(title)}</b><small>${escapeText(topic)} · ${count(view.drawSize, base.drawSize)} cartas</small></span><em class="pm-tag${modifier}">${tag}</em></a>`;
 }
 
-function choiceRow(id) {
-  const base = photoSurveyById(id);
-  const answer = homeChoices.get(id);
-  const champion = artById.has(answer?.championId) ? answer.championId : "";
-  return `<a class="ps-pick" href="${surveyHref(id)}" data-survey="${escapeText(id)}">${champion ? staticCard(champion, "44px") : '<span class="ps-card" aria-hidden="true"></span>'}<span class="ps-survey-text"><small>${escapeText(base.subject)} · ${escapeText(base.question)}</small><b>${champion ? escapeText(cardName(champion)) : "Ver a sua escolha"}</b></span><i aria-hidden="true">›</i></a>`;
-}
-
 /**
- * As listas da capa: o que a pessoa já escolheu, as outras pesquisas e, quando
- * há anúncio, as que vêm. Cada bloco só sai se tem o que mostrar; sem nenhum,
- * o texto é vazio e a área das listas some (`.ps-home:empty`).
+ * As listas da capa de quem não entrou: as outras pesquisas e, quando há
+ * anúncio, as que vêm. Cada bloco só sai se tem o que mostrar; sem nenhum, o
+ * texto é vazio e a área das listas some (`.ps-home:empty`).
  */
 function homeSections() {
-  const chosen = homeViews.filter((view) => homeChoices.has(view.id));
-  const others = homeViews.filter((view) => view.id !== surveyId && !homeChoices.has(view.id));
+  const others = homeViews.filter((view) => view.id !== surveyId);
   return [
-    chosen.length ? `<p class="ps-label ps-home-label">Suas escolhas</p>${chosen.map((view) => choiceRow(view.id)).join("")}` : "",
     others.length ? `<p class="ps-label ps-home-label">Mais pesquisas</p>${others.map(surveyRow).join("")}` : "",
     upcomingSectionMarkup(),
   ].join("");
@@ -333,21 +344,19 @@ function homeSections() {
 // capa, e na capa com uma pesquisa por responder, vale o convite de sempre.
 const ENTRY_COPY = Object.freeze({
   resume: Object.freeze({ label: "Continuar", hint: "Você parou no meio. Continue de onde parou.", action: "start" }),
-  more: Object.freeze({ label: "Mais uma rodada", hint: "Ainda há confrontos que você não viu.", action: "next-round" }),
   start: Object.freeze({ label: "Começar", hint: "Leva menos de um minuto.", action: "start" }),
 });
 
 /**
  * A entrada de uma pesquisa. Na capa ela é a da pesquisa em destaque e leva
  * as listas embaixo; sem destaque (tudo respondido, ou nada aberto), só o
- * título e as listas. Quando o destaque é uma pesquisa com rodada por jogar,
- * o botão é "Mais uma rodada" e o rótulo de cima diz o número da rodada.
+ * título e as listas.
  */
 function renderEntry({ pending = "", action = "", label = "", focus = false } = {}) {
   const mode = atHome && Object.hasOwn(ENTRY_COPY, homeMode) ? homeMode : "start";
   const copy = ENTRY_COPY[mode];
   const featured = surveyId
-    ? `${heading(mode === "more" ? roundKicker(homeRound) : kicker(), question(), copy.hint, surveyNote(), hasPhotoCredits())}
+    ? `${heading(kicker(), question(), copy.hint, surveyNote(), hasPhotoCredits())}
       <div class="ps-fan" aria-hidden="true">${entryCards().map((id) => staticCard(id, "176px")).join("")}</div>
       <div class="ps-cta"><button class="ps-btn" id="ps-action" data-action="${action || copy.action}" type="button"${pending ? " disabled" : ""}>${escapeText(pending || label || copy.label)}</button>
         <p class="ps-muted ps-cta-note">${signedIn() ? "Sua escolha só é registrada quando você confirmar." : "Para responder, entre com Google e cadastre o CPF."}</p></div>`
@@ -371,6 +380,11 @@ function renderOpening(hint = "Abrindo de onde você parou…") {
   });
 }
 
+// "Ver meu resultado" (ICM 76, #354): à mão durante o voto, na confirmação e
+// depois de cada rodada, assim que a pessoa tem ao menos uma rodada respondida.
+const RESULT_LINK = '<button class="ps-link ps-result-link" data-action="result" type="button">Ver meu resultado</button>';
+const hasResult = () => Boolean(rounds.lastAnswered) || (rounds.progress?.answeredRounds ?? 0) > 0;
+
 function renderPlay({ focus = false, sending = false } = {}) {
   const current = progressView(progress);
   const total = screens();
@@ -386,7 +400,7 @@ function renderPlay({ focus = false, sending = false } = {}) {
       focus,
       body: `${heading(later ? roundKicker(rounds.round) : kicker(), question(), "Toque em uma carta.")}
         ${choiceGrid(current.cards, current.selectedId)}
-        <div class="ps-foot">${current.screen > 0 ? '<button class="ps-link" data-action="back" type="button">← Voltar</button>' : ""}<span class="ps-muted">${footHint("Dá para voltar e trocar antes de terminar.")}</span></div>`,
+        <div class="ps-foot">${current.screen > 0 ? '<button class="ps-link" data-action="back" type="button">← Voltar</button>' : ""}${hasResult() ? RESULT_LINK : `<span class="ps-muted">${footHint("Dá para voltar e trocar antes de terminar.")}</span>`}</div>`,
     });
     preload(progress.groups[current.screen + 1]);
     return;
@@ -399,7 +413,7 @@ function renderPlay({ focus = false, sending = false } = {}) {
       focus,
       body: `${heading(`As suas ${inWords(total)} escolhas`, finalTitleFor(definition), "Um toque decide.")}
         ${choiceGrid(current.cards, current.selectedId)}
-        <div class="ps-foot"><button class="ps-link" data-action="back" type="button">← Voltar</button><span class="ps-muted">${footHint("Você confirma na próxima tela.")}</span></div>`,
+        <div class="ps-foot"><button class="ps-link" data-action="back" type="button">← Voltar</button>${hasResult() ? RESULT_LINK : `<span class="ps-muted">${footHint("Você confirma na próxima tela.")}</span>`}</div>`,
     });
     return;
   }
@@ -421,31 +435,29 @@ function renderPlay({ focus = false, sending = false } = {}) {
       <div class="ps-row">${current.otherIds.map((id) => staticCard(id, "84px", cardName(id))).join("")}</div>
       <div class="ps-stack ps-stack--pair">
         <button class="ps-btn" data-action="confirm" type="button"${sending ? " disabled" : ""}>${sending ? "Registrando…" : notice ? "Tentar de novo" : "Confirmar minha escolha"}</button>
-        <button class="ps-btn ps-btn--ghost" data-action="back" type="button"${locked ? " disabled" : ""}>Voltar e trocar</button>
+        <button class="ps-btn ps-btn--ghost" data-action="back" type="button"${locked ? " disabled" : ""}>Voltar e trocar</button>${hasResult() && !locked ? RESULT_LINK : ""}
       </div>`,
   });
 }
 
 /**
- * A resposta registrada: a rodada que a pessoa acabou de responder, ou a
- * última respondida. Enquanto há rodada por jogar, o botão principal é "Mais
- * uma rodada" e, abaixo dele, ficam lado a lado o compartilhar e o caminho
- * para as outras pesquisas; o texto conta os confrontos já vistos. Sem rodada
- * por jogar, os botões são os dois de sempre. Sem a resposta na tela (a
- * pessoa saiu da conta, ou o servidor não respondeu) não há o que continuar.
+ * A resposta registrada, como era antes das rodadas contínuas: a escolha, as
+ * finalistas, o compartilhar e o caminho para as outras pesquisas. Desde a
+ * ICM 76 (#354) ela só aparece com um servidor de antes das rodadas, quando a
+ * pessoa sai da conta com a resposta na tela, ou quando o servidor recusa uma
+ * resposta repetida e devolve a que valeu. "Mais uma rodada" saiu daqui: quem
+ * continua votando faz isso pelo resultado.
  */
 function renderDone({ focus = false } = {}) {
   view = "done";
   const picks = Array.isArray(response?.pickIds) ? response.pickIds.filter((id) => artById.has(id)) : [];
   const champion = artById.has(response?.championId) ? response.championId : "";
   const others = picks.filter((id) => id !== champion);
-  const copy = registeredCopy(response ? rounds : NO_ROUNDS, survey?.status);
+  const copy = registeredCopy(NO_ROUNDS, survey?.status);
   const shareButton = (ghost) => (champion
     ? `<button class="ps-btn${ghost ? " ps-btn--ghost" : ""}" data-action="share" type="button" aria-label="Compartilhar minha escolha" aria-busy="true" disabled>Compartilhar</button>`
     : "");
-  const actions = copy.next
-    ? `<div class="ps-stack ps-stack--more"><button class="ps-btn" data-action="next-round" type="button">Mais uma rodada</button><div class="ps-pair">${shareButton(true)}${nextLink()}</div></div>`
-    : `<div class="ps-stack ps-stack--pair">${shareButton(false)}${nextLink()}</div>`;
+  const actions = `<div class="ps-stack ps-stack--pair">${shareButton(false)}${nextLink()}</div>`;
   shell({
     step: "Registrada",
     filled: screens() + 1,
@@ -458,6 +470,113 @@ function renderDone({ focus = false } = {}) {
       ${actions}`,
   });
   prepareShare(champion, others);
+}
+
+/**
+ * O aviso curto depois de confirmar uma rodada (ICM 76, #354): a rodada ficou
+ * registrada e a seguinte está abrindo, sem toque. "Ver meu resultado" fica à
+ * mão enquanto isso.
+ */
+function renderRegistered() {
+  view = "registered";
+  shell({
+    step: "Registrada",
+    filled: screens() + 1,
+    mainClass: "ps-main--play ps-main--registered",
+    focus: true,
+    body: `${heading(roundKicker(rounds.round), "Rodada registrada", "Abrindo a próxima rodada…")}
+      <div class="ps-grid" data-ready="false" aria-hidden="true">${Array.from({ length: groupSize() }, () => '<span class="ps-card"></span>').join("")}</div>
+      <div class="ps-foot">${RESULT_LINK}</div>`,
+  });
+}
+
+/** Dá para seguir votando: a pesquisa está aberta e há rodada pela metade, emitida ou por emitir. */
+const canKeepVoting = () => survey?.status === "open" && (Boolean(progress) || Boolean(nextRoundNumber(rounds, survey.status)));
+
+/**
+ * O resultado prévio da pessoa nesta pesquisa (ICM 76, #354): a primeira
+ * colocada grande, as seguintes em lista (até cinco ao todo), quantas rodadas
+ * e quantos confrontos ela viu, "Continuar votando" quando cabe e
+ * "Compartilhar", com a imagem de sempre: a primeira colocada e as seguintes.
+ */
+function renderResult({ focus = false } = {}) {
+  view = "result";
+  const summary = resultSummary(resultData, rounds, (id) => artById.has(id));
+  const loading = !resultData && !resultFailed;
+  const first = summary.first;
+  const more = canKeepVoting();
+  const title = loading ? "Seu resultado" : first ? cardName(first) : "Ainda sem resultado";
+  const lines = [summary.roundsLine, summary.seenLine].filter(Boolean).join(" ");
+  const hint = loading
+    ? "Carregando…"
+    : first
+      ? `Sua primeira colocada até agora.${lines ? ` ${lines}` : ""}`
+      : resultFailed ? "Não deu para carregar o seu resultado." : "Responda uma rodada para ver a sua primeira colocada.";
+  const shareButton = first
+    ? `<button class="ps-btn${more ? " ps-btn--ghost" : ""}" data-action="share" type="button" aria-label="Compartilhar meu resultado" aria-busy="true" disabled>Compartilhar</button>`
+    : "";
+  const actions = more
+    ? `<div class="ps-stack ps-stack--pair"><button class="ps-btn" data-action="continue" type="button">Continuar votando</button>${shareButton}</div>`
+    : `<div class="ps-stack ps-stack--pair">${shareButton}${nextLink()}</div>`;
+  shell({
+    step: "Resultado",
+    mainClass: "ps-main--summary ps-main--result",
+    focus,
+    body: `${heading(`${subject()} · Seu resultado`, title, hint)}
+      ${first ? `<div class="ps-hero">${staticCard(first, "176px")}</div>` : ""}
+      ${summary.rest.length ? `<p class="ps-label">Depois dela</p><ol class="ps-rank">${summary.rest.map((id, index) => `<li>${staticCard(id, "44px")}<span class="ps-survey-text"><small>${index + 2}º lugar</small><b>${escapeText(cardName(id))}</b></span></li>`).join("")}</ol>` : ""}
+      ${more ? '<p class="ps-more"><a class="ps-link" href="./">Outras pesquisas</a></p>' : ""}
+      ${actions}`,
+  });
+  prepareShare(first, summary.rest.slice(0, 3));
+}
+
+/**
+ * Abre o resultado e lê o ranking da pessoa no servidor. Só lê: nada aqui
+ * grava. O aviso que estiver na tela continua (quem chama decide).
+ */
+async function openResult({ focus = true } = {}) {
+  window.clearTimeout(advanceTimer);
+  const run = ++epoch;
+  busy = false;
+  resultData = null;
+  resultFailed = false;
+  renderResult({ focus });
+  const key = identity || readStored(IDENTITY_KEY);
+  try {
+    const data = await loadPhotoSurveyResult(surveyId, key);
+    if (run !== epoch || view !== "result") return;
+    resultData = data && typeof data === "object" ? data : { answeredRounds: 0, ranking: [] };
+  } catch (error) {
+    if (run !== epoch || view !== "result") return;
+    resultFailed = true;
+    notice = `${error.status === 429 ? "Muitas tentativas agora. Espere um pouco e tente de novo." : "Não conseguimos carregar o seu resultado agora."} ${retryButton("result")}`;
+  }
+  renderResult({ focus });
+}
+
+/** "Ver meu resultado": do voto, da confirmação ou do aviso de rodada registrada. */
+function showResult() {
+  if (!["play", "registered", "result"].includes(view) || (busy && view !== "registered")) return;
+  if (view === "play" && uncertain) return;
+  notice = "";
+  openResult();
+}
+
+/**
+ * "Continuar votando": volta para a rodada que está pela metade, ou pede a
+ * seguinte. Pedir a seguinte com uma rodada emitida e sem resposta devolve
+ * essa mesma: o toque repetido não emite duas.
+ */
+function continueVoting() {
+  if (busy || view !== "result") return;
+  notice = "";
+  if (progress && survey?.status === "open") {
+    view = "play";
+    renderPlay({ focus: true });
+    return;
+  }
+  start({ next: true });
 }
 
 // Compartilhar --------------------------------------------------------------
@@ -478,6 +597,7 @@ let shareRun = 0;
 let sharePreparing = false;
 let shareChampion = "";
 let shareOthers = [];
+let shareLabels = CHOICE_LABELS;
 let sharing = false;
 let sharingTimer = 0;
 // A prévia: a imagem na tela, para baixar, onde o aparelho não compartilha arquivo.
@@ -492,7 +612,7 @@ function prepareShare(champion, others = shareOthers) {
   sharePreparing = Boolean(champion);
   if (!champion) return;
   const art = artById.get(champion);
-  const current = () => run === shareRun && view === "done" && response?.championId === champion;
+  const current = () => run === shareRun && (view === "done" || view === "result") && shareChampion === champion;
   const release = () => {
     const button = root.querySelector('[data-action="share"]');
     if (!current() || !button) return;
@@ -502,10 +622,13 @@ function prepareShare(champion, others = shareOthers) {
   };
   // O prazo é desta preparação: outra tela não o apaga.
   const timer = window.setTimeout(release, SHARE_PREPARE_MS);
+  // No resultado os rótulos falam da primeira colocada e das seguintes.
+  shareLabels = view === "result" ? RESULT_LABELS : CHOICE_LABELS;
   shareImage({
     src: art.src,
     name: art.name,
     question: question(),
+    labels: shareLabels,
     others: others.map((id) => ({ src: artById.get(id).src })),
     photos: [art, ...others.map((id) => artById.get(id))].map((card) => card.photo).filter(Boolean),
   }).then((file) => {
@@ -532,8 +655,8 @@ function lockShare() {
 
 /** Só acontece no toque. Leva as escolhas da pessoa, nunca resultado somado. */
 async function share() {
-  const champion = response?.championId;
-  if (view !== "done" || !artById.has(champion)) return;
+  const champion = shareChampion;
+  if ((view !== "done" && view !== "result") || !artById.has(champion)) return;
   if (sharePlan(navigator, shareFile) === "preview") {
     openSharePreview();
     return;
@@ -544,7 +667,7 @@ async function share() {
   release();
   // O aparelho recusou o arquivo: a imagem continua sendo a entrega. Quem
   // compartilhou ou fechou a folha não vê nada a mais.
-  if (view === "done" && outcome === "failed") openSharePreview();
+  if ((view === "done" || view === "result") && outcome === "failed") openSharePreview();
 }
 
 function sharePreviewOpen() {
@@ -565,13 +688,14 @@ function renderSharePreview() {
     url: sharePreviewUrl,
     name: cardName(shareChampion),
     others: shareOthers.map(cardName),
+    othersLabel: shareLabels === RESULT_LABELS ? "Depois dela" : "Também na final",
     canShareLink: typeof navigator.share === "function",
   });
   sharePreview.focus({ preventScroll: true });
 }
 
 function openSharePreview() {
-  if (!artById.has(response?.championId) || sharePreviewOpen()) return;
+  if (!artById.has(shareChampion) || sharePreviewOpen()) return;
   if (!sharePreview) {
     sharePreview = document.createElement("dialog");
     sharePreview.className = "ps-share";
@@ -621,7 +745,7 @@ function closeSharePreview() {
 
 /** O segundo botão da prévia: o link da pesquisa, pelo aparelho ou copiado. */
 async function shareLink() {
-  const champion = response?.championId;
+  const champion = shareChampion;
   if (sharing || !artById.has(champion)) return;
   const release = lockShare();
   const outcome = await shareChoice({ surveyId, name: cardName(champion), question: question(), file: null });
@@ -722,14 +846,14 @@ function showLastAnswered(text = "") {
   progress = null;
   persist();
   notice = text;
-  renderDone({ focus: true });
+  openResult();
 }
 
 /**
  * O que o sorteio devolveu. `next` diz que a pessoa pediu outra rodada: se o
  * servidor devolveu a última respondida, não havia rodada para abrir.
  */
-function applyDraw(result, { next = false } = {}) {
+function applyDraw(result, { next = false, auto = false } = {}) {
   survey = result?.survey || survey;
   rounds = roundState(result);
   const groups = result?.draw?.groups;
@@ -737,10 +861,12 @@ function applyDraw(result, { next = false } = {}) {
     response = result.response;
     progress = null;
     persist();
-    // Vistos todos os confrontos, a própria tela diz. Com a pesquisa fora da
-    // janela ela não diz por que a rodada não abriu: o aviso diz.
+    // Vistos todos os confrontos, o resultado diz. Com a pesquisa fora da
+    // janela ele não diz por que a rodada não abriu: o aviso diz.
     if (next && survey?.status !== "open") notice = "Esta pesquisa fechou. Não dá para jogar outra rodada.";
-    renderDone({ focus: true });
+    // Um servidor de antes das rodadas não tem resultado: vale a tela de antes.
+    if (rounds.round) openResult();
+    else renderDone({ focus: true });
     return;
   }
   if (survey?.status !== "open") {
@@ -758,6 +884,16 @@ function applyDraw(result, { next = false } = {}) {
   if (!validGroups(groups)) {
     notice = "Atualize a página para abrir esta pesquisa.";
     renderStopped("unavailable", { focus: true });
+    return;
+  }
+  // Abrir uma pesquisa já respondida, sem toque, mostra o resultado, mesmo com
+  // uma rodada emitida e ainda não tocada: só quem já escolheu carta nela
+  // volta direto para o voto. O toque em "Continuar votando" abre essa rodada.
+  if (resultOnOpen(rounds, { auto, hasPicks: hasSavedPicksFor(groups) })) {
+    response = rounds.lastAnswered.response;
+    progress = null;
+    persist();
+    openResult();
     return;
   }
   // As escolhas salvas só voltam se o sorteio for o mesmo, da mesma rodada,
@@ -802,7 +938,7 @@ function renderSwitched({ recorded = false } = {}) {
 
 /** A conta desta aba deixou de ser a que está salva: recomeça com a atual, com um toque. */
 function identityChanged() {
-  const wasDone = view === "done";
+  const wasDone = view === "done" || view === "result" || view === "registered";
   epoch += 1;
   busy = false;
   uncertain = false;
@@ -854,7 +990,8 @@ function recordedBeforeSwitch(key, result) {
     progress = null;
     notice = "";
     persist();
-    renderDone({ focus: true });
+    if (rounds.round) openResult();
+    else renderDone({ focus: true });
     return;
   }
   const saved = savedRecord();
@@ -885,7 +1022,7 @@ function leaveHome() {
  * `next` é o toque em "Mais uma rodada": o pedido de sorteio leva o pedido da
  * rodada seguinte. Só um toque manda `next`; a retomada e a capa, nunca.
  */
-async function start({ auto = false, retried = false, fromGate = false, next = false } = {}) {
+async function start({ auto = false, retried = false, fromGate = false, next = false, hold = 0 } = {}) {
   if (busy || !surveyId) return;
   leaveHome();
   busy = true;
@@ -931,7 +1068,9 @@ async function start({ auto = false, retried = false, fromGate = false, next = f
     return;
   }
   if (fromGate) renderGate();
-  else {
+  else if (hold) {
+    // O aviso "Rodada registrada" já está na tela e fica até o sorteio chegar.
+  } else {
     view = "entry";
     if (next) renderOpening("Abrindo a rodada nova…");
     else if (resumable()) renderOpening();
@@ -939,9 +1078,16 @@ async function start({ auto = false, retried = false, fromGate = false, next = f
   }
   identity = key;
   let result;
+  const startedAt = Date.now();
+  // O aviso de rodada registrada fica ao menos `hold` ms, para dar para ler.
+  const held = async () => {
+    const left = hold - (Date.now() - startedAt);
+    if (left > 0) await new Promise((resolve) => { window.setTimeout(resolve, left); });
+  };
   try {
     result = await drawPhotoSurvey(surveyId, key, { next });
   } catch (error) {
+    await held();
     if (run !== epoch) return;
     busy = false;
     if (error.status === 403 && error.code === "CPF_REGISTRATION_REQUIRED") {
@@ -994,22 +1140,18 @@ async function start({ auto = false, retried = false, fromGate = false, next = f
     else failStart(error);
     return;
   }
+  await held();
   if (run !== epoch) return;
   busy = false;
-  applyDraw(result, { next });
-}
-
-/** O toque em "Mais uma rodada", na resposta registrada ou no destaque da capa. */
-function nextRound() {
-  if (busy || (view !== "done" && view !== "entry")) return;
-  start({ next: true });
+  applyDraw(result, { next, auto });
 }
 
 /**
- * A rodada nova não abriu, e a resposta registrada estava na tela: ela volta,
- * com o motivo. O botão "Mais uma rodada" continua lá para tentar de novo, e
- * repetir o pedido não emite duas rodadas: com uma rodada emitida e sem
- * resposta, o servidor devolve essa.
+ * A rodada nova não abriu (depois de confirmar, ou no toque em "Continuar
+ * votando"): a tela vai para o resultado, com o motivo. "Continuar votando"
+ * fica lá para tentar de novo, e repetir o pedido não emite duas rodadas: com
+ * uma rodada emitida e sem resposta, o servidor devolve essa. Um servidor de
+ * antes das rodadas não chega aqui.
  */
 function failNext(error) {
   if (error.status === 404) {
@@ -1026,7 +1168,8 @@ function failNext(error) {
   } else {
     notice = "Não conseguimos abrir a rodada nova agora. Tente de novo em instantes.";
   }
-  renderDone({ focus: true });
+  if (rounds.round) openResult();
+  else renderDone({ focus: true });
 }
 
 /**
@@ -1067,7 +1210,9 @@ function failStart(error) {
   if (saved?.answered) {
     // Quem já respondeu não volta para a entrada só porque o servidor não respondeu.
     response = null;
-    notice = `${busyServer || "Não conseguimos falar com o servidor para mostrar a sua escolha."} ${retryButton("start")}`;
+    // A nova tentativa refaz a abertura, sem toque de rodada: quem respondeu
+    // vê o resultado, e nenhuma rodada nasce dela.
+    notice = `${busyServer || "Não conseguimos falar com o servidor para mostrar a sua escolha."} ${retryButton("init")}`;
     renderDone({ focus: true });
     return;
   }
@@ -1105,7 +1250,15 @@ async function submit() {
   rounds = roundState(result);
   progress = null;
   persist();
-  renderDone({ focus: true });
+  const after = afterConfirm(response ? rounds : NO_ROUNDS, survey?.status);
+  if (after === "done") renderDone({ focus: true });
+  else if (after === "result") openResult();
+  else {
+    // A rodada seguinte abre sozinha: o aviso fica um instante e o sorteio
+    // pede a rodada seguinte. Foi a pessoa quem confirmou: é o toque dela.
+    renderRegistered();
+    start({ next: true, hold: REGISTERED_MS });
+  }
 }
 
 function failSubmit(error, key) {
@@ -1241,12 +1394,10 @@ const unreachableNotice = (error) => (error.status !== 0
     : "Não conseguimos falar com o servidor agora. Tente de novo em instantes.");
 
 /**
- * A capa. Lê a definição de cada pesquisa (uma leitura por pesquisa, sem
- * identidade) e escolhe o destaque. Só para o que este aparelho sabe
- * respondido, ou para uma pesquisa já fechada, busca a resposta da pessoa:
- * nesses dois casos o pedido de sorteio não grava nada. Esse pedido nunca
- * leva `next`: a capa não emite rodada. É ele que diz também se ainda há
- * rodada por jogar em cada pesquisa respondida.
+ * A capa. Quem entrou com Google vê o feed (ICM 76, #354). Para quem não
+ * entrou, a capa é a de sempre: lê a definição de cada pesquisa (uma leitura
+ * por pesquisa, sem identidade), destaca a primeira aberta e lista as outras.
+ * Nada aqui grava, e a capa nunca emite rodada.
  */
 async function openHome() {
   view = "loading";
@@ -1254,21 +1405,17 @@ async function openHome() {
   survey = null;
   identity = "";
   const key = readStored(IDENTITY_KEY);
+  homeKey = key;
+  homeMode = "";
+  homeViews = [];
   // Só uma conta Google responde. O que este aparelho guardou de uma chave
   // sem conta não vale como "respondida" nem como "pela metade": a capa
   // convida a entrar, em vez de dizer que não há o que responder.
-  const account = accountKind(key) === "google";
-  const tag = identityTag(key);
-  const saved = readStored(PHOTO_SURVEY_STORAGE_KEY);
-  const answered = account ? answeredSurveyIds(saved, tag) : [];
-  const pending = account ? inProgressSurveyId(saved, tag) : "";
-  homeKey = key;
-  homeMode = "";
-  homeRound = 0;
-  homeViews = [];
-  homeChoices.clear();
-  homeRounds.clear();
-  useSurvey(pending || nextSurveyId("", answered) || PHOTO_SURVEYS[0].id);
+  if (accountKind(key) === "google") {
+    openFeed(key);
+    return;
+  }
+  useSurvey(PHOTO_SURVEYS[0].id);
   renderEntry({ pending: "Carregando…" });
   const run = ++epoch;
   const results = await Promise.all(PHOTO_SURVEYS.map((item) => loadPhotoSurvey(item.id).then((value) => ({ value }), (error) => ({ error }))));
@@ -1289,53 +1436,95 @@ async function openHome() {
     renderStopped("unavailable");
     return;
   }
-  for (const id of answered) if (homeViews.some((item) => item.id === id)) homeChoices.set(id, null);
-  const feature = (choice) => {
-    homeMode = choice.mode;
-    homeRound = choice.round;
-    useSurvey(choice.id);
-    survey = homeViews.find((item) => item.id === choice.id) || null;
-    view = "entry";
-    renderEntry();
-  };
-  // O que este aparelho sabe decide na hora: a pesquisa que ficou pela metade,
-  // se ainda estiver aberta, ou a primeira aberta ainda sem resposta.
-  const known = coverFeature(homeViews, { pendingId: pending, answeredIds: answered });
-  // Só uma conta Google pode ter resposta para mostrar: sem ela o servidor recusa.
-  if (known.id || !account) feature(known);
-  if (!account) return;
-  const wanted = homeViews.filter((item) => homeChoices.has(item.id) || item.status === "closed").map((item) => item.id);
-  await Promise.all(wanted.map(async (id) => {
-    try {
-      const result = await drawPhotoSurvey(id, key);
-      // A capa pode ter sido refeita para outra identidade enquanto isto viajava.
-      if (run !== epoch) return;
-      const state = roundState(result);
-      // "Suas escolhas" mostra a última rodada respondida: com uma rodada nova
-      // aberta, a resposta devolvida é vazia e a escolha vem de `lastAnswered`.
-      const chosen = state.lastAnswered?.response || result?.response;
-      if (chosen) homeChoices.set(id, chosen);
-      homeRounds.set(id, state);
-    } catch {
-      // Sem a resposta, a linha fica sem a carta e leva à tela da pesquisa.
-    }
-  }));
+  const choice = coverFeature(homeViews);
+  homeMode = choice.mode;
+  useSurvey(choice.id);
+  survey = homeViews.find((item) => item.id === choice.id) || null;
+  view = "entry";
+  renderEntry();
+}
+
+// Feed (ICM 76, #354) --------------------------------------------------------
+
+// O que o feed leu: o perfil da conta (para a primeira colocada de cada
+// pesquisa) e o que este aparelho sabe de respondidas e de pela metade.
+let feedProfile = null;
+let feedAnswered = [];
+let feedPending = [];
+// A carta que ilustra o cartão de uma pesquisa ainda sem resultado: sorteada
+// uma vez por visita, da lista que pode ilustrar a entrada dela.
+const feedFaces = new Map();
+
+function feedFace(id) {
+  if (!feedFaces.has(id)) feedFaces.set(id, sampleCards(entryCardIdsFor(photoSurveyById(id)).filter((card) => artById.has(card)), 1)[0] || "");
+  return feedFaces.get(id);
+}
+
+// O que vem do servidor (pergunta, assunto) entra sempre escapado.
+function feedCard(entry) {
+  const base = photoSurveyById(entry.id);
+  const remote = homeViews.find((item) => item.id === entry.id) || {};
+  const title = (typeof remote.question === "string" && remote.question) || base.question;
+  const topic = (typeof remote.subject === "string" && remote.subject) || base.subject;
+  const [tag, modifier] = Object.hasOwn(STATUS_TAG, entry.status) ? STATUS_TAG[entry.status] : STATUS_TAG.closed;
+  const face = entry.firstCardId || feedFace(entry.id);
+  return `<a class="ps-feed-card" href="${surveyHref(entry.id)}" data-survey="${escapeText(entry.id)}">${face ? staticCard(face, "84px") : '<span class="ps-card" aria-hidden="true"></span>'}<span class="ps-feed-text"><small><span>${escapeText(topic)}</span><em class="pm-tag${modifier}">${tag}</em></small><b>${escapeText(title)}</b>${entry.firstCardId ? `<span class="ps-feed-first">Seu 1º lugar: <strong>${escapeText(cardName(entry.firstCardId))}</strong></span>` : ""}<span class="ps-feed-go">${escapeText(entry.label)} <i aria-hidden="true">›</i></span></span></a>`;
+}
+
+/**
+ * A capa de quem entrou com Google: as pesquisas em cartões, uma embaixo da
+ * outra, com o estado e, nas respondidas, a primeira colocada da pessoa.
+ */
+function renderFeed({ pending = false, retry = false, focus = false } = {}) {
+  view = "entry";
+  const entries = pending || retry ? [] : feedEntries(homeViews, {
+    firstPlaces: feedProfile?.firstPlaces,
+    answeredIds: feedAnswered,
+    pendingIds: feedPending,
+  });
+  const hint = pending
+    ? "Carregando…"
+    : retry ? "Não deu para carregar as pesquisas." : entries.length ? "Vote nas abertas e veja a sua primeira colocada em cada uma." : "Nenhuma pesquisa aberta agora. Quando abrir outra, ela aparece aqui.";
+  shell({
+    step: "Pesquisas",
+    mainClass: "ps-main--entry ps-main--feed",
+    focus,
+    body: `${heading("Pesquisas", "Suas pesquisas", hint)}
+      ${entries.length ? `<div class="ps-feed">${entries.map(feedCard).join("")}</div>` : ""}
+      ${retry ? '<div class="ps-cta"><button class="ps-btn" id="ps-action" data-action="init" type="button">Tentar de novo</button></div>' : ""}
+      <div class="ps-home">${upcomingSectionMarkup()}</div>`,
+  });
+}
+
+/**
+ * Lê as pesquisas (sem identidade) e o perfil da conta, que traz a primeira
+ * colocada de cada pesquisa respondida: um pedido só, em vez de um por
+ * pesquisa. Os dois só leem; a capa não grava nada e não emite rodada.
+ */
+async function openFeed(key) {
+  const tag = identityTag(key);
+  const saved = readStored(PHOTO_SURVEY_STORAGE_KEY);
+  feedAnswered = answeredSurveyIds(saved, tag);
+  feedPending = inProgressSurveyIds(saved, tag);
+  feedProfile = null;
+  useSurvey("");
+  renderFeed({ pending: true });
+  const run = ++epoch;
+  const [results, profile] = await Promise.all([
+    Promise.all(PHOTO_SURVEYS.map((item) => loadPhotoSurvey(item.id).then((value) => ({ value }), (error) => ({ error })))),
+    // Sem o perfil o feed sai assim mesmo, sem a primeira colocada.
+    loadMyProfile(key).catch(() => null),
+  ]);
   if (run !== epoch) return;
-  if (!known.id) {
-    // A conta pode ter mudado enquanto a capa esperava: ela é refeita.
-    if (readStored(IDENTITY_KEY) !== key) {
-      init();
-      return;
-    }
-    // Sem pesquisa pela metade nem por responder, o destaque é a primeira em
-    // que ainda há rodada por jogar, e isso só o servidor sabe. Sem nenhuma,
-    // a capa diz que a pessoa respondeu todas.
-    feature(coverFeature(homeViews, { pendingId: pending, answeredIds: answered, rounds: homeRounds }));
+  const failure = results.find((result) => result.error && result.error.status !== 404)?.error;
+  if (failure) {
+    notice = unreachableNotice(failure);
+    renderFeed({ retry: true });
     return;
   }
-  // Só as listas são refeitas: o destaque e o foco ficam como estão.
-  const lists = root.querySelector(".ps-home");
-  if (atHome && view === "entry" && lists) lists.innerHTML = homeSections();
+  homeViews = results.filter((result) => result.value && photoSurveyById(result.value.id)).map((result) => result.value);
+  feedProfile = profile ? profileState(profile, (id) => artById.has(id)) : null;
+  renderFeed();
 }
 
 /** A capa foi montada para outra identidade: refaz, sem gravar nada. */
@@ -1635,7 +1824,8 @@ root.addEventListener("click", (event) => {
   }
   const action = event.target.closest("[data-action]")?.dataset.action;
   if (action === "start") start();
-  else if (action === "next-round") nextRound();
+  else if (action === "result") showResult();
+  else if (action === "continue") continueVoting();
   else if (action === "gate-retry" && view === "gate" && !busy) {
     notice = "";
     renderGate();
@@ -1708,7 +1898,7 @@ function identityUpdated() {
     identityChanged();
     return;
   }
-  if (!identity && !busy && ["entry", "done", "closed", "scheduled"].includes(view)) init();
+  if (!identity && !busy && ["entry", "done", "result", "closed", "scheduled"].includes(view)) init();
 }
 
 const siteMenu = mountSiteMenu({ current: () => (atHome ? "home" : surveyId), onIdentityChange: identityUpdated });

@@ -60,9 +60,11 @@ function listNames(names) {
  * oferece tentar de novo). `url` é o endereço local da imagem (blob);
  * `others` são os nomes das finalistas, para a descrição da imagem.
  * `canShareLink` troca "Copiar link" por "Compartilhar link", onde o aparelho
- * compartilha texto. O link só vai se a pessoa pedir.
+ * compartilha texto. O link só vai se a pessoa pedir. `othersLabel` é como a
+ * descrição chama as outras cartas: as finalistas na resposta registrada; no
+ * resultado (ICM 76, #354), as colocadas seguintes.
  */
-export function sharePreviewMarkup({ state = "ready", url = "", name, others = [], canShareLink = false }) {
+export function sharePreviewMarkup({ state = "ready", url = "", name, others = [], canShareLink = false, othersLabel = "Também na final" }) {
   const link = `<button class="ps-btn ps-btn--ghost" type="button" data-share="link">${canShareLink ? "Compartilhar link" : "Copiar link"}</button>`;
   const close = '<button class="ps-link" type="button" data-share="close">Fechar</button>';
   const linkNotice = '<p class="ps-notice" id="ps-share-notice" role="status" hidden></p>';
@@ -76,7 +78,7 @@ export function sharePreviewMarkup({ state = "ready", url = "", name, others = [
       <div class="ps-share-actions"><button class="ps-btn" type="button" data-share="retry">Tentar de novo</button>${link}${close}</div>`;
   }
   const source = escapeText(url);
-  const finalists = others.length ? ` Também na final: ${listNames(others)}.` : "";
+  const finalists = others.length ? ` ${othersLabel}: ${listNames(others)}.` : "";
   return `<img class="ps-share-img" src="${source}" width="${WIDTH}" height="${HEIGHT}" alt="${escapeText(`Imagem com a minha escolha: ${name}.${finalists}`)}">
     <p class="ps-muted ps-share-hint">Baixe a imagem para postar. No celular, segure o dedo na imagem para salvar ou compartilhar.</p>
     ${linkNotice}
@@ -237,9 +239,13 @@ function drawCard(context, image, { x, y, width, height }, radius) {
  * levam foto de outra pessoa, o crédito das fotos (`photos`). `others` são as
  * outras finalistas (`{ src }`); uma que não carregue fica de fora, e a
  * imagem sai assim mesmo. Devolve um `File` JPEG, ou null se o navegador não
- * conseguir desenhar.
+ * conseguir desenhar. `labels` troca os dois rótulos: o do resultado da pessoa
+ * (ICM 76, #354) fala da primeira colocada e das seguintes, não da final.
  */
-export async function shareImage({ src, name, question, others = [], photos = [] }) {
+export const CHOICE_LABELS = Object.freeze({ kicker: "MINHA ESCOLHA", others: "TAMBÉM NA FINAL" });
+export const RESULT_LABELS = Object.freeze({ kicker: "MEU PRIMEIRO LUGAR", others: "DEPOIS DELA" });
+
+export async function shareImage({ src, name, question, others = [], photos = [], labels = CHOICE_LABELS }) {
   try {
     const [card, ...rest] = await Promise.all([
       loadImage(src),
@@ -255,12 +261,12 @@ export async function shareImage({ src, name, question, others = [], photos = []
     context.fillRect(0, 0, WIDTH, HEIGHT);
     context.textAlign = "center";
     context.textBaseline = "alphabetic";
-    fitText(context, "MINHA ESCOLHA", layout.kickerY, { size: 28, weight: 600, color: "#6b7280" });
+    fitText(context, labels.kicker, layout.kickerY, { size: 28, weight: 600, color: "#6b7280" });
     fitText(context, name, layout.nameY, { size: 64, weight: 700, color: "#111418" });
     fitText(context, question, layout.questionY, { size: 36, weight: 600, color: "#374151" });
     drawCard(context, card, layout.hero, 26);
     if (finalists.length) {
-      fitText(context, "TAMBÉM NA FINAL", layout.labelY, { size: 26, weight: 600, color: "#6b7280" });
+      fitText(context, labels.others, layout.labelY, { size: 26, weight: 600, color: "#6b7280" });
       finalists.forEach((image, index) => drawCard(context, image, layout.finalists[index], 14));
     }
     // "Responda em polimatch.com.br", com "match" em verde.

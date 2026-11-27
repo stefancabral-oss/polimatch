@@ -10,6 +10,8 @@ import {
   shareMode,
   sharePlan,
   sharePreviewMarkup,
+  RESULT_LABELS,
+  CHOICE_LABELS,
   shareText,
   shareUrl,
 } from "./share-choice.js";
@@ -247,4 +249,11 @@ test("o crédito de qualquer combinação de cartas de famosos cabe nas duas lin
     }
   }
   assert.ok(longest <= 140, `a linha mais comprida tem ${longest} letras`);
+});
+
+test("no resultado (ICM 76, #354) a descrição da prévia chama as outras cartas de colocadas seguintes", () => {
+  const alt = /alt="([^"]*)"/.exec(sharePreviewMarkup({ url: "blob:x", name: "Ana", others: ["Bia", "Caio"], othersLabel: "Depois dela" }))[1];
+  assert.equal(alt, "Imagem com a minha escolha: Ana. Depois dela: Bia e Caio.");
+  assert.deepEqual({ ...RESULT_LABELS }, { kicker: "MEU PRIMEIRO LUGAR", others: "DEPOIS DELA" });
+  assert.deepEqual({ ...CHOICE_LABELS }, { kicker: "MINHA ESCOLHA", others: "TAMBÉM NA FINAL" });
 });
