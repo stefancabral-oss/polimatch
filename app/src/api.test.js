@@ -4,9 +4,13 @@ import {
   ApiError,
   drawPhotoSurvey,
   loadDailyPredictionResults,
+  loadMyProfile,
   loadPhotoSurvey,
+  loadPhotoSurveyResult,
+  loadPublicProfile,
   requestJson,
   respondPhotoSurvey,
+  saveMyProfile,
   submitDailyPrediction,
   submitDailyVote,
   submitRoundVote,
@@ -325,4 +329,59 @@ test("a resposta leva a rodada quando ela é um número de rodada, e só então"
   );
   assert.deepEqual(bodies.slice(0, 3), [{ ...answer, round: 1 }, { ...answer, round: 2 }, { ...answer, round: 11 }]);
   for (const body of bodies.slice(3)) assert.deepEqual(body, answer);
+});
+
+// ICM 76 (#354): resultado da pessoa, perfil da conta e perfil público.
+async function captured(callback, json = {}) {
+  const requests = [];
+  await withFetch(
+    async (url, options = {}) => {
+      requests.push({ url, options, body: options.body === undefined ? undefined : JSON.parse(options.body) });
+      return { ok: true, status: 200, json: async () => json };
+    },
+    callback,
+  );
+  return requests;
+}
+
+test("o resultado da pessoa é uma leitura com a sessão, sem corpo", async () => {
+  const [request] = await captured(() => loadPhotoSurveyResult("politica 2026/01", "pms_private"));
+  assert.match(request.url, /\/api\/photo-surveys\/politica%202026%2F01\/result$/);
+  assert.equal(request.options.method, undefined);
+  assert.equal(request.options.headers.Authorization, "Bearer pms_private");
+  assert.equal(request.body, undefined);
+});
+
+test("o perfil da conta é lido com a sessão, sem corpo", async () => {
+  const [request] = await captured(() => loadMyProfile("pms_private"));
+  assert.match(request.url, /\/api\/me\/profile$/);
+  assert.equal(request.options.method, undefined);
+  assert.equal(request.options.headers.Authorization, "Bearer pms_private");
+  assert.equal(request.body, undefined);
+});
+
+test("salvar o perfil manda só os campos do contrato", async () => {
+  const requests = await captured(async () => {
+    await saveMyProfile("pms_private", { enabled: true, handle: "bia_23", surveys: ["politica-2026-01", 7], consentVersion: "2026-11-26", cpf: "123" });
+    await saveMyProfile("pms_private", { enabled: false });
+    await saveMyProfile("pms_private", { enabled: "true", consentVersion: "" });
+  });
+  for (const request of requests) {
+    assert.match(request.url, /\/api\/me\/profile$/);
+    assert.equal(request.options.method, "PUT");
+    assert.equal(request.options.headers.Authorization, "Bearer pms_private");
+    assert.equal(request.options.headers["Content-Type"], "application/json");
+  }
+  assert.deepEqual(requests.map((request) => request.body), [
+    { enabled: true, handle: "bia_23", surveys: ["politica-2026-01"], consentVersion: "2026-11-26" },
+    { enabled: false },
+    { enabled: false },
+  ]);
+});
+
+test("o perfil público é lido sem sessão, com o nome no endereço escapado", async () => {
+  const [request] = await captured(() => loadPublicProfile("bia/../x"));
+  assert.match(request.url, /\/api\/profiles\/bia%2F\.\.%2Fx$/);
+  assert.equal(request.options.method, undefined);
+  assert.equal(request.options.headers, undefined);
 });

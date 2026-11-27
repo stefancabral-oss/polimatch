@@ -44,6 +44,9 @@ o arquivo, ou pausa. O Stefan respondeu com um quarto caminho.
 4. **O que aparece.** Quem jogou vê os cinco primeiros. Resultado completo e
    recortes ficam com quem encomendou a pesquisa.
 5. **O que sai do PoliMatch.** Só a resposta somada. Nunca o dado de uma pessoa.
+   (Alterado pela [decisão 0008](0008-rodadas-continuas-resultado-feed-e-perfil.md),
+   de 26/11/2026: a escolha de uma pessoa aparece no perfil que ela mesma
+   ligar, e só nas pesquisas que marcar.)
 6. **Assuntos de abertura.** Política, Famosos e influenciadores, Futebol.
    (Decisão 0002: a ordem de construção é política, celebridades e
    influenciadores, roupas. Futebol não foi tratado nela.)

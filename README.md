@@ -107,6 +107,10 @@ O contrato de `role`, `party`, `primaryArea`, `contextAffiliation` e da proveni�
 | `GET` | `/api/photo-surveys/:surveyId` | definição pública de uma pesquisa por foto e se ela está aberta; as três rotas de pesquisa respondem 404 `PHOTO_SURVEYS_DISABLED` enquanto `PHOTO_SURVEYS_ENABLED` não for `true` ([ICM 68] #324) |
 | `POST` | `/api/photo-surveys/:surveyId/draw` | emite ou devolve a rodada do jogador (sorteio de cartas e resposta, se já houver), com `round`, `progress` e `lastAnswered`; `next: true` no corpo pede a rodada seguinte enquanto houver confronto por ver ([ICM 75] #350); exige sessão de conta Google com cadastro com CPF, senão 403 `CPF_REGISTRATION_REQUIRED` ([ICM 71] #336) |
 | `POST` | `/api/photo-surveys/:surveyId/response` | grava uma única vez a resposta de uma rodada, por `answerId`, `pickIds`, `championId` e `round` (opcional), conferida contra o sorteio da rodada; mesma exigência do sorteio |
+| `GET` | `/api/photo-surveys/:surveyId/result` | resultado da própria pessoa na pesquisa: `surveyId`, `answeredRounds` e `ranking` (`cardId`, `points`, `finalWins`, `screenWins`), pelas rodadas respondidas; só lê; mesma exigência do sorteio ([ICM 76] #354) |
+| `GET` | `/api/me/profile` | perfil da conta Google da sessão: `enabled`, `handle`, `consentVersion`, `consentedAt`, `surveys`, `firstPlaces` e `canEnable`; cadastro não exigido para ler; sem conta, 403 `GOOGLE_ACCOUNT_REQUIRED` ([ICM 76] #354) |
+| `PUT` | `/api/me/profile` | liga ou desliga o perfil, troca o nome e as pesquisas marcadas: `enabled`, `handle`, `surveys` e `consentVersion`; ligar exige o aceite atual e nome livre (409 `PROFILE_HANDLE_TAKEN`); exige conta com cadastro com CPF ([ICM 76] #354) |
+| `GET` | `/api/profiles/:handle` | perfil público, sem sessão e sem cache: o nome e, por pesquisa marcada com rodada respondida, `surveyId`, `subject`, `question` e a primeira colocada; desligado e inexistente respondem igual, 404 `PROFILE_NOT_FOUND`; as quatro rotas do estágio 76 seguem `PHOTO_SURVEYS_ENABLED` ([ICM 76] #354) |
 | `POST` | `/api/registration` | cadastro com CPF da conta Google da sessão: `cpf`, `ageRange`, `gender`, `state`, `consent` e `consentVersion`; um CPF por conta e uma conta por CPF; o número do CPF não é guardado, só um código; cinco tentativas por conta por dia ([ICM 71] #336) |
 
 Exemplo do corpo atual:
@@ -169,7 +173,7 @@ Backup externo do PostgreSQL, ensaio de restauração e reconstrução do ambien
 Decisões e estado da reconstrução:
 
 - `CONTEXT.md`
-- `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md` e as decisões seguintes da mesma pasta (0002 a 0007)
+- `docs/decisions/0001-pesquisa-de-preferencia-por-foto.md` e as decisões seguintes da mesma pasta (0002 a 0008)
 - `stages/67_photo_survey_direction/CONTEXT.md`
 - `stages/10_rebuild_eleicoes_2026/CONTEXT.md`
 - `stages/10_rebuild_eleicoes_2026/output/HANDOFF.md`

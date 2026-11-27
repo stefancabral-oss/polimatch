@@ -78,6 +78,8 @@ item 5). Estas escolhas respondem à pendência "Login Google e CPF" da decisão
 ## O que não muda
 
 - Do PoliMatch só sai a resposta somada, nunca o dado de uma pessoa.
+  (Alterado pela decisão 0008, de 26/11/2026: a escolha de uma pessoa aparece
+  no perfil que ela mesma ligar, e só nas pesquisas que marcar.)
 - O gate de publicação agregada (#177): nenhuma soma de respostas aparece.
 - App online-only, mesma exposição para todas as opções de uma tela, nenhum
   resultado manipulado, compartilhamento por iniciativa da pessoa.

@@ -42,8 +42,9 @@ test("a capa monta o bloco das próximas pesquisas pelo menu: sem anúncio, sem 
   assert.match(sections, /upcomingSectionMarkup\(\)/);
   assert.doesNotMatch(sections, /Em breve|upcomingMarkup\(/);
   assert.doesNotMatch(page, /ps-home-label">Em breve/);
-  // "Suas escolhas" e "Mais pesquisas" também só saem com conteúdo, e os blocos são unidos sem espaço.
-  assert.match(sections, /chosen\.length \? `<p class="ps-label ps-home-label">Suas escolhas<\/p>/);
+  // "Mais pesquisas" também só sai com conteúdo, e os blocos são unidos sem
+  // espaço. "Suas escolhas" saiu da capa na ICM 76 (#354): quem entrou vê o feed.
+  assert.doesNotMatch(sections, /Suas escolhas/);
   assert.match(sections, /others\.length \? `<p class="ps-label ps-home-label">Mais pesquisas<\/p>/);
   assert.match(sections, /\]\.join\(""\)/);
   const css = readFileSync(new URL("./photo-survey.css", import.meta.url), "utf8");
@@ -137,4 +138,15 @@ test("o erro aparece como alerta e nunca entra como marcação", () => {
 test("o menu tem um botão de fechar e o botão que abre diz o que faz", () => {
   assert.match(menuMarkup(), /<button class="pm-menu-btn" type="button" data-menu="close" aria-label="Fechar menu">/);
   assert.match(menuButtonMarkup(), /^<button class="pm-menu-btn" type="button" data-action="menu" aria-haspopup="dialog" aria-label="Abrir menu">/);
+});
+
+test("Meu perfil aparece no menu só com conta Google, logo depois de Início", () => {
+  for (const account of ["none", "anonymous"]) {
+    assert.doesNotMatch(menuMarkup({ account, googleReady: true }), /meu-perfil\.html|Meu perfil/, account);
+  }
+  const markup = menuMarkup({ account: "google" });
+  assert.match(markup, /<a class="pm-item" href="\.\/"><span>Início<\/span><i aria-hidden="true">›<\/i><\/a>\s*<a class="pm-item" href="\.\/meu-perfil\.html"><span>Meu perfil<\/span><i aria-hidden="true">›<\/i><\/a>/);
+  assert.equal(markup.match(/class="pm-item"/g).length, PHOTO_SURVEYS.length + 4);
+  const marked = [...menuMarkup({ account: "google", current: "profile" }).matchAll(/href="([^"]+)" aria-current="page"/g)].map((match) => match[1]);
+  assert.deepEqual(marked, ["./meu-perfil.html"]);
 });

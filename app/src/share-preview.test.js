@@ -29,9 +29,12 @@ test("o build confere a prévia sem tirar a checagem de referências da borda", 
 const noindex = (entry) => /<meta\s+name="robots"\s+content="noindex"\s*\/?>/i.test(readSource(entry));
 const RETIRED_PAGES = ["pesquisa.html", "quem-disse-isso.html", "fato-ou-fake.html", "duelos-da-corrida.html", "integridade.html"];
 
-test("as páginas do build são a capa, que é a pesquisa, Como funciona e Créditos das fotos", () => {
-  assert.deepEqual(htmlEntries(config).map((entry) => entry.file), ["como-funciona.html", "creditos.html", "index.html"]);
-  assert.deepEqual(htmlEntries(config).filter(noindex).map((entry) => entry.file), []);
+test("as páginas do build são a capa, que é a pesquisa, Como funciona, Créditos das fotos e as duas de perfil", () => {
+  assert.deepEqual(htmlEntries(config).map((entry) => entry.file), ["como-funciona.html", "creditos.html", "index.html", "meu-perfil.html", "perfil.html"]);
+  // As páginas de perfil (ICM 76, #354) pedem para não ser indexadas.
+  assert.deepEqual(htmlEntries(config).filter(noindex).map((entry) => entry.file), ["meu-perfil.html", "perfil.html"]);
+  assert.match(readSource({ file: "meu-perfil.html" }), /<script type="module" src="\/src\/my-profile-page\.js"><\/script>/);
+  assert.match(readSource({ file: "perfil.html" }), /<script type="module" src="\/src\/public-profile-page\.js"><\/script>/);
   assert.match(readSource({ file: "index.html" }), /<script type="module" src="\/src\/photo-survey-page\.js"><\/script>/);
   assert.match(readSource({ file: "como-funciona.html" }), /<script type="module" src="\/src\/how-it-works-page\.js"><\/script>/);
   assert.match(readSource({ file: "creditos.html" }), /<script type="module" src="\/src\/credits-page\.js"><\/script>/);
@@ -48,7 +51,7 @@ test("as URLs canônicas das páginas indexáveis coincidem com o sitemap da bor
 test("nenhuma página do build aponta para um endereço aposentado", () => {
   const retired = new RegExp(RETIRED_PAGES.map((name) => name.replace(".", "\\.")).join("|"));
   for (const entry of htmlEntries(config)) assert.doesNotMatch(readSource(entry), retired, entry.file);
-  for (const source of ["photo-survey-page.js", "site-menu.js", "how-it-works-page.js", "credits-page.js"]) {
+  for (const source of ["photo-survey-page.js", "site-menu.js", "how-it-works-page.js", "credits-page.js", "my-profile-page.js", "public-profile-page.js"]) {
     assert.doesNotMatch(readFileSync(path.join(appRoot, "src", source), "utf8"), retired, source);
   }
   for (const name of RETIRED_PAGES.filter((page) => page !== "integridade.html")) {

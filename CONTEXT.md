@@ -301,3 +301,16 @@ rodada, e as rodadas seguintes vão para tabelas novas; no resultado, cada
 pessoa vale uma só, com todas as rodadas dela. Nenhuma soma é calculada
 neste estágio. Mesclado e publicado em 26/11/2026, com API e app no commit
 `e0914ae`.
+
+## Rodadas contínuas, resultado da pessoa, feed e perfil — issue #354
+Em 26/11/2026 o Stefan pediu que as rodadas sigam sem a pergunta "Mais uma
+rodada", que a pessoa veja o resultado prévio quando pedir, um feed das
+pesquisas na página inicial de quem entrou e um perfil como no Instagram,
+com a foto da primeira colocada nas escolhas da pessoa em cada pesquisa. O
+resultado prévio é o da própria pessoa; o perfil é visível a outras pessoas
+e só depois de a pessoa ligar (decisão 0008, com as respostas dele). O resto
+é escolha do agente, listada na decisão: como se chega ao primeiro lugar,
+aceite próprio, pesquisas marcadas uma a uma, nome de perfil escolhido, perfil
+só pelo link. Estágio `stages/76_feed_profile/`. Em 26/11/2026 o estágio estava
+em construção, sem merge e sem publicação; publicar o perfil depende da
+revisão jurídica que o Stefan decidir.

@@ -7,6 +7,12 @@ import { randomUUID } from "node:crypto";
 // Consulta desconhecida é erro, para o teste não passar sem olhar o banco.
 // O SQL de verdade, as travas e a imutabilidade são provados num PostgreSQL
 // em back/scripts/photo-survey-smoke.mjs.
+//
+// Perfil (ICM 76, #354): entende também as consultas do store do perfil, com
+// a conta Google de cada jogador (player_identities), as duas tabelas do
+// perfil, o nome único sem diferença de caixa e a regra de "ligado só com
+// nome, aceite e data". O SQL de verdade e a disputa simultânea pelo mesmo
+// nome são provados em back/scripts/profile-smoke.mjs.
 
 const squash = (sql) => sql.replace(/\s+/g, " ").trim();
 const result = (rows) => ({ rowCount: rows.length, rows });
@@ -15,10 +21,18 @@ function constraint(message) {
   return Object.assign(new Error(message), { code: "23505" });
 }
 
+const HANDLE_PATTERN = /^[a-z0-9_]{3,20}$/;
+
 export function createPhotoSurveyMemoryDb() {
-  let tables = { draws: [], responses: [], roundDraws: [], roundResponses: [], links: [] };
+  let tables = {
+    draws: [], responses: [], roundDraws: [], roundResponses: [], links: [],
+    identities: [], profileSettings: [], profileSurveys: [],
+  };
   const players = new Map();
   const statements = [];
+  // Chamado uma vez antes da próxima gravação em profile_settings: o teste
+  // planta ali o que outra conta gravou entre a conferência e a gravação.
+  let beforeProfileUpsert = null;
   // Uma transação por vez, como a trava por jogador faz no banco de verdade.
   let queue = Promise.resolve();
 
@@ -110,6 +124,77 @@ export function createPhotoSurveyMemoryDb() {
       return result(used ? [{}] : []);
     }
 
+    // --- Perfil (ICM 76) ---
+    const sameAccount = (row, provider, subject) => row.provider === provider && row.subject === subject;
+
+    if (sql === "SELECT provider, subject FROM player_identities WHERE provider = 'google' AND player_id = $1") {
+      const [playerId] = values;
+      return result(tables.identities.filter((row) => row.provider === "google" && row.player_id === playerId).map(({ provider, subject }) => ({ provider, subject })));
+    }
+
+    if (sql === "SELECT handle, enabled, consent_version, consented_at FROM profile_settings WHERE provider = $1 AND subject = $2") {
+      const [provider, subject] = values;
+      return result(tables.profileSettings.filter((row) => sameAccount(row, provider, subject))
+        .map(({ handle, enabled, consent_version, consented_at }) => ({ handle, enabled, consent_version, consented_at })));
+    }
+
+    if (sql === "SELECT survey_id FROM profile_surveys WHERE provider = $1 AND subject = $2") {
+      const [provider, subject] = values;
+      return result(tables.profileSurveys.filter((row) => sameAccount(row, provider, subject)).map(({ survey_id }) => ({ survey_id })));
+    }
+
+    if (sql === "SELECT 1 FROM profile_settings WHERE lower(handle) = $1 AND NOT (provider = $2 AND subject = $3)") {
+      const [handle, provider, subject] = values;
+      return result(tables.profileSettings.filter((row) => row.handle?.toLowerCase() === handle && !sameAccount(row, provider, subject)).map(() => ({})));
+    }
+
+    if (sql.startsWith("INSERT INTO profile_settings (provider, subject, handle, enabled, consent_version, consented_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (provider, subject) DO UPDATE SET")) {
+      if (beforeProfileUpsert) {
+        const plant = beforeProfileUpsert;
+        beforeProfileUpsert = null;
+        plant(tables);
+      }
+      const [provider, subject, handle, enabled, consentVersion, consentedAt, updatedAt] = values;
+      if (!tables.identities.some((row) => sameAccount(row, provider, subject))) throw Object.assign(new Error("profile_settings sem conta"), { code: "23503" });
+      if (handle !== null && !HANDLE_PATTERN.test(handle)) throw Object.assign(new Error("profile_settings_handle_check"), { code: "23514" });
+      if (enabled && (handle === null || consentVersion === null || consentedAt === null)) throw Object.assign(new Error("profile_settings_check"), { code: "23514" });
+      if (handle !== null && tables.profileSettings.some((row) => row.handle?.toLowerCase() === handle.toLowerCase() && !sameAccount(row, provider, subject))) {
+        throw Object.assign(constraint("profile_settings_handle_idx"), { constraint: "profile_settings_handle_idx" });
+      }
+      const row = { provider, subject, handle, enabled, consent_version: consentVersion, consented_at: consentedAt, updated_at: updatedAt };
+      const index = tables.profileSettings.findIndex((entry) => sameAccount(entry, provider, subject));
+      if (index >= 0) tables.profileSettings[index] = row;
+      else tables.profileSettings.push(row);
+      return result([]);
+    }
+
+    if (sql === "DELETE FROM profile_surveys WHERE provider = $1 AND subject = $2") {
+      const [provider, subject] = values;
+      const before = tables.profileSurveys.length;
+      tables.profileSurveys = tables.profileSurveys.filter((row) => !sameAccount(row, provider, subject));
+      return { rowCount: before - tables.profileSurveys.length, rows: [] };
+    }
+
+    if (sql === "INSERT INTO profile_surveys (provider, subject, survey_id) SELECT $1, $2, unnest($3::text[])") {
+      const [provider, subject, surveyIds] = values;
+      if (!tables.profileSettings.some((row) => sameAccount(row, provider, subject))) throw Object.assign(new Error("profile_surveys sem perfil"), { code: "23503" });
+      for (const surveyId of surveyIds) {
+        if (tables.profileSurveys.some((row) => sameAccount(row, provider, subject) && row.survey_id === surveyId)) throw constraint("profile_surveys_pkey");
+        tables.profileSurveys.push({ provider, subject, survey_id: surveyId });
+      }
+      return result([]);
+    }
+
+    if (sql.startsWith("SELECT s.provider, s.subject, s.handle, i.player_id FROM profile_settings s JOIN player_identities i")
+      && sql.endsWith("WHERE lower(s.handle) = $1 AND s.enabled")) {
+      const [handle] = values;
+      const rows = tables.profileSettings
+        .filter((row) => row.enabled && row.handle?.toLowerCase() === handle)
+        .flatMap((row) => tables.identities.filter((identity) => sameAccount(identity, row.provider, row.subject))
+          .map((identity) => ({ provider: row.provider, subject: row.subject, handle: row.handle, player_id: identity.player_id })));
+      return result(rows);
+    }
+
     throw new Error(`consulta inesperada: ${sql}`);
   }
 
@@ -150,10 +235,31 @@ export function createPhotoSurveyMemoryDb() {
         throw Object.assign(new Error("cadastro com CPF obrigatório para responder"), { status: 403, code: "CPF_REGISTRATION_REQUIRED" });
       }
     },
-    addPlayer({ registered = true } = {}) {
-      const player = { id: randomUUID(), key: `pms_${randomUUID()}`, registered };
+    // Como o hasCpfRegistration do servidor: a conta do jogador tem cadastro.
+    async hasRegistration(_client, playerId) {
+      const player = [...players.values()].find((entry) => entry.id === playerId);
+      return Boolean(player?.registered) && tables.identities.some((row) => row.player_id === playerId);
+    },
+    // `account: false` é um visitante anônimo, sem conta Google.
+    addPlayer({ registered = true, account = true } = {}) {
+      const player = { id: randomUUID(), key: `pms_${randomUUID()}`, registered, subject: account ? `google-${randomUUID()}` : null };
       players.set(player.key, player);
+      if (account) tables.identities.push({ provider: "google", subject: player.subject, player_id: player.id });
       return player;
+    },
+    // A conta de `from` passa a ter `to` como jogador ativo, como no login
+    // que reúne dois históricos; `from` fica ligado a `to`.
+    moveAccount(from, to) {
+      const identity = tables.identities.find((row) => row.subject === from.subject);
+      identity.player_id = to.id;
+      to.subject = from.subject;
+      to.registered = from.registered;
+      from.subject = null;
+      tables.links.push({ source_player_id: from.id, player_id: to.id });
+    },
+    // Uma vez, antes da próxima gravação em profile_settings.
+    onProfileUpsert(plant) {
+      beforeProfileUpsert = plant;
     },
     // A conta do jogador deixa de ter cadastro.
     unregister(player) {
@@ -170,6 +276,9 @@ export function createPhotoSurveyMemoryDb() {
         roundDraws: tables.roundDraws.length,
         roundResponses: tables.roundResponses.length,
       };
+    },
+    profileCounts() {
+      return { settings: tables.profileSettings.length, surveys: tables.profileSurveys.length };
     },
     rows(table) {
       return structuredClone(tables[table]);

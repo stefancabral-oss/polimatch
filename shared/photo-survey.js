@@ -307,3 +307,36 @@ export function drawRound(survey, seenKeys, randomInt) {
   }
   return shuffled(best.groups.map((group) => shuffled(group, randomInt)), randomInt).flat().map((card) => cards[card]);
 }
+
+// Resultado da pessoa (ICM 76, #354, decisão 0008). Em cada rodada respondida,
+// a campeã da final ganha 3 pontos e cada vencedora de tela (as cartas de
+// `pickIds`) ganha 1; a campeã ganha os dois. Ordem: pontos, vitórias na
+// final, vitórias em tela, ordem das cartas na pesquisa. Só entram cartas
+// atuais da pesquisa com ao menos 1 ponto. `rounds` são as rodadas
+// respondidas, cada uma com `pickIds` e `championId`.
+export function personalRanking(survey, rounds) {
+  const position = new Map(survey.cardIds.map((id, index) => [id, index]));
+  const scores = new Map();
+  const score = (id) => {
+    if (!scores.has(id)) scores.set(id, { cardId: id, points: 0, finalWins: 0, screenWins: 0 });
+    return scores.get(id);
+  };
+  for (const round of Array.isArray(rounds) ? rounds : []) {
+    const picks = Array.isArray(round?.pickIds) ? [...new Set(round.pickIds)] : [];
+    for (const id of picks) {
+      if (!position.has(id)) continue;
+      const entry = score(id);
+      entry.points += 1;
+      entry.screenWins += 1;
+    }
+    if (position.has(round?.championId) && picks.includes(round.championId)) {
+      const entry = score(round.championId);
+      entry.points += 3;
+      entry.finalWins += 1;
+    }
+  }
+  return [...scores.values()].sort((left, right) => right.points - left.points
+    || right.finalWins - left.finalWins
+    || right.screenWins - left.screenWins
+    || position.get(left.cardId) - position.get(right.cardId));
+}

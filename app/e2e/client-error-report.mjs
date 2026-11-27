@@ -1,7 +1,7 @@
 // Erros forçados no navegador chegam à API como relatos pequenos, sem dados do
 // jogador: erro de execução, rejeição não tratada e falha de import dinâmico,
-// em cada página do site (a capa, que é a pesquisa, "Como funciona" e
-// "Créditos das fotos").
+// em cada página do site (a capa, que é a pesquisa, "Como funciona",
+// "Créditos das fotos", "Meu perfil" e o perfil público).
 import assert from "node:assert/strict";
 import { chromium, webkit } from "playwright";
 import { PHOTO_SURVEYS, publicPhotoSurvey } from "../../shared/photo-survey.js";
@@ -20,6 +20,9 @@ const pages = [
   { file: "", path: "/", ready: "#ps-action:not([disabled])" },
   { file: "como-funciona.html", path: "/como-funciona.html", ready: "h1" },
   { file: "creditos.html", path: "/creditos.html", ready: "h1" },
+  // As páginas de perfil (ICM 76, #354): sem conta e sem nome, nenhuma fala com a API.
+  { file: "meu-perfil.html", path: "/meu-perfil.html", ready: ".ps-hint" },
+  { file: "perfil.html", path: "/perfil.html", ready: ".ps-hint" },
 ];
 
 const browser = await browserType.launch();

@@ -7,6 +7,7 @@ import {
   ENTRY_CARD_IDS,
   NO_ROUNDS,
   PHOTO_SURVEY_STORAGE_KEY,
+  afterConfirm,
   answeredElsewhere,
   answeredSurveyIds,
   chooseChampion,
@@ -18,6 +19,7 @@ import {
   goBack,
   identityTag,
   inProgressSurveyId,
+  inProgressSurveyIds,
   nextRoundNumber,
   nextSurveyId,
   pickCard,
@@ -26,11 +28,14 @@ import {
   registeredCopy,
   responseBody,
   restoreProgress,
+  resultOnOpen,
+  resultSummary,
   roundState,
   sameGroups,
   sampleCards,
   savedProgressText,
   surveyIdFromSearch,
+  resultRequested,
 } from "./photo-survey-flow.js";
 
 const PHOTO_SURVEY_ID = "politica-2026-01";
@@ -648,4 +653,92 @@ test("uma rodada nova pela metade conta como pesquisa em andamento, e outra aba 
   assert.equal(answeredElsewhere({ identity: tag, progress: play(fresh(), "a1"), answered: false }), false);
   assert.equal(answeredElsewhere({ identity: tag, progress: null, answered: false }), false);
   for (const empty of [null, undefined, {}]) assert.equal(answeredElsewhere(empty), false);
+});
+
+// Rodada contínua e resultado (ICM 76, #354) ---------------------------------
+
+const roundsAfter = ({ answeredRounds = 1, seenPairs = 30, totalPairs = 190, canContinue = true, open = false, round = 1 } = {}) => roundState({
+  round,
+  progress: { answeredRounds, seenPairs, totalPairs, canContinue },
+  lastAnswered: { round: answeredRounds, response: { championId: "x" } },
+  response: open ? null : { championId: "x" },
+});
+
+test("depois de confirmar: a rodada seguinte abre sozinha enquanto houver confronto e a pesquisa estiver aberta", () => {
+  assert.equal(afterConfirm(roundsAfter(), "open"), "next");
+  assert.equal(afterConfirm(roundsAfter({ answeredRounds: 7, seenPairs: 189 }), "open"), "next");
+});
+
+test("depois de confirmar: vistos todos os confrontos, ou fora da janela, a tela vai ao resultado", () => {
+  assert.equal(afterConfirm(roundsAfter({ seenPairs: 190, canContinue: false }), "open"), "result");
+  assert.equal(afterConfirm(roundsAfter({ seenPairs: 190, canContinue: true }), "open"), "result");
+  assert.equal(afterConfirm(roundsAfter({ canContinue: false }), "open"), "result");
+  assert.equal(afterConfirm(roundsAfter(), "closed"), "result");
+  assert.equal(afterConfirm(roundsAfter(), "scheduled"), "result");
+});
+
+test("depois de confirmar: um servidor de antes das rodadas fica na resposta registrada de sempre", () => {
+  assert.equal(afterConfirm(NO_ROUNDS, "open"), "done");
+  assert.equal(afterConfirm(roundState({ response: { championId: "x" } }), "open"), "done");
+  assert.equal(afterConfirm(undefined, "open"), "done");
+});
+
+test("abrir uma pesquisa respondida sem toque mostra o resultado, mesmo com rodada emitida e não tocada", () => {
+  const emitted = roundsAfter({ open: true, round: 2 });
+  assert.equal(resultOnOpen(emitted, { auto: true, hasPicks: false }), true);
+  // Quem já escolheu carta nesta rodada neste aparelho volta para o voto.
+  assert.equal(resultOnOpen(emitted, { auto: true, hasPicks: true }), false);
+  // O toque (Começar, Continuar votando) leva à rodada.
+  assert.equal(resultOnOpen(emitted, { auto: false, hasPicks: false }), false);
+  // Sem rodada respondida não há resultado: a primeira rodada abre.
+  assert.equal(resultOnOpen(roundState({ round: 1, progress: null, lastAnswered: null, response: null }), { auto: true }), false);
+  assert.equal(resultOnOpen(NO_ROUNDS, { auto: true }), false);
+});
+
+test("o resultado: a primeira colocada, até mais quatro, e as linhas de rodadas e confrontos", () => {
+  const ranking = ["a", "b", "c", "d", "e", "f", "g"].map((cardId, index) => ({ cardId, points: 10 - index, finalWins: 0, screenWins: 0 }));
+  const summary = resultSummary({ answeredRounds: 3, ranking }, roundsAfter({ answeredRounds: 3, seenPairs: 85 }));
+  assert.equal(summary.first, "a");
+  assert.deepEqual(summary.rest, ["b", "c", "d", "e"]);
+  assert.equal(summary.roundsLine, "3 rodadas respondidas.");
+  assert.equal(summary.seenLine, "Você viu 85 de 190 confrontos.");
+  const one = resultSummary({ answeredRounds: 1, ranking: ranking.slice(0, 2) }, roundsAfter({ seenPairs: 190, canContinue: false }));
+  assert.equal(one.roundsLine, "1 rodada respondida.");
+  assert.equal(one.seenLine, "Você viu todos os confrontos desta pesquisa.");
+  assert.deepEqual(one.rest, ["b"]);
+});
+
+test("o resultado só mostra cartas do catálogo do app, sem repetir, e o que vem torto vale como vazio", () => {
+  const known = (id) => id !== "retirada";
+  const summary = resultSummary({ answeredRounds: 2, ranking: [{ cardId: "retirada" }, { cardId: "a" }, { cardId: "a" }, { cardId: 7 }, null, { cardId: "b" }] }, NO_ROUNDS, known);
+  assert.equal(summary.first, "a");
+  assert.deepEqual(summary.rest, ["b"]);
+  assert.equal(summary.seenLine, "");
+  for (const raw of [null, undefined, {}, { ranking: "x" }, { answeredRounds: 0, ranking: [] }]) {
+    const empty = resultSummary(raw, NO_ROUNDS);
+    assert.equal(empty.first, "");
+    assert.deepEqual(empty.rest, []);
+    assert.equal(empty.roundsLine, "");
+  }
+});
+
+test("todas as pesquisas pela metade neste aparelho, na ordem da capa", () => {
+  const tag = identityTag("pms_conta");
+  const groups = [["a", "b"], ["c", "d"]];
+  let text = "";
+  text = savedProgressText(text, PHOTO_SURVEYS[3].id, { identity: tag, progress: { ...freshProgress(groups), picks: ["a", null] } });
+  text = savedProgressText(text, PHOTO_SURVEYS[0].id, { identity: tag, progress: { ...freshProgress(groups), picks: ["b", null] } });
+  text = savedProgressText(text, PHOTO_SURVEYS[1].id, { identity: tag, progress: freshProgress(groups) });
+  text = savedProgressText(text, PHOTO_SURVEYS[2].id, { identity: identityTag("pms_outra"), progress: { ...freshProgress(groups), picks: ["a", null] } });
+  assert.deepEqual(inProgressSurveyIds(text, tag), [PHOTO_SURVEYS[0].id, PHOTO_SURVEYS[3].id]);
+  assert.equal(inProgressSurveyId(text, tag), PHOTO_SURVEYS[0].id);
+  assert.deepEqual(inProgressSurveyIds(text, ""), []);
+});
+
+test("o pedido do resultado vindo do feed: só `ver=resultado` vale", () => {
+  assert.equal(resultRequested("?p=politica-2026-01&ver=resultado"), true);
+  assert.equal(resultRequested("?ver=resultado&p=politica-2026-01"), true);
+  for (const search of ["", "?p=politica-2026-01", "?p=politica-2026-01&ver=Resultado", "?ver=", "?ver=voto", undefined, null]) {
+    assert.equal(resultRequested(search), false, String(search));
+  }
 });

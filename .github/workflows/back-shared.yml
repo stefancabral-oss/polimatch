@@ -120,6 +120,8 @@ jobs:
         run: npm run test:photo-survey --prefix back
       - name: Verify the CPF registration gate, one CPF per account and the attempt limit
         run: npm run test:registration --prefix back
+      - name: Verify the personal result, the opt-in public profile and the unique profile name
+        run: npm run test:profile --prefix back
       # pg_dump/pg_restore do próprio container, como no cron da VPS via docker exec.
       - name: Back up with manifest and rehearse the restore
         env:

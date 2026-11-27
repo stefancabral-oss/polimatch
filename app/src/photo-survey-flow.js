@@ -219,6 +219,15 @@ export function surveyIdFromSearch(search, surveys = PHOTO_SURVEYS) {
   return surveys.some((survey) => survey.id === requested) ? requested : "";
 }
 
+/**
+ * O cartão "Ver meu resultado" do feed pede o resultado (`ver=resultado`,
+ * ICM 76, #354): noutro aparelho, sem registro local, a página abriria a
+ * entrada com "Começar". O pedido só lê; nunca emite rodada.
+ */
+export function resultRequested(search) {
+  return new URLSearchParams(typeof search === "string" ? search : "").get("ver") === "resultado";
+}
+
 function savedRecords(text, tag, surveys) {
   if (!tag) return [];
   return surveys
@@ -249,10 +258,14 @@ export function answeredElsewhere(record, round = 1) {
  * escolhas de uma rodada nova (da segunda em diante).
  */
 export function inProgressSurveyId(text, tag, surveys = PHOTO_SURVEYS) {
-  const pending = savedRecords(text, tag, surveys).find(({ record }) => Array.isArray(record.progress?.picks)
+  return inProgressSurveyIds(text, tag, surveys)[0] || "";
+}
+
+/** Todas as pesquisas que esta identidade deixou pela metade neste aparelho, na ordem da capa (ICM 76, #354). */
+export function inProgressSurveyIds(text, tag, surveys = PHOTO_SURVEYS) {
+  return savedRecords(text, tag, surveys).filter(({ record }) => Array.isArray(record.progress?.picks)
     && record.progress.picks.some(Boolean)
-    && (!record.answered || laterRound(record.progress.round) >= 2));
-  return pending ? pending.id : "";
+    && (!record.answered || laterRound(record.progress.round) >= 2)).map(({ id }) => id);
 }
 
 /** A primeira pesquisa aberta que a pessoa ainda não respondeu, ou "". */
@@ -357,4 +370,62 @@ export function coverFeature(views, { pendingId = "", answeredIds = [], rounds =
     if (round) return { id: view.id, mode: "more", round };
   }
   return { id: "", mode: "", round: 0 };
+}
+
+// Rodada contínua e resultado da pessoa (ICM 76, #354) -----------------------
+
+/**
+ * O que vem depois de confirmar uma rodada. `next`: a rodada seguinte abre
+ * sozinha, porque a pesquisa está aberta e ainda há confronto por ver.
+ * `result`: o servidor conhece rodadas e não há outra para abrir, então a
+ * tela vai para o resultado. `done`: servidor de antes das rodadas; a tela é
+ * a resposta registrada de sempre.
+ */
+export function afterConfirm(state, status) {
+  if (!state?.round) return "done";
+  return nextRoundNumber(state, status) ? "next" : "result";
+}
+
+/**
+ * Ao abrir uma pesquisa já respondida, sem toque, a tela é o resultado mesmo
+ * que o servidor tenha uma rodada emitida e ainda sem resposta: só quem já
+ * escolheu carta nela neste aparelho volta direto para o voto. Assim abrir a
+ * página nunca leva a pessoa a uma rodada que ela não começou.
+ */
+export function resultOnOpen(state, { auto = false, hasPicks = false } = {}) {
+  return auto && Boolean(state?.lastAnswered) && state.open === true && !hasPicks;
+}
+
+const plural = (count, one, many) => `${count} ${count === 1 ? one : many}`;
+const RANK_SIZE = 5;
+
+/**
+ * O resultado prévio na tela: a primeira colocada (`first`), as seguintes até
+ * completar cinco (`rest`), e as linhas de rodadas e confrontos. `result` é o
+ * que `GET …/result` devolveu; `state`, o roundState do último sorteio ou
+ * resposta; `known` diz se a carta existe no catálogo do app. Carta que o app
+ * não conhece não entra, e o que vier torto vale como resultado vazio.
+ */
+export function resultSummary(result, state, known = () => true) {
+  const ranking = Array.isArray(result?.ranking) ? result.ranking : [];
+  const ids = [];
+  for (const entry of ranking) {
+    const id = entry?.cardId;
+    if (typeof id === "string" && known(id) && !ids.includes(id)) ids.push(id);
+    if (ids.length === RANK_SIZE) break;
+  }
+  const answered = isCount(result?.answeredRounds) ? result.answeredRounds : (state?.progress?.answeredRounds ?? 0);
+  const progress = state?.progress;
+  const seen = progress
+    ? progress.seenPairs >= progress.totalPairs
+      ? "Você viu todos os confrontos desta pesquisa."
+      : `Você viu ${progress.seenPairs} de ${progress.totalPairs} confrontos.`
+    : "";
+  return {
+    first: ids[0] || "",
+    rest: ids.slice(1),
+    answeredRounds: answered,
+    roundsLine: answered ? `${plural(answered, "rodada respondida", "rodadas respondidas")}.` : "",
+    seenLine: seen,
+  };
 }

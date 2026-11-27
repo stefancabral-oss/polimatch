@@ -49,7 +49,7 @@ export function registrationFormMarkup({ form = EMPTY_REGISTRATION_FORM, busy = 
     <div class="ps-field"><p class="ps-flabel" id="ps-gender-label">Gênero</p><div class="ps-chips" role="group" aria-labelledby="ps-gender-label"${described("gender")}>${chips("gender", GENDERS, form.gender)}</div></div>
     <div class="ps-field"><label class="ps-flabel" for="ps-state">Estado</label><select class="ps-input" id="ps-state" name="state" aria-required="true"${wrong("state")}><option value="">Escolha</option>${states}</select></div>
     <label class="ps-consent"><input type="checkbox" id="ps-consent" name="consent" aria-required="true"${wrong("consent")}${form.consent ? " checked" : ""}><span>${escapeText(CONSENT_TEXT)}</span></label>
-    <p class="ps-muted ps-form-note">Não guardamos o número do CPF, só um código gerado a partir dele, para reconhecer um CPF repetido. Do PoliMatch só sai o resultado somado, nunca a escolha de uma pessoa.</p>
+    <p class="ps-muted ps-form-note">Não guardamos o número do CPF, só um código gerado a partir dele, para reconhecer um CPF repetido. Do PoliMatch só sai o resultado somado. A sua escolha só aparece no perfil que você ligar.</p>
     <div class="ps-stack"><button class="ps-btn" type="submit"${busy ? " disabled" : ""}>${busy ? "Concluindo…" : "Concluir"}</button><a class="ps-btn ps-btn--ghost" href="./">Voltar</a></div>
   </form>`;
 }

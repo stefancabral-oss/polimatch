@@ -1,6 +1,6 @@
 # Política de integridade do voto público
 
-Status: política normativa da API do PoliMatch, versão 6, vinculada às issues #170, #179, #282, #324, #336 e #350.
+Status: política normativa da API do PoliMatch, versão 7, vinculada às issues #170, #179, #282, #324, #336, #350 e #354.
 
 Esta política existe para que o placar público seja um painel de preferências declaradas com limites conhecidos. Ela não transforma o resultado em pesquisa eleitoral nem prova que cada jogador corresponde a uma pessoa única.
 
@@ -95,6 +95,20 @@ A versão 6 acrescenta as rodadas ([ICM 75] #350, decisão 0007). Ela não muda 
 - As rodadas 2 em diante são gravadas em duas tabelas novas, imutáveis como as da rodada 1. As tabelas e as linhas que já existiam não são alteradas.
 - A resposta e o sorteio de uma rodada nova, como os da rodada 1, não consomem cota e não alteram o ranking nem o Elo.
 - O smoke `back/scripts/photo-survey-smoke.mjs` prova estas regras num PostgreSQL de verdade.
+
+## Perfil público (versão 7)
+
+A versão 7 acrescenta o resultado da pessoa e o perfil público ([ICM 76] #354, decisão 0008). Ela não muda nenhum número das seções acima.
+
+- O resultado (`GET /api/photo-surveys/:surveyId/result`) é só da própria pessoa, calculado com as mesmas rodadas respondidas que o progresso usa. Tem as mesmas recusas do sorteio e não grava nada.
+- O perfil pertence à conta (`provider + subject`), como o cadastro. Nasce desligado. Só conta com cadastro com CPF liga o perfil ou muda marcações (HTTP 403, `CPF_REGISTRATION_REQUIRED`). Sem cadastro, a conta só pode desligar: o pedido de desligar não grava marcações nem cria perfil.
+- Ligar exige o aceite do perfil na versão atual (HTTP 400, `PROFILE_CONSENT_REQUIRED`) e um nome de perfil válido (HTTP 400, `PROFILE_INVALID`) e livre (HTTP 409, `PROFILE_HANDLE_TAKEN`, também em pedidos simultâneos de contas diferentes). O banco guarda a versão e o instante do aceite. Depois de gravado, o nome de perfil não muda (HTTP 400, `PROFILE_INVALID`, motivo `handle-locked`) e não volta a ficar livre enquanto a conta existir: um link antigo nunca mostra as escolhas de outra pessoa.
+- Desligar não exige aceite nem cadastro, só a conta, e vale na hora: a leitura pública confere se o perfil está ligado a cada pedido. Nome, aceite e marcações ficam guardados com o perfil desligado.
+- O perfil público (`GET /api/profiles/:handle`) só mostra o nome de perfil e, para cada pesquisa marcada em que a pessoa tem rodada respondida, o assunto, a pergunta e a carta em primeiro lugar dela. Não mostra nome da conta, foto, CPF, faixa de idade, gênero, estado nem contagem de rodadas. Responde sem cache.
+- Perfil desligado, nome inexistente e nome inválido recebem a mesma resposta: HTTP 404, `PROFILE_NOT_FOUND`.
+- Nenhuma rota devolve soma de respostas nem contagem de outras pessoas. O [gate de publicação agregada](../legal/AGGREGATE_PUBLICATION_GATE.md) continua valendo.
+- As quatro rotas seguem `PHOTO_SURVEYS_ENABLED`, como as rotas da pesquisa.
+- O smoke `back/scripts/profile-smoke.mjs` prova estas regras num PostgreSQL de verdade.
 
 ## Origem e proxy
 
